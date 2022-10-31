@@ -193,7 +193,7 @@ fun IdentificationScreen(
                 .height(54.dp)
                 .padding(top = 0.dp),
             enabled = if(code.size==4) true else false,
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3F51B5), contentColor = Color.White),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
             content = { Text(text = "Подтвердить", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
         )
     }
