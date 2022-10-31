@@ -22,7 +22,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             GramClientTheme {
                 val navController= rememberNavController()
-
                 Navigation(navController =navController)
             }
         }
