@@ -18,14 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
-import com.example.gramclient.R
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.components.CustomButton
 
 @Composable
 fun AuthorizationScreen(navController:NavHostController){
@@ -68,22 +66,20 @@ fun AuthorizationScreen(navController:NavHostController){
             Spacer(modifier = Modifier.height(15.dp))
         }
         Spacer(modifier = Modifier.height(50.dp))
-        Button(
-            onClick = {
-                login.value=login.value.trim()
-                password.value=password.value.trim()
-                navController.navigate(RoutesName.IDENTIFICATION_SCREEN)
-            },
-            modifier = Modifier
-                .clip(RoundedCornerShape(5.dp))
-                .background(Color.Black)
-                .width(303.dp)
-                .height(54.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3F51B5), contentColor = Color.White),
-            content = { Text(text = "Продолжить", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
-        )
+        CustomButton(
+            text = "Продолжить",
+            textSize = 18,
+            textBold = true,
+            width = 303,
+            height = 54,
+            radius = 12
+        ) {
+            navController.navigate(RoutesName.IDENTIFICATION_SCREEN)
+        }
         Spacer(modifier = Modifier.height(80.dp))
-        Column(modifier = Modifier.fillMaxSize().padding( vertical = 43.dp),
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 43.dp),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally){
             Text(text = "Подтверждая номер телефона, я соглашаюсь с ", color= Color.Gray)
