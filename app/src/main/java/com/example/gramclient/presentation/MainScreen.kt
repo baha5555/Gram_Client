@@ -167,7 +167,7 @@ fun BottomSheetContent(navController: NavHostController) {
                     .clip(RoundedCornerShape(5.dp))
                     .background(Color.Black)
                     .fillMaxWidth()
-                    .height(54.dp)
+                    .height(55.dp)
                     .padding(top = 0.dp),
                 enabled =  true ,
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3F51B5), contentColor = Color.White),
