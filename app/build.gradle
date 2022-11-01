@@ -107,5 +107,8 @@ dependencies {
     //ComposeContrainLayouts
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-rc01"
 
+    //Coil
+    implementation("io.coil-kt:coil-compose:1.3.0")
+
 
 }

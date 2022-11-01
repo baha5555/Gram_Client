@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.components.CustomButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -158,11 +159,11 @@ fun IdentificationScreen(
             Text(text = "Отправить код еще раз",
                 modifier= Modifier
                     .clickable {
-                        time=25
-                        coroutineScope.launch(Dispatchers.Main){
-                            while (time>0) {
+                        time = 25
+                        coroutineScope.launch(Dispatchers.Main) {
+                            while (time > 0) {
                                 delay(1000L)
-                                time=time-1
+                                time = time - 1
                             }
                         }
                     }
@@ -192,7 +193,7 @@ fun IdentificationScreen(
                 .height(54.dp)
                 .padding(top = 0.dp),
             enabled = if(code.size==4) true else false,
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3F51B5), contentColor = Color.White),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
             content = { Text(text = "Подтвердить", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
         )
     }

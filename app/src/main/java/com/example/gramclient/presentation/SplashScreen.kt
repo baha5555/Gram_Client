@@ -5,10 +5,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
@@ -20,6 +24,8 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.components.CustomButton
+import com.example.gramclient.presentation.components.CustomDialog
 
 @Composable
 fun SplashScreen(navController: NavController){
@@ -41,6 +47,7 @@ fun SplashScreen(navController: NavController){
 
     }
     Splash(alpha = alphaAnimation.value)
+
 }
 
 @Composable
@@ -51,7 +58,9 @@ fun Splash(alpha:Float){
             .background(Color.White),
         contentAlignment = Alignment.BottomCenter
     ){
-        Column(modifier = Modifier.fillMaxWidth().padding(bottom = 440.dp)){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 440.dp)){
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, 
                 horizontalArrangement = Arrangement.Center) {
                 Image(
@@ -71,7 +80,8 @@ fun Splash(alpha:Float){
                     contentDescription = "shere"
                 )
             }
-            Text(text = "БЫСТРО, ДЕШЕВО, БЕЗОПАСНО", modifier = Modifier.fillMaxWidth()
+            Text(text = "БЫСТРО, ДЕШЕВО, БЕЗОПАСНО", modifier = Modifier
+                .fillMaxWidth()
                 .padding(end = 40.dp), fontSize = 15.sp, textAlign = TextAlign.Center,
             )
         }
