@@ -1,7 +1,5 @@
 package com.example.gramclient.presentation
 
-import android.preference.PreferenceManager
-import android.view.View
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,22 +17,16 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
-import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomMap
-import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MainScreen(navController: NavHostController){
-    val bottomSheetScaffoldState =rememberBottomSheetScaffoldState(
+fun MainScreen(navController: NavHostController) {
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
     val scope = rememberCoroutineScope()
@@ -45,18 +37,19 @@ fun MainScreen(navController: NavHostController){
         scaffoldState = bottomSheetScaffoldState,
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         sheetBackgroundColor = Color.White,
-         sheetPeekHeight = 240.dp,
-        modifier =  Modifier
+        sheetPeekHeight = 240.dp,
+        modifier = Modifier
             .shadow(elevation = 28.dp, clip = false, shape = RectangleShape)
     ) {
         Scaffold(
             backgroundColor = Color(0xFFF8F6F6)
         ) {
-            CustomMap()
+            CustomMap(
+                LocalContext.current
+            )
         }
     }
 }
-
 
 
 @Composable
@@ -99,11 +92,12 @@ fun BottomSheetContent(navController: NavHostController) {
                 placeholder = { Text("Откуда?") },
                 value = text,
                 onValueChange = {
-                    text = it },
+                    text = it
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent,
-                    focusedIndicatorColor =  Color.Gray,
+                    focusedIndicatorColor = Color.Gray,
                     unfocusedIndicatorColor = Color.Gray,
                     disabledIndicatorColor = Transparent
                 )
@@ -128,11 +122,12 @@ fun BottomSheetContent(navController: NavHostController) {
                 placeholder = { Text("Куда?") },
                 value = text,
                 onValueChange = {
-                    text = it },
+                    text = it
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent,
-                    focusedIndicatorColor =  Color.Gray,
+                    focusedIndicatorColor = Color.Gray,
                     unfocusedIndicatorColor = Color.Gray,
                     disabledIndicatorColor = Transparent
                 )
@@ -147,7 +142,7 @@ fun BottomSheetContent(navController: NavHostController) {
         ) {
             Button(
                 onClick = {
-                    navController.navigate(RoutesName.SUBMITORDER_SCREEN){
+                    navController.navigate(RoutesName.SUBMITORDER_SCREEN) {
                         popUpTo(RoutesName.MAIN_SCREEN) {
                             //inclusive = true
                         }
@@ -159,9 +154,19 @@ fun BottomSheetContent(navController: NavHostController) {
                     .fillMaxWidth()
                     .height(55.dp)
                     .padding(top = 0.dp),
-                enabled =  true ,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3F51B5), contentColor = Color.White),
-                content = { Text(text = "Подтвердить", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
+                enabled = true,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(0xFF3F51B5),
+                    contentColor = Color.White
+                ),
+                content = {
+                    Text(
+                        text = "Подтвердить",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        lineHeight = 28.sp
+                    )
+                },
             )
         }
     }

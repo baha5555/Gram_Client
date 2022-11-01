@@ -44,7 +44,7 @@ fun SubmitOrderScreen(navController: NavHostController){
                 },
                 sheetPeekHeight = 350.dp,
             ) {
-                CustomMap()
+                CustomMap(LocalContext.current)
             }
         }
 }
