@@ -13,59 +13,57 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 
 @Composable
 fun CustomDialog(
     text: String,
     okBtnClick: () -> Unit,
-    cancelBtnClick: () -> Unit
+    cancelBtnClick: () -> Unit,
+    isDialogOpen:Boolean
 ){
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color(0x33000000))
-            .padding(horizontal = 15.dp),
-        contentAlignment = Alignment.Center
-    ){
-        Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(10.dp)
-        ) {
-            Text(
-                text = text,
-                fontSize = 18.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Button(
+    if(isDialogOpen){
+        Dialog(onDismissRequest = { /*TODO*/ }) {
+
+                Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
-                        .width(166.dp)
-                        .height(39.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFE2EAF2), contentColor = Color.Black),
-                    onClick = { cancelBtnClick() }
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(10.dp)
                 ) {
-                    Text(text = "Нет", fontSize = 18.sp)
+                    Text(
+                        text = text,
+                        fontSize = 18.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .weight(1f),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFE2EAF2), contentColor = Color.Black),
+                            onClick = { cancelBtnClick() }
+                        ) {
+                            Text(text = "Нет", fontSize = 18.sp)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .weight(1f),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
+                            onClick = { okBtnClick() }
+                        ) {
+                            Text(text = "Да", fontSize = 18.sp)
+                        }
+                    }
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                CustomButton(
-                    text = "Да",
-                    textSize = 18,
-                    textBold = false,
-                    width = 166,
-                    height = 39,
-                    radius = 10
-                ) {
-                    okBtnClick()
-                }
-            }
         }
     }
 }
