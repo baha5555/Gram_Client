@@ -140,7 +140,11 @@ fun AuthorizationScreen(navController: NavHostController) {
                     height = 61,
                     radius = 10
                 ) {
-                    navController.navigate(RoutesName.IDENTIFICATION_SCREEN)
+                    navController.navigate(RoutesName.IDENTIFICATION_SCREEN){
+                        popUpTo(RoutesName.AUTH_SCREEN) {
+                            inclusive = true
+                        }
+                    }
                 }
 
             }

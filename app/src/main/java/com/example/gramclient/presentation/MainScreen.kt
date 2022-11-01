@@ -170,7 +170,11 @@ fun BottomSheetContent(navController: NavHostController) {
         ) {
             Button(
                 onClick = {
-                    navController.navigate(RoutesName.SUBMITORDER_SCREEN)
+                    navController.navigate(RoutesName.SUBMITORDER_SCREEN){
+                        popUpTo(RoutesName.MAIN_SCREEN) {
+                            inclusive = true
+                        }
+                    }
                 },
                 modifier = Modifier
                     .clip(RoundedCornerShape(5.dp))

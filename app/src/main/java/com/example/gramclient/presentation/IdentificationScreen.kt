@@ -181,7 +181,11 @@ fun IdentificationScreen(
 
         Button(
             onClick = {
-                navController.navigate(RoutesName.MAIN_SCREEN)
+                navController.navigate(RoutesName.MAIN_SCREEN){
+                    popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
+                        inclusive = true
+                    }
+                }
             },
             modifier = Modifier
                 .constrainAs(btn) {
