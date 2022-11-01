@@ -1,11 +1,9 @@
 package com.example.gramclient.presentation
 
-import android.widget.Toast
+import android.preference.PreferenceManager
+import android.view.View
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -13,26 +11,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.example.gramclient.presentation.components.CustomDialog
+import com.example.gramclient.presentation.components.CustomMap
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -54,23 +50,14 @@ fun MainScreen(navController: NavHostController){
             .shadow(elevation = 28.dp, clip = false, shape = RectangleShape)
     ) {
         Scaffold(
-            backgroundColor = Color(0xFFF8F6F6),
-            topBar = { TopBar() },
+            backgroundColor = Color(0xFFF8F6F6)
         ) {
-            ///
+            CustomMap()
         }
     }
 }
 
 
-@Composable
-fun TopBar() {
-    TopAppBar(
-        title = { Text(text = "GramClient", fontSize = 18.sp) },
-        backgroundColor = Color.Blue,
-        contentColor = Color.White
-    )
-}
 
 @Composable
 fun BottomSheetContent(navController: NavHostController) {
@@ -160,13 +147,17 @@ fun BottomSheetContent(navController: NavHostController) {
         ) {
             Button(
                 onClick = {
-                    navController.navigate(RoutesName.SUBMITORDER_SCREEN)
+                    navController.navigate(RoutesName.SUBMITORDER_SCREEN){
+                        popUpTo(RoutesName.MAIN_SCREEN) {
+                            //inclusive = true
+                        }
+                    }
                 },
                 modifier = Modifier
                     .clip(RoundedCornerShape(5.dp))
                     .background(Color.Black)
                     .fillMaxWidth()
-                    .height(54.dp)
+                    .height(55.dp)
                     .padding(top = 0.dp),
                 enabled =  true ,
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3F51B5), contentColor = Color.White),

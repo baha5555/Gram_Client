@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.components.CustomMap
 import com.example.gramclient.presentation.components.TariffItem
 
 
@@ -42,7 +43,9 @@ fun SubmitOrderScreen(navController: NavHostController){
                     bottomSheetContent(navController)
                 },
                 sheetPeekHeight = 350.dp,
-            ) {}
+            ) {
+                CustomMap()
+            }
         }
 }
 
@@ -160,7 +163,9 @@ fun bottomSheetContent(navController: NavHostController) {
             )
         }
         Spacer(modifier = Modifier.height(23.dp))
-        LazyRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp)){
+        LazyRow(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 15.dp)){
             repeat(6){
                 item{
                     TariffItem(icon = R.drawable.econom_car, name = "Эконом", price = 10)
