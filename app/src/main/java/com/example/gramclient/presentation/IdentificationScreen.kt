@@ -27,6 +27,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.gramclient.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.RoutesName
@@ -78,7 +80,7 @@ fun IdentificationScreen(
                 .padding(top = 155.dp)
                 .width(176.dp)
                 .height(50.07.dp),
-            bitmap = ImageBitmap.imageResource(R.drawable.logo),
+            imageVector = ImageVector.vectorResource(R.drawable.logo_gram_black),
             contentDescription = "Logo"
         )
 
@@ -135,9 +137,9 @@ fun IdentificationScreen(
                             }
                         }
                     },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Number
                     ),
 
                     )
