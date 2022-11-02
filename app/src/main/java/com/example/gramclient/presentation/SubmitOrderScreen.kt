@@ -59,25 +59,38 @@ fun BottomBar(navController: NavHostController) {
             .fillMaxWidth()
             .height(80.dp),
     ){
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Image(
+                modifier = Modifier.size(35.dp),
+                bitmap = ImageBitmap.imageResource(R.drawable.options),
+                contentDescription = "icon"
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = {
                     navController.navigate(RoutesName.MAIN_SCREEN)
                 },
                 modifier = Modifier
-                    .clip(RoundedCornerShape(5.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(Color.Black)
-                    .width(278.dp)
+                    .width(270.dp)
                     .height(54.dp)
                     .padding(top = 0.dp),
                 enabled =  true ,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3F51B5), contentColor = Color.White),
-                content = { Text(text = "Подтвердить", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
+                content = { Text(text = "Заказать", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                modifier = Modifier.size(45.dp),
+                bitmap = ImageBitmap.imageResource(R.drawable.icon_cash),
+                contentDescription = "icon"
             )
         }
     }
