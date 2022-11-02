@@ -24,6 +24,7 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.components.CustomDialog
+import com.example.gramclient.presentation.components.CustomMap
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -51,34 +52,12 @@ fun MainScreen(navController: NavHostController){
         Scaffold(
             backgroundColor = Color(0xFFF8F6F6)
         ) {
-            Map()
+            CustomMap()
             ///
         }
     }
 }
-@Composable
-fun Map(
-) {
-    lateinit var map: MapView
-    AndroidView(factory = {
-        View.inflate(it, R.layout.map, null)
 
-    },
-        update = {
-            //val roadManager:RoadManager=OSRMRoadManager(it.context, "GramDriver/1.0")
-            map=it.findViewById<MapView>(R.id.map)
-
-            Configuration.getInstance()
-                .load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
-            map.setTileSource(TileSourceFactory.MAPNIK)
-            val startPoint = GeoPoint(48.8583, 2.2944)
-            val mapController = map.controller
-            mapController.setZoom(18.0)
-            map.controller.setCenter(startPoint)
-
-        }
-    )
-}
 
 
 
