@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/arrow_down.xml" value="0.157" />
+        <entry key="app/src/main/res/drawable/arrow_right.xml" value="0.157" />
         <entry key="app/src/main/res/drawable/cash_icon.xml" value="0.2135" />
         <entry key="app/src/main/res/drawable/econom_car.xml" value="0.262" />
         <entry key="app/src/main/res/drawable/from_marker.xml" value="0.262" />
