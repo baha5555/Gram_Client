@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CustomTab() {
+fun CustomTab(function: () -> Unit) {
     var selectedIndex by remember { mutableStateOf(0) }
 
     val list = listOf("Такси", "Доставка")
@@ -45,7 +45,10 @@ fun CustomTab() {
                         )
                     ),
                 selected = selected,
-                onClick = { selectedIndex = index },
+                onClick = {
+                    selectedIndex = index
+                          function()
+                          },
                 text = { Text(text = text, color = if (selected) Color(0xFFFFFFFF) else Color(0xFF000000)) }
             )
         }
