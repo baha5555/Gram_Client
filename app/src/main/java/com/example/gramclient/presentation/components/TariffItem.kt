@@ -11,7 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +46,7 @@ fun TariffItem(
                 .constrainAs(icn) {
                     start.linkTo(parent.start)
                 },
-            bitmap = ImageBitmap.imageResource(icon),
+            imageVector = ImageVector.vectorResource(icon),
             contentDescription = "icon"
         )
         Spacer(modifier = Modifier.height(10.dp))
