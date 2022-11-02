@@ -12,8 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,7 +70,7 @@ fun BottomBar(navController: NavHostController) {
         ) {
             Image(
                 modifier = Modifier.size(35.dp),
-                bitmap = ImageBitmap.imageResource(R.drawable.options),
+                imageVector = ImageVector.vectorResource(R.drawable.options_icon),
                 contentDescription = "icon"
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -89,7 +91,7 @@ fun BottomBar(navController: NavHostController) {
             Spacer(modifier = Modifier.width(8.dp))
             Image(
                 modifier = Modifier.size(45.dp),
-                bitmap = ImageBitmap.imageResource(R.drawable.icon_cash),
+                imageVector = ImageVector.vectorResource(R.drawable.cash_icon),
                 contentDescription = "icon"
             )
         }
@@ -128,7 +130,7 @@ fun bottomSheetContent(navController: NavHostController) {
                 modifier = Modifier
                     .width(35.dp)
                     .height(35.dp),
-                bitmap = ImageBitmap.imageResource(R.drawable.from_marker),
+                imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                 contentDescription = "Logo"
             )
             Spacer(modifier = Modifier.width(15.dp))
@@ -157,7 +159,7 @@ fun bottomSheetContent(navController: NavHostController) {
                 modifier = Modifier
                     .width(35.dp)
                     .height(35.dp),
-                bitmap = ImageBitmap.imageResource(R.drawable.to_marker),
+                imageVector = ImageVector.vectorResource(R.drawable.to_marker),
                 contentDescription = "Logo"
             )
             Spacer(modifier = Modifier.width(15.dp))
