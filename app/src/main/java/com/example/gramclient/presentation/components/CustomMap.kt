@@ -4,10 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.preference.PreferenceManager
-import android.provider.MediaStore.Images.Media.getBitmap
 import android.view.View
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.example.gramclient.R
@@ -21,7 +19,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 @Composable
-fun CustomMap(context: Context) {
+fun CustomMap() {
     lateinit var map: MapView
     AndroidView(factory = {
         View.inflate(it, R.layout.map, null)
@@ -50,7 +48,7 @@ fun CustomMap(context: Context) {
             map.maxZoomLevel = 22.0
 
             val myLocationProvider = GpsMyLocationProvider(it.context)
-            var mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
+            val mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
             myLocationShow(it.context, mLocationOverlay)
             map.overlays.add(mLocationOverlay)
 
@@ -63,12 +61,12 @@ fun CustomMap(context: Context) {
 }
 
 fun myLocationShow(context: Context?, mLocationOverlay: MyLocationNewOverlay) {
-    var person: Bitmap = context?.let { getBitmap(it, R.drawable.ic_person) }!!
+    val person: Bitmap = context?.let { getBitmap(it, R.drawable.ic_person) }!!
     val arrow: Bitmap = getBitmap(context, R.drawable.ic_navigation)!!
-    mLocationOverlay?.setPersonHotspot(person.width / 2f, person.height / 2f)
-    mLocationOverlay?.setPersonIcon(person)
-    mLocationOverlay?.setDirectionArrow(person, arrow)
-    mLocationOverlay?.enableMyLocation()
+    mLocationOverlay.setPersonHotspot(person.width / 2f, person.height / 2f)
+    mLocationOverlay.setPersonIcon(person)
+    mLocationOverlay.setDirectionArrow(person, arrow)
+    mLocationOverlay.enableMyLocation()
 
 }
 
