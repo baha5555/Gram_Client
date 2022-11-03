@@ -36,13 +36,21 @@ fun SubmitOrderScreen(navController: NavHostController){
     val bottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
+    val drawerState = rememberDrawerState(
+        initialValue = DrawerValue.Closed
+    )
+
+    val scaffoldState = rememberScaffoldState()
+
     val scope = rememberCoroutineScope()
 
         Scaffold(
-            backgroundColor = Color(0xFFFFFFFF),
-            bottomBar = { BottomBar(navController, bottomSheetState) },
+            scaffoldState = scaffoldState,
+            bottomBar = { BottomBar(navController, bottomSheetState, scaffoldState) },
+            drawerContent = { DrawerContent(drawerState)},
         ) {
             BottomSheetScaffold(
+                sheetBackgroundColor= Color.Transparent,
                 scaffoldState = bottomSheetState,
                 sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                 sheetContent = {
@@ -54,13 +62,155 @@ fun SubmitOrderScreen(navController: NavHostController){
             }
         }
 }
+@Composable
+fun DrawerContent(drawerState: DrawerState) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF2264D1))
+    ){
+        TopAppBar(
+          modifier = Modifier.height(80.dp),
+            backgroundColor = Color.White
+        ) {
+            Row(modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 12.dp, start = 21.dp, end = 21.dp),
+                verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween){
+                Image(
+                    modifier = Modifier
+                        .width(91.dp)
+                        .height(28.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
+                    contentDescription = "",
+                )
+                Text(text = "Худжанд", fontSize = 18.sp, color = Color.Black)
+            }
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Box(
+                modifier = Modifier
+                    .size(90.dp)
+                    .background(Color.White, shape = RoundedCornerShape(50.dp))
+                    .padding(15.dp),
+                content = {
+                    Image(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(60.dp),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
+                        contentDescription = "",
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(text = "Ваше имя...", fontSize = 22.sp, color = Color.White)
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(text = "Добавьте почту...", fontSize = 18.sp, color = Color.White)
+        }
+        Spacer(modifier = Modifier.height(30.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 21.dp),
+        ){
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.phone_icon),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(text = "Позвонить оператору", fontSize = 18.sp, color = Color.White)
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.star_icon),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(text = "Мои адреса", fontSize = 18.sp, color = Color.White)
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.clock_icon),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(text = "История заказов", fontSize = 18.sp, color = Color.White)
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.promocode_icon),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(text = "Промокоды", fontSize = 18.sp, color = Color.White)
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.message_icon),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(text = "Поддержка", fontSize = 18.sp, color = Color.White)
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.parametres_icon),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(text = "Параметры", fontSize = 18.sp, color = Color.White)
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.about_icon),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(text = "О приложении", fontSize = 18.sp, color = Color.White)
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.logout_icon),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(text = "Выход", fontSize = 18.sp, color = Color.White)
+            }
+        }
+    }
+}
+
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomBar(
     navController: NavHostController,
-    bottomSheetState: BottomSheetScaffoldState
+    bottomSheetState: BottomSheetScaffoldState,
+    scaffoldState:  ScaffoldState
 ) {
     val coroutineScope= rememberCoroutineScope()
     BottomAppBar(
@@ -106,7 +256,15 @@ fun BottomBar(
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
                 content = { Text(text = "Заказать", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
             )
-            IconButton(onClick = {  }) {
+            IconButton(onClick = {
+                coroutineScope.launch {
+                    if(scaffoldState.drawerState.isClosed){
+                        scaffoldState.drawerState.open()
+                    } else{
+                        scaffoldState.drawerState.close()
+                    }
+                }
+            }) {
                 Image(
                     modifier = Modifier.size(30.dp),
                     imageVector = ImageVector.vectorResource(R.drawable.cash_icon),
@@ -130,239 +288,242 @@ fun bottomSheetContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFE2EAF2))
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFE2EAF2))
-                .padding(top = 10.dp),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            Image(
+            Box(
                 modifier = Modifier
-                    .width(65.dp)
-                    .height(7.dp),
-                bitmap = ImageBitmap.imageResource(R.drawable.rectangle),
-                contentDescription = "Logo"
+                    .width(67.dp)
+                    .height(8.dp)
+                    .background(Color(0xFFA1ACB6), shape = RoundedCornerShape(50.dp))
+                    .padding(bottom = 7.dp),
             )
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFffffff), shape = RoundedCornerShape(20.dp))
-                .padding(vertical = 15.dp)
+                .background(Color(0xFFE2EAF2), shape = RoundedCornerShape(20.dp))
         ){
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 15.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
+                    .background(Color(0xFFffffff), shape = RoundedCornerShape(20.dp))
+                    .padding(vertical = 15.dp)
+            ){
+                Row(
                     modifier = Modifier
-                        .width(35.dp)
-                        .height(35.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                    contentDescription = "Logo"
-                )
-                Spacer(modifier = Modifier.width(15.dp))
-                TextField(
-                    placeholder = { Text("Откуда?") },
-                    value = text,
-                    onValueChange = {
-                        text = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
-                        focusedIndicatorColor =  Color.Gray,
-                        unfocusedIndicatorColor = Color.Gray,
-                        disabledIndicatorColor = Color.Transparent
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .width(35.dp)
+                            .height(35.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                        contentDescription = "Logo"
                     )
-                )
+                    Spacer(modifier = Modifier.width(15.dp))
+                    TextField(
+                        placeholder = { Text("Откуда?") },
+                        value = text,
+                        onValueChange = {
+                            text = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent,
+                            focusedIndicatorColor =  Color.Gray,
+                            unfocusedIndicatorColor = Color.Gray,
+                            disabledIndicatorColor = Color.Transparent
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .width(35.dp)
+                            .height(35.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.to_marker),
+                        contentDescription = "Logo"
+                    )
+                    Spacer(modifier = Modifier.width(15.dp))
+                    TextField(
+                        placeholder = { Text("Куда?") },
+                        value = text,
+                        onValueChange = {
+                            text = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent,
+                            focusedIndicatorColor =  Color.Gray,
+                            unfocusedIndicatorColor = Color.Gray,
+                            disabledIndicatorColor = Color.Transparent
+                        )
+                    )
+                }
+                if(bottomSheetState.bottomSheetState.isCollapsed){
+                    Spacer(modifier = Modifier.height(15.dp))
+                    CustomTab(){
+                        isTaxiState=!isTaxiState
+                    }
+                    Spacer(modifier = Modifier.height(23.dp))
+                    LazyRow(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp)){
+                        if(isTaxiState){
+                            repeat(6){
+                                item{
+                                    TariffItem(icon = R.drawable.econom_car, name = "Эконом", price = 10)
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                }
+                            }
+                        }else{
+                            repeat(6){
+                                item{
+                                    TariffItem(icon = R.drawable.courier_icon, name = "Курьер", price = 10)
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                }
+                            }
+                        }
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(15.dp))
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 15.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+                    .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
+                    .padding(15.dp)
+            ){
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(text = "Эконом", modifier = Modifier.padding(start = 10.dp), fontSize = 24.sp, fontWeight = FontWeight.Bold, lineHeight = 14.sp)
+                    Text(text = "10 c", modifier = Modifier.padding(end = 10.dp), fontSize = 28.sp, fontWeight = FontWeight.Normal, lineHeight = 14.sp)
+                }
+                Spacer(modifier = Modifier.height(15.dp))
                 Image(
                     modifier = Modifier
-                        .width(35.dp)
-                        .height(35.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.to_marker),
-                    contentDescription = "Logo"
+                        .fillMaxWidth()
+                        .height(89.dp),
+                    painter = painterResource(R.drawable.econom_pic),
+                    contentDescription = "icon"
                 )
-                Spacer(modifier = Modifier.width(15.dp))
-                TextField(
-                    placeholder = { Text("Куда?") },
-                    value = text,
-                    onValueChange = {
-                        text = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
-                        focusedIndicatorColor =  Color.Gray,
-                        unfocusedIndicatorColor = Color.Gray,
-                        disabledIndicatorColor = Color.Transparent
-                    )
-                )
-            }
-            if(bottomSheetState.bottomSheetState.isCollapsed){
-                Spacer(modifier = Modifier.height(15.dp))
-                CustomTab(){
-                     isTaxiState=!isTaxiState
-                }
-                Spacer(modifier = Modifier.height(23.dp))
-                LazyRow(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp)){
-                    if(isTaxiState){
-                        repeat(6){
-                            item{
+                if(bottomSheetState.bottomSheetState.isExpanded) {
+                    Spacer(modifier = Modifier.height(15.dp))
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        repeat(6) {
+                            item {
                                 TariffItem(icon = R.drawable.econom_car, name = "Эконом", price = 10)
                                 Spacer(modifier = Modifier.width(10.dp))
                             }
                         }
-                    }else{
-                        repeat(6){
-                            item{
-                                TariffItem(icon = R.drawable.courier_icon, name = "Курьер", price = 10)
-                                Spacer(modifier = Modifier.width(10.dp))
-                            }
-                        }
                     }
                 }
-            }
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
-                .padding(15.dp)
-        ){
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Text(text = "Эконом", modifier = Modifier.padding(start = 10.dp), fontSize = 24.sp, fontWeight = FontWeight.Bold, lineHeight = 14.sp)
-                Text(text = "10 c", modifier = Modifier.padding(end = 10.dp), fontSize = 28.sp, fontWeight = FontWeight.Normal, lineHeight = 14.sp)
             }
             Spacer(modifier = Modifier.height(15.dp))
-            Image(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(89.dp),
-                painter = painterResource(R.drawable.econom_pic),
-                contentDescription = "icon"
-            )
-            if(bottomSheetState.bottomSheetState.isExpanded) {
-                Spacer(modifier = Modifier.height(15.dp))
-                LazyRow(
+                    .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
+                    .padding(horizontal = 15.dp)
+            ){
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                ) {
-                    repeat(6) {
-                        item {
-                            TariffItem(icon = R.drawable.econom_car, name = "Эконом", price = 10)
-                            Spacer(modifier = Modifier.width(10.dp))
-                        }
-                    }
+                        .padding(15.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = "Коментарий для водителя", fontSize = 16.sp)
+                    Image(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                        contentDescription = "icon"
+                    )
+                }
+                Divider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = "Запланировать поездку", fontSize = 16.sp)
+                    Image(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                        contentDescription = "icon"
+                    )
+                }
+                Divider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = "Заказ другому человеку", fontSize = 16.sp)
                 }
             }
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
-                .padding(horizontal = 15.dp)
-        ){
-            Row(
+            Spacer(modifier = Modifier.height(15.dp))
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                Text(text = "Коментарий для водителя", fontSize = 16.sp)
-                Image(
-                    modifier = Modifier.size(18.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
-                    contentDescription = "icon"
-                )
-            }
-            Divider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                Text(text = "Запланировать поездку", fontSize = 16.sp)
-                Image(
-                    modifier = Modifier.size(18.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
-                    contentDescription = "icon"
-                )
-            }
-            Divider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                Text(text = "Заказ другому человеку", fontSize = 16.sp)
-            }
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
-                .padding(horizontal = 15.dp)
-        ){
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                Text(text = "Перевозка домашнего животного", fontSize = 16.sp)
-                Switch(
-                    checked = true,
-                    onCheckedChange = { }
-                )
-            }
-            Divider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                Text(text = "Донести вещи, проводить", fontSize = 16.sp)
-                Switch(
-                    checked = true,
-                    onCheckedChange = { }
-                )
-            }
-            Divider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                Text(text = "Поездка в тишине", fontSize = 16.sp)
-                Switch(
-                    checked = true,
-                    onCheckedChange = { }
-                )
+                    .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
+                    .padding(horizontal = 15.dp)
+            ){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = "Перевозка домашнего животного", fontSize = 16.sp)
+                    Switch(
+                        checked = true,
+                        onCheckedChange = { }
+                    )
+                }
+                Divider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = "Донести вещи, проводить", fontSize = 16.sp)
+                    Switch(
+                        checked = true,
+                        onCheckedChange = { }
+                    )
+                }
+                Divider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = "Поездка в тишине", fontSize = 16.sp)
+                    Switch(
+                        checked = true,
+                        onCheckedChange = { }
+                    )
+                }
             }
         }
     }
