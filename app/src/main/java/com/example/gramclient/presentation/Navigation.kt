@@ -14,7 +14,7 @@ import com.example.gramclient.presentation.Setting.SettingRegionScreen
 fun Navigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = RoutesName.SPLASH_SCREEN
+        startDestination = RoutesName.SUBMITORDER_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
             SplashScreen(navController)

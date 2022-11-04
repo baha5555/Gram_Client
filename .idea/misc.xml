@@ -6,6 +6,7 @@
         <entry key="app/src/main/res/drawable/about_icon.xml" value="0.2055" />
         <entry key="app/src/main/res/drawable/arrow_down.xml" value="0.157" />
         <entry key="app/src/main/res/drawable/arrow_right.xml" value="0.157" />
+        <entry key="app/src/main/res/drawable/bonus_icon.xml" value="0.262" />
         <entry key="app/src/main/res/drawable/camera_plus.xml" value="0.2055" />
         <entry key="app/src/main/res/drawable/cash_icon.xml" value="0.2135" />
         <entry key="app/src/main/res/drawable/clock_icon.xml" value="0.2055" />
@@ -20,10 +21,12 @@
         <entry key="app/src/main/res/drawable/message_icon.xml" value="0.2055" />
         <entry key="app/src/main/res/drawable/ojdsfvo.xml" value="0.1675" />
         <entry key="app/src/main/res/drawable/parametres_icon.xml" value="0.2055" />
+        <entry key="app/src/main/res/drawable/payment_card_icon.xml" value="0.262" />
         <entry key="app/src/main/res/drawable/phone_icon.xml" value="0.2055" />
         <entry key="app/src/main/res/drawable/promocode_icon.xml" value="0.2055" />
         <entry key="app/src/main/res/drawable/star_icon.xml" value="0.2055" />
         <entry key="app/src/main/res/drawable/to_marker.xml" value="0.262" />
+        <entry key="app/src/main/res/drawable/wallet_icon.xml" value="0.262" />
         <entry key="app/src/main/res/layout/map.xml" value="0.2604166666666667" />
       </map>
     </option>
