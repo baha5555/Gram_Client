@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GramClient</string>
+    <string name="btn_back">back</string>
 </resources>
