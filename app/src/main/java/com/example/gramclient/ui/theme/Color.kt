@@ -9,3 +9,4 @@ val Teal200 = Color(0xFF03DAC5)
 
 val BackgroundColor = Color(0xFFEBEBEB)
 val FontSilver = Color(0xFF848484)
+val Transparent = Color(0x848484)
