@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -41,6 +42,8 @@ fun SubmitOrderScreen(navController: NavHostController){
 
     val paymentMethods= listOf("Наличные", "Картой", "С бонусного счета")
     val paymentState = remember { mutableStateOf("") }
+
+    val coroutineScope= rememberCoroutineScope()
 
         BottomSheetScaffold(
             sheetBackgroundColor= Color.White,
@@ -95,7 +98,11 @@ fun SubmitOrderScreen(navController: NavHostController){
                             .height(55.dp)
                             .clip(RoundedCornerShape(12.dp)),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
-                        onClick = { /*TODO*/ }) {
+                        onClick = {
+                            coroutineScope.launch {
+                                bottomSheetState.bottomSheetState.collapse()
+                            }
+                        }) {
                         Text(text = "Готово", fontSize = 20.sp, modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
                     }

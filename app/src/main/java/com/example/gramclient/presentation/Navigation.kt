@@ -16,7 +16,7 @@ import com.example.gramclient.presentation.setting_screens.SettingScreen
 fun Navigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = RoutesName.SUBMITORDER_SCREEN
+        startDestination = RoutesName.SPLASH_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
             SplashScreen(navController)
