@@ -8,7 +8,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.gramclient.RoutesName
-import com.example.gramclient.presentation.Setting.SettingRegionScreen
+import com.example.gramclient.presentation.setting_screens.SettingLanguageScreen
+import com.example.gramclient.presentation.setting_screens.SettingRegionScreen
+import com.example.gramclient.presentation.setting_screens.SettingScreen
 
 @Composable
 fun Navigation(navController: NavHostController) {
