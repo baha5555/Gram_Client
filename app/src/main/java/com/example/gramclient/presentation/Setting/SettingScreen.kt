@@ -46,7 +46,7 @@ fun SettingScreen(navController: NavHostController) {
                 .background(BackgroundColor)
         ) {
             Column(Modifier.clickable {
-                navController.navigate(RoutesName.SETTING_LANGUAGE_SCREEN)
+                navController.navigate(RoutesName.SETTING_REGION_SCREEN)
             }) {
                 Row(
                     modifier = Modifier
@@ -73,7 +73,7 @@ fun SettingScreen(navController: NavHostController) {
                         ),
                 )
             }
-            Column(Modifier.clickable { navController.navigate(RoutesName.SETTING_REGION_SCREEN) }) {
+            Column(Modifier.clickable { navController.navigate(RoutesName.SETTING_LANGUAGE_SCREEN) }) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

@@ -2,6 +2,7 @@ package com.example.gramclient.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,7 +48,7 @@ fun SubmitOrderScreen(navController: NavHostController){
         Scaffold(
             scaffoldState = scaffoldState,
             bottomBar = { BottomBar(navController, bottomSheetState, scaffoldState) },
-            drawerContent = { DrawerContent(drawerState)},
+            drawerContent = { DrawerContent(drawerState, navController)},
         ) {
             BottomSheetScaffold(
                 sheetBackgroundColor= Color.Transparent,
@@ -63,7 +64,7 @@ fun SubmitOrderScreen(navController: NavHostController){
         }
 }
 @Composable
-fun DrawerContent(drawerState: DrawerState) {
+fun DrawerContent(drawerState: DrawerState, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -169,7 +170,7 @@ fun DrawerContent(drawerState: DrawerState) {
                 Spacer(modifier = Modifier.width(18.dp))
                 Text(text = "Поддержка", fontSize = 18.sp, color = Color.White)
             }
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp).clickable { navController.navigate(RoutesName.SETTING_SCREEN) }, verticalAlignment = Alignment.CenterVertically){
                 Image(
                     modifier = Modifier
                         .size(20.dp),
