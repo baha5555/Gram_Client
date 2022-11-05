@@ -14,8 +14,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -93,7 +95,7 @@ fun BottomSheetContent(navController: NavHostController) {
                 modifier = Modifier
                     .width(35.dp)
                     .height(35.dp),
-                bitmap = ImageBitmap.imageResource(R.drawable.from_marker),
+                imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                 contentDescription = "Logo"
             )
             Spacer(modifier = Modifier.width(15.dp))
@@ -122,7 +124,7 @@ fun BottomSheetContent(navController: NavHostController) {
                 modifier = Modifier
                     .width(35.dp)
                     .height(35.dp),
-                bitmap = ImageBitmap.imageResource(R.drawable.to_marker),
+                imageVector = ImageVector.vectorResource(R.drawable.to_marker),
                 contentDescription = "Logo"
             )
             Spacer(modifier = Modifier.width(15.dp))
