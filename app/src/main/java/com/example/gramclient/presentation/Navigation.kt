@@ -11,6 +11,7 @@ import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.setting_screens.SettingLanguageScreen
 import com.example.gramclient.presentation.setting_screens.SettingRegionScreen
 import com.example.gramclient.presentation.setting_screens.SettingScreen
+import com.example.gramclient.presentation.setting_screens.SettingSelectRegionScreen
 
 @Composable
 fun Navigation(navController: NavHostController) {
@@ -43,8 +44,11 @@ fun Navigation(navController: NavHostController) {
         composable(RoutesName.SETTING_LANGUAGE_SCREEN) {
             SettingLanguageScreen(navController)
         }
-    composable(RoutesName.SETTING_REGION_SCREEN) {
+        composable(RoutesName.SETTING_REGION_SCREEN) {
             SettingRegionScreen(navController)
+        }
+        composable(RoutesName.SETTING_SELECT_REGION_SCREEN) {
+            SettingSelectRegionScreen(navController)
         }
     }
 }

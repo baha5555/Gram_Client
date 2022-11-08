@@ -55,7 +55,7 @@ private fun CheckBoxGroupGroup(
     Column {
         items.forEach { item ->
             Row(
-                modifier = Modifier
+                modifier = Modifier.clickable { state.value = item }
                     .padding(start = 10.dp, end = 22.dp, top = 12.dp, bottom = 10.dp)
                     .fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically
             ) {
