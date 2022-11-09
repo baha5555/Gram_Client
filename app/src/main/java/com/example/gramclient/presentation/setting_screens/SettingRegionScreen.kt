@@ -25,7 +25,7 @@ import com.example.gramclient.presentation.components.CustomTopBar
 
 @Composable
 fun SettingRegionScreen(navController: NavHostController) {
-    Scaffold(topBar = { CustomTopBar(title = "Регион", navController = navController, true) }) {
+    Scaffold(topBar = { CustomTopBar(title = "Регион", navController = navController, 1) }) {
         Column() {
             val search = remember {
                 mutableStateOf("")

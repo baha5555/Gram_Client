@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.myaddresses_screen.AddAddresScreen
 import com.example.gramclient.presentation.myaddresses_screen.MyAddressesScreen
 import com.example.gramclient.presentation.setting_screens.SettingLanguageScreen
 import com.example.gramclient.presentation.setting_screens.SettingRegionScreen
@@ -51,8 +52,11 @@ fun Navigation(navController: NavHostController) {
         composable(RoutesName.SETTING_SELECT_REGION_SCREEN) {
             SettingSelectRegionScreen(navController)
         }
-        composable(RoutesName.MYADDRESSES_SCREEN) {
+        composable(RoutesName.MY_ADDRESSES_SCREEN) {
             MyAddressesScreen(navController)
+        }
+        composable(RoutesName.ADD_ADDRESSES_SCREEN) {
+            AddAddresScreen(navController)
         }
     }
 }
