@@ -26,15 +26,18 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF2264D1))
-    ){
+    ) {
         TopAppBar(
             modifier = Modifier.height(80.dp),
             backgroundColor = Color.White
         ) {
-            Row(modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 12.dp, start = 21.dp, end = 21.dp),
-                verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween){
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 12.dp, start = 21.dp, end = 21.dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Image(
                     modifier = Modifier
                         .width(91.dp)
@@ -50,7 +53,7 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
                 .fillMaxWidth()
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .size(90.dp)
@@ -75,89 +78,54 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 21.dp),
-        ){
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.phone_icon),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.width(18.dp))
-                Text(text = "Позвонить оператору", fontSize = 18.sp, color = Color.White)
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.star_icon),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.width(18.dp))
-                Text(text = "Мои адреса", fontSize = 18.sp, color = Color.White)
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.clock_icon),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.width(18.dp))
-                Text(text = "История заказов", fontSize = 18.sp, color = Color.White)
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.promocode_icon),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.width(18.dp))
-                Text(text = "Промокоды", fontSize = 18.sp, color = Color.White)
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.message_icon),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.width(18.dp))
-                Text(text = "Поддержка", fontSize = 18.sp, color = Color.White)
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp).clickable { navController.navigate(
-                RoutesName.SETTING_SCREEN) }, verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.parametres_icon),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.width(18.dp))
-                Text(text = "Параметры", fontSize = 18.sp, color = Color.White)
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.about_icon),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.width(18.dp))
-                Text(text = "О приложении", fontSize = 18.sp, color = Color.White)
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp), verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.logout_icon),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.width(18.dp))
-                Text(text = "Выход", fontSize = 18.sp, color = Color.White)
+        ) {
+            var iconList = arrayOf<ImageVector>(
+                ImageVector.vectorResource(id = R.drawable.phone_icon),
+                ImageVector.vectorResource(id = R.drawable.star_icon),
+                ImageVector.vectorResource(id = R.drawable.clock_icon),
+                ImageVector.vectorResource(id = R.drawable.promocode_icon),
+                ImageVector.vectorResource(id = R.drawable.message_icon),
+                ImageVector.vectorResource(id = R.drawable.parametres_icon),
+                ImageVector.vectorResource(id = R.drawable.about_icon),
+                ImageVector.vectorResource(id = R.drawable.logout_icon),
+            )
+            val textList = arrayOf<String>(
+                "Позвонить оператору",
+                "Мои адреса",
+                "История заказов",
+                "Промокоды",
+                "Поддержка",
+                "Параметры",
+                "О приложении",
+                "Выход",
+            )
+            for (i in iconList.indices){
+                showItems(iconList[i], textList[i], navController)
             }
         }
     }
+}
+
+@Composable
+fun showItems(icon: ImageVector, text: String, navController: NavHostController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth().clickable {
+                when(text){
+                    "Параметры"-> navController.navigate(RoutesName.SETTING_SCREEN)
+                }
+            }
+            .padding(vertical = 15.dp, horizontal = 21.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            modifier = Modifier
+                .size(20.dp),
+            imageVector = icon,
+            contentDescription = "",
+        )
+        Spacer(modifier = Modifier.width(18.dp))
+        Text(text = text, fontSize = 18.sp, color = Color.White)
+    }
+
 }
