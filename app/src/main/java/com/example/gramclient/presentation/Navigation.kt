@@ -35,9 +35,6 @@ fun Navigation(navController: NavHostController) {
         composable(RoutesName.MAIN_SCREEN) {
             MainScreen(navController)
         }
-        composable(RoutesName.SUBMITORDER_SCREEN) {
-            SubmitOrderScreen(navController)
-        }
         composable(RoutesName.SETTING_SCREEN) {
             SettingScreen(navController)
         }
