@@ -14,21 +14,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun CustomSearch(search: MutableState<String>) {
+fun CustomSearch(search: MutableState<String>, placeholderText:String="Поиск...") {
     
     TextField(
         value = search.value,
         onValueChange = {
             search.value = it
         },
-        placeholder = { Text(text = "Поиск...", fontSize = 20.sp) },
+        placeholder = { Text(text = placeholderText, fontSize = 19.sp) },
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.Transparent,
             cursorColor = Color(0xFF005EFF),
             focusedIndicatorColor = Color(0xFF005EFF),
             leadingIconColor = Color(0xFF005EFF)
         ),
-        modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp),
         textStyle = TextStyle(fontSize = 20.sp)
     )
+
 }
