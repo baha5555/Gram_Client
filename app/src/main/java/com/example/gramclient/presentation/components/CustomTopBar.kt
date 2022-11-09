@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +24,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun CustomTopBar(
     title: String,
     navController: NavHostController,
-    regionSelectVisible: Boolean = false
+    actionNum: Int = 0
 ) {
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
@@ -39,10 +41,25 @@ fun CustomTopBar(
             }
         },
         actions = {
-            if(regionSelectVisible){
-                Text("Таджикистан", fontSize = 18.sp, modifier = Modifier.padding(end=15.dp).clickable {
-                    navController.navigate(RoutesName.SETTING_SELECT_REGION_SCREEN)
-                })
+            when (actionNum) {
+                1 -> {
+                    Text(
+                        "Таджикистан",
+                        fontSize = 18.sp,
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate(RoutesName.SETTING_SELECT_REGION_SCREEN)
+                            }
+                            .padding(end = 15.dp)
+                    )
+                }
+                2 -> {
+                    Image(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "",
+
+                    )
+                }
             }
         }
     )

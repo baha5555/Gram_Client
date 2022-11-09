@@ -113,6 +113,7 @@ fun showItems(icon: ImageVector, text: String, navController: NavHostController)
             .fillMaxWidth().clickable {
                 when(text){
                     "Параметры"-> navController.navigate(RoutesName.SETTING_SCREEN)
+                    "Мои адреса"-> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
                 }
             }
             .padding(vertical = 15.dp, horizontal = 21.dp),
