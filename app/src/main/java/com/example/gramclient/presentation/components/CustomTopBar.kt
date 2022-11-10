@@ -31,7 +31,7 @@ fun CustomTopBar(
         color = Color.White
     )
     TopAppBar(
-        title = { Text(title) }, backgroundColor = Color.White,
+        title = { Text(title, fontSize = 18.sp) }, backgroundColor = Color.White,
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Image(
@@ -54,11 +54,12 @@ fun CustomTopBar(
                     )
                 }
                 2 -> {
-                    Image(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "",
-
-                    )
+                    IconButton(onClick = {  }) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_delete_blue),
+                            contentDescription = ""
+                        )
+                    }
                 }
             }
         }
