@@ -55,6 +55,9 @@ fun Navigation(navController: NavHostController) {
         composable(RoutesName.ADD_ADDRESSES_SCREEN) {
             AddAddresScreen(navController)
         }
+        composable(RoutesName.SUPPORT_SCREEN) {
+            SupportScreen(navController)
+        }
     }
 }
 
