@@ -178,15 +178,7 @@ fun IdentificationScreen(
                     .padding(top = 60.dp, bottom = 20.dp),
                 textAlign = TextAlign.Center, color = Color.Blue)
         }
-
-        Button(
-            onClick = {
-                navController.navigate(RoutesName.MAIN_SCREEN){
-                    popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
-                        inclusive = true
-                    }
-                }
-            },
+        CustomButton(
             modifier = Modifier
                 .constrainAs(btn) {
                     top.linkTo(text2.bottom)
@@ -198,10 +190,16 @@ fun IdentificationScreen(
                 .width(303.dp)
                 .height(54.dp)
                 .padding(top = 0.dp),
-            enabled = if(code.size==4) true else false,
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
-            content = { Text(text = "Подтвердить", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
-        )
+            text = "Подтвердить",
+            textSize = 18,
+            textBold = true,
+            enabled = code.size==4,
+        onClick = {
+            navController.navigate(RoutesName.MAIN_SCREEN){
+                popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
+                    inclusive = true
+                }
+            }
+        })
     }
-
 }
