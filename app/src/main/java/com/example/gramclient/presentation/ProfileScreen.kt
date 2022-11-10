@@ -119,7 +119,7 @@ fun ProfileScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
 
                 ) {
-                    Text(text = "Получение рассылки", color = Color.Black, fontSize = 14.sp)
+                    Text(text = "Получение рассылки", color = Color.Black, fontSize = 15.sp)
                  Box(modifier = Modifier.padding(end = 5.dp)) {
                      val switchON = remember {
                          mutableStateOf(false) // Initially the switch is ON

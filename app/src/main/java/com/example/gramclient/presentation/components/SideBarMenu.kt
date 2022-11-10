@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.DrawerState
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -14,11 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.ProfileScreen
 
 @Composable
 fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
@@ -54,25 +59,35 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
+            IconButton(
+                onClick = { navController.navigate(RoutesName.PROFILE_SCREEN) }, modifier = Modifier
+                    .padding(top = 21.dp)
                     .size(90.dp)
                     .background(Color.White, shape = RoundedCornerShape(50.dp))
-                    .padding(15.dp),
-                content = {
-                    Image(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(60.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
-                        contentDescription = "",
-                    )
-                }
+
+            ) {
+                Image(
+                    modifier = Modifier
+                        .width(60.dp)
+                        .height(60.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
+                    contentDescription = "",
+                )
+            }
+            Spacer(modifier = Modifier.height(15.dp))
+            ClickableText(text = AnnotatedString(text = "Ваше имя...", SpanStyle(
+                fontSize = 22.sp,
+                color = Color.White
+            )),
+                onClick ={navController.navigate(RoutesName.PROFILE_SCREEN)}
             )
             Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Ваше имя...", fontSize = 22.sp, color = Color.White)
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Добавьте почту...", fontSize = 18.sp, color = Color.White)
+            ClickableText(text = AnnotatedString(text = "Добавьте почту...", SpanStyle(
+                fontSize = 18.sp,
+                color = Color.White
+            )),
+                onClick ={navController.navigate(RoutesName.PROFILE_SCREEN)}
+            )
         }
         Spacer(modifier = Modifier.height(30.dp))
         Column(
@@ -110,10 +125,11 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
 fun showItems(icon: ImageVector, text: String, navController: NavHostController) {
     Row(
         modifier = Modifier
-            .fillMaxWidth().clickable {
-                when(text){
-                    "Параметры"-> navController.navigate(RoutesName.SETTING_SCREEN)
-                    "Мои адреса"-> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
+            .fillMaxWidth()
+            .clickable {
+                when (text) {
+                    "Параметры" -> navController.navigate(RoutesName.SETTING_SCREEN)
+                    "Мои адреса" -> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
                 }
             }
             .padding(vertical = 15.dp, horizontal = 21.dp),
