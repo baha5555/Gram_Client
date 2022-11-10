@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gramclient.RoutesName
+import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
 fun CustomButton(
@@ -31,7 +32,7 @@ fun CustomButton(
         },
         enabled = enabled,
         modifier = modifier,
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
+        colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor, contentColor = Color.White),
         content = { Text(text = text, fontWeight = if(textBold) FontWeight.Bold else FontWeight.Normal, fontSize = textSize.sp, lineHeight = 28.sp) },
     )
 }
