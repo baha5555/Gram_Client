@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DrawerState
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -60,19 +61,27 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
                     .background(Color.White, shape = RoundedCornerShape(50.dp))
                     .padding(15.dp),
                 content = {
-                    Image(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(60.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
-                        contentDescription = "",
-                    )
+                    IconButton(onClick = { navController.navigate(RoutesName.PROFILE_SCREEN) }) {
+                        Image(
+                            modifier = Modifier
+                                .width(60.dp)
+                                .height(60.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
+                            contentDescription = "",
+                        )
+                    }
                 }
             )
             Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Ваше имя...", fontSize = 22.sp, color = Color.White)
+            Text(modifier = Modifier.clickable {
+                navController.navigate(RoutesName.PROFILE_SCREEN)
+            },
+                text = "Ваше имя...", fontSize = 22.sp, color = Color.White)
             Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Добавьте почту...", fontSize = 18.sp, color = Color.White)
+            Text(modifier = Modifier.clickable {
+                navController.navigate(RoutesName.PROFILE_SCREEN)
+            },
+                text = "Добавьте почту...", fontSize = 18.sp, color = Color.White)
         }
         Spacer(modifier = Modifier.height(30.dp))
         Column(
@@ -110,11 +119,12 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
 fun showItems(icon: ImageVector, text: String, navController: NavHostController) {
     Row(
         modifier = Modifier
-            .fillMaxWidth().clickable {
-                when(text){
-                    "Параметры"-> navController.navigate(RoutesName.SETTING_SCREEN)
-                    "Мои адреса"-> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
-                    "Поддержка"-> navController.navigate(RoutesName.SUPPORT_SCREEN)
+            .fillMaxWidth()
+            .clickable {
+                when (text) {
+                    "Параметры" -> navController.navigate(RoutesName.SETTING_SCREEN)
+                    "Мои адреса" -> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
+                    "Поддержка" -> navController.navigate(RoutesName.SUPPORT_SCREEN)
 
                 }
             }

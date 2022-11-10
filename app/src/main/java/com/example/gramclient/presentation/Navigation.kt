@@ -63,6 +63,9 @@ fun Navigation(navController: NavHostController, messageViewModel: Lazy<MessageV
         composable(RoutesName.SUPPORT_SCREEN) {
             SupportScreen(navController)
         }
+        composable(RoutesName.PROFILE_SCREEN) {
+            ProfileScreen(navController)
+        }
         composable(RoutesName.MESSAGE_SCREEN) {
             MessageScreen(navController, messageViewModel)
         }
