@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.messageScreen.MessageViewModel
 import com.example.gramclient.presentation.myaddresses_screen.AddAddressScreen
 import com.example.gramclient.presentation.myaddresses_screen.EditAddressScreen
 import com.example.gramclient.presentation.myaddresses_screen.MyAddressesScreen
@@ -17,7 +18,7 @@ import com.example.gramclient.presentation.setting_screens.SettingScreen
 import com.example.gramclient.presentation.setting_screens.SettingSelectRegionScreen
 
 @Composable
-fun Navigation(navController: NavHostController) {
+fun Navigation(navController: NavHostController, messageViewModel: Lazy<MessageViewModel>) {
     NavHost(
         navController = navController,
         startDestination = RoutesName.SPLASH_SCREEN
@@ -64,6 +65,9 @@ fun Navigation(navController: NavHostController) {
         }
         composable(RoutesName.PROFILE_SCREEN) {
             ProfileScreen(navController)
+        }
+        composable(RoutesName.MESSAGE_SCREEN) {
+            MessageScreen(navController, messageViewModel)
         }
     }
 }
