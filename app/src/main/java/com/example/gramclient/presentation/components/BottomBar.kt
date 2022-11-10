@@ -58,20 +58,19 @@ fun BottomBar(
                     contentDescription = "icon"
                 )
             }
-            Button(
-                onClick = {
-                    navController.navigate(RoutesName.MAIN_SCREEN)
-                },
+            CustomButton(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.Black)
                     .width(260.dp)
                     .height(54.dp)
                     .padding(top = 0.dp),
-                enabled =  true ,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
-                content = { Text(text = "Заказать", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
-            )
+                text = "Заказать",
+                textSize = 18,
+                textBold = true,
+            onClick = {
+                navController.navigate(RoutesName.MAIN_SCREEN)
+            })
             IconButton(onClick = {
                 coroutineScope.launch {
                     if(bottomSheetState.bottomSheetState.isCollapsed){

@@ -105,20 +105,19 @@ fun MainScreen(navController: NavHostController){
                     }
                 }
                 Spacer(modifier = Modifier.height(54.dp))
-                Button(
+                CustomButton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp)
                         .clip(RoundedCornerShape(12.dp)),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
-                    onClick = {
-                        coroutineScope.launch {
-                            bottomSheetState.bottomSheetState.collapse()
-                        }
-                    }) {
-                    Text(text = "Готово", fontSize = 20.sp, modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
-                }
+                    text = "Готово",
+                    textSize = 20,
+                    textBold = true,
+                onClick = {
+                    coroutineScope.launch {
+                        bottomSheetState.bottomSheetState.collapse()
+                    }
+                })
             }
         },
         sheetPeekHeight = 0.dp,
@@ -141,119 +140,9 @@ fun MainScreen(navController: NavHostController){
             }
         }
     }
-
 }
 
 
-
-
-@Composable
-fun BottomSheetContent(navController: NavHostController) {
-    val context = LocalContext.current
-    var text by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                modifier = Modifier
-                    .width(65.dp)
-                    .height(7.dp),
-                bitmap = ImageBitmap.imageResource(R.drawable.rectangle),
-                contentDescription = "Logo"
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                modifier = Modifier
-                    .width(35.dp)
-                    .height(35.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                contentDescription = "Logo"
-            )
-            Spacer(modifier = Modifier.width(15.dp))
-            TextField(
-                placeholder = { Text("Откуда?") },
-                value = text,
-                onValueChange = {
-                    text = it },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent,
-                    focusedIndicatorColor =  Color.Gray,
-                    unfocusedIndicatorColor = Color.Gray,
-                    disabledIndicatorColor = Transparent
-                )
-            )
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                modifier = Modifier
-                    .width(35.dp)
-                    .height(35.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.to_marker),
-                contentDescription = "Logo"
-            )
-            Spacer(modifier = Modifier.width(15.dp))
-            TextField(
-                placeholder = { Text("Куда?") },
-                value = text,
-                onValueChange = {
-                    text = it },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent,
-                    focusedIndicatorColor =  Color.Gray,
-                    unfocusedIndicatorColor = Color.Gray,
-                    disabledIndicatorColor = Transparent
-                )
-            )
-        }
-        Spacer(modifier = Modifier.height(23.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Button(
-                onClick = {
-                    navController.navigate(RoutesName.MAIN_SCREEN){
-                        popUpTo(RoutesName.MAIN_SCREEN) {
-                            inclusive = true
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(5.dp))
-                    .background(Color.Black)
-                    .fillMaxWidth()
-                    .height(55.dp)
-                    .padding(top = 0.dp),
-                enabled =  true ,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
-                content = { Text(text = "Подтвердить", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
-            )
-        }
-    }
-}
 
 
 
