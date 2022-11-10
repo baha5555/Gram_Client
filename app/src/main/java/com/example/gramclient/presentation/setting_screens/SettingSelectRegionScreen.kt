@@ -34,7 +34,7 @@ fun SettingSelectRegionScreen(navController: NavHostController) {
                 ImageVector.vectorResource(id = R.drawable.flag_uz),
                 ImageVector.vectorResource(id = R.drawable.flag_ru)
             )
-            for (i in textRegion.indices){
+            for (i in textRegion.indices) {
                 ListRegions(text = textRegion[i], img = iconRegion[i])
             }
         }
@@ -61,7 +61,6 @@ fun ListRegions(text: String, img: ImageVector) {
             .fillMaxWidth()
             .height(1.dp)
             .background(
-                color = Color(0xFFBAC2CA)
-            ),
+                color = Color(0xFFBAC2CA)),
     )
 }

@@ -3,17 +3,15 @@ package com.example.gramclient.presentation.myaddresses_screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.materialIcon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -43,8 +41,8 @@ fun MyAddressesScreen(navController: NavHostController) {
                     modifier = Modifier.padding(15.dp),
                     color = Color(0xFF434B53)
                 )
-                listAddressesShow(1, "Дом")
-                listAddressesShow(2, "Работа")
+                listAddressesShow(1, "Дом", navController)
+                listAddressesShow(2, "Работа", navController)
             }
             FloatingActionButton(
                 backgroundColor = Color(0xFF2264D1),
@@ -64,7 +62,7 @@ fun MyAddressesScreen(navController: NavHostController) {
 }
 
 @Composable
-fun listAddressesShow(num: Int, title: String) {
+fun listAddressesShow(num: Int, title: String, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,7 +73,8 @@ fun listAddressesShow(num: Int, title: String) {
             Image(
                 modifier = Modifier
                     .size(24.dp)
-                    .offset(-10.dp, 10.dp),
+                    .offset(-10.dp, 10.dp)
+                    .clickable { navController.navigate(RoutesName.EDIT_ADDRESSES_SCREEN)},
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_edit_blue),
                 contentDescription = "",
             )
