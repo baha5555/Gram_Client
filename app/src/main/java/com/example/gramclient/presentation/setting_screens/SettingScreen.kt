@@ -1,30 +1,19 @@
 package com.example.gramclient.presentation.setting_screens
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -57,7 +46,7 @@ fun SettingScreen(navController: NavHostController) {
                         Text(text = "Худжанд", fontSize = 15.sp, color = Color(0xFF565E66))
                     }
                     Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.btn_back_icon_2),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_blue_2),
                         contentDescription = ""
                     )
                 }
@@ -87,7 +76,7 @@ fun SettingScreen(navController: NavHostController) {
                         Text(text = "Русский", fontSize = 15.sp, color = Color(0xFF565E66))
                     }
                     Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.btn_back_icon_2),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_blue_2),
                         contentDescription = ""
                     )
                 }
