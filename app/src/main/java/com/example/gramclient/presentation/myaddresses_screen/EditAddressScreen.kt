@@ -31,6 +31,7 @@ fun EditAddressScreen(navController: NavHostController) {
             mutableStateOf("Дом")
         }
         Column() {
+
             CustomSearch(search = search, "Введите название адреса")
             Row() {
                 Box(
