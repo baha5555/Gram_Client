@@ -4,17 +4,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.viewModels
 import androidx.navigation.compose.rememberNavController
+import com.example.gramclient.presentation.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -23,8 +16,9 @@ class MainActivity : ComponentActivity() {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
         setContent {
             GramClientTheme {
+                val messageViewModel= viewModels<MessageViewModel>()
                 val navController= rememberNavController()
-                Navigation(navController =navController)
+                Navigation(navController =navController, messageViewModel)
             }
         }
     }
