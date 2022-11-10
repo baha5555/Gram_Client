@@ -11,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -133,12 +134,13 @@ fun AuthorizationScreen(navController: NavHostController) {
                 }
 
                 CustomButton(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .fillMaxWidth()
+                        .height(61.dp),
                     text = "Продолжить",
                     textSize = 18,
                     textBold = true,
-                    width = 303,
-                    height = 61,
-                    radius = 10
                 ) {
                     navController.navigate(RoutesName.IDENTIFICATION_SCREEN){
                         popUpTo(RoutesName.AUTH_SCREEN) {

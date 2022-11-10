@@ -18,22 +18,19 @@ import com.example.gramclient.RoutesName
 
 @Composable
 fun CustomButton(
+    modifier: Modifier,
     text: String,
     textSize: Int,
     textBold: Boolean,
-    width: Int,
-    height: Int,
-    radius: Int,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Button(
         onClick = {
             onClick()
         },
-        modifier = Modifier
-            .clip(RoundedCornerShape(radius.dp))
-            .width(width.dp)
-            .height(height.dp),
+        enabled = enabled,
+        modifier = modifier,
         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
         content = { Text(text = text, fontWeight = if(textBold) FontWeight.Bold else FontWeight.Normal, fontSize = textSize.sp, lineHeight = 28.sp) },
     )
