@@ -114,6 +114,8 @@ fun showItems(icon: ImageVector, text: String, navController: NavHostController)
                 when(text){
                     "Параметры"-> navController.navigate(RoutesName.SETTING_SCREEN)
                     "Мои адреса"-> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
+                    "Поддержка"-> navController.navigate(RoutesName.SUPPORT_SCREEN)
+
                 }
             }
             .padding(vertical = 15.dp, horizontal = 21.dp),
