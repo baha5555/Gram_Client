@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
+import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.presentation.components.CustomTopBar
 import com.example.gramclient.ui.theme.BackgroundColor
@@ -107,9 +108,10 @@ fun SupportScreen(navController: NavHostController){
                             .clip(RoundedCornerShape(12.dp))
                             .fillMaxWidth()
                             .height(35.dp),
-                            text = "Отправить сообщение", textSize = 14, textBold = false) {
-
-                        }
+                            text = "Отправить сообщение", textSize = 14, textBold = false,
+                        onClick = {
+                            navController.navigate(RoutesName.MESSAGE_SCREEN)
+                        })
                     }
                 }
 
