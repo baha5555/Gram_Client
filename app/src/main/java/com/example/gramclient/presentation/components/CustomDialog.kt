@@ -35,7 +35,8 @@ fun CustomDialog(
                     Text(
                         text = text,
                         fontSize = 18.sp,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color.Black
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Row(
@@ -52,7 +53,7 @@ fun CustomDialog(
                         ) {
                             Text(text = "Нет", fontSize = 18.sp)
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
                         Button(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
