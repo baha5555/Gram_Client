@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +31,8 @@ fun BottomBar(
     bottomSheetState: BottomSheetScaffoldState,
 ) {
     val coroutineScope= rememberCoroutineScope()
+    val isDialogopen=remember{ mutableStateOf(false) }
+
     BottomAppBar(
         backgroundColor = Color(0xFFF7F7F7),
         contentColor = Color.White,
@@ -69,7 +73,7 @@ fun BottomBar(
                 textSize = 18,
                 textBold = true,
             onClick = {
-                navController.navigate(RoutesName.MAIN_SCREEN)
+                isDialogopen.value=true
             })
             IconButton(onClick = {
                 coroutineScope.launch {
@@ -87,5 +91,11 @@ fun BottomBar(
                 )
             }
         }
+        CustomDialog(
+            text = "Вы действительно хотите заказать?",
+            okBtnClick = { isDialogopen.value=false },
+            cancelBtnClick = { isDialogopen.value=false },
+            isDialogOpen = isDialogopen.value
+        )
     }
 }

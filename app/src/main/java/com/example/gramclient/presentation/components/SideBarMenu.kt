@@ -11,6 +11,9 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +28,8 @@ import com.example.gramclient.RoutesName
 
 @Composable
 fun SideBarMenu(drawerState: DrawerState, navController: NavHostController, preferences: SharedPreferences) {
+    val isDialogopen= remember{ mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -111,14 +116,32 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController, pref
                 "Выход",
             )
             for (i in iconList.indices){
-                showItems(iconList[i], textList[i], navController, preferences)
+                showItems(iconList[i], textList[i], navController, preferences, isDialogopen)
             }
         }
+        CustomDialog(
+            text = "Вы уверены что хотите выйти?",
+            okBtnClick = {
+                isDialogopen.value=false
+                preferences.edit()
+                    .putBoolean(PreferencesName.IS_AUTH, false)
+                    .apply()
+                navController.navigate(RoutesName.AUTH_SCREEN)
+                         },
+            cancelBtnClick = { isDialogopen.value=false },
+            isDialogOpen = isDialogopen.value
+        )
     }
 }
 
 @Composable
-fun showItems(icon: ImageVector, text: String, navController: NavHostController, preferences: SharedPreferences) {
+fun showItems(
+    icon: ImageVector,
+    text: String,
+    navController: NavHostController,
+    preferences: SharedPreferences,
+    isDialogopen: MutableState<Boolean>
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -129,10 +152,7 @@ fun showItems(icon: ImageVector, text: String, navController: NavHostController,
                     "Поддержка" -> navController.navigate(RoutesName.SUPPORT_SCREEN)
                     "О приложении" -> navController.navigate(RoutesName.ABOUT_SCREEN)
                     "Выход" -> {
-                        preferences.edit()
-                            .putBoolean(PreferencesName.IS_AUTH, false)
-                            .apply()
-                        navController.navigate(RoutesName.AUTH_SCREEN)
+                        isDialogopen.value=true
                     }
                 }
             }
