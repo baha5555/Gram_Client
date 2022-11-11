@@ -2,6 +2,7 @@ package com.example.gramclient.presentation
 
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -68,6 +69,9 @@ fun Navigation(navController: NavHostController, messageViewModel: Lazy<MessageV
         }
         composable(RoutesName.MESSAGE_SCREEN) {
             MessageScreen(navController, messageViewModel)
+        }
+        composable(RoutesName.ABOUT_SCREEN) {
+            AboutScreen(navController)
         }
     }
 }
