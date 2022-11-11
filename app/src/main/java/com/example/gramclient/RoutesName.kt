@@ -15,5 +15,6 @@ object RoutesName {
     const val EDIT_ADDRESSES_SCREEN="EDIT_ADDRESSES_SCREEN"
     const val PROFILE_SCREEN="PROFILE_SCREEN"
     const val MESSAGE_SCREEN="MESSAGE_SCREEN"
+    const val ABOUT_SCREEN="ABOUT_SCREEN"
 
 }
