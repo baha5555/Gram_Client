@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,11 +19,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
 
 @Composable
-fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
+fun SideBarMenu(drawerState: DrawerState, navController: NavHostController, preferences: SharedPreferences) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -109,14 +111,14 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController) {
                 "Выход",
             )
             for (i in iconList.indices){
-                showItems(iconList[i], textList[i], navController)
+                showItems(iconList[i], textList[i], navController, preferences)
             }
         }
     }
 }
 
 @Composable
-fun showItems(icon: ImageVector, text: String, navController: NavHostController) {
+fun showItems(icon: ImageVector, text: String, navController: NavHostController, preferences: SharedPreferences) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -126,6 +128,12 @@ fun showItems(icon: ImageVector, text: String, navController: NavHostController)
                     "Мои адреса" -> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
                     "Поддержка" -> navController.navigate(RoutesName.SUPPORT_SCREEN)
                     "О приложении" -> navController.navigate(RoutesName.ABOUT_SCREEN)
+                    "Выход" -> {
+                        preferences.edit()
+                            .putBoolean(PreferencesName.IS_AUTH, false)
+                            .apply()
+                        navController.navigate(RoutesName.AUTH_SCREEN)
+                    }
                 }
             }
             .padding(vertical = 15.dp, horizontal = 21.dp),

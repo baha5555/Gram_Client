@@ -1,6 +1,7 @@
 package com.example.gramclient.presentation
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.components.CustomButton
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +45,8 @@ fun IdentificationScreen(
     modifier: Modifier = Modifier,
     length: Int = 4,
     onFilled: (code: String) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    preferences: SharedPreferences
 ) {
     var code: List<Char> by remember{ mutableStateOf(listOf())}
     var time: Int by remember{ mutableStateOf(25)}
@@ -200,6 +203,9 @@ fun IdentificationScreen(
                     inclusive = true
                 }
             }
+            preferences.edit()
+                .putBoolean(PreferencesName.IS_AUTH, true)
+                .apply()
         })
     }
 }

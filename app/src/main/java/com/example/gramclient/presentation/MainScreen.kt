@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation
 
+import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.view.View
 import androidx.compose.foundation.Image
@@ -37,7 +38,7 @@ import org.osmdroid.views.MapView
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MainScreen(navController: NavHostController){
+fun MainScreen(navController: NavHostController, preferences: SharedPreferences){
 
     val mainBottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -125,7 +126,7 @@ fun MainScreen(navController: NavHostController){
         Scaffold(
             scaffoldState = scaffoldState,
             bottomBar = { BottomBar(navController, mainBottomSheetState, bottomSheetState) },
-            drawerContent = { SideBarMenu(drawerState, navController) },
+            drawerContent = { SideBarMenu(drawerState, navController, preferences) },
         ) {
             BottomSheetScaffold(
                 sheetBackgroundColor= Color.Transparent,
