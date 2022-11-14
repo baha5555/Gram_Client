@@ -79,6 +79,9 @@ fun Navigation(
         composable(RoutesName.ABOUT_SCREEN) {
             AboutScreen(navController)
         }
+        composable(RoutesName.ORDEREXECUTION_SCREEN) {
+            OrderExecution(navController)
+        }
     }
 }
 
