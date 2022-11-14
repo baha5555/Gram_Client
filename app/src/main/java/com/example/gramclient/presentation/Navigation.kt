@@ -86,6 +86,9 @@ fun Navigation(
         composable(RoutesName.ORDERS_HISTORY_SCREEN) {
             OrdersHistoryScreen(navController)
         }
+        composable(RoutesName.PROMO_CODE_SCREEN) {
+            PromoCodeScreen(navController)
+        }
     }
 }
 

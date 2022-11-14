@@ -17,6 +17,6 @@ object RoutesName {
     const val MESSAGE_SCREEN="MESSAGE_SCREEN"
     const val ABOUT_SCREEN="ABOUT_SCREEN"
     const val ORDERS_HISTORY_SCREEN="ORDERS_HISTORY_SCREEN"
-
+    const val PROMO_CODE_SCREEN="PROMO_CODE_SCREEN"
 
 }
