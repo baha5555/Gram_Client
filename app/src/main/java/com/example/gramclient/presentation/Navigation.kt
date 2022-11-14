@@ -27,7 +27,11 @@ fun Navigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = if(!preferences.getBoolean(PreferencesName.IS_AUTH, false)) RoutesName.SPLASH_SCREEN else RoutesName.MAIN_SCREEN
+        startDestination = if (!preferences.getBoolean(
+                PreferencesName.IS_AUTH,
+                false
+            )
+        ) RoutesName.SPLASH_SCREEN else RoutesName.MAIN_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
             SplashScreen(navController)
@@ -78,6 +82,9 @@ fun Navigation(
         }
         composable(RoutesName.ABOUT_SCREEN) {
             AboutScreen(navController)
+        }
+        composable(RoutesName.ORDERS_HISTORY_SCREEN) {
+            OrdersHistoryScreen(navController)
         }
     }
 }
