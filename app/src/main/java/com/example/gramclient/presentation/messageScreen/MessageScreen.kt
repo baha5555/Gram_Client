@@ -3,7 +3,9 @@ package com.example.gramclient.presentation
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -18,7 +20,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomTopBar
@@ -92,11 +93,17 @@ fun MessageScreen(
                             cursorColor = Color(0xFF000000),
                             textColor = Color.Black,
                         ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        keyboardActions = KeyboardActions {
+                            val sendMessage=message.value.trim()
+                            viewModel.value.sendMessage(sendMessage)
+                            message.value = ""
+                             }
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     IconButton(onClick = {
-                        viewModel.value.sendMessage(message.value)
+                        val sendMessage=message.value.trim()
+                        viewModel.value.sendMessage(sendMessage)
                         message.value = ""
                     }) {
                         Image(
@@ -111,21 +118,32 @@ fun MessageScreen(
             }
         },
         content = {
-            Column(modifier = Modifier
+            LazyColumn(modifier = Modifier
                 .fillMaxSize()
-                .padding(15.dp), horizontalAlignment = Alignment.End,) {
+                .padding(top = 5.dp, bottom = 90.dp, start = 5.dp, end = 5.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Bottom)
+            {
                 messages.value?.forEach { mess ->
-                    Column(
-                        modifier = Modifier
-                            .background(PrimaryColor, shape = RoundedCornerShape(10.dp))
-                            .padding(5.dp)
-                    ) {
-                        Text(
-                            text = mess,
-                            color = Color.White
-                        )
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Card(
+                                modifier = Modifier.widthIn(max = 340.dp),
+                                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp), // 3
+                                backgroundColor = PrimaryColor,
+                            ) {
+                                Text(
+                                    modifier = Modifier.padding(8.dp),
+                                    text = mess,
+                                    color = Color.White
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(5.dp))
                     }
-                    Spacer(modifier = Modifier.height(5.dp))
                 }
             }
         }

@@ -11,7 +11,9 @@ class MessageViewModel:ViewModel() {
     val _messages = mutableListOf<String>()
 
     fun sendMessage(message:String){
-        _messages.add(message)
-        messages.value=_messages.toList()
+        if(message.isNotEmpty()) {
+            _messages.add(message)
+            messages.value = _messages.toList()
+        }
     }
 }
