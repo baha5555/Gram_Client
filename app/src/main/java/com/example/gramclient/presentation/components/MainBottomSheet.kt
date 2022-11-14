@@ -29,6 +29,7 @@ fun MainBottomSheet(
     val context = LocalContext.current
     var text by remember { mutableStateOf("") }
     var isTaxiState by remember { mutableStateOf(true) }
+    val switchState = remember{ mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -238,10 +239,7 @@ fun MainBottomSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween){
                     Text(text = "Перевозка домашнего животного", fontSize = 16.sp)
-                    Switch(
-                        checked = true,
-                        onCheckedChange = { }
-                    )
+                    CustomSwitch(switchON = switchState)
                 }
                 Divider()
                 Row(
@@ -251,10 +249,7 @@ fun MainBottomSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween){
                     Text(text = "Донести вещи, проводить", fontSize = 16.sp)
-                    Switch(
-                        checked = true,
-                        onCheckedChange = { }
-                    )
+                    CustomSwitch(switchON = switchState)
                 }
                 Divider()
                 Row(
@@ -264,10 +259,7 @@ fun MainBottomSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween){
                     Text(text = "Поездка в тишине", fontSize = 16.sp)
-                    Switch(
-                        checked = true,
-                        onCheckedChange = { }
-                    )
+                    CustomSwitch(switchON = switchState)
                 }
             }
         }
