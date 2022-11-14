@@ -154,6 +154,12 @@ fun showItems(
                     "Выход" -> {
                         isDialogopen.value=true
                     }
+                    "История заказов"-> {
+                        navController.navigate(RoutesName.ORDERS_HISTORY_SCREEN)
+                    }
+                    "Промокоды"->{
+                        navController.navigate(RoutesName.PROMO_CODE_SCREEN)
+                    }
                 }
             }
             .padding(vertical = 15.dp, horizontal = 21.dp),
