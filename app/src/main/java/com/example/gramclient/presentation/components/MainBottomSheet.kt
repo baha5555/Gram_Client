@@ -118,7 +118,7 @@ fun MainBottomSheet(
                 }
                 if(bottomSheetState.bottomSheetState.isCollapsed){
                     Spacer(modifier = Modifier.height(15.dp))
-                    CustomTab(){
+                    CustomTab{
                         isTaxiState=!isTaxiState
                     }
                     Spacer(modifier = Modifier.height(23.dp))

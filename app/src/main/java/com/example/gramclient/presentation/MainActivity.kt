@@ -13,13 +13,14 @@ import com.example.gramclient.presentation.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
 import kotlinx.coroutines.delay
 
+@Suppress("DEPRECATION")
 class MainActivity : ComponentActivity() {
-    lateinit var preferences: SharedPreferences
+    private lateinit var preferences: SharedPreferences
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         setContent {
             GramClientTheme {
                 val messageViewModel= viewModels<MessageViewModel>()

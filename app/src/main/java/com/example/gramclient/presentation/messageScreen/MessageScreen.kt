@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation
+package com.example.gramclient.presentation.messageScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomTopBar
-import com.example.gramclient.presentation.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 
@@ -33,7 +32,7 @@ fun MessageScreen(
     navController: NavHostController,
     viewModel: Lazy<MessageViewModel>
 ){
-    var message = remember { mutableStateOf("") }
+    val message = remember { mutableStateOf("") }
     val messages=viewModel.value.messages.observeAsState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),

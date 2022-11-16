@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -22,7 +21,7 @@ import com.example.gramclient.presentation.components.CustomTopBar
 
 @Composable
 fun OrdersHistoryScreen(navController: NavHostController) {
-    Column() {
+    Column{
         CustomTopBar(title = "История заказов", navController = navController)
         ListHistoryItem(status = "Выполнен")
         ListHistoryItem(status = "Отменен")
@@ -31,7 +30,7 @@ fun OrdersHistoryScreen(navController: NavHostController) {
 
 @Composable
 fun ListHistoryItem(status: String) {
-    var expanded = remember { mutableStateOf(false) }
+    val expanded = remember { mutableStateOf(false) }
     Card(
         Modifier
             .padding(top = 15.dp, start = 15.dp, end = 15.dp)

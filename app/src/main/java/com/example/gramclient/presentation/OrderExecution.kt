@@ -2,17 +2,13 @@ package com.example.gramclient.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -34,9 +30,9 @@ fun OrderExecution(navController: NavHostController) {
     )
     val coroutineScope= rememberCoroutineScope()
     var text by remember { mutableStateOf("") }
-    val showMylocation = remember{ mutableStateOf(false) }
+    val showMyLocation = remember{ mutableStateOf(false) }
 
-    val isDialogopen= remember{ mutableStateOf(false) }
+    val isDialogOpen= remember{ mutableStateOf(false) }
 
     BottomSheetScaffold(
         scaffoldState = sheetState,
@@ -265,7 +261,7 @@ fun OrderExecution(navController: NavHostController) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Row(modifier= Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
-                                    Column() {
+                                    Column {
                                         Text(text = "Наличные")
                                         Text(text = "Способ оплаты", fontSize = 12.sp, color = Color.Gray)
                                     }
@@ -301,7 +297,7 @@ fun OrderExecution(navController: NavHostController) {
                                     .padding(end = 15.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
                                     Text(text = "Показать водителю, где я")
-                                    CustomSwitch(switchON = showMylocation)
+                                    CustomSwitch(switchON = showMyLocation)
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Divider(color = Color(0x72111111))
@@ -324,7 +320,7 @@ fun OrderExecution(navController: NavHostController) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Row(modifier= Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
-                                    Column() {
+                                    Column {
                                         Text(text = "Стоимость поездки")
                                         Text(text = "11 сомон", fontSize = 12.sp, color = Color.Gray)
                                     }
@@ -355,7 +351,7 @@ fun OrderExecution(navController: NavHostController) {
                                 shape = RoundedCornerShape(50.dp)
                             ) {
                                 IconButton(onClick = {
-                                    isDialogopen.value=true
+                                    isDialogOpen.value=true
                                 }) {
                                     Image(
                                         modifier = Modifier
@@ -379,12 +375,12 @@ fun OrderExecution(navController: NavHostController) {
             text = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?",
             okBtnClick = {
                 coroutineScope.launch {
-                    isDialogopen.value = false
+                    isDialogOpen.value = false
                     sheetState.bottomSheetState.collapse()
                 }
                          },
-            cancelBtnClick = { isDialogopen.value=false },
-            isDialogOpen = isDialogopen.value
+            cancelBtnClick = { isDialogOpen.value=false },
+            isDialogOpen = isDialogOpen.value
         )
     }
 }

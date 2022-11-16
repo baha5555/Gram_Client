@@ -15,9 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
@@ -31,7 +29,7 @@ fun BottomBar(
     bottomSheetState: BottomSheetScaffoldState,
 ) {
     val coroutineScope= rememberCoroutineScope()
-    val isDialogopen=remember{ mutableStateOf(false) }
+    val isDialogOpen=remember{ mutableStateOf(false) }
 
     BottomAppBar(
         backgroundColor = Color(0xFFF7F7F7),
@@ -73,7 +71,7 @@ fun BottomBar(
                 textSize = 18,
                 textBold = true,
             onClick = {
-                isDialogopen.value=true
+                isDialogOpen.value=true
             })
             IconButton(onClick = {
                 coroutineScope.launch {
@@ -95,10 +93,10 @@ fun BottomBar(
             text = "Оформить данный заказ?",
             okBtnClick = {
                 navController.navigate(RoutesName.ORDEREXECUTION_SCREEN)
-                isDialogopen.value=false
+                isDialogOpen.value=false
                          },
-            cancelBtnClick = { isDialogopen.value=false },
-            isDialogOpen = isDialogopen.value
+            cancelBtnClick = { isDialogOpen.value=false },
+            isDialogOpen = isDialogOpen.value
         )
     }
 }

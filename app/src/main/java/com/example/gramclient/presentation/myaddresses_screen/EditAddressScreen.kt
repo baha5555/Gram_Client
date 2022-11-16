@@ -33,7 +33,7 @@ fun EditAddressScreen(navController: NavHostController) {
         }
         Column(Modifier.fillMaxHeight(0.3f)) {
             CustomSearch(search = search, "Введите название адреса")
-            Row() {
+            Row{
                 Box(
                     modifier = Modifier
                         .height(100.dp)
@@ -51,7 +51,7 @@ fun EditAddressScreen(navController: NavHostController) {
                         .fillMaxWidth(1f).padding(end=20.dp),
                     Arrangement.SpaceEvenly
                 ) {
-                    Column() {
+                    Column{
                         Text(
                             text = "Паприка (Меҳмонхонаи Суғдиён)",
                             fontWeight = FontWeight.Medium,
