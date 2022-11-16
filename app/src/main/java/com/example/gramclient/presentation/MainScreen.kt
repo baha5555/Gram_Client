@@ -126,7 +126,7 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
         Scaffold(
             scaffoldState = scaffoldState,
             bottomBar = { BottomBar(navController, mainBottomSheetState, bottomSheetState) },
-            drawerContent = { SideBarMenu(drawerState, navController, preferences) },
+            drawerContent = { SideBarMenu(navController, preferences) },
         ) {
             BottomSheetScaffold(
                 sheetBackgroundColor= Color.Transparent,

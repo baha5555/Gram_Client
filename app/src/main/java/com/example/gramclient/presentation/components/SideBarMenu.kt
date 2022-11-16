@@ -6,8 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DrawerState
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -27,8 +25,11 @@ import com.example.gramclient.R
 import com.example.gramclient.RoutesName
 
 @Composable
-fun SideBarMenu(drawerState: DrawerState, navController: NavHostController, preferences: SharedPreferences) {
-    val isDialogopen= remember{ mutableStateOf(false) }
+fun SideBarMenu(
+    navController: NavHostController,
+    preferences: SharedPreferences
+) {
+    val isDialogOpen = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -58,6 +59,9 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController, pref
         }
         Column(
             modifier = Modifier
+                .clickable {
+                    navController.navigate(RoutesName.PROFILE_SCREEN)
+                }
                 .fillMaxWidth()
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -68,34 +72,30 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController, pref
                     .background(Color.White, shape = RoundedCornerShape(50.dp))
                     .padding(15.dp),
                 content = {
-                    IconButton(onClick = { navController.navigate(RoutesName.PROFILE_SCREEN) }) {
-                        Image(
-                            modifier = Modifier
-                                .width(60.dp)
-                                .height(60.dp),
-                            imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
-                            contentDescription = "",
-                        )
-                    }
+                    Image(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(60.dp),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
+                        contentDescription = "",
+                    )
                 }
             )
             Spacer(modifier = Modifier.height(15.dp))
-            Text(modifier = Modifier.clickable {
-                navController.navigate(RoutesName.PROFILE_SCREEN)
-            },
-                text = "Ваше имя...", fontSize = 22.sp, color = Color.White)
+            Text(
+                text = "Ваше имя...", fontSize = 22.sp, color = Color.White
+            )
             Spacer(modifier = Modifier.height(15.dp))
-            Text(modifier = Modifier.clickable {
-                navController.navigate(RoutesName.PROFILE_SCREEN)
-            },
-                text = "Добавьте почту...", fontSize = 18.sp, color = Color.White)
+            Text(
+                text = "Добавьте почту...", fontSize = 18.sp, color = Color.White
+            )
+            Spacer(modifier = Modifier.height(30.dp))
         }
-        Spacer(modifier = Modifier.height(30.dp))
         Column(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            var iconList = arrayOf<ImageVector>(
+            val iconList = arrayOf(
                 ImageVector.vectorResource(id = R.drawable.phone_icon),
                 ImageVector.vectorResource(id = R.drawable.star_icon),
                 ImageVector.vectorResource(id = R.drawable.clock_icon),
@@ -105,7 +105,7 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController, pref
                 ImageVector.vectorResource(id = R.drawable.about_icon),
                 ImageVector.vectorResource(id = R.drawable.logout_icon),
             )
-            val textList = arrayOf<String>(
+            val textList = arrayOf(
                 "Позвонить оператору",
                 "Мои адреса",
                 "История заказов",
@@ -115,32 +115,31 @@ fun SideBarMenu(drawerState: DrawerState, navController: NavHostController, pref
                 "О приложении",
                 "Выход",
             )
-            for (i in iconList.indices){
-                showItems(iconList[i], textList[i], navController, preferences, isDialogopen)
+            for (i in iconList.indices) {
+                ShowItems(iconList[i], textList[i], navController, isDialogOpen)
             }
         }
         CustomDialog(
             text = "Вы уверены что хотите выйти?",
             okBtnClick = {
-                isDialogopen.value=false
+                isDialogOpen.value = false
                 preferences.edit()
                     .putBoolean(PreferencesName.IS_AUTH, false)
                     .apply()
                 navController.navigate(RoutesName.AUTH_SCREEN)
-                         },
-            cancelBtnClick = { isDialogopen.value=false },
-            isDialogOpen = isDialogopen.value
+            },
+            cancelBtnClick = { isDialogOpen.value = false },
+            isDialogOpen = isDialogOpen.value
         )
     }
 }
 
 @Composable
-fun showItems(
+fun ShowItems(
     icon: ImageVector,
     text: String,
     navController: NavHostController,
-    preferences: SharedPreferences,
-    isDialogopen: MutableState<Boolean>
+    isDialogOpen: MutableState<Boolean>
 ) {
     Row(
         modifier = Modifier
@@ -152,12 +151,12 @@ fun showItems(
                     "Поддержка" -> navController.navigate(RoutesName.SUPPORT_SCREEN)
                     "О приложении" -> navController.navigate(RoutesName.ABOUT_SCREEN)
                     "Выход" -> {
-                        isDialogopen.value=true
+                        isDialogOpen.value = true
                     }
-                    "История заказов"-> {
+                    "История заказов" -> {
                         navController.navigate(RoutesName.ORDERS_HISTORY_SCREEN)
                     }
-                    "Промокоды"->{
+                    "Промокоды" -> {
                         navController.navigate(RoutesName.PROMO_CODE_SCREEN)
                     }
                 }
