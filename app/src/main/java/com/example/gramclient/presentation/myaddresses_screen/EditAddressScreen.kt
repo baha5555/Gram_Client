@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
+import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.presentation.components.CustomSearch
 import com.example.gramclient.presentation.components.CustomTopBar
 
@@ -30,8 +31,7 @@ fun EditAddressScreen(navController: NavHostController) {
         val search = remember {
             mutableStateOf("Дом")
         }
-        Column() {
-
+        Column(Modifier.fillMaxHeight(0.3f)) {
             CustomSearch(search = search, "Введите название адреса")
             Row() {
                 Box(
@@ -77,6 +77,20 @@ fun EditAddressScreen(navController: NavHostController) {
                             ),
                     )
                 }
+            }
+        }
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .padding(20.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            CustomButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Сахранить",
+                textSize = 18,
+                textBold = false
+            ) {
             }
         }
     }
