@@ -41,14 +41,14 @@ fun MyAddressesScreen(navController: NavHostController) {
                     modifier = Modifier.padding(15.dp),
                     color = Color(0xFF434B53)
                 )
-                listAddressesShow(1, "Дом", navController)
-                listAddressesShow(2, "Работа", navController)
+                ListAddressesShow(1, "Дом", navController)
+                ListAddressesShow(2, "Работа", navController)
             }
             FloatingActionButton(
                 backgroundColor = Color(0xFF2264D1),
                 contentColor = Color.White,
                 onClick = { navController.navigate(RoutesName.ADD_ADDRESSES_SCREEN) },
-                modifier = Modifier.offset(-30.dp, -35.dp)
+                modifier = Modifier.offset((-30).dp, (-35).dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -62,7 +62,7 @@ fun MyAddressesScreen(navController: NavHostController) {
 }
 
 @Composable
-fun listAddressesShow(num: Int, title: String, navController: NavHostController) {
+fun ListAddressesShow(num: Int, title: String, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -73,7 +73,7 @@ fun listAddressesShow(num: Int, title: String, navController: NavHostController)
             Image(
                 modifier = Modifier
                     .size(24.dp)
-                    .offset(-10.dp, 10.dp)
+                    .offset((-10).dp, 10.dp)
                     .clickable { navController.navigate(RoutesName.EDIT_ADDRESSES_SCREEN)},
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_edit_blue),
                 contentDescription = "",

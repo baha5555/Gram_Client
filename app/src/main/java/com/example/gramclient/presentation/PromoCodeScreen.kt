@@ -26,7 +26,7 @@ import com.example.gramclient.ui.theme.PrimaryColor
 @Composable
 fun PromoCodeScreen(navController: NavHostController) {
     Scaffold(topBar = { CustomTopBar(title = "Промокоды", navController = navController) }) {
-        Column() {
+        Column{
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

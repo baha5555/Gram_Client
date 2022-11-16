@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun CustomTab(function: () -> Unit) {
     var selectedIndex by remember { mutableStateOf(0) }

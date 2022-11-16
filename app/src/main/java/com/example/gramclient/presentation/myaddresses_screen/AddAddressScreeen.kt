@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation.myaddresses_screen
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
@@ -11,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,7 +20,6 @@ import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.presentation.components.CustomSearch
 import com.example.gramclient.presentation.components.CustomTopBar
-import com.example.gramclient.ui.theme.DividerColor
 
 @Composable
 fun AddAddressScreen(navController: NavHostController) {
@@ -35,7 +32,7 @@ fun AddAddressScreen(navController: NavHostController) {
         val search = remember {
             mutableStateOf("")
         }
-        Column() {
+        Column {
             CustomSearch(search = search, "Название, например “Дом”")
             Row(
                 Modifier

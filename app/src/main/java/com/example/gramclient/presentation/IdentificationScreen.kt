@@ -17,8 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,7 +28,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
@@ -63,7 +60,7 @@ fun IdentificationScreen(
     coroutineScope.launch(Dispatchers.Main){
         while (time>0) {
             delay(1000L)
-            time=time-1
+            time -= 1
         }
     }
     ConstraintLayout(
@@ -168,7 +165,7 @@ fun IdentificationScreen(
                         coroutineScope.launch(Dispatchers.Main) {
                             while (time > 0) {
                                 delay(1000L)
-                                time = time - 1
+                                time -= 1
                             }
                         }
                     }

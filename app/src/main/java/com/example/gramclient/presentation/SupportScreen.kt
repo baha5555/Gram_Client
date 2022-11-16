@@ -87,7 +87,7 @@ fun SupportScreen(navController: NavHostController){
                                 contentDescription = "icon"
                             )
                             Spacer(modifier = Modifier.width(25.dp))
-                            Column() {
+                            Column {
                                 Text(text = "Среднее время ответа!", fontSize = 13.sp, color = Color.Gray)
                                 Spacer(modifier = Modifier.height(7.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
