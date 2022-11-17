@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.navigation.compose.rememberNavController
 import com.example.gramclient.PreferencesName
+import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
 import kotlinx.coroutines.delay
@@ -24,8 +25,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             GramClientTheme {
                 val messageViewModel= viewModels<MessageViewModel>()
+                val authViewModel= viewModels<AuthViewModel>()
                 val navController= rememberNavController()
-                Navigation(navController =navController, messageViewModel, preferences)
+                Navigation(navController =navController, messageViewModel, preferences, authViewModel)
             }
         }
         preferences=getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
