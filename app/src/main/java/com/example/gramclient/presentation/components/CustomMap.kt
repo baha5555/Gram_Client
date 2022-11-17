@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.gramclient.presentation.components
 
 import android.animation.AnimatorSet
@@ -34,7 +36,7 @@ fun CustomMap() {
     },
         update = {
             //val roadManager:RoadManager=OSRMRoadManager(it.context, "GramDriver/1.0")
-            map=it.findViewById<MapView>(R.id.map)
+            map=it.findViewById(R.id.map)
             val btnLocation=it.findViewById<ImageButton>(R.id.btnLocation)
             
 
@@ -63,14 +65,14 @@ fun CustomMap() {
             btnLocation.setOnClickListener{
                 try {
                     if (map.overlays.contains(mLocationOverlay)) {
-                        val myLocation: GeoPoint = mLocationOverlay.getMyLocation()
+                        val myLocation: GeoPoint = mLocationOverlay.myLocation
                         if (myLocation.latitude != 0.0 && myLocation.longitude != 0.0) {
                             //Log.d("MyApp3", "jumpToLocation " + myLocation.getLatitude() + ";" + myLocation.getLongitude());
                             jump(myLocation)
                             return@setOnClickListener
                         }
                     }
-                }catch (e: Exception){
+                }catch (_: Exception){
 
                 }
             }
@@ -119,19 +121,19 @@ private fun jump(targetPoint: GeoPoint) {
 
 private fun jump(targetPoint: GeoPoint, requestedZoom: Double) {
     setRequiredCenter(targetPoint)
-    if (map.getWidth() == 0 || map.getHeight() == 0) { // no animation possible
-        map.getController().setCenter(targetPoint)
+    if (map.width == 0 || map.height == 0) { // no animation possible
+        map.controller.setCenter(targetPoint)
         return
     }
-    val startPoint = GeoPoint(map.getMapCenter())
-    val startZoom: Double = map.getZoomLevelDouble()
+    val startPoint = GeoPoint(map.mapCenter)
+    val startZoom: Double = map.zoomLevelDouble
     val targetZoom = if (requestedZoom == 0.0) startZoom else requestedZoom
     val points: MutableList<GeoPoint> = ArrayList()
     points.add(startPoint)
     points.add(targetPoint)
     val boundingBox1 = BoundingBox.fromGeoPoints(points)
     val intermediateZoom =
-        MapView.getTileSystem().getBoundingBoxZoom(boundingBox1, map.getWidth(), map.getHeight())
+        MapView.getTileSystem().getBoundingBoxZoom(boundingBox1, map.width, map.height)
     //        final GeoPoint intermediatePoint = boundingBox1.getCenterWithDateLine();
 //        if (BuildConfig.DEBUG)
 //            Toast.makeText(this, "Zooms " + startZoom + " " + intermediateZoom, Toast.LENGTH_SHORT).show();
@@ -144,7 +146,7 @@ private fun jump(targetPoint: GeoPoint, requestedZoom: Double) {
         zoomOut.addUpdateListener { updatedAnimation: ValueAnimator ->
             val fraction = updatedAnimation.animatedFraction
             try { // for an unknown reason here happens a crash in BoundingBox.set
-                map.getController().setZoom(startZoom + (intermediateZoom - startZoom) * fraction)
+                map.controller.setZoom(startZoom + (intermediateZoom - startZoom) * fraction)
             } catch (ignored: Exception) {
             }
         }
@@ -153,10 +155,10 @@ private fun jump(targetPoint: GeoPoint, requestedZoom: Double) {
         move.duration = 500.toLong()
         move.addUpdateListener { updatedAnimation: ValueAnimator ->
             val fraction = updatedAnimation.animatedFraction
-            map.getController().setCenter(
+            map.controller.setCenter(
                 GeoPoint(
-                    startPoint.getLatitude() + (targetPoint.latitude - startPoint.getLatitude()) * fraction,
-                    startPoint.getLongitude() + (targetPoint.longitude - startPoint.getLongitude()) * fraction
+                    startPoint.latitude + (targetPoint.latitude - startPoint.latitude) * fraction,
+                    startPoint.longitude + (targetPoint.longitude - startPoint.longitude) * fraction
                 )
             )
         }
@@ -165,9 +167,9 @@ private fun jump(targetPoint: GeoPoint, requestedZoom: Double) {
         zoomIn.duration = speed.toLong()
         zoomIn.addUpdateListener { updatedAnimation: ValueAnimator ->
             val fraction = updatedAnimation.animatedFraction
-            map.getController()
+            map.controller
                 .setZoom(intermediateZoom + (targetZoom - intermediateZoom) * fraction)
-            map.getController().setCenter(targetPoint) // important
+            map.controller.setCenter(targetPoint) // important
         }
         zoomOut.interpolator = DecelerateInterpolator()
         val animation = AnimatorSet()
@@ -178,13 +180,13 @@ private fun jump(targetPoint: GeoPoint, requestedZoom: Double) {
         move.duration = 500.toLong()
         move.addUpdateListener { updatedAnimation: ValueAnimator ->
             val fraction = updatedAnimation.animatedFraction
-            map.getController().setCenter(
+            map.controller.setCenter(
                 GeoPoint(
-                    startPoint.getLatitude() + (targetPoint.latitude - startPoint.getLatitude()) * fraction,
-                    startPoint.getLongitude() + (targetPoint.longitude - startPoint.getLongitude()) * fraction
+                    startPoint.latitude + (targetPoint.latitude - startPoint.latitude) * fraction,
+                    startPoint.longitude + (targetPoint.longitude - startPoint.longitude) * fraction
                 )
             )
-            if (targetZoom != startZoom) map.getController()
+            if (targetZoom != startZoom) map.controller
                 .setZoom(startZoom + (targetZoom - startZoom) * fraction)
         }
         move.interpolator = AccelerateDecelerateInterpolator()
