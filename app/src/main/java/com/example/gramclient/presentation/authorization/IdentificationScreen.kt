@@ -2,6 +2,7 @@ package com.example.gramclient.presentation
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,28 +28,32 @@ import com.example.gramclient.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.components.CustomButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@SuppressLint("CoroutineCreationDuringComposition", "SuspiciousIndentation")
 @Composable
 fun IdentificationScreen(
     modifier: Modifier = Modifier,
     length: Int = 4,
     onFilled: (code: String) -> Unit,
     navController: NavHostController,
-    preferences: SharedPreferences
+    preferences: SharedPreferences,
+    viewModel: Lazy<AuthViewModel>
 ) {
     var code: List<Char> by remember{ mutableStateOf(listOf())}
     var time: Int by remember{ mutableStateOf(25)}
 
     val coroutineScope= rememberCoroutineScope()
+    val context=LocalContext.current
 
     val focusRequesters: List<FocusRequester> = remember {
         val temp = mutableListOf<FocusRequester>()
@@ -95,7 +100,7 @@ fun IdentificationScreen(
                 .padding(top = 47.dp)
         ){
             Text(text = "Сообщение с кодом отправлено на", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-            Text(text = "+992 92999-99-99", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+            Text(text = "+992${viewModel.value.phoneNumber}", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
         }
 
         Row(modifier = modifier
@@ -195,14 +200,24 @@ fun IdentificationScreen(
             textBold = true,
             enabled = code.size==4,
         onClick = {
-            navController.navigate(RoutesName.MAIN_SCREEN){
-                popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
-                    inclusive = true
+            try {
+                if(code.isNotEmpty()) {
+                    viewModel.value.identification(listOf())
+                    navController.navigate(RoutesName.MAIN_SCREEN) {
+                        popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                    preferences.edit()
+                        .putBoolean(PreferencesName.IS_AUTH, true)
+                        .apply()
+                    preferences.edit()
+                        .putString(PreferencesName.ACCESS_TOKEN, viewModel.value.accsess_token)
+                        .apply()
                 }
+            }catch (e:Exception){
+                Toast.makeText(context, "Неверный код, повторите еще раз пожалуйста", Toast.LENGTH_LONG).show()
             }
-            preferences.edit()
-                .putBoolean(PreferencesName.IS_AUTH, true)
-                .apply()
         })
     }
 }

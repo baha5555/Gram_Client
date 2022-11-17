@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.messageScreen.MessageScreen
 import com.example.gramclient.presentation.messageScreen.MessageViewModel
 import com.example.gramclient.presentation.myaddresses_screen.AddAddressScreen
@@ -24,7 +25,8 @@ import com.example.gramclient.presentation.setting_screens.SettingSelectRegionSc
 fun Navigation(
     navController: NavHostController,
     messageViewModel: Lazy<MessageViewModel>,
-    preferences: SharedPreferences
+    preferences: SharedPreferences,
+    authViewModel: Lazy<AuthViewModel>
 ) {
     NavHost(
         navController = navController,
@@ -42,11 +44,12 @@ fun Navigation(
                 modifier = Modifier.fillMaxWidth(),
                 onFilled = { Log.d("Tag", "Hello") },
                 navController = navController,
-                preferences = preferences
+                preferences = preferences,
+                viewModel = authViewModel
             )
         }
         composable(RoutesName.AUTH_SCREEN) {
-            AuthorizationScreen(navController)
+            AuthorizationScreen(navController, authViewModel)
         }
         composable(RoutesName.MAIN_SCREEN) {
             MainScreen(navController, preferences)
