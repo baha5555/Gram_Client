@@ -2,13 +2,9 @@ package com.example.gramclient.presentation
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -69,8 +65,7 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "Способ оплаты",
@@ -81,39 +76,33 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     paymentMethods.forEachIndexed { idx, item ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { paymentState.value = item }
-                                .padding(vertical = 15.dp),
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { paymentState.value = item }
+                            .padding(vertical = 15.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
+                            horizontalArrangement = Arrangement.SpaceBetween) {
                             Row {
                                 Image(
-                                    modifier = Modifier
-                                        .size(20.dp),
+                                    modifier = Modifier.size(20.dp),
                                     imageVector = ImageVector.vectorResource(if (idx == 0) R.drawable.wallet_icon else if (idx == 1) R.drawable.payment_card_icon else R.drawable.bonus_icon),
                                     contentDescription = "Logo"
                                 )
                                 Spacer(modifier = Modifier.width(19.dp))
                                 Text(text = item)
                             }
-                            CustomCheckBox(
-                                size = 25.dp,
+                            CustomCheckBox(size = 25.dp,
                                 isChecked = paymentState.value == item,
-                                onChecked = { paymentState.value = item }
-                            )
+                                onChecked = { paymentState.value = item })
                         }
                         Divider()
                     }
                 }
                 Spacer(modifier = Modifier.height(54.dp))
-                CustomButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(55.dp)
-                        .clip(RoundedCornerShape(12.dp)),
+                CustomButton(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp)
+                    .clip(RoundedCornerShape(12.dp)),
                     text = "Готово",
                     textSize = 20,
                     textBold = true,
@@ -133,8 +122,7 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
         }
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             HorizontalPager(
                 state = pagerState,
@@ -143,8 +131,6 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                 userScrollEnabled = false
             ) { page ->
                 pageNum.value = page
-                var offset by remember { mutableStateOf(0f) }
-                var offse2 = offset
 
                 if (page == 0) {
                     Box(
@@ -154,55 +140,32 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                         contentAlignment = Alignment.CenterEnd
                     ) {
                         SideBarMenu(navController, preferences)
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
+                        Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
                             contentDescription = "",
                             modifier = Modifier
                                 .offset(43.dp, 0.dp)
                                 .width(100.dp)
                                 .clickable {
+                                    if (pageNum.value == 1) scope.launch {
+                                        pagerState.animateScrollToPage(0)
+                                        pageNum.value = 0
 
-                                    if (pageNum.value == 1) {
-                                        scope.launch {
-                                            pagerState.animateScrollToPage(0)
-                                            pageNum.value = 0
-                                        }
-                                    } else {
-                                        scope.launch {
-                                            pagerState.animateScrollToPage(1)
-                                            pageNum.value = 1
-                                        }
+                                    } else scope.launch {
+                                        pagerState.animateScrollToPage(1)
+                                        pageNum.value = 1
                                     }
-                                }
-                                .scrollable(
-                                    orientation = Orientation.Vertical,
-                                    // Scrollable state: describes how to consume
-                                    // scrolling delta and update offset
-                                    state = rememberScrollableState { delta ->
-                                        offset += delta
-                                        delta
-                                    }
-                                )
-                        )
+                                })
                     }
                 } else {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Green),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.CenterStart
-
                     ) {
-                        Scaffold(
-                            scaffoldState = scaffoldState,
-                            bottomBar = {
-                                BottomBar(
-                                    navController,
-                                    mainBottomSheetState,
-                                    bottomSheetState
-                                )
-                            }
-                        ) {
+                        Scaffold(scaffoldState = scaffoldState, bottomBar = {
+                            BottomBar(
+                                navController, mainBottomSheetState, bottomSheetState
+                            )
+                        }) {
                             BottomSheetScaffold(
                                 sheetBackgroundColor = Color.Transparent,
                                 scaffoldState = mainBottomSheetState,
@@ -210,42 +173,28 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                                 sheetContent = {
                                     MainBottomSheet(navController, mainBottomSheetState)
                                 },
-                                sheetPeekHeight = 440.dp,
+                                sheetPeekHeight = 360.dp,
                             ) {
                                 CustomMap()
                             }
                         }
-
-                        Box(Modifier.scrollable(
-                            orientation = Orientation.Horizontal,
-                            state = rememberScrollableState{delta->
-                                offset += delta
-                                Log.d("lsdoaj", ""+offset)
-                                delta
-                            }
-                        )){
-                            Image(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer_blue),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .offset(-(47).dp, 0.dp)
-                                    .width(100.dp)
-                                    .rotate(180f)
-                                    .clickable {
-                                        if (pageNum.value == 1) {
-                                            scope.launch {
-                                                pagerState.animateScrollToPage(0)
-                                                pageNum.value = 0
-                                            }
-                                        } else {
-                                            scope.launch {
-                                                pagerState.animateScrollToPage(1)
-                                                pageNum.value = 1
-                                            }
-                                        }
+                        Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer_blue),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .offset(-(47).dp, 0.dp)
+                                .width(100.dp)
+                                .rotate(180f)
+                                .clickable {
+                                    if (pageNum.value == 1) scope.launch {
+                                        pagerState.animateScrollToPage(0)
+                                        pageNum.value = 0
                                     }
-                            )
-                        }
+                                    else scope.launch {
+                                        pagerState.animateScrollToPage(1)
+                                        pageNum.value = 1
+                                    }
+                                })
+
                     }
                 }
             }

@@ -10,7 +10,7 @@ import androidx.activity.viewModels
 import androidx.navigation.compose.rememberNavController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
-import com.example.gramclient.presentation.messageScreen.MessageViewModel
+import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
 import kotlinx.coroutines.delay
 

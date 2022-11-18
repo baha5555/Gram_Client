@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation.myaddresses_screen
+package com.example.gramclient.presentation.drawer_bar.myaddresses_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

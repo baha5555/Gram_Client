@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation.messageScreen
+package com.example.gramclient.presentation.drawer_bar.messageScreen
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
