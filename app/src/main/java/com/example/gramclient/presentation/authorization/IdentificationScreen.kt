@@ -201,20 +201,18 @@ fun IdentificationScreen(
             enabled = code.size==4,
         onClick = {
             try {
-                if(code.isNotEmpty()) {
-                    viewModel.value.identification(listOf())
-                    navController.navigate(RoutesName.MAIN_SCREEN) {
-                        popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
-                            inclusive = true
-                        }
+                viewModel.value.identification(code)
+                navController.navigate(RoutesName.MAIN_SCREEN) {
+                    popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
+                        inclusive = true
                     }
-                    preferences.edit()
-                        .putBoolean(PreferencesName.IS_AUTH, true)
-                        .apply()
-                    preferences.edit()
-                        .putString(PreferencesName.ACCESS_TOKEN, viewModel.value.accsess_token)
-                        .apply()
                 }
+                preferences.edit()
+                    .putBoolean(PreferencesName.IS_AUTH, true)
+                    .apply()
+                preferences.edit()
+                    .putString(PreferencesName.ACCESS_TOKEN, viewModel.value.accsess_token)
+                    .apply()
             }catch (e:Exception){
                 Toast.makeText(context, "Неверный код, повторите еще раз пожалуйста", Toast.LENGTH_LONG).show()
             }
