@@ -11,15 +11,15 @@ import androidx.navigation.compose.composable
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
-import com.example.gramclient.presentation.messageScreen.MessageScreen
-import com.example.gramclient.presentation.messageScreen.MessageViewModel
-import com.example.gramclient.presentation.myaddresses_screen.AddAddressScreen
-import com.example.gramclient.presentation.myaddresses_screen.EditAddressScreen
-import com.example.gramclient.presentation.myaddresses_screen.MyAddressesScreen
-import com.example.gramclient.presentation.setting_screens.SettingLanguageScreen
-import com.example.gramclient.presentation.setting_screens.SettingRegionScreen
-import com.example.gramclient.presentation.setting_screens.SettingScreen
-import com.example.gramclient.presentation.setting_screens.SettingSelectRegionScreen
+import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageScreen
+import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
+import com.example.gramclient.presentation.drawer_bar.myaddresses_screen.AddAddressScreen
+import com.example.gramclient.presentation.drawer_bar.myaddresses_screen.EditAddressScreen
+import com.example.gramclient.presentation.drawer_bar.myaddresses_screen.MyAddressesScreen
+import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingLanguageScreen
+import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingRegionScreen
+import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingScreen
+import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSelectRegionScreen
 
 @Composable
 fun Navigation(
@@ -34,7 +34,7 @@ fun Navigation(
                 PreferencesName.IS_AUTH,
                 false
             )
-        ) RoutesName.SPLASH_SCREEN else RoutesName.MAIN_SCREEN
+        ) RoutesName.MAIN_SCREEN else RoutesName.MAIN_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
             SplashScreen(navController)

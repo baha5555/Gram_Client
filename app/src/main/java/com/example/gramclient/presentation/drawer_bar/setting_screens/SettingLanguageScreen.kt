@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation.setting_screens
+package com.example.gramclient.presentation.drawer_bar.setting_screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
