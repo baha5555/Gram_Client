@@ -1,6 +1,8 @@
 package com.example.gramclient.presentation.components
 
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
@@ -141,6 +145,7 @@ fun ShowItems(
     navController: NavHostController,
     isDialogOpen: MutableState<Boolean>
 ) {
+    val context= LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -158,6 +163,12 @@ fun ShowItems(
                     }
                     "Промокоды" -> {
                         navController.navigate(RoutesName.PROMO_CODE_SCREEN)
+                    }
+                    "Позвонить оператору" -> {
+                        val callIntent: Intent = Uri.parse("tel:0666").let { number ->
+                            Intent(Intent.ACTION_DIAL, number)
+                        }
+                        context.startActivity(callIntent)
                     }
                 }
             }
