@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,9 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
@@ -29,6 +29,8 @@ fun BottomBar(
     bottomSheetState: BottomSheetScaffoldState,
 ) {
     val coroutineScope= rememberCoroutineScope()
+    val isDialogOpen=remember{ mutableStateOf(false) }
+
     BottomAppBar(
         backgroundColor = Color(0xFFF7F7F7),
         contentColor = Color.White,
@@ -58,20 +60,19 @@ fun BottomBar(
                     contentDescription = "icon"
                 )
             }
-            Button(
-                onClick = {
-                    navController.navigate(RoutesName.MAIN_SCREEN)
-                },
+            CustomButton(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.Black)
                     .width(260.dp)
                     .height(54.dp)
                     .padding(top = 0.dp),
-                enabled =  true ,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
-                content = { Text(text = "Заказать", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
-            )
+                text = "Заказать",
+                textSize = 18,
+                textBold = true,
+            onClick = {
+                isDialogOpen.value=true
+            })
             IconButton(onClick = {
                 coroutineScope.launch {
                     if(bottomSheetState.bottomSheetState.isCollapsed){
@@ -88,5 +89,14 @@ fun BottomBar(
                 )
             }
         }
+        CustomDialog(
+            text = "Оформить данный заказ?",
+            okBtnClick = {
+                navController.navigate(RoutesName.ORDEREXECUTION_SCREEN)
+                isDialogOpen.value=false
+                         },
+            cancelBtnClick = { isDialogOpen.value=false },
+            isDialogOpen = isDialogOpen.value
+        )
     }
 }

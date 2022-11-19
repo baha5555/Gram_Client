@@ -2,7 +2,6 @@ package com.example.gramclient.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -10,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -22,27 +20,51 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun CustomTopBar(
     title: String,
     navController: NavHostController,
-    regionSelectVisible: Boolean = false
+    actionNum: Int = 0
 ) {
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = Color.White
     )
     TopAppBar(
-        title = { Text(title) }, backgroundColor = Color.White,
+        title = { Text(title, fontSize = 18.sp) }, backgroundColor = Color.White,
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Image(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.btn_back_icon),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_blue),
                     contentDescription = ""
                 )
             }
         },
         actions = {
-            if(regionSelectVisible){
-                Text("Таджикистан", fontSize = 18.sp, modifier = Modifier.padding(end=15.dp).clickable {
-                    navController.navigate(RoutesName.SETTING_SELECT_REGION_SCREEN)
-                })
+            when (actionNum) {
+                1 -> {
+                    Text(
+                        "Таджикистан",
+                        fontSize = 18.sp,
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate(RoutesName.SETTING_SELECT_REGION_SCREEN)
+                            }
+                            .padding(end = 15.dp)
+                    )
+                }
+                2 -> {
+                    IconButton(onClick = {  }) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_delete_blue),
+                            contentDescription = ""
+                        )
+                    }
+                }
+                3 -> {
+                    IconButton(onClick = {  }) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_logout_blue),
+                            contentDescription = ""
+                        )
+                    }
+                }
             }
         }
     )

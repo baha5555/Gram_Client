@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -30,8 +31,8 @@ fun CustomCheckBox(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .clip(shape = CircleShape)
-            .background(if (isChecked) Color(0xFF2264D1) else Color.Transparent,)
-            .clickable { onChecked() }.border(width = 1.dp, shape = CircleShape, color = if (isChecked) Color.Transparent else Color(
+            .background(if (isChecked) Color(0xFF2264D1) else Transparent,)
+            .clickable { onChecked() }.border(width = 1.dp, shape = CircleShape, color = if (isChecked) Transparent else Color(
                 0xFF9C9C9C
             )
             ),
@@ -42,7 +43,7 @@ fun CustomCheckBox(
                 .clip(CircleShape),
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_checkbox),
             contentDescription = stringResource(R.string.icon_check),
-            tint = if (isChecked) Color.White else Color.Transparent,
+            tint = if (isChecked) Color.White else Transparent,
         )
 
     }

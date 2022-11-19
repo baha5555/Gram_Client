@@ -1,32 +1,38 @@
 package com.example.gramclient.presentation
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.viewModels
 import androidx.navigation.compose.rememberNavController
+import com.example.gramclient.PreferencesName
+import com.example.gramclient.presentation.authorization.AuthViewModel
+import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 
+@Suppress("DEPRECATION")
 class MainActivity : ComponentActivity() {
+    private lateinit var preferences: SharedPreferences
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
             GramClientTheme {
+                val messageViewModel= viewModels<MessageViewModel>()
+                val authViewModel= viewModels<AuthViewModel>()
                 val navController= rememberNavController()
-                Navigation(navController =navController)
+                Navigation(navController =navController, messageViewModel, preferences, authViewModel)
             }
         }
+        preferences=getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
     }
 }
 

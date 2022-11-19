@@ -117,5 +117,8 @@ dependencies {
 
     implementation 'org.osmdroid:osmdroid-android:6.0.3'
 
+    implementation "com.google.accompanist:accompanist-pager:0.24.1-alpha"
+
+
 
 }

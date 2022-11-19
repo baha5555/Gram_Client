@@ -1,6 +1,8 @@
 package com.example.gramclient.presentation
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,8 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,27 +28,32 @@ import com.example.gramclient.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.components.CustomButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@SuppressLint("CoroutineCreationDuringComposition", "SuspiciousIndentation")
 @Composable
 fun IdentificationScreen(
     modifier: Modifier = Modifier,
     length: Int = 4,
     onFilled: (code: String) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    preferences: SharedPreferences,
+    viewModel: Lazy<AuthViewModel>
 ) {
     var code: List<Char> by remember{ mutableStateOf(listOf())}
     var time: Int by remember{ mutableStateOf(25)}
 
     val coroutineScope= rememberCoroutineScope()
+    val context=LocalContext.current
 
     val focusRequesters: List<FocusRequester> = remember {
         val temp = mutableListOf<FocusRequester>()
@@ -57,10 +62,10 @@ fun IdentificationScreen(
         }
         temp
     }
-    coroutineScope.launch(Dispatchers.Main){
+    LaunchedEffect(key1 = true ){
         while (time>0) {
             delay(1000L)
-            time=time-1
+            time -= 1
         }
     }
     ConstraintLayout(
@@ -95,7 +100,7 @@ fun IdentificationScreen(
                 .padding(top = 47.dp)
         ){
             Text(text = "Сообщение с кодом отправлено на", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-            Text(text = "+992 92999-99-99", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+            Text(text = "+992${viewModel.value.phoneNumber}", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
         }
 
         Row(modifier = modifier
@@ -165,7 +170,7 @@ fun IdentificationScreen(
                         coroutineScope.launch(Dispatchers.Main) {
                             while (time > 0) {
                                 delay(1000L)
-                                time = time - 1
+                                time -= 1
                             }
                         }
                     }
@@ -178,15 +183,7 @@ fun IdentificationScreen(
                     .padding(top = 60.dp, bottom = 20.dp),
                 textAlign = TextAlign.Center, color = Color.Blue)
         }
-
-        Button(
-            onClick = {
-                navController.navigate(RoutesName.MAIN_SCREEN){
-                    popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
-                        inclusive = true
-                    }
-                }
-            },
+        CustomButton(
             modifier = Modifier
                 .constrainAs(btn) {
                     top.linkTo(text2.bottom)
@@ -198,10 +195,27 @@ fun IdentificationScreen(
                 .width(303.dp)
                 .height(54.dp)
                 .padding(top = 0.dp),
-            enabled = if(code.size==4) true else false,
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
-            content = { Text(text = "Подтвердить", fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp) },
-        )
+            text = "Подтвердить",
+            textSize = 18,
+            textBold = true,
+            enabled = code.size==4,
+        onClick = {
+            try {
+                viewModel.value.identification(code)
+                navController.navigate(RoutesName.MAIN_SCREEN) {
+                    popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
+                        inclusive = true
+                    }
+                }
+                preferences.edit()
+                    .putBoolean(PreferencesName.IS_AUTH, true)
+                    .apply()
+                preferences.edit()
+                    .putString(PreferencesName.ACCESS_TOKEN, viewModel.value.accsess_token)
+                    .apply()
+            }catch (e:Exception){
+                Toast.makeText(context, "Неверный код, повторите еще раз пожалуйста", Toast.LENGTH_LONG).show()
+            }
+        })
     }
-
 }

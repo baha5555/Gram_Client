@@ -11,25 +11,31 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.ui.theme.BackgroundColor
+import kotlinx.coroutines.launch
 
 @Composable
-fun AuthorizationScreen(navController: NavHostController) {
-    var login = remember { mutableStateOf(TextFieldValue(text = "")) }
-    var pass = remember { mutableStateOf(TextFieldValue(text = "")) }
+fun AuthorizationScreen(
+    navController: NavHostController,
+    viewModel: Lazy<AuthViewModel>
+) {
+    val phone = remember { mutableStateOf("") }
+    val coroutineScope= rememberCoroutineScope()
+
     Column(
         Modifier
             .fillMaxHeight()
@@ -108,9 +114,9 @@ fun AuthorizationScreen(navController: NavHostController) {
                             }
                         )
                         OutlinedTextField(
-                            value = login.value,
+                            value = phone.value,
                             onValueChange = {
-                                login.value = it
+                                phone.value = it
                             },
                             placeholder = {
                                 Text(text = "Телефон", fontSize = 18.sp)
@@ -133,22 +139,26 @@ fun AuthorizationScreen(navController: NavHostController) {
                 }
 
                 CustomButton(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .fillMaxWidth()
+                        .height(61.dp),
                     text = "Продолжить",
                     textSize = 18,
                     textBold = true,
-                    width = 303,
-                    height = 61,
-                    radius = 10
                 ) {
-                    navController.navigate(RoutesName.IDENTIFICATION_SCREEN){
-                        popUpTo(RoutesName.AUTH_SCREEN) {
-                            inclusive = true
+                    coroutineScope.launch {
+                        val phoneNumber=phone.value.toInt()
+                        viewModel.value.authorization(phoneNumber)
+                        navController.navigate(RoutesName.IDENTIFICATION_SCREEN){
+                            popUpTo(RoutesName.AUTH_SCREEN) {
+                                inclusive = true
+                            }
                         }
                     }
                 }
 
             }
-
         }
         Column(modifier = Modifier
             .padding(10.dp),
