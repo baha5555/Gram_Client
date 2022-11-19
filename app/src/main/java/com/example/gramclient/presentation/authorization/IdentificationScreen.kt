@@ -62,7 +62,7 @@ fun IdentificationScreen(
         }
         temp
     }
-    coroutineScope.launch(Dispatchers.Main){
+    LaunchedEffect(key1 = true ){
         while (time>0) {
             delay(1000L)
             time -= 1
