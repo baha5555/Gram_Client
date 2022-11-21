@@ -2,9 +2,11 @@ package com.example.gramclient.presentation
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -15,6 +17,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,6 +31,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import java.lang.Math.abs
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -131,6 +136,7 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                 userScrollEnabled = false
             ) { page ->
                 pageNum.value = page
+                var direction by remember { mutableStateOf(-1) }
 
                 if (page == 0) {
                     Box(
@@ -145,15 +151,55 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                             modifier = Modifier
                                 .offset(43.dp, 0.dp)
                                 .width(100.dp)
-                                .clickable {
-                                    if (pageNum.value == 1) scope.launch {
-                                        pagerState.animateScrollToPage(0)
-                                        pageNum.value = 0
+                                .pointerInput(Unit) {
+                                    detectDragGestures(
+                                        onDrag = { change, dragAmount ->
+                                            change.consumeAllChanges()
 
-                                    } else scope.launch {
-                                        pagerState.animateScrollToPage(1)
-                                        pageNum.value = 1
-                                    }
+                                            val (x, y) = dragAmount
+                                            if (kotlin.math.abs(x) > kotlin.math.abs(y)) {
+                                                when {
+                                                    x > 0 -> {
+                                                        //right
+                                                        direction = 0
+                                                    }
+                                                    x < 0 -> {
+                                                        // left
+                                                        direction = 1
+                                                    }
+                                                }
+                                            } else {
+                                                when {
+                                                    y > 0 -> {
+                                                        // down
+                                                        direction = 2
+                                                    }
+                                                    y < 0 -> {
+                                                        // up
+                                                        direction = 3
+                                                    }
+                                                }
+                                            }
+
+                                        },
+                                        onDragEnd = {
+                                            when (direction) {
+                                                0, 1, 2, 3 -> {
+                                                    Log.d("Direction", "Right")
+                                                    if (pageNum.value == 1) scope.launch {
+                                                        pagerState.animateScrollToPage(0)
+                                                        pageNum.value = 0
+                                                    }
+                                                    else scope.launch {
+                                                        pagerState.animateScrollToPage(1)
+                                                        pageNum.value = 1
+                                                    }
+                                                }
+                                            }
+
+                                        }
+
+                                    )
                                 })
                     }
                 } else {
@@ -184,17 +230,56 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                                 .offset(-(47).dp, 0.dp)
                                 .width(100.dp)
                                 .rotate(180f)
-                                .clickable {
-                                    if (pageNum.value == 1) scope.launch {
-                                        pagerState.animateScrollToPage(0)
-                                        pageNum.value = 0
-                                    }
-                                    else scope.launch {
-                                        pagerState.animateScrollToPage(1)
-                                        pageNum.value = 1
-                                    }
-                                })
+                                .pointerInput(Unit) {
+                                    detectDragGestures(
+                                        onDrag = { change, dragAmount ->
+                                            change.consumeAllChanges()
 
+                                            val (x, y) = dragAmount
+                                            if (kotlin.math.abs(x) > kotlin.math.abs(y)) {
+                                                when {
+                                                    x > 0 -> {
+                                                        //right
+                                                        direction = 0
+                                                    }
+                                                    x < 0 -> {
+                                                        // left
+                                                        direction = 1
+                                                    }
+                                                }
+                                            } else {
+                                                when {
+                                                    y > 0 -> {
+                                                        // down
+                                                        direction = 2
+                                                    }
+                                                    y < 0 -> {
+                                                        // up
+                                                        direction = 3
+                                                    }
+                                                }
+                                            }
+
+                                        },
+                                        onDragEnd = {
+                                            when (direction) {
+                                                0, 1, 2, 3 -> {
+                                                    Log.d("Direction", "Right")
+                                                    if (pageNum.value == 1) scope.launch {
+                                                        pagerState.animateScrollToPage(0)
+                                                        pageNum.value = 0
+                                                    }
+                                                    else scope.launch {
+                                                        pagerState.animateScrollToPage(1)
+                                                        pageNum.value = 1
+                                                    }
+                                                }
+                                            }
+
+                                        }
+
+                                    )
+                                })
                     }
                 }
             }

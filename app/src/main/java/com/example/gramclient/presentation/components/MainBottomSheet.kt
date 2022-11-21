@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation.components
 
 import android.util.Log
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -37,25 +35,34 @@ fun MainBottomSheet(
     var text by remember { mutableStateOf("") }
     var isTaxiState by remember { mutableStateOf(true) }
     val switchState = remember { mutableStateOf(true) }
+    val tariffs = arrayOf("Эконом", "Комфорт", "Бизнес", "Минивэн")
+    val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic)
+    val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon)
 
+    var selectedTariff by remember {
+        mutableStateOf(0)
+    }
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth().height(10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .width(67.dp)
+                .height(8.dp)
+                .background(Color(0xFFA1ACB6), shape = RoundedCornerShape(50.dp))
+                .padding(bottom = 7.dp),
+        )
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(67.dp)
-                    .height(8.dp)
-                    .background(Color(0xFFA1ACB6), shape = RoundedCornerShape(50.dp))
-                    .padding(bottom = 7.dp),
-            )
-        }
+
 
         Column(
             modifier = Modifier
@@ -67,13 +74,13 @@ fun MainBottomSheet(
 
             val rocketOffset by transition.animateOffset(transitionSpec = {
                 if (this.targetState) {
-                    tween(1000) // launch duration
+                    tween(1100) // launch duration
 
                 } else {
-                    tween(1500) // land duration
+                    tween(1100) // land duration
                 }
             }, label = "rocket offset") { animated ->
-                if (animated) Offset(0f, 0f) else Offset(0f, 170f)
+                if (animated) Offset(0f, 0f) else Offset(0f, 172f)
             }
             isAnimated = bottomSheetState.bottomSheetState.isCollapsed
 
@@ -93,7 +100,7 @@ fun MainBottomSheet(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Эконом",
+                                text = tariffs[selectedTariff],
                                 modifier = Modifier.padding(start = 10.dp),
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
@@ -108,26 +115,41 @@ fun MainBottomSheet(
                             )
                         }
                         Spacer(modifier = Modifier.height(15.dp))
-                        Image(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(89.dp),
-                            painter = painterResource(R.drawable.econom_pic),
-                            contentDescription = "icon"
-                        )
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            if(!bottomSheetState.bottomSheetState.isCollapsed){
+                                Image(
+                                    modifier = Modifier.offset(0.dp, 10.dp).padding(horizontal = 30.dp),
+                                    painter = painterResource(id = R.drawable.shape_car),
+                                    contentDescription = null
+                                )
+                            }
+                            Image(
+                                modifier = Modifier.fillMaxWidth()
+                                    .height(89.dp),
+                                painter = painterResource(tariffIcons[selectedTariff]),
+                                contentDescription = "icon"
+                            )
+
+                        }
 //                if (bottomSheetState.bottomSheetState.isExpanded) {
                         Spacer(modifier = Modifier.height(15.dp))
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
                         ) {
-                            repeat(6) {
+                            repeat(4) {
                                 item {
                                     TariffItem(
-                                        icon = R.drawable.econom_car,
-                                        name = "Эконом",
-                                        price = 10
-                                    )
+                                        icon = tariffListIcons[it],
+                                        name = tariffs[it],
+                                        price = 10,
+                                        isSelected=selectedTariff==it,
+                                        onSelected = { selectedTariff = it })
                                     Spacer(modifier = Modifier.width(10.dp))
                                 }
                             }
@@ -188,12 +210,12 @@ fun MainBottomSheet(
                             .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
                             .padding(horizontal = 15.dp)
                     ) {
-                        val listAllowance = arrayOf(
+                        val allowances = arrayOf(
                             "Перевозка домашнего животного",
                             "Донести вещи, проводить",
                             "Поездка в тишине"
                         )
-                        listAllowance.forEach {
+                        allowances.forEach {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
