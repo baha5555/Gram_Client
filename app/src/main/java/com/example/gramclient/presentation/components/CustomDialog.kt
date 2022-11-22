@@ -38,7 +38,7 @@ fun CustomDialog(
                         modifier = Modifier.fillMaxWidth(),
                         color = Color.Black
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
