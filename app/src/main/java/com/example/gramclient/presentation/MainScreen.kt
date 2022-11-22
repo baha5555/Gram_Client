@@ -149,7 +149,7 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                         Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
                             contentDescription = "",
                             modifier = Modifier
-                                .offset(43.dp, 0.dp)
+                                .offset(43.dp, (-180).dp)
                                 .width(100.dp)
                                 .pointerInput(Unit) {
                                     detectDragGestures(
@@ -227,7 +227,7 @@ fun MainScreen(navController: NavHostController, preferences: SharedPreferences)
                         Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer_blue),
                             contentDescription = "",
                             modifier = Modifier
-                                .offset(-(47).dp, 0.dp)
+                                .offset(-(47).dp, -(180).dp)
                                 .width(100.dp)
                                 .rotate(180f)
                                 .pointerInput(Unit) {
