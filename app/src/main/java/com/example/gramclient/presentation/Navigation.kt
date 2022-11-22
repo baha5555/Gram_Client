@@ -93,6 +93,9 @@ fun Navigation(
         composable(RoutesName.ORDEREXECUTION_SCREEN) {
             OrderExecution(navController)
         }
+        composable(RoutesName.SEARCH_DRIVER_SCREEN) {
+            SearchDriverScreen(navController)
+        }
     }
 }
 
