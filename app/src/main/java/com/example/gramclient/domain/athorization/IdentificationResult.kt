@@ -1,6 +1,6 @@
 package com.example.gramclient.domain.athorization
 
-data class ResultIdentification(
+data class IdentificationResult(
     val access_token: String,
     val expires_at: String,
     val token_type: String

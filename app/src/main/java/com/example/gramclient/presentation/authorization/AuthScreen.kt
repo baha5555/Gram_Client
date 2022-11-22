@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.tween
@@ -15,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,6 +37,7 @@ fun AuthorizationScreen(
 ) {
     val phone = remember { mutableStateOf("") }
     val coroutineScope= rememberCoroutineScope()
+    val context= LocalContext.current
 
     Column(
         Modifier
@@ -148,12 +151,20 @@ fun AuthorizationScreen(
                     textBold = true,
                 ) {
                     coroutineScope.launch {
-                        val phoneNumber=phone.value.toInt()
-                        viewModel.value.authorization(phoneNumber)
-                        navController.navigate(RoutesName.IDENTIFICATION_SCREEN){
-                            popUpTo(RoutesName.AUTH_SCREEN) {
-                                inclusive = true
+                        try {
+                            if (phone.value.length<9){
+                                Toast.makeText(context, "Номер телефона не должен быть менее 12 символов!", Toast.LENGTH_LONG).show()
+                            }else {
+                                val phoneNumber = phone.value.toInt()
+                                viewModel.value.authorization(phoneNumber)
+                                navController.navigate(RoutesName.IDENTIFICATION_SCREEN) {
+                                    popUpTo(RoutesName.AUTH_SCREEN) {
+                                        inclusive = true
+                                    }
+                                }
                             }
+                        }catch (_:Exception){
+                            Toast.makeText(context, "Номер телефона не должен быть длиннее 12 символов!", Toast.LENGTH_LONG).show()
                         }
                     }
                 }
