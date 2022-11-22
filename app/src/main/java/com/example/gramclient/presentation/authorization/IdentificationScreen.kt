@@ -2,7 +2,7 @@ package com.example.gramclient.presentation
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,14 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.gramclient.R
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
-import com.example.gramclient.PreferencesName
-import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
+import com.example.gramclient.presentation.authorization.states.IdentificationResponseState
 import com.example.gramclient.presentation.components.CustomButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -53,7 +54,8 @@ fun IdentificationScreen(
     var time: Int by remember{ mutableStateOf(25)}
 
     val coroutineScope= rememberCoroutineScope()
-    val context=LocalContext.current
+    val stateLogin: IdentificationResponseState by viewModel.value.stateLogin
+
 
     val focusRequesters: List<FocusRequester> = remember {
         val temp = mutableListOf<FocusRequester>()
@@ -68,12 +70,15 @@ fun IdentificationScreen(
             time -= 1
         }
     }
+    LoadingIndicator(stateLogin.isLoading)
+
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        val (logo, text, codeField, text2, btn) = createRefs()
+        val (logo, text, codeField, text2, btn, error) = createRefs()
 
         Image(
             modifier= Modifier
@@ -146,11 +151,21 @@ fun IdentificationScreen(
                         imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Number
                     ),
-
                     )
                 Spacer(modifier = Modifier.width(16.dp))
             }
         }
+        ErrorMessage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(error) {
+                    top.linkTo(codeField.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                .padding(top = 20.dp),
+            message = stateLogin.error
+        )
         if(time>0) {
             Text(text = "Повторный запрос кода: 00:$time",
                 modifier = Modifier
@@ -200,22 +215,35 @@ fun IdentificationScreen(
             textBold = true,
             enabled = code.size==4,
         onClick = {
-            try {
-                viewModel.value.identification(code)
-                navController.navigate(RoutesName.MAIN_SCREEN) {
-                    popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
-                        inclusive = true
-                    }
-                }
-                preferences.edit()
-                    .putBoolean(PreferencesName.IS_AUTH, true)
-                    .apply()
-                preferences.edit()
-                    .putString(PreferencesName.ACCESS_TOKEN, viewModel.value.accsess_token)
-                    .apply()
-            }catch (e:Exception){
-                Toast.makeText(context, "Неверный код, повторите еще раз пожалуйста", Toast.LENGTH_LONG).show()
-            }
+            viewModel.value.identification(code, preferences, navController)
         })
+    }
+}
+
+@Composable
+fun ErrorMessage(
+    modifier: Modifier,
+    message: String
+) {
+    if (message != "") {
+        Text(
+            modifier=modifier,
+            text = message,
+            textAlign = TextAlign.Center,
+            color = Color(0xFFF44336)
+        )
+    }
+}
+@Composable
+fun LoadingIndicator(isLoading: Boolean, backgroundColor: Color = Color(0x00E5E5E5)) {
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundColor),
+            contentAlignment = Alignment.Center
+        ) {
+            //CircularProgressIndicator()
+        }
     }
 }
