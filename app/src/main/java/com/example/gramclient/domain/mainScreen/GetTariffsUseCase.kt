@@ -1,6 +1,7 @@
-package com.example.gramclient.domain
+package com.example.gramclient.domain.mainScreen
 
 import com.example.gramclient.Resource
+import com.example.gramclient.domain.AppRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -13,7 +14,7 @@ class GetTariffsUseCase(private val repository: AppRepository) {
         flow{
             try {
                 emit(Resource.Loading<TariffsResponse>())
-                val response:TariffsResponse = repository.getTariffs(token)
+                val response: TariffsResponse = repository.getTariffs(token)
                 emit(Resource.Success<TariffsResponse>(response))
             }catch (e: HttpException) {
                 emit(

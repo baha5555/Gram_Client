@@ -2,7 +2,8 @@ package com.example.gramclient.domain
 
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
-import retrofit2.Response
+import com.example.gramclient.domain.mainScreen.AllowancesResponse
+import com.example.gramclient.domain.mainScreen.TariffsResponse
 import retrofit2.http.*
 
 interface AppRepository {
@@ -19,4 +20,10 @@ interface AppRepository {
 
     @GET("/api/orders/tariffs")
     suspend fun getTariffs(@Header("Authorization") token: String): TariffsResponse
+
+    @GET("api/orders/tariff-allowances")
+    suspend fun getAllowancesByTariffId(
+        @Header("Authorization") token: String,
+        @Query( "tariff_id") tariff_id: Int
+    ): AllowancesResponse
 }

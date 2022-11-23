@@ -1,4 +1,4 @@
-package com.example.gramclient.domain
+package com.example.gramclient.domain.mainScreen
 
 data class TariffsResponse(
     val code: Int,

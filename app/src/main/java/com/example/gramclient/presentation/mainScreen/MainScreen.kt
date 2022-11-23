@@ -65,11 +65,14 @@ fun MainScreen(
 
     LaunchedEffect(key1 = true){
         mainViewModel.value.getTariffs(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+        mainViewModel.value.getAllowancesByTariffId(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), 1)
     }
 
     val stateTariffs by mainViewModel.value.stateTariffs
+    val stateAllowances by mainViewModel.value.stateAllowances
 
-    LoadingIndicator(isLoading = stateTariffs.isLoading)
+    LoadingIndicator(isLoading = stateTariffs.isLoading || stateAllowances.isLoading)
+
     stateTariffs.response?.let {  tariffs ->
         if(tariffs.size!=0){
             BottomSheetScaffold(
@@ -231,7 +234,8 @@ fun MainScreen(
                                         scaffoldState = mainBottomSheetState,
                                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                                         sheetContent = {
-                                            MainBottomSheet(navController, mainBottomSheetState, tariffs)
+                                            MainBottomSheet(navController, mainBottomSheetState,
+                                                tariffs, stateAllowances, mainViewModel, preferences)
                                         },
                                         sheetPeekHeight = 360.dp,
                                     ) {

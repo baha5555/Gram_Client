@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -24,8 +25,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.domain.TariffsResult
+import com.example.gramclient.domain.mainScreen.TariffsResult
+import com.example.gramclient.presentation.LoadingIndicator
+import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -33,6 +38,9 @@ fun MainBottomSheet(
     navController: NavHostController,
     bottomSheetState: BottomSheetScaffoldState,
     tariffs: List<TariffsResult>,
+    stateAllowances: AllowancesResponseState,
+    mainViewModel: Lazy<MainViewModel>,
+    preferences: SharedPreferences,
 ) {
     val context = LocalContext.current
     var text by remember { mutableStateOf("") }
@@ -41,7 +49,7 @@ fun MainBottomSheet(
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
 
     var selectedTariff by remember {
-        mutableStateOf(tariffs[1])
+        mutableStateOf(tariffs[0])
     }
 
 
@@ -152,7 +160,12 @@ fun MainBottomSheet(
                                         name =tariff.name,
                                         price = 10,
                                         isSelected=selectedTariff==tariff,
-                                        onSelected = { selectedTariff = tariff })
+                                        onSelected = {
+                                            selectedTariff = tariff
+                                            mainViewModel.value.getAllowancesByTariffId(
+                                                preferences.getString(
+                                                PreferencesName.ACCESS_TOKEN, "").toString(), selectedTariff.id)
+                                        })
                                     Spacer(modifier = Modifier.width(10.dp))
                             })
                         }
@@ -211,25 +224,28 @@ fun MainBottomSheet(
                             .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
                             .padding(horizontal = 15.dp)
                     ) {
-                        val allowances = arrayOf(
-                            "Перевозка домашнего животного",
-                            "Донести вещи, проводить",
-                            "Поездка в тишине"
-                        )
-                        allowances.forEach {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(15.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = it, fontSize = 16.sp)
-                                CustomSwitch(switchON = switchState)
+                        LoadingIndicator(isLoading = stateAllowances.isLoading)
+                        stateAllowances.response?.let { allowances ->
+                            if(allowances.size!=0){
+                                allowances.forEach { allowance ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(15.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Row() {
+                                            Text(text = allowance.name, fontSize = 16.sp)
+                                            Text(text = " (${allowance.price}c)", fontSize = 16.sp, color = Color.Gray)
+                                        }
+                                        CustomSwitch(switchON = switchState)
+                                    }
+                                    Divider()
+                                }
+                                Spacer(modifier = Modifier.height(100.dp))
                             }
-                            Divider()
                         }
-                        Spacer(modifier = Modifier.height(100.dp))
                     }
                 }
                 Column(
