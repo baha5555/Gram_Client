@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.authorization.states.IdentificationResponseState
 import com.example.gramclient.presentation.components.CustomButton
+import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -240,10 +241,10 @@ fun LoadingIndicator(isLoading: Boolean, backgroundColor: Color = Color(0x00E5E5
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(backgroundColor),
+                .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = PrimaryColor)
         }
     }
 }

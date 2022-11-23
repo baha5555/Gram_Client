@@ -2,9 +2,10 @@ package com.example.gramclient.data
 
 import com.example.gramclient.Constants
 import com.example.gramclient.domain.AppRepository
-import com.example.gramclient.domain.TariffsResponse
+import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
+import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -59,6 +60,26 @@ object AppRepositoryImpl:AppRepository {
             .build()
         val tariffsApi = retrofit.create(AppRepository::class.java)
         tariffsApi.getTariffs(token).let{
+            return it
+        }
+    }
+
+    override suspend fun getAllowancesByTariffId(
+        token: String,
+        tariff_id: Int
+    ): AllowancesResponse {
+        val retrofit = Retrofit
+            .Builder()
+            .baseUrl(Constants.LOCAL_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder().addInterceptor(
+                    HttpLoggingInterceptor()
+                        .setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .build())
+            .build()
+        val allowancesApi = retrofit.create(AppRepository::class.java)
+        allowancesApi.getAllowancesByTariffId(token, tariff_id).let{
             return it
         }
     }
