@@ -33,6 +33,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
+import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.authorization.states.IdentificationResponseState
 import com.example.gramclient.presentation.components.CustomButton
@@ -55,7 +57,7 @@ fun IdentificationScreen(
     var time: Int by remember{ mutableStateOf(25)}
 
     val coroutineScope= rememberCoroutineScope()
-    val stateLogin: IdentificationResponseState by viewModel.value.stateLogin
+    val stateLogin by viewModel.value.stateLogin
 
 
     val focusRequesters: List<FocusRequester> = remember {
@@ -71,6 +73,7 @@ fun IdentificationScreen(
             time -= 1
         }
     }
+
     LoadingIndicator(stateLogin.isLoading)
 
 
@@ -189,6 +192,7 @@ fun IdentificationScreen(
                                 time -= 1
                             }
                         }
+                        viewModel.value.authorization(viewModel.value.phoneNumber.toInt())
                     }
                     .fillMaxWidth()
                     .constrainAs(text2) {

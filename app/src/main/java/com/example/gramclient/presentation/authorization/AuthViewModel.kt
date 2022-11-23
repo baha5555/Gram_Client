@@ -17,6 +17,7 @@ import com.example.gramclient.domain.athorization.AuthUseCase
 import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.athorization.IdentificationUseCase
 import com.example.gramclient.presentation.authorization.states.IdentificationResponseState
+import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -31,8 +32,6 @@ class AuthViewModel: ViewModel() {
 
     private val _stateLogin = mutableStateOf(IdentificationResponseState())
     val stateLogin: State<IdentificationResponseState> = _stateLogin
-
-    val stateToken = MutableLiveData<String>()
 
     fun authorization(phone: Int){
         phoneNumber=phone.toString()
@@ -64,24 +63,18 @@ class AuthViewModel: ViewModel() {
         identificationUseCase.invoke(client_register_id, code).onEach { result: Resource<IdentificationResponse> ->
             when (result) {
                 is Resource.Success -> {
-                    val res = result.data
-                    stateToken.value=res?.result?.access_token
-                    Log.e("authresponse", "authresponse->\n ${stateToken.value}")
-                    if(stateToken.value != "" && stateToken.value != null){
-                        navController.navigate(RoutesName.MAIN_SCREEN) {
-                            popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
-                                inclusive = true
-                            }
+                    val response = result.data
+                    _stateLogin.value =
+                        IdentificationResponseState(response = response?.result)
+                    Log.e("authresponse", "authresponse->\n ${_stateLogin.value}")
+                    preferences.edit()
+                        .putString(PreferencesName.ACCESS_TOKEN, response?.result?.access_token)
+                        .apply()
+                    navController.navigate(RoutesName.MAIN_SCREEN) {
+                        popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
+                            inclusive = true
                         }
-                        preferences.edit()
-                            .putBoolean(PreferencesName.IS_AUTH, true)
-                            .apply()
-                        preferences.edit()
-                            .putString(PreferencesName.ACCESS_TOKEN, stateToken.value)
-                            .apply()
                     }
-
-                    _stateLogin.value = IdentificationResponseState(response = res)
                 }
                 is Resource.Error -> {
                     Log.e("authresponse", "authresponseError->\n ${result.message}")
