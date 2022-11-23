@@ -243,7 +243,7 @@ fun LoadingIndicator(isLoading: Boolean, backgroundColor: Color = Color(0x00E5E5
                 .background(backgroundColor),
             contentAlignment = Alignment.Center
         ) {
-            //CircularProgressIndicator()
+            CircularProgressIndicator()
         }
     }
 }

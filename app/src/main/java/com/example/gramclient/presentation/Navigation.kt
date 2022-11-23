@@ -20,13 +20,15 @@ import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingLan
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingRegionScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSelectRegionScreen
+import com.example.gramclient.presentation.mainScreen.MainViewModel
 
 @Composable
 fun Navigation(
     navController: NavHostController,
     messageViewModel: Lazy<MessageViewModel>,
     preferences: SharedPreferences,
-    authViewModel: Lazy<AuthViewModel>
+    authViewModel: Lazy<AuthViewModel>,
+    mainViewModel: Lazy<MainViewModel>
 ) {
     NavHost(
         navController = navController,
@@ -49,7 +51,7 @@ fun Navigation(
             AuthorizationScreen(navController, authViewModel)
         }
         composable(RoutesName.MAIN_SCREEN) {
-            MainScreen(navController, preferences)
+            MainScreen(navController, preferences, mainViewModel)
         }
         composable(RoutesName.SETTING_SCREEN) {
             SettingScreen(navController)

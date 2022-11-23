@@ -2,9 +2,8 @@ package com.example.gramclient.domain
 
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import retrofit2.Response
+import retrofit2.http.*
 
 interface AppRepository {
     @FormUrlEncoded
@@ -17,4 +16,7 @@ interface AppRepository {
         @Field( "client_register_id") client_register_id:String,
         @Field( "sms_code") sms_code:Long
     ): IdentificationResponse
+
+    @GET("/api/orders/tariffs")
+    suspend fun getTariffs(@Header("Authorization") token: String): TariffsResponse
 }

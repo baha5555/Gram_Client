@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -24,29 +25,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
+import com.example.gramclient.domain.TariffsResult
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainBottomSheet(
     navController: NavHostController,
     bottomSheetState: BottomSheetScaffoldState,
+    tariffs: List<TariffsResult>,
 ) {
     val context = LocalContext.current
     var text by remember { mutableStateOf("") }
-    var isTaxiState by remember { mutableStateOf(true) }
     val switchState = remember { mutableStateOf(true) }
-    val tariffs = arrayOf("Эконом", "Комфорт", "Бизнес", "Минивэн")
-    val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic)
-    val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon)
+    val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
+    val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
 
     var selectedTariff by remember {
-        mutableStateOf(0)
+        mutableStateOf(tariffs[1])
     }
-
-
     Box(
         modifier = Modifier
-            .fillMaxWidth().height(10.dp),
+            .fillMaxWidth()
+            .height(10.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -62,8 +62,6 @@ fun MainBottomSheet(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -100,7 +98,7 @@ fun MainBottomSheet(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = tariffs[selectedTariff],
+                                text = selectedTariff.name,
                                 modifier = Modifier.padding(start = 10.dp),
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
@@ -123,37 +121,35 @@ fun MainBottomSheet(
                         ) {
                             if(!bottomSheetState.bottomSheetState.isCollapsed){
                                 Image(
-                                    modifier = Modifier.offset(0.dp, 10.dp).padding(horizontal = 30.dp),
+                                    modifier = Modifier
+                                        .offset(0.dp, 10.dp)
+                                        .padding(horizontal = 30.dp),
                                     painter = painterResource(id = R.drawable.shape_car),
                                     contentDescription = null
                                 )
                             }
                             Image(
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
                                     .height(89.dp),
-                                painter = painterResource(tariffIcons[selectedTariff]),
+                                painter = painterResource(if(selectedTariff.id==1) tariffIcons[0] else if(selectedTariff.id==2) tariffIcons[1] else if(selectedTariff.id==4) tariffIcons[2] else if(selectedTariff.id==5) tariffIcons[3] else tariffIcons[4]),
                                 contentDescription = "icon"
                             )
-
                         }
-//                if (bottomSheetState.bottomSheetState.isExpanded) {
                         Spacer(modifier = Modifier.height(15.dp))
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
                         ) {
-                            repeat(4) {
-                                item {
-                                    TariffItem(
-                                        icon = tariffListIcons[it],
-                                        name = tariffs[it],
+                            items(items = tariffs, itemContent = { tariff ->
+                                TariffItem(
+                                        icon = if(tariff.id==1) tariffListIcons[0] else if(tariff.id==2) tariffListIcons[1] else if(tariff.id==4) tariffListIcons[2] else if(tariff.id==5) tariffListIcons[3] else  tariffListIcons[4],
+                                        name =tariff.name,
                                         price = 10,
-                                        isSelected=selectedTariff==it,
-                                        onSelected = { selectedTariff = it })
+                                        isSelected=selectedTariff==tariff,
+                                        onSelected = { selectedTariff = tariff })
                                     Spacer(modifier = Modifier.width(10.dp))
-                                }
-                            }
-//                    }
+                            })
                         }
                     }
                     Spacer(modifier = Modifier.height(15.dp))
