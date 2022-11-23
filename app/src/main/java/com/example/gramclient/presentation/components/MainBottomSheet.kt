@@ -43,6 +43,8 @@ fun MainBottomSheet(
     var selectedTariff by remember {
         mutableStateOf(tariffs[1])
     }
+
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -62,6 +64,8 @@ fun MainBottomSheet(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
+
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -135,6 +139,7 @@ fun MainBottomSheet(
                                 painter = painterResource(if(selectedTariff.id==1) tariffIcons[0] else if(selectedTariff.id==2) tariffIcons[1] else if(selectedTariff.id==4) tariffIcons[2] else if(selectedTariff.id==5) tariffIcons[3] else tariffIcons[4]),
                                 contentDescription = "icon"
                             )
+
                         }
                         Spacer(modifier = Modifier.height(15.dp))
                         LazyRow(
