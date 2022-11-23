@@ -32,8 +32,8 @@ fun Navigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = if (!preferences.getBoolean(PreferencesName.IS_AUTH, false)
-        ) RoutesName.SPLASH_SCREEN else RoutesName.MAIN_SCREEN
+        startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
+            RoutesName.SPLASH_SCREEN else RoutesName.MAIN_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
             SplashScreen(navController)

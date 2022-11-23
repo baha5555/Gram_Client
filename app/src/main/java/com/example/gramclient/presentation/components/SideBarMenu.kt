@@ -128,7 +128,7 @@ fun SideBarMenu(
             okBtnClick = {
                 isDialogOpen.value = false
                 preferences.edit()
-                    .putBoolean(PreferencesName.IS_AUTH, false)
+                    .putString(PreferencesName.ACCESS_TOKEN, "")
                     .apply()
                 navController.navigate(RoutesName.AUTH_SCREEN)
             },
