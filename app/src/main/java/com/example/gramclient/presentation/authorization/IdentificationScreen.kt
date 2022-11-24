@@ -184,6 +184,13 @@ fun IdentificationScreen(
         }else{
             Text(text = "Отправить код еще раз",
                 modifier= Modifier
+                    .fillMaxWidth()
+                    .constrainAs(text2) {
+                        top.linkTo(codeField.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .padding(top = 60.dp, bottom = 20.dp)
                     .clickable {
                         time = 25
                         coroutineScope.launch(Dispatchers.Main) {
@@ -193,14 +200,7 @@ fun IdentificationScreen(
                             }
                         }
                         viewModel.value.authorization(viewModel.value.phoneNumber.toInt())
-                    }
-                    .fillMaxWidth()
-                    .constrainAs(text2) {
-                        top.linkTo(codeField.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(top = 60.dp, bottom = 20.dp),
+                    },
                 textAlign = TextAlign.Center, color = Color.Blue)
         }
         CustomButton(
