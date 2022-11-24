@@ -2,6 +2,7 @@ package com.example.gramclient.domain
 
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
+import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.profile.ProfileResponse
@@ -39,4 +40,14 @@ interface AppRepository {
         @Query("birth_date")birth_date:Date,
         @Query("email")email:String,
     ): ProfileResponse
+
+    @FormUrlEncoded
+    @POST("/api/get-address-by-point")
+    suspend fun getAddressByPoint(
+        @Header("Authorization")token:String,
+        @Field( "lng") lng:Double,
+        @Field( "lat") lat:Double
+    ): AddressByPointResponse
+
+
 }
