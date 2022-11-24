@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation
+package com.example.gramclient.presentation.authorization
 
 import android.widget.Toast
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
-import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.ui.theme.BackgroundColor
 import kotlinx.coroutines.launch
@@ -36,8 +35,11 @@ fun AuthorizationScreen(
     viewModel: Lazy<AuthViewModel>
 ) {
     val phone = remember { mutableStateOf("") }
-    val coroutineScope= rememberCoroutineScope()
-    val context= LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val nextBtnEnabled = remember {
+        mutableStateOf(false)
+    }
 
     Column(
         Modifier
@@ -119,7 +121,11 @@ fun AuthorizationScreen(
                         OutlinedTextField(
                             value = phone.value,
                             onValueChange = {
-                                phone.value = it
+                                if (it.length < 10) {
+                                    phone.value = it
+                                    nextBtnEnabled.value = false
+                                }
+                                if (it.length == 9) nextBtnEnabled.value = true
                             },
                             placeholder = {
                                 Text(text = "Телефон", fontSize = 18.sp)
@@ -142,6 +148,7 @@ fun AuthorizationScreen(
                 }
 
                 CustomButton(
+                    enabled = nextBtnEnabled.value,
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .fillMaxWidth()
@@ -152,9 +159,13 @@ fun AuthorizationScreen(
                 ) {
                     coroutineScope.launch {
                         try {
-                            if (phone.value.length<9){
-                                Toast.makeText(context, "Номер телефона не должен быть менее 12 символов!", Toast.LENGTH_LONG).show()
-                            }else {
+                            if (phone.value.length < 9) {
+                                Toast.makeText(
+                                    context,
+                                    "Номер телефона не должен быть менее 12 символов!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            } else {
                                 val phoneNumber = phone.value.toInt()
                                 viewModel.value.authorization(phoneNumber)
                                 navController.navigate(RoutesName.IDENTIFICATION_SCREEN) {
@@ -163,23 +174,28 @@ fun AuthorizationScreen(
                                     }
                                 }
                             }
-                        }catch (_:Exception){
-                            Toast.makeText(context, "Номер телефона не должен быть длиннее 12 символов!", Toast.LENGTH_LONG).show()
+                        } catch (_: Exception) {
+                            Toast.makeText(
+                                context,
+                                "Номер телефона не должен быть длиннее 12 символов!",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }
-
             }
         }
-        Column(modifier = Modifier
-            .padding(10.dp),
+        Column(
+            modifier = Modifier
+                .padding(10.dp),
             verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally){
-            Text(text = "Подтверждая номер телефона, я соглашаюсь с ", color= Color.Gray)
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Подтверждая номер телефона, я соглашаюсь с ", color = Color.Gray)
             Text(text = " правилами работы сервиса и политикой\n" +
-                    "    обработки персональных данных.", color= Color.Blue, modifier = Modifier.clickable {  })
+                    "    обработки персональных данных.",
+                color = Color.Blue,
+                modifier = Modifier.clickable { })
         }
     }
-
-
 }

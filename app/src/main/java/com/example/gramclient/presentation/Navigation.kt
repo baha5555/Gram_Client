@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
+import com.example.gramclient.presentation.authorization.AuthorizationScreen
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageScreen
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
 import com.example.gramclient.presentation.drawer_bar.myaddresses_screen.AddAddressScreen
@@ -92,7 +93,7 @@ fun Navigation(
         composable(RoutesName.PROMO_CODE_SCREEN) {
             PromoCodeScreen(navController)
         }
-        composable(RoutesName.ORDEREXECUTION_SCREEN) {
+        composable(RoutesName.ORDER_EXECUTION_SCREEN) {
             OrderExecution(navController)
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
