@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -62,16 +63,19 @@ fun MainScreen(
     val paymentState = remember { mutableStateOf("") }
 
     val coroutineScope = rememberCoroutineScope()
+    val context= LocalContext.current
 
     LaunchedEffect(key1 = true){
         mainViewModel.value.getTariffs(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
         mainViewModel.value.getAllowancesByTariffId(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), 1)
+        mainViewModel.value.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
     }
 
     val stateTariffs by mainViewModel.value.stateTariffs
     val stateAllowances by mainViewModel.value.stateAllowances
+    val stateAddressByPoint by mainViewModel.value.stateAddressPoint
 
-//    LoadingIndicator(isLoading = stateTariffs.isLoading || stateAllowances.isLoading)
+
 
             BottomSheetScaffold(
                 sheetBackgroundColor = Color.White,
@@ -233,7 +237,7 @@ fun MainScreen(
                                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                                         sheetContent = {
                                             MainBottomSheet(navController, mainBottomSheetState,
-                                                stateTariffs, stateAllowances, mainViewModel, preferences)
+                                                stateTariffs, stateAllowances, mainViewModel, preferences, stateAddressByPoint)
                                         },
                                         sheetPeekHeight = 360.dp,
                                     ) {

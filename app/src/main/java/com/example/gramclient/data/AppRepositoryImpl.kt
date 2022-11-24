@@ -5,6 +5,7 @@ import com.example.gramclient.domain.AppRepository
 import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
+import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import okhttp3.OkHttpClient
@@ -106,6 +107,27 @@ object AppRepositoryImpl:AppRepository {
             .build()
         val profileApi = retrofit.create(AppRepository::class.java)
         profileApi.sendProfile(token,first_name,last_name,gender,birth_date,email).let{
+            return it
+        }
+    }
+
+    override suspend fun getAddressByPoint(
+        token: String,
+        lng: Double,
+        lat: Double
+    ): AddressByPointResponse {
+        val retrofit = Retrofit
+            .Builder()
+            .baseUrl(Constants.LOCAL_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder().addInterceptor(
+                    HttpLoggingInterceptor()
+                        .setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .build())
+            .build()
+        val addressApi = retrofit.create(AppRepository::class.java)
+        addressApi.getAddressByPoint(token, lng, lat).let{
             return it
         }
     }

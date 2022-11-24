@@ -28,9 +28,12 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.TariffsResult
+import com.example.gramclient.presentation.LoadingIndicator
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.mainScreen.states.AddressByPointResponseState
 import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
 import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
+import com.example.gramclient.ui.theme.PrimaryColor
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -41,9 +44,11 @@ fun MainBottomSheet(
     stateAllowances: AllowancesResponseState,
     mainViewModel: Lazy<MainViewModel>,
     preferences: SharedPreferences,
+    stateAddressByPoint: AddressByPointResponseState,
 ) {
     val context = LocalContext.current
-    var text by remember { mutableStateOf("") }
+    var from_address by remember { mutableStateOf("") }
+    var to_address by remember { mutableStateOf("") }
     val switchState = remember { mutableStateOf(true) }
     val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
@@ -272,26 +277,31 @@ fun MainBottomSheet(
                             .padding(horizontal = 15.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            modifier = Modifier
-                                .width(35.dp)
-                                .height(35.dp),
-                            imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                            contentDescription = "Logo"
-                        )
+                        Loader(isLoading = stateAddressByPoint.isLoading)
+                        stateAddressByPoint.response?.let { address ->
+                            Image(
+                                modifier = Modifier
+                                    .width(35.dp)
+                                    .height(35.dp),
+                                imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                                contentDescription = "Logo"
+                            )
+                            from_address=address.name
+                        }
                         Spacer(modifier = Modifier.width(15.dp))
                         TextField(
                             placeholder = { Text("Откуда?") },
-                            value = text,
+                            value = from_address,
                             onValueChange = {
-                                text = it
+                                from_address = it
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.textFieldColors(
                                 backgroundColor = Color.Transparent,
                                 focusedIndicatorColor = Color.Gray,
                                 unfocusedIndicatorColor = Color.Gray,
-                                disabledIndicatorColor = Color.Transparent
+                                disabledIndicatorColor = Color.Transparent,
+                                cursorColor = PrimaryColor
                             )
                         )
                     }
@@ -312,16 +322,17 @@ fun MainBottomSheet(
                         Spacer(modifier = Modifier.width(15.dp))
                         TextField(
                             placeholder = { Text("Куда?") },
-                            value = text,
+                            value = to_address,
                             onValueChange = {
-                                text = it
+                                to_address = it
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.textFieldColors(
                                 backgroundColor = Color.Transparent,
                                 focusedIndicatorColor = Color.Gray,
                                 unfocusedIndicatorColor = Color.Gray,
-                                disabledIndicatorColor = Color.Transparent
+                                disabledIndicatorColor = Color.Transparent,
+                                cursorColor = PrimaryColor
                             )
                         )
                     }
@@ -329,5 +340,12 @@ fun MainBottomSheet(
             }
             Spacer(modifier = Modifier.height(200.dp))
         }
+    }
+}
+
+@Composable
+fun Loader(isLoading:Boolean){
+    if(isLoading){
+        CircularProgressIndicator(modifier = Modifier.size(35.dp), color = PrimaryColor)
     }
 }
