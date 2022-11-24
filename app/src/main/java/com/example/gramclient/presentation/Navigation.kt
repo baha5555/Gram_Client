@@ -92,7 +92,7 @@ fun Navigation(
         composable(RoutesName.PROMO_CODE_SCREEN) {
             PromoCodeScreen(navController)
         }
-        composable(RoutesName.ORDEREXECUTION_SCREEN) {
+        composable(RoutesName.ORDER_EXECUTION_SCREEN) {
             OrderExecution(navController)
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {

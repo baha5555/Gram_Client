@@ -2,12 +2,19 @@ package com.example.gramclient.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -28,15 +35,18 @@ fun OrderExecution(navController: NavHostController) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
-    val coroutineScope= rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     var text by remember { mutableStateOf("") }
-    val showMyLocation = remember{ mutableStateOf(false) }
+    val showMyLocation = remember { mutableStateOf(false) }
 
-    val isDialogOpen= remember{ mutableStateOf(false) }
+    val isDialogOpen = remember { mutableStateOf(false) }
+    var showGrade by remember{
+        mutableStateOf(false)
+    }
 
     BottomSheetScaffold(
         scaffoldState = sheetState,
-        sheetBackgroundColor= Color.Transparent,
+        sheetBackgroundColor = Color.Transparent,
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         sheetContent = {
             Column(
@@ -61,22 +71,25 @@ fun OrderExecution(navController: NavHostController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color(0xFFE2EAF2), shape = RoundedCornerShape(20.dp))
-                ){
+                ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color(0xFFffffff), shape = RoundedCornerShape(20.dp))
                             .padding(vertical = 15.dp)
-                    ){
-                       
-                       Text(text = "5 мин и приедет", modifier = Modifier.fillMaxWidth(),
-                           textAlign = TextAlign.Center,
-                       fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    ) {
+
+                        Text(
+                            text = "5 мин и приедет", modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp, fontWeight = FontWeight.Bold
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Row(Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
-                            ) 
+                        )
                         {
                             Text(text = "серебристый Opel Astra")
                             Spacer(modifier = Modifier.width(8.dp))
@@ -92,14 +105,16 @@ fun OrderExecution(navController: NavHostController) {
                             }
                         }
                         Spacer(modifier = Modifier.height(19.dp))
-                        Row(Modifier.fillMaxWidth(),
+                        Row(
+                            Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         )
                         {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally){
-                                Card(modifier = Modifier
-                                    .size(55.dp),
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Card(
+                                    modifier = Modifier
+                                        .size(55.dp),
                                     elevation = 5.dp,
                                     shape = RoundedCornerShape(50.dp)
                                 ) {
@@ -114,9 +129,10 @@ fun OrderExecution(navController: NavHostController) {
                                 Text(text = "Акбар", color = Color.Gray)
                             }
                             Spacer(modifier = Modifier.width(15.dp))
-                            Column(horizontalAlignment = Alignment.CenterHorizontally){
-                                Card(modifier = Modifier
-                                    .size(55.dp),
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Card(
+                                    modifier = Modifier
+                                        .size(55.dp),
                                     elevation = 5.dp,
                                     shape = RoundedCornerShape(50.dp)
                                 ) {
@@ -136,9 +152,10 @@ fun OrderExecution(navController: NavHostController) {
                                 Text(text = "Позвонить", color = Color.Gray)
                             }
                             Spacer(modifier = Modifier.width(15.dp))
-                            Column(horizontalAlignment = Alignment.CenterHorizontally){
-                                Card(modifier = Modifier
-                                    .size(55.dp),
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Card(
+                                    modifier = Modifier
+                                        .size(55.dp),
                                     elevation = 5.dp,
                                     shape = RoundedCornerShape(50.dp)
                                 ) {
@@ -165,12 +182,12 @@ fun OrderExecution(navController: NavHostController) {
                             .fillMaxWidth()
                             .background(Color(0xFFffffff), shape = RoundedCornerShape(20.dp))
                             .padding(top = 15.dp, bottom = 15.dp, start = 25.dp, end = 5.dp),
-                    ){
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
-                        ){
+                        ) {
                             Image(
                                 modifier = Modifier
                                     .size(28.dp),
@@ -182,11 +199,12 @@ fun OrderExecution(navController: NavHostController) {
                                 placeholder = { Text("Откуда?") },
                                 value = text,
                                 onValueChange = {
-                                    text = it },
+                                    text = it
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = TextFieldDefaults.textFieldColors(
                                     backgroundColor = Color.Transparent,
-                                    focusedIndicatorColor =  Color.Gray,
+                                    focusedIndicatorColor = Color.Gray,
                                     unfocusedIndicatorColor = Color.Gray,
                                     disabledIndicatorColor = Color.Transparent
                                 )
@@ -196,7 +214,7 @@ fun OrderExecution(navController: NavHostController) {
                             modifier = Modifier
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
-                        ){
+                        ) {
                             Image(
                                 modifier = Modifier
                                     .size(28.dp),
@@ -208,11 +226,12 @@ fun OrderExecution(navController: NavHostController) {
                                 placeholder = { Text("Добавить остановку") },
                                 value = text,
                                 onValueChange = {
-                                    text = it },
+                                    text = it
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = TextFieldDefaults.textFieldColors(
                                     backgroundColor = Color.Transparent,
-                                    focusedIndicatorColor =  Color.Gray,
+                                    focusedIndicatorColor = Color.Gray,
                                     unfocusedIndicatorColor = Color.Gray,
                                     disabledIndicatorColor = Color.Transparent
                                 )
@@ -222,7 +241,7 @@ fun OrderExecution(navController: NavHostController) {
                             modifier = Modifier
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
-                        ){
+                        ) {
                             Image(
                                 modifier = Modifier
                                     .size(28.dp),
@@ -234,11 +253,12 @@ fun OrderExecution(navController: NavHostController) {
                                 placeholder = { Text("Куда") },
                                 value = text,
                                 onValueChange = {
-                                    text = it },
+                                    text = it
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = TextFieldDefaults.textFieldColors(
                                     backgroundColor = Color.Transparent,
-                                    focusedIndicatorColor =  Color.Gray,
+                                    focusedIndicatorColor = Color.Gray,
                                     unfocusedIndicatorColor = Color.Gray,
                                     disabledIndicatorColor = Color.Transparent
                                 )
@@ -249,7 +269,7 @@ fun OrderExecution(navController: NavHostController) {
                                 .fillMaxWidth()
                                 .padding(top = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
-                        ){
+                        ) {
                             Icon(
                                 modifier = Modifier
                                     .size(25.dp),
@@ -259,11 +279,18 @@ fun OrderExecution(navController: NavHostController) {
                             )
                             Spacer(modifier = Modifier.width(15.dp))
                             Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(modifier= Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     Column {
                                         Text(text = "Наличные")
-                                        Text(text = "Способ оплаты", fontSize = 12.sp, color = Color.Gray)
+                                        Text(
+                                            text = "Способ оплаты",
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
                                     }
                                     Icon(
                                         modifier = Modifier
@@ -282,7 +309,7 @@ fun OrderExecution(navController: NavHostController) {
                                 .fillMaxWidth()
                                 .padding(top = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
-                        ){
+                        ) {
                             Icon(
                                 modifier = Modifier
                                     .size(25.dp),
@@ -292,10 +319,13 @@ fun OrderExecution(navController: NavHostController) {
                             )
                             Spacer(modifier = Modifier.width(15.dp))
                             Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(modifier= Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = 15.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(end = 15.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     Text(text = "Показать водителю, где я")
                                     CustomSwitch(switchON = showMyLocation)
                                 }
@@ -308,7 +338,7 @@ fun OrderExecution(navController: NavHostController) {
                                 .fillMaxWidth()
                                 .padding(top = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
-                        ){
+                        ) {
                             Icon(
                                 modifier = Modifier
                                     .size(25.dp),
@@ -318,11 +348,18 @@ fun OrderExecution(navController: NavHostController) {
                             )
                             Spacer(modifier = Modifier.width(15.dp))
                             Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(modifier= Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     Column {
                                         Text(text = "Стоимость поездки")
-                                        Text(text = "11 сомон", fontSize = 12.sp, color = Color.Gray)
+                                        Text(
+                                            text = "11 сомон",
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
                                     }
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
@@ -337,21 +374,22 @@ fun OrderExecution(navController: NavHostController) {
                                 Color(0xFFffffff),
                                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                             )
-                    ){
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(15.dp),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            Card(modifier = Modifier
-                                .size(55.dp),
+                        ) {
+                            Card(
+                                modifier = Modifier
+                                    .size(55.dp),
                                 elevation = 5.dp,
                                 shape = RoundedCornerShape(50.dp)
                             ) {
                                 IconButton(onClick = {
-                                    isDialogOpen.value=true
+                                    isDialogOpen.value = true
                                 }) {
                                     Image(
                                         modifier = Modifier
@@ -370,17 +408,63 @@ fun OrderExecution(navController: NavHostController) {
         },
         sheetPeekHeight = 205.dp,
     ) {
-        CustomMap()
-        CustomDialog(
-            text = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?",
-            okBtnClick = {
-                coroutineScope.launch {
-                    isDialogOpen.value = false
-                    sheetState.bottomSheetState.collapse()
+        Box {
+            CustomMap()
+            CustomDialog(
+                text = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?",
+                okBtnClick = {
+                    coroutineScope.launch {
+                        isDialogOpen.value = false
+                        sheetState.bottomSheetState.collapse()
+                    }
+                },
+                cancelBtnClick = { isDialogOpen.value = false },
+                isDialogOpen = isDialogOpen.value
+            )
+            if(showGrade){
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp).offset(0.dp, 100.dp)
+                    .padding(horizontal = 30.dp)
+                    .clip(
+                        RoundedCornerShape(30.dp)
+                    )
+                    .background(PrimaryColor),
+                    contentAlignment = Alignment.Center) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "Оцените поездку:", color = Color.White, fontSize = 18.sp)
+                        Icon(
+                            imageVector = Icons.Outlined.ThumbUp,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clickable { }
+                        )
+                        Divider(
+                            color = Color.White,
+                            modifier = Modifier
+                                .fillMaxHeight(0.6f)
+                                .width(1.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Outlined.ThumbUp,
+                            modifier = Modifier
+                                .rotate(180f)
+                                .size(38.dp)
+                                .clickable {
+
+                                },
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                 }
-                         },
-            cancelBtnClick = { isDialogOpen.value=false },
-            isDialogOpen = isDialogOpen.value
-        )
+            }
+        }
     }
 }
