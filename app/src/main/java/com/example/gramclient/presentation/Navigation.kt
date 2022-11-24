@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
+import com.example.gramclient.presentation.authorization.AuthorizationScreen
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageScreen
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
 import com.example.gramclient.presentation.drawer_bar.myaddresses_screen.AddAddressScreen
