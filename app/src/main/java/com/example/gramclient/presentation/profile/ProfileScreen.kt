@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,15 +19,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomSwitch
 import com.example.gramclient.presentation.components.CustomTopBar
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
+import java.util.*
 
 @Composable
 fun ProfileScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: Lazy<ProfileViewModel>,
+    preferences: SharedPreferences,
 ) {
     Scaffold(
         topBar = { CustomTopBar(title = "Профиль", navController = navController, actionNum = 3) }
@@ -110,6 +116,19 @@ fun ProfileScreen(
                         cursorColor = FontSilver,
                     )
                 )
+                Spacer(modifier = Modifier.height(49.dp))
+                Button(onClick = {
+                    viewModel.value.sendProfile(
+                        preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                        profileName.value,
+                        profileName.value,
+                        "0",
+                        Date(),
+                        profileEmail.value
+                    )
+                }) {
+
+                }
                 Spacer(modifier = Modifier.height(49.dp))
 
                 Row(
