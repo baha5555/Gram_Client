@@ -71,10 +71,8 @@ fun MainScreen(
     val stateTariffs by mainViewModel.value.stateTariffs
     val stateAllowances by mainViewModel.value.stateAllowances
 
-    LoadingIndicator(isLoading = stateTariffs.isLoading || stateAllowances.isLoading)
+//    LoadingIndicator(isLoading = stateTariffs.isLoading || stateAllowances.isLoading)
 
-    stateTariffs.response?.let {  tariffs ->
-        if(tariffs.size!=0){
             BottomSheetScaffold(
                 sheetBackgroundColor = Color.White,
                 scaffoldState = bottomSheetState,
@@ -235,7 +233,7 @@ fun MainScreen(
                                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                                         sheetContent = {
                                             MainBottomSheet(navController, mainBottomSheetState,
-                                                tariffs, stateAllowances, mainViewModel, preferences)
+                                                stateTariffs, stateAllowances, mainViewModel, preferences)
                                         },
                                         sheetPeekHeight = 360.dp,
                                     ) {
@@ -303,8 +301,6 @@ fun MainScreen(
                     }
                 }
             }
-        }
-    }
 }
 
 

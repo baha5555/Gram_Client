@@ -28,16 +28,16 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.TariffsResult
-import com.example.gramclient.presentation.LoadingIndicator
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
+import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainBottomSheet(
     navController: NavHostController,
     bottomSheetState: BottomSheetScaffoldState,
-    tariffs: List<TariffsResult>,
+    stateTariffs: TariffsResponseState,
     stateAllowances: AllowancesResponseState,
     mainViewModel: Lazy<MainViewModel>,
     preferences: SharedPreferences,
@@ -49,7 +49,7 @@ fun MainBottomSheet(
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
 
     var selectedTariff by remember {
-        mutableStateOf(tariffs[0])
+        mutableStateOf(TariffsResult(1, "Эконом"))
     }
 
 
@@ -150,25 +150,35 @@ fun MainBottomSheet(
 
                         }
                         Spacer(modifier = Modifier.height(15.dp))
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            items(items = tariffs, itemContent = { tariff ->
-                                TariffItem(
-                                        icon = if(tariff.id==1) tariffListIcons[0] else if(tariff.id==2) tariffListIcons[1] else if(tariff.id==4) tariffListIcons[2] else if(tariff.id==5) tariffListIcons[3] else  tariffListIcons[4],
-                                        name =tariff.name,
-                                        price = 10,
-                                        isSelected=selectedTariff==tariff,
-                                        onSelected = {
-                                            selectedTariff = tariff
-                                            mainViewModel.value.getAllowancesByTariffId(
-                                                preferences.getString(
-                                                PreferencesName.ACCESS_TOKEN, "").toString(), selectedTariff.id)
-                                        })
-                                    Spacer(modifier = Modifier.width(10.dp))
-                            })
+
+                        CustomRectangleShimmer(stateTariffs.isLoading)
+
+                        stateTariffs.response?.let { tariffs ->
+                            if (tariffs.size != 0) {
+                                LazyRow(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    items(items = tariffs, itemContent = { tariff ->
+                                        TariffItem(
+                                            icon = if (tariff.id == 1) tariffListIcons[0] else if (tariff.id == 2) tariffListIcons[1] else if (tariff.id == 4) tariffListIcons[2] else if (tariff.id == 5) tariffListIcons[3] else tariffListIcons[4],
+                                            name = tariff.name,
+                                            price = 10,
+                                            isSelected = selectedTariff == tariff,
+                                            onSelected = {
+                                                selectedTariff = tariff
+                                                mainViewModel.value.getAllowancesByTariffId(
+                                                    preferences.getString(
+                                                        PreferencesName.ACCESS_TOKEN, ""
+                                                    ).toString(), selectedTariff.id
+                                                )
+                                            })
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                    })
+                                }
+                            }
                         }
+                        CustomRectangleShimmer(if(stateTariffs.error != "") true else false)
                     }
                     Spacer(modifier = Modifier.height(15.dp))
                     Column(
@@ -224,7 +234,8 @@ fun MainBottomSheet(
                             .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
                             .padding(horizontal = 15.dp)
                     ) {
-                        LoadingIndicator(isLoading = stateAllowances.isLoading)
+                        CustomLinearShimmer(stateAllowances.isLoading)
+
                         stateAllowances.response?.let { allowances ->
                             if(allowances.size!=0){
                                 allowances.forEach { allowance ->
@@ -246,6 +257,7 @@ fun MainBottomSheet(
                                 Spacer(modifier = Modifier.height(100.dp))
                             }
                         }
+                        CustomLinearShimmer(if(stateTariffs.error != "") true else false)
                     }
                 }
                 Column(
