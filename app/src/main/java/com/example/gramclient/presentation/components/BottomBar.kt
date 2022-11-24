@@ -92,7 +92,7 @@ fun BottomBar(
         CustomDialog(
             text = "Оформить данный заказ?",
             okBtnClick = {
-                navController.navigate(RoutesName.ORDEREXECUTION_SCREEN)
+                navController.navigate(RoutesName.ORDER_EXECUTION_SCREEN)
                 isDialogOpen.value=false
                          },
             cancelBtnClick = { isDialogOpen.value=false },
