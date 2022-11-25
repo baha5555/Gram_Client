@@ -48,6 +48,7 @@ class MainActivity : ComponentActivity() {
                 val profileViewModel = viewModels<ProfileViewModel>()
                 val orderExecutionViewModel = viewModels<OrderExecutionViewModel>()
                 val navController= rememberNavController()
+                profileViewModel.value.getProfileInfo(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
                 Navigation(navController =navController, messageViewModel, preferences, authViewModel, mainViewModel,profileViewModel, orderExecutionViewModel)
             }
         }
