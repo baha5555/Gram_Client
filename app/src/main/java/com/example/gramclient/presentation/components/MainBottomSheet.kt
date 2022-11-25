@@ -15,10 +15,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,8 +31,8 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.TariffsResult
-import com.example.gramclient.presentation.LoadingIndicator
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
 import com.example.gramclient.presentation.mainScreen.states.AddressByPointResponseState
 import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
 import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
@@ -47,8 +50,8 @@ fun MainBottomSheet(
     stateAddressByPoint: AddressByPointResponseState,
 ) {
     val context = LocalContext.current
-    var from_address by remember { mutableStateOf("") }
-    var to_address by remember { mutableStateOf("") }
+    var from_address = remember { mutableStateOf("") }
+    var to_address = remember { mutableStateOf("") }
     val switchState = remember { mutableStateOf(true) }
     val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
@@ -286,14 +289,14 @@ fun MainBottomSheet(
                                 imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                                 contentDescription = "Logo"
                             )
-                            from_address=address.name
+                            from_address.value=address.name
                         }
                         Spacer(modifier = Modifier.width(15.dp))
                         TextField(
                             placeholder = { Text("Откуда?") },
-                            value = from_address,
+                            value = from_address.value,
                             onValueChange = {
-                                from_address = it
+                                from_address.value = it
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.textFieldColors(
@@ -306,6 +309,8 @@ fun MainBottomSheet(
                         )
                     }
                     Spacer(modifier = Modifier.height(15.dp))
+                    val isToListAddress=remember{ mutableStateOf(false) }
+                    val focusManager = LocalFocusManager.current
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -322,11 +327,16 @@ fun MainBottomSheet(
                         Spacer(modifier = Modifier.width(15.dp))
                         TextField(
                             placeholder = { Text("Куда?") },
-                            value = to_address,
+                            value = to_address.value,
                             onValueChange = {
-                                to_address = it
+                                to_address.value = it
                             },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().onFocusChanged { focusState ->
+                                isToListAddress.value = focusState.isFocused
+                            }
+                                .onFocusEvent { focusState ->
+                                    isToListAddress.value = focusState.isFocused
+                                },
                             colors = TextFieldDefaults.textFieldColors(
                                 backgroundColor = Color.Transparent,
                                 focusedIndicatorColor = Color.Gray,
@@ -336,6 +346,7 @@ fun MainBottomSheet(
                             )
                         )
                     }
+                    AddressList(navController, isToListAddress, to_address, focusManager)
                 }
             }
             Spacer(modifier = Modifier.height(200.dp))

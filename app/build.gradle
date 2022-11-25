@@ -119,6 +119,7 @@ dependencies {
 
     implementation "com.google.accompanist:accompanist-pager:0.24.1-alpha"
 
+    implementation "com.google.accompanist:accompanist-insets:0.6.2"
 
 
 }
