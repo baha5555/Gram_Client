@@ -5,6 +5,7 @@ import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.TariffsResponse
+import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import retrofit2.http.*
 import java.util.*
@@ -12,13 +13,13 @@ import java.util.*
 interface AppRepository {
     @FormUrlEncoded
     @POST("/api/auth/client-registers")
-    suspend fun authorization(@Field( "phone_number") phone_number:Long): AuthResponse
+    suspend fun authorization(@Field("phone_number") phone_number: Long): AuthResponse
 
     @FormUrlEncoded
     @POST("/api/auth/client-registers/2")
     suspend fun identification(
-        @Field( "client_register_id") client_register_id:String,
-        @Field( "sms_code") sms_code:Long
+        @Field("client_register_id") client_register_id: String,
+        @Field("sms_code") sms_code: Long
     ): IdentificationResponse
 
     @GET("/api/orders/tariffs")
@@ -27,27 +28,33 @@ interface AppRepository {
     @GET("api/orders/tariff-allowances")
     suspend fun getAllowancesByTariffId(
         @Header("Authorization") token: String,
-        @Query( "tariff_id") tariff_id: Int
+        @Query("tariff_id") tariff_id: Int
     ): AllowancesResponse
 
     @FormUrlEncoded
     @POST("/api/profile")
     suspend fun sendProfile(
-        @Header("Authorization")token:String,
-        @Query("first_name")first_name:String,
-        @Query("last_name") last_name:String,
-        @Query("gender")gender:String,
-        @Query("birth_date")birth_date:Date,
-        @Query("email")email:String,
+        @Header("Authorization") token: String,
+        @Query("first_name") first_name: String,
+        @Query("last_name") last_name: String,
+        @Query("gender") gender: String,
+        @Query("birth_date") birth_date: Date,
+        @Query("email") email: String,
     ): ProfileResponse
 
     @FormUrlEncoded
     @POST("/api/get-address-by-point")
     suspend fun getAddressByPoint(
-        @Header("Authorization")token:String,
-        @Field( "lng") lng:Double,
-        @Field( "lat") lat:Double
+        @Header("Authorization") token: String,
+        @Field("lng") lng: Double,
+        @Field("lat") lat: Double
     ): AddressByPointResponse
 
-
+    @FormUrlEncoded
+    @POST("/api/orders/{order_id}/add-rating")
+    suspend fun sendRating(
+        @Header("Authorization") token: String,
+        @Path("order_id") order_id: Int,
+        @Query("add_rating") add_rating: Int,
+    ): AddRatingResponse
 }

@@ -22,6 +22,8 @@ import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingReg
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSelectRegionScreen
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.orderScreen.OrderExecution
+import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 import com.example.gramclient.presentation.profile.ProfileViewModel
 
 @Composable
@@ -32,8 +34,9 @@ fun Navigation(
     authViewModel: Lazy<AuthViewModel>,
     mainViewModel: Lazy<MainViewModel>,
     profileViewModel: Lazy<ProfileViewModel>,
+    orderExecutionViewModel: Lazy<OrderExecutionViewModel>,
 
-) {
+    ) {
     NavHost(
         navController = navController,
         startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
@@ -97,7 +100,7 @@ fun Navigation(
             PromoCodeScreen(navController)
         }
         composable(RoutesName.ORDER_EXECUTION_SCREEN) {
-            OrderExecution(navController)
+            OrderExecution(navController, preferences, orderExecutionViewModel)
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
             SearchDriverScreen(navController)

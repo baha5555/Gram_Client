@@ -7,6 +7,7 @@ import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
+import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -128,6 +129,27 @@ object AppRepositoryImpl:AppRepository {
             .build()
         val addressApi = retrofit.create(AppRepository::class.java)
         addressApi.getAddressByPoint(token, lng, lat).let{
+            return it
+        }
+    }
+
+    override suspend fun sendRating(
+        token: String,
+        order_id: Int,
+        add_rating: Int
+    ): AddRatingResponse {
+        val retrofit = Retrofit
+            .Builder()
+            .baseUrl(Constants.LOCAL_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder().addInterceptor(
+                    HttpLoggingInterceptor()
+                        .setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .build())
+            .build()
+        val addRating = retrofit.create(AppRepository::class.java)
+        addRating.sendRating(token, order_id, add_rating).let{
             return it
         }
     }
