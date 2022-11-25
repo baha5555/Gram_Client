@@ -42,7 +42,7 @@ interface AppRepository {
         @Field("first_name") first_name: String,
         @Field("last_name") last_name: String,
         @Field("gender") gender: String,
-        @Field("birth_date") birth_date: Date,
+        @Field("birth_date") birth_date: String,
         @Field("email") email: String,
     ): ProfileResponse
 
