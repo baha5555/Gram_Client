@@ -24,6 +24,7 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
 
@@ -45,8 +46,9 @@ class MainActivity : ComponentActivity() {
                 val authViewModel= viewModels<AuthViewModel>()
                 val mainViewModel= viewModels<MainViewModel>()
                 val profileViewModel = viewModels<ProfileViewModel>()
+                val orderExecutionViewModel = viewModels<OrderExecutionViewModel>()
                 val navController= rememberNavController()
-                Navigation(navController =navController, messageViewModel, preferences, authViewModel, mainViewModel,profileViewModel)
+                Navigation(navController =navController, messageViewModel, preferences, authViewModel, mainViewModel,profileViewModel, orderExecutionViewModel)
             }
         }
         checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)

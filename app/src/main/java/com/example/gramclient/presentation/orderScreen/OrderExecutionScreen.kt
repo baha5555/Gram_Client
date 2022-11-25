@@ -1,6 +1,8 @@
-package com.example.gramclient.presentation
+package com.example.gramclient.presentation.orderScreen
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,13 +10,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -24,10 +23,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.ui.theme.PrimaryColor
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.material.Divider as Divider1
@@ -36,7 +35,11 @@ import androidx.compose.material.Divider as Divider1
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OrderExecution(navController: NavHostController) {
+fun OrderExecution(
+    navController: NavHostController,
+    preferences: SharedPreferences,
+    orderExecutionViewModel: Lazy<OrderExecutionViewModel>
+) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
@@ -483,7 +486,14 @@ fun OrderExecution(navController: NavHostController) {
                                         scope.launch {
                                             delay(3000)
                                             thumbUpClicked = true
+                                            orderExecutionViewModel.value.sendRating(
+                                                token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                                                order_id = 590,
+                                                add_rating = ratingState.value*10
+                                            )
+                                            Log.d("balll", ""+ratingState.value*10)
                                         }
+
                                     }) {
                                         if (it < ratingState.value) Image(
                                             imageVector = ImageVector.vectorResource(
