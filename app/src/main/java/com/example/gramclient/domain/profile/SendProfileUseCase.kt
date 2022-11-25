@@ -2,7 +2,6 @@ package com.example.gramclient.domain.profile
 
 import com.example.gramclient.Resource
 import com.example.gramclient.domain.AppRepository
-import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -15,7 +14,7 @@ class SendProfileUseCase (private val repository: AppRepository) {
                         first_name: String,
                         last_name: String,
                         gender: String,
-                        birth_date: Date,
+                        birth_date: String,
                         email: String,
     ): Flow<Resource<ProfileResponse>> =
         flow{

@@ -123,7 +123,7 @@ fun ProfileScreen(
                         profileName.value,
                         profileName.value,
                         "0",
-                        Date(),
+                        "2022-01-01",
                         profileEmail.value
                     )
                 }) {
