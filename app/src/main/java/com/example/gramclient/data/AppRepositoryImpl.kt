@@ -68,6 +68,22 @@ object AppRepositoryImpl:AppRepository {
         }
     }
 
+    override suspend fun getProfileInfo(token: String): TariffsResponse {
+        val retrofit = Retrofit
+            .Builder()
+            .baseUrl(Constants.LOCAL_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder().addInterceptor(
+                    HttpLoggingInterceptor()
+                        .setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .build())
+            .build()
+        val tariffsApi = retrofit.create(AppRepository::class.java)
+        tariffsApi.getProfileInfo(token).let{
+            return it
+        }
+    }
     override suspend fun getAllowancesByTariffId(
         token: String,
         tariff_id: Int

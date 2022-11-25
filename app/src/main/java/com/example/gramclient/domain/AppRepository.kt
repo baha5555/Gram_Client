@@ -6,6 +6,7 @@ import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import retrofit2.http.*
 import java.util.*
@@ -31,15 +32,18 @@ interface AppRepository {
         @Query("tariff_id") tariff_id: Int
     ): AllowancesResponse
 
+    @GET("/api/profile")
+    suspend fun getProfileInfo(@Header("Authorization") token: String): GetProfileInfoResponse
+
     @FormUrlEncoded
-    @POST("/api/profile")
+    @PATCH("/api/profile")
     suspend fun sendProfile(
         @Header("Authorization") token: String,
-        @Query("first_name") first_name: String,
-        @Query("last_name") last_name: String,
-        @Query("gender") gender: String,
-        @Query("birth_date") birth_date: Date,
-        @Query("email") email: String,
+        @Field("first_name") first_name: String,
+        @Field("last_name") last_name: String,
+        @Field("gender") gender: String,
+        @Field("birth_date") birth_date: Date,
+        @Field("email") email: String,
     ): ProfileResponse
 
     @FormUrlEncoded
