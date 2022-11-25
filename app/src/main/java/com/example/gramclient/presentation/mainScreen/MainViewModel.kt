@@ -15,6 +15,7 @@ import com.example.gramclient.data.AppRepositoryImpl
 import com.example.gramclient.domain.mainScreen.*
 import com.example.gramclient.presentation.mainScreen.states.AddressByPointResponseState
 import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
+import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
 import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.launchIn
@@ -25,6 +26,7 @@ class MainViewModel:ViewModel() {
     private val getTariffsUseCase= GetTariffsUseCase(repository)
     private val getAllowancesUseCase= GetAllowancesUseCase(repository)
     private val getAddressByPointUseCase= GetAddressByPointUseCase(repository)
+    private val searchAddressUseCase= SearchAddressUseCase(repository)
 
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
@@ -35,6 +37,9 @@ class MainViewModel:ViewModel() {
 
     private val _stateAddressPoint = mutableStateOf(AddressByPointResponseState())
     val stateAddressPoint: State<AddressByPointResponseState> = _stateAddressPoint
+
+    private val _stateSearchAddress = mutableStateOf(SearchAddressResponseState())
+    val stateSearchAddress: State<SearchAddressResponseState> = _stateSearchAddress
 
     fun getTariffs(token:String){
         getTariffsUseCase.invoke(token="Bearer $token").onEach { result: Resource<TariffsResponse> ->
@@ -138,5 +143,30 @@ class MainViewModel:ViewModel() {
             }
         }
 
+    }
+    fun searchAddress(token: String, addressName: String){
+        searchAddressUseCase.invoke(token="Bearer $token", addressName).onEach { result: Resource<SearchAddressResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val addressResponse: SearchAddressResponse? = result.data
+                        _stateSearchAddress.value =
+                            SearchAddressResponseState(response = addressResponse?.result)
+                        Log.e("TariffsResponse", "SearchAddressResponse->\n ${_stateSearchAddress.value}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("TariffsResponse", "TariffsResponseError->\n ${result.message}")
+                    _stateSearchAddress.value = SearchAddressResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateSearchAddress.value = SearchAddressResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 }

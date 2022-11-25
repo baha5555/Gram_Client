@@ -35,6 +35,7 @@ import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
 import com.example.gramclient.presentation.mainScreen.states.AddressByPointResponseState
 import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
+import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
 import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
 import com.example.gramclient.ui.theme.PrimaryColor
 
@@ -48,6 +49,7 @@ fun MainBottomSheet(
     mainViewModel: Lazy<MainViewModel>,
     preferences: SharedPreferences,
     stateAddressByPoint: AddressByPointResponseState,
+    stateSearchAddress: SearchAddressResponseState,
 ) {
     val context = LocalContext.current
     var from_address = remember { mutableStateOf("") }
@@ -330,6 +332,7 @@ fun MainBottomSheet(
                             value = to_address.value,
                             onValueChange = {
                                 to_address.value = it
+                                mainViewModel.value.searchAddress(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), it)
                             },
                             modifier = Modifier.fillMaxWidth().onFocusChanged { focusState ->
                                 isToListAddress.value = focusState.isFocused
@@ -346,7 +349,7 @@ fun MainBottomSheet(
                             )
                         )
                     }
-                    AddressList(navController, isToListAddress, to_address, focusManager)
+                    AddressList(navController, isToListAddress, to_address, focusManager, stateSearchAddress, isToListAddress)
                 }
             }
             Spacer(modifier = Modifier.height(200.dp))
