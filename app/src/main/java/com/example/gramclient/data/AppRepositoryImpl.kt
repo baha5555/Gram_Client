@@ -7,6 +7,7 @@ import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
+import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
@@ -167,6 +168,23 @@ object AppRepositoryImpl:AppRepository {
             .build()
         val addRating = retrofit.create(AppRepository::class.java)
         addRating.sendRating(token, order_id, add_rating).let{
+            return it
+        }
+    }
+
+    override suspend fun searchAddress(token: String, addressName: String): SearchAddressResponse {
+        val retrofit = Retrofit
+            .Builder()
+            .baseUrl(Constants.LOCAL_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder().addInterceptor(
+                    HttpLoggingInterceptor()
+                        .setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .build())
+            .build()
+        val searchAddressApi = retrofit.create(AppRepository::class.java)
+        searchAddressApi.searchAddress(token, addressName).let{
             return it
         }
     }
