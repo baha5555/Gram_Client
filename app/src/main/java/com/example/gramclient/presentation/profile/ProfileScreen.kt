@@ -7,26 +7,27 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
+import com.example.gramclient.presentation.components.CustomButton
+import com.example.gramclient.presentation.components.CustomDropDownMenu
 import com.example.gramclient.presentation.components.CustomSwitch
 import com.example.gramclient.presentation.components.CustomTopBar
 import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
-import java.util.*
 
 @Composable
 fun ProfileScreen(
@@ -34,6 +35,22 @@ fun ProfileScreen(
     viewModel: Lazy<ProfileViewModel>,
     preferences: SharedPreferences,
 ) {
+    val stateGetProfileInfo by viewModel.value.stateGetProfileInfo
+    val profileFirstName = remember { mutableStateOf(stateGetProfileInfo.response?.first_name) }
+    val profileEmail = remember { mutableStateOf(stateGetProfileInfo.response?.email) }
+    val profileLastName = remember { mutableStateOf(stateGetProfileInfo.response?.last_name) }
+
+    val selectedTextGender = remember {
+        mutableStateOf(
+            when (viewModel.value.genderId.value) {
+                1 -> "Мужской"
+                2 -> "Женский"
+                else -> "Пол"
+            }
+        )
+    }
+
+        viewModel.value.getProfileInfo(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
     Scaffold(
         topBar = { CustomTopBar(title = "Профиль", navController = navController, actionNum = 3) }
     ) {
@@ -65,14 +82,12 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .padding(start = 27.dp, end = 21.dp)
             ) {
-                val profileName = remember { mutableStateOf("") }
-                val profileEmail = remember { mutableStateOf("") }
-                val profilePhone = remember { mutableStateOf("") }
+
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = profileName.value,
-                    onValueChange = { profileName.value = it },
+                    value = profileFirstName.value.toString(),
+                    onValueChange = { profileFirstName.value = it },
                     label = {Text(text = "Имя*") },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = BackgroundColor,
@@ -85,11 +100,12 @@ fun ProfileScreen(
                 )
                 Spacer(modifier = Modifier.height(35.dp))
                 TextField(
+//                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = profileEmail.value,
-                    onValueChange = { profileEmail.value = it },
-                    label = {Text(text = "Email") },
+                    value = profileLastName.value.toString(),
+                    onValueChange = { profileLastName.value = it },
+                    label = {Text(text = "Фамилия") },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = BackgroundColor,
                         unfocusedLabelColor = FontSilver,
@@ -101,12 +117,11 @@ fun ProfileScreen(
                 )
                 Spacer(modifier = Modifier.height(35.dp))
                 TextField(
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = profilePhone.value,
-                    onValueChange = { profilePhone.value = it },
-                    label = {Text(text = "Телефон") },
+                    value = profileEmail.value.toString(),
+                    onValueChange = { profileEmail.value = it },
+                    label = {Text(text = "Email") },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = BackgroundColor,
                         unfocusedLabelColor = FontSilver,
@@ -116,21 +131,71 @@ fun ProfileScreen(
                         cursorColor = FontSilver,
                     )
                 )
-                Spacer(modifier = Modifier.height(49.dp))
-                Button(onClick = {
-                    viewModel.value.sendProfile(
-                        preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
-                        profileName.value,
-                        profileName.value,
-                        "0",
-                        "2022-01-01",
-                        profileEmail.value
-                    )
-                }) {
 
+                Spacer(modifier = Modifier.height(35.dp))
+                TextField(
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = viewModel.value.stateGetProfileInfo.value.response?.phone.toString(),
+                    onValueChange = {  },
+                    label = {Text(text = "Телефон") },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = BackgroundColor,
+                        unfocusedLabelColor = FontSilver,
+                        focusedLabelColor = FontSilver,
+                        unfocusedIndicatorColor = FontSilver,
+                        focusedIndicatorColor = FontSilver,
+                        cursorColor = FontSilver,
+                    ),
+                    textStyle = TextStyle(color = Color.Gray)
+                )
+
+                Spacer(modifier = Modifier.height(49.dp))
+//                CustomDropDownMenu(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 32.dp),
+//                    selectedText = selectedTextGender.value,
+//                    suggestions = viewModel.value.stateListOfGenders.value,
+//                    onClick = {
+//                        selectedTextGender.value = it
+//                        when (it) {
+//                            viewModel.value.stateListOfGenders.value[0] -> {
+//                                viewModel.value.setGenderId(1)
+//                            }
+//                            viewModel.value.stateListOfGenders.value[1] -> {
+//                                viewModel.value.setGenderId(0)
+//                            }
+//                        }
+//
+//                    }
+//                )
+//                Spacer(modifier = Modifier.height(49.dp))
+
+                Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center) {
+                    CustomButton(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.Black)
+                            .width(363.dp)
+                            .height(55.dp)
+                            .padding(top = 0.dp),
+                        text = "Cохранить",
+                        textSize = 18,
+                        textBold = true,
+                        onClick = {
+                            viewModel.value.sendProfile(
+                                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                                profileFirstName.value!!,
+                                profileLastName.value!!,
+                                "0",
+                                "2022-01-01",
+                                profileEmail.value!!
+                            )
+                        })
+                    Spacer(modifier = Modifier.height(49.dp))
                 }
-                Spacer(modifier = Modifier.height(49.dp))
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),

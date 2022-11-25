@@ -7,19 +7,58 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
-import com.example.gramclient.domain.profile.ProfileResponse
-import com.example.gramclient.domain.profile.ProfileResponseState
-import com.example.gramclient.domain.profile.SendProfileUseCase
+import com.example.gramclient.domain.mainScreen.TariffsResponse
+import com.example.gramclient.domain.profile.*
+import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.util.*
 
 class ProfileViewModel:ViewModel() {
     private val repository= AppRepositoryImpl
     private val sendProfileUseCase: SendProfileUseCase = SendProfileUseCase(repository)
+    private val getProfileInfoUseCase:GetProfileInfoUseCase = GetProfileInfoUseCase(repository)
+    private val _stateprofile = mutableStateOf(ProfileResponseState())
+    val stateAllowances: State<ProfileResponseState> = _stateprofile
 
-    private val _stateAllowances = mutableStateOf(ProfileResponseState())
-    val stateAllowances: State<ProfileResponseState> = _stateAllowances
+    private val _stateListOfGenders = mutableStateOf(listOf("Мужской", "Женский"))
+    val stateListOfGenders: State<List<String>> = _stateListOfGenders
+
+    private val _genderId = mutableStateOf(-1)
+    val genderId: State<Int> = _genderId
+
+    fun setGenderId(id: Int) {
+        _genderId.value = id
+    }
+
+    private val _stateGetProfileInfo = mutableStateOf(GetProfileInfoResponseState())
+    val stateGetProfileInfo: State<GetProfileInfoResponseState> = _stateGetProfileInfo
+
+    fun getProfileInfo(token:String){
+        getProfileInfoUseCase.invoke(token="Bearer $token").onEach { result: Resource<GetProfileInfoResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val tariffsResponse: GetProfileInfoResponse? = result.data
+                        _stateGetProfileInfo.value =
+                            GetProfileInfoResponseState(response = tariffsResponse?.result)
+                        Log.e("TariffsResponse", "TariffsResponse->\n ${_stateGetProfileInfo.value}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("TariffsResponse", "TariffsResponseError->\n ${result.message}")
+                    _stateGetProfileInfo.value = GetProfileInfoResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateGetProfileInfo.value = GetProfileInfoResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
 
     fun sendProfile(token:String,
                                 first_name: String,
@@ -32,21 +71,22 @@ class ProfileViewModel:ViewModel() {
                 is Resource.Success -> {
                     try {
                         val allowancesResponse: ProfileResponse? = result.data
-                        _stateAllowances.value =
+                        _stateprofile.value =
                             ProfileResponseState(response = allowancesResponse?.result)
-                        Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAllowances.value}")
+                        getProfileInfo(token)
+                        Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateprofile.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
                     Log.e("AllowancesResponse", "AllowancesResponse->\n ${result.message}")
-                    _stateAllowances.value = ProfileResponseState(
+                    _stateprofile.value = ProfileResponseState(
                         error = "${result.message}"
                     )
                 }
                 is Resource.Loading -> {
-                    _stateAllowances.value = ProfileResponseState(isLoading = true)
+                    _stateprofile.value = ProfileResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

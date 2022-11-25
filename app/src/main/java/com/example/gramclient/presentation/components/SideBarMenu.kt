@@ -63,9 +63,6 @@ fun SideBarMenu(
         }
         Column(
             modifier = Modifier
-                .clickable {
-                    navController.navigate(RoutesName.PROFILE_SCREEN)
-                }
                 .fillMaxWidth()
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -87,10 +84,16 @@ fun SideBarMenu(
             )
             Spacer(modifier = Modifier.height(15.dp))
             Text(
+                modifier=Modifier.clickable {
+                    navController.navigate(RoutesName.PROFILE_SCREEN)
+                },
                 text = "Ваше имя...", fontSize = 22.sp, color = Color.White
             )
             Spacer(modifier = Modifier.height(15.dp))
             Text(
+                modifier=Modifier.clickable {
+                    navController.navigate(RoutesName.PROFILE_SCREEN)
+                },
                 text = "Добавьте почту...", fontSize = 18.sp, color = Color.White
             )
             Spacer(modifier = Modifier.height(30.dp))
