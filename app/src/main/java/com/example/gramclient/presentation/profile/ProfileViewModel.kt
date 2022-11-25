@@ -25,7 +25,7 @@ class ProfileViewModel:ViewModel() {
                                 first_name: String,
                                 last_name: String,
                                 gender: String,
-                                birth_date: Date,
+                                birth_date: String,
                                 email: String){
         sendProfileUseCase.invoke(token="Bearer $token",first_name,last_name, gender, birth_date, email).onEach { result: Resource<ProfileResponse> ->
             when (result){
