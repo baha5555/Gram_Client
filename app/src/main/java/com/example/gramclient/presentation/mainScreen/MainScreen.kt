@@ -74,6 +74,7 @@ fun MainScreen(
     val stateTariffs by mainViewModel.value.stateTariffs
     val stateAllowances by mainViewModel.value.stateAllowances
     val stateAddressByPoint by mainViewModel.value.stateAddressPoint
+    val stateSearchAddress by mainViewModel.value.stateSearchAddress
 
 
 
@@ -237,7 +238,8 @@ fun MainScreen(
                                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                                         sheetContent = {
                                             MainBottomSheet(navController, mainBottomSheetState,
-                                                stateTariffs, stateAllowances, mainViewModel, preferences, stateAddressByPoint)
+                                                stateTariffs, stateAllowances, mainViewModel,
+                                                preferences, stateAddressByPoint, stateSearchAddress)
                                         },
                                         sheetPeekHeight = 360.dp,
                                     ) {

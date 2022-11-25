@@ -4,6 +4,7 @@ import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
+import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
@@ -61,4 +62,11 @@ interface AppRepository {
         @Path("order_id") order_id: Int,
         @Query("add_rating") add_rating: Int,
     ): AddRatingResponse
+
+    @FormUrlEncoded
+    @POST("/api/orders/search-addresses")
+    suspend fun searchAddress(
+        @Header("Authorization") token: String,
+        @Field("search") addressName: String,
+    ): SearchAddressResponse
 }
