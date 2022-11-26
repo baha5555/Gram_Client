@@ -1,34 +1,49 @@
 package com.example.gramclient.presentation
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Camera
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
 import com.example.gramclient.PreferencesName
-import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomButton
-import com.example.gramclient.presentation.components.CustomDropDownMenu
 import com.example.gramclient.presentation.components.CustomSwitch
 import com.example.gramclient.presentation.components.CustomTopBar
 import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
+import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 
+@SuppressLint("UnrememberedMutableState", "RememberReturnType")
+@ExperimentalCoilApi
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
@@ -39,18 +54,17 @@ fun ProfileScreen(
     val profileFirstName = remember { mutableStateOf(stateGetProfileInfo.response?.first_name) }
     val profileEmail = remember { mutableStateOf(stateGetProfileInfo.response?.email) }
     val profileLastName = remember { mutableStateOf(stateGetProfileInfo.response?.last_name) }
+    var selectImage by mutableStateOf<Uri?>(null)
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
+            selectImage = it
+        }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val photo = remember { mutableStateOf(File("$selectImage")) }
 
-    val selectedTextGender = remember {
-        mutableStateOf(
-            when (viewModel.value.genderId.value) {
-                1 -> "Мужской"
-                2 -> "Женский"
-                else -> "Пол"
-            }
-        )
-    }
-
-        viewModel.value.getProfileInfo(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+    viewModel.value.getProfileInfo(
+        preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
+    )
     Scaffold(
         topBar = { CustomTopBar(title = "Профиль", navController = navController, actionNum = 3) }
     ) {
@@ -61,19 +75,26 @@ fun ProfileScreen(
                 .fillMaxSize()
         ) {
             IconButton(
-                onClick = { /*TODO*/ }, modifier = Modifier
+                onClick = {
+                    launcher.launch("image/*")
+
+                }, modifier = Modifier
                     .padding(top = 21.dp)
                     .size(90.dp)
                     .background(Color.White, shape = RoundedCornerShape(50.dp))
 
             ) {
-                Image(
-                    modifier = Modifier
-                        .width(60.dp)
-                        .height(60.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
-                    contentDescription = "",
-                )
+                if (selectImage != null) {
+                    Image(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(60.dp),
+                        painter = rememberImagePainter(selectImage),
+//                    imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
+                        contentDescription = "",
+                    )
+                }
+                Icon(imageVector = Icons.Default.Camera, contentDescription = null)
             }
             Spacer(modifier = Modifier.height(75.dp))
 
@@ -88,7 +109,7 @@ fun ProfileScreen(
                         .fillMaxWidth(),
                     value = profileFirstName.value.toString(),
                     onValueChange = { profileFirstName.value = it },
-                    label = {Text(text = "Имя*") },
+                    label = { Text(text = "Имя*") },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = BackgroundColor,
                         unfocusedLabelColor = FontSilver,
@@ -105,7 +126,7 @@ fun ProfileScreen(
                         .fillMaxWidth(),
                     value = profileLastName.value.toString(),
                     onValueChange = { profileLastName.value = it },
-                    label = {Text(text = "Фамилия") },
+                    label = { Text(text = "Фамилия") },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = BackgroundColor,
                         unfocusedLabelColor = FontSilver,
@@ -121,7 +142,7 @@ fun ProfileScreen(
                         .fillMaxWidth(),
                     value = profileEmail.value.toString(),
                     onValueChange = { profileEmail.value = it },
-                    label = {Text(text = "Email") },
+                    label = { Text(text = "Email") },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = BackgroundColor,
                         unfocusedLabelColor = FontSilver,
@@ -138,8 +159,8 @@ fun ProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     value = viewModel.value.stateGetProfileInfo.value.response?.phone.toString(),
-                    onValueChange = {  },
-                    label = {Text(text = "Телефон") },
+                    onValueChange = { },
+                    label = { Text(text = "Телефон") },
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = BackgroundColor,
                         unfocusedLabelColor = FontSilver,
@@ -173,7 +194,10 @@ fun ProfileScreen(
 //                )
 //                Spacer(modifier = Modifier.height(49.dp))
 
-                Row(modifier=Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     CustomButton(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
@@ -185,14 +209,41 @@ fun ProfileScreen(
                         textSize = 18,
                         textBold = true,
                         onClick = {
-                            viewModel.value.sendProfile(
-                                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
-                                profileFirstName.value!!,
-                                profileLastName.value!!,
-                                "0",
-                                "2022-01-01",
-                                profileEmail.value!!
-                            )
+                            scope.launch {
+                                try {
+                                    Log.e("PHOTO", "IMAGE -> 1 ${photo.value.name}")
+                                    val part = MultipartBody.Part
+                                        .createFormData(
+                                            name = "images/*",
+                                            filename = photo.value.name,
+                                            body = photo.value.asRequestBody()
+                                        )
+
+                                    viewModel.value.sendProfile(
+                                        preferences.getString(PreferencesName.ACCESS_TOKEN, "")
+                                            .toString(),
+                                        profileFirstName.value!!,
+                                        profileLastName.value!!,
+                                        "0",
+                                        "2022-01-01",
+                                        profileEmail.value!!,
+                                        part
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        "Фото успешно отправлено!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+//                                    navController.popBackStack()
+                                } catch (e: Exception) {
+                                    Toast.makeText(
+                                        context,
+                                        "Произошла ошибка! Повторите еще раз",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+
                         })
                     Spacer(modifier = Modifier.height(49.dp))
                 }
@@ -203,12 +254,12 @@ fun ProfileScreen(
 
                 ) {
                     Text(text = "Получение рассылки", color = Color.Black, fontSize = 15.sp)
-                 Box(modifier = Modifier.padding(end = 5.dp)) {
-                     val switchON = remember {
-                         mutableStateOf(false) // Initially the switch is ON
-                     }
-                     CustomSwitch(switchON)
-                 }
+                    Box(modifier = Modifier.padding(end = 5.dp)) {
+                        val switchON = remember {
+                            mutableStateOf(false) // Initially the switch is ON
+                        }
+                        CustomSwitch(switchON)
+                    }
 
                 }
             }

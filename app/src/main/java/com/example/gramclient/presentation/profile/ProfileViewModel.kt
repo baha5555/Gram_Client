@@ -7,11 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
-import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.profile.*
-import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import okhttp3.MultipartBody
 
 class ProfileViewModel:ViewModel() {
     private val repository= AppRepositoryImpl
@@ -61,12 +60,14 @@ class ProfileViewModel:ViewModel() {
 
 
     fun sendProfile(token:String,
-                                first_name: String,
-                                last_name: String,
-                                gender: String,
-                                birth_date: String,
-                                email: String){
-        sendProfileUseCase.invoke(token="Bearer $token",first_name,last_name, gender, birth_date, email).onEach { result: Resource<ProfileResponse> ->
+                    first_name: String,
+                    last_name: String,
+                    gender: String,
+                    birth_date: String,
+                    email: String,
+                    images: MultipartBody.Part
+                    ){
+        sendProfileUseCase.invoke(token="Bearer $token",first_name,last_name, gender, birth_date, email, avatar = images).onEach { result: Resource<ProfileResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -74,13 +75,13 @@ class ProfileViewModel:ViewModel() {
                         _stateprofile.value =
                             ProfileResponseState(response = allowancesResponse?.result)
                         getProfileInfo(token)
-                        Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateprofile.value}")
+                        Log.e("ProfileResponse", "SendProfileSuccess->\n ${_stateprofile.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("AllowancesResponse", "AllowancesResponse->\n ${result.message}")
+                    Log.e("ProfileResponse", "SendProfileErorr->\n ${result.message}")
                     _stateprofile.value = ProfileResponseState(
                         error = "${result.message}"
                     )
