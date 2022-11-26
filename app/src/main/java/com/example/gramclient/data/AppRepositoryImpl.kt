@@ -11,6 +11,7 @@ import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -112,7 +113,8 @@ object AppRepositoryImpl:AppRepository {
         last_name: String,
         gender: String,
         birth_date: String,
-        email: String
+        email: String,
+        avatar: MultipartBody.Part
     ): ProfileResponse {
         val retrofit = Retrofit
             .Builder()
@@ -125,7 +127,7 @@ object AppRepositoryImpl:AppRepository {
                     .build())
             .build()
         val profileApi = retrofit.create(AppRepository::class.java)
-        profileApi.sendProfile(token,first_name,last_name,gender,birth_date,email).let{
+        profileApi.sendProfile(token,first_name,last_name,gender,birth_date,email,avatar).let{
             return it
         }
     }

@@ -4,6 +4,7 @@ import com.example.gramclient.Resource
 import com.example.gramclient.domain.AppRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.*
@@ -16,11 +17,12 @@ class SendProfileUseCase (private val repository: AppRepository) {
                         gender: String,
                         birth_date: String,
                         email: String,
+                        avatar: MultipartBody.Part
     ): Flow<Resource<ProfileResponse>> =
         flow{
             try {
                 emit(Resource.Loading<ProfileResponse>())
-                val response: ProfileResponse = repository.sendProfile(token,first_name,last_name,gender,birth_date,email)
+                val response: ProfileResponse = repository.sendProfile(token,first_name,last_name,gender,birth_date,email,avatar)
                 emit(Resource.Success<ProfileResponse>(response))
             }catch (e: HttpException) {
                 emit(
@@ -29,7 +31,7 @@ class SendProfileUseCase (private val repository: AppRepository) {
                     )
                 )
             } catch (e: IOException) {
-                emit(Resource.Error<ProfileResponse>("Не удалось связаться с сервером. Проверьте подключение к Интернету."))
+                emit(Resource.Error<ProfileResponse>("${e.message}"))
             } catch (e: Exception) {
                 emit(Resource.Error<ProfileResponse>("${e.message}"))
             }
