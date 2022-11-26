@@ -9,6 +9,7 @@ import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
+import okhttp3.MultipartBody
 import retrofit2.http.*
 import java.util.*
 
@@ -36,15 +37,16 @@ interface AppRepository {
     @GET("/api/profile")
     suspend fun getProfileInfo(@Header("Authorization") token: String): GetProfileInfoResponse
 
-    @FormUrlEncoded
+    @Multipart
     @PATCH("/api/profile")
     suspend fun sendProfile(
         @Header("Authorization") token: String,
-        @Field("first_name") first_name: String,
-        @Field("last_name") last_name: String,
-        @Field("gender") gender: String,
-        @Field("birth_date") birth_date: String,
-        @Field("email") email: String,
+        @Query("first_name") first_name: String,
+        @Query("last_name") last_name: String,
+        @Query("gender") gender: String,
+        @Query("birth_date") birth_date: String,
+        @Query("email") email: String,
+        @Part avatar: MultipartBody.Part
     ): ProfileResponse
 
     @FormUrlEncoded
