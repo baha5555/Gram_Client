@@ -486,7 +486,7 @@ fun OrderExecution(
                                         scope.launch {
                                             delay(3000)
                                             thumbUpClicked = true
-                                            orderExecutionViewModel.value.sendRating(
+                                            orderExecutionViewModel.value.sendRating2(
                                                 token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
                                                 order_id = 590,
                                                 add_rating = ratingState.value*10

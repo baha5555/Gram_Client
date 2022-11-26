@@ -60,7 +60,7 @@ interface AppRepository {
     suspend fun sendRating(
         @Header("Authorization") token: String,
         @Path("order_id") order_id: Int,
-        @Query("add_rating") add_rating: Int,
+        @Field("add_rating") add_rating: Int,
     ): AddRatingResponse
 
     @FormUrlEncoded
