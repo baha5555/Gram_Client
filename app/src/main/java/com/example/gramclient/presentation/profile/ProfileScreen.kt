@@ -8,19 +8,19 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.presentation.components.CustomSwitch
@@ -51,9 +53,6 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -66,51 +65,69 @@ fun ProfileScreen(
     preferences: SharedPreferences,
 ) {
     val stateGetProfileInfo by viewModel.value.stateGetProfileInfo
-    val profileFirstName = remember { mutableStateOf(stateGetProfileInfo.response?.first_name ) }
-    val profileEmail = remember { mutableStateOf(stateGetProfileInfo.response?.email ) }
-    val profileLastName = remember { mutableStateOf(stateGetProfileInfo.response?.last_name ) }
+    val getProfileFirstName = stateGetProfileInfo.response?.first_name
+    val profileFirstName = remember { mutableStateOf(stateGetProfileInfo.response?.first_name ?: "") }
+    val profileEmail = remember { mutableStateOf(stateGetProfileInfo.response?.email?:"" ) }
+    val profileLastName = remember { mutableStateOf(stateGetProfileInfo.response?.last_name?:"" ) }
+    val profileImage = viewModel.value.stateGetProfileInfo.value.response?.avatar_url
     var selectImage by mutableStateOf<Uri?>(null)
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
-            selectImage = it
-        }
+        selectImage = it
+    }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val bitmap = remember{ mutableStateOf<Bitmap?>(null)}
 
-//    viewModel.value.getProfileInfo(
-//        preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
-//    )
+    LaunchedEffect(key1 = true ){
+        viewModel.value.getProfileInfo(
+            preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
+        )
+    }
     Scaffold(
         topBar = { CustomTopBar(title = "Профиль", navController = navController, actionNum = 3) }
     ) {
-        Column(
+        LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .background(BackgroundColor)
                 .fillMaxSize()
         ) {
-            IconButton(
-                onClick = {
-                    launcher.launch("image/*")
-
-                }, modifier = Modifier
-                    .padding(top = 21.dp)
-                    .size(90.dp)
-                    .background(Color.White, shape = RoundedCornerShape(50.dp))
-
-            ) {
+            item(){
+                Spacer(modifier = Modifier.height(75.dp))
                 if (selectImage != null) {
                     Image(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(60.dp),
                         painter = rememberImagePainter(selectImage),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                launcher.launch("image/*")
+                            },
 //                    imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
                         contentDescription = "",
                     )
                 }
-                Icon(imageVector = Icons.Default.Camera, contentDescription = null)
-            }
+            else {
+                if(profileImage!=null)
+                    Image(
+                        painter = rememberAsyncImagePainter(model = profileImage),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                launcher.launch("image/*")
+                            },
+//                    imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
+                        contentDescription = "",
+                    )
+                    else
+                    Icon(modifier=Modifier.width(120.dp)
+                        .height(120.dp).clickable {
+                        launcher.launch("image/*")
+                    },imageVector = Icons.Default.Camera, contentDescription = null,tint = Color.Black)
+                }
             Spacer(modifier = Modifier.height(75.dp))
 
             Column(
@@ -122,7 +139,7 @@ fun ProfileScreen(
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = profileFirstName.value.toString(),
+                    value = profileFirstName.value,
                     onValueChange = { profileFirstName.value = it },
                     label = { Text(text = "Имя*") },
                     colors = TextFieldDefaults.textFieldColors(
@@ -139,7 +156,7 @@ fun ProfileScreen(
 //                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = profileLastName.value.toString(),
+                    value = profileLastName.value,
                     onValueChange = { profileLastName.value = it },
                     label = { Text(text = "Фамилия") },
                     colors = TextFieldDefaults.textFieldColors(
@@ -155,7 +172,7 @@ fun ProfileScreen(
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = profileEmail.value.toString(),
+                    value = profileEmail.value,
                     onValueChange = { profileEmail.value = it },
                     label = { Text(text = "Email") },
                     colors = TextFieldDefaults.textFieldColors(
@@ -226,55 +243,46 @@ fun ProfileScreen(
                         onClick = {
                             scope.launch {
                                 try {
+                                    lateinit var photos:MultipartBody.Part
                                     selectImage?.let {
-                                        if(Build.VERSION.SDK_INT < 28){
-                                            bitmap.value = MediaStore.Images
-                                                .Media.getBitmap(context.contentResolver,it)
-                                        }
-                                        else {
-                                            val source = ImageDecoder.createSource(
-                                                context.contentResolver,
-                                                it
-                                            )
-                                            bitmap.value = ImageDecoder.decodeBitmap(source)
-                                        }
-                                        bitmap.value?.let {
-                                            val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-                                                .readTimeout(600, TimeUnit.SECONDS)
-                                                .connectTimeout(60, TimeUnit.SECONDS)
-                                                .build()
-                                            okHttpClient
-                                            val photo =  mutableStateOf(File(getRealPathFromURI(context,selectImage!!)))
-                                            Log.e("PHOTO", "IMAGE -> 3 ${photo.value.name}")
-                                            Log.e("PHOTO", "IMAGE -> 1 ${bitmap.value}")
-                                            Log.e("PHOTO", "IMAGE -> 1 ${selectImage}")
-                                            val part = MultipartBody.Part
-                                                .createFormData(
-                                                    name = "avatar",
-                                                    filename = photo.value.name,
-                                                    body = photo.value.asRequestBody()
+                                        val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+                                            .readTimeout(600, TimeUnit.SECONDS)
+                                            .connectTimeout(60, TimeUnit.SECONDS)
+                                            .build()
+                                        okHttpClient
+                                        val photo = mutableStateOf(
+                                            File(
+                                                getRealPathFromURI(
+                                                    context,
+                                                    selectImage!!
                                                 )
-
-                                            viewModel.value.sendProfile(
-                                                preferences.getString(PreferencesName.ACCESS_TOKEN, "")
-                                                    .toString(),
-                                                profileFirstName.value!!,
-                                                profileLastName.value!!,
-                                                "0",
-                                                "2022-01-01",
-                                                profileEmail.value!!,
-                                                part
                                             )
-                                            Toast.makeText(
-                                                context,
-                                                "Фото успешно отправлено!",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
+                                        )
+                                        val part = MultipartBody.Part
+                                            .createFormData(
+                                                name = "avatar",
+                                                filename = photo.value.name,
+                                                body = photo.value.asRequestBody()
+                                            )
+                                        photos = part
                                     }
-
+                                        viewModel.value.sendProfile(
+                                            preferences.getString(PreferencesName.ACCESS_TOKEN, "")
+                                                .toString(),
+                                            profileFirstName.value,
+                                            profileLastName.value,
+                                            "0",
+                                            "2022-01-01",
+                                            profileEmail.value,
+                                            photos
+                                        )
+                                        Toast.makeText(
+                                            context,
+                                            "Фото успешно отправлено!",
+                                            Toast.LENGTH_LONG
+                                        ).show()
 //                                    navController.popBackStack()
-                                } catch (e: Exception) {
+                                }catch (e: Exception) {
                                     Toast.makeText(
                                         context,
                                         "Произошла ошибка! Повторите еще раз",
@@ -284,8 +292,8 @@ fun ProfileScreen(
                             }
 
                         })
-                    Spacer(modifier = Modifier.height(49.dp))
                 }
+                Spacer(modifier = Modifier.height(49.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -301,6 +309,9 @@ fun ProfileScreen(
                     }
 
                 }
+                Spacer(modifier = Modifier.height(49.dp))
+
+            }
             }
         }
     }
