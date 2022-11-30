@@ -27,6 +27,7 @@ fun BottomBar(
     navController: NavHostController,
     mainBottomSheetState: BottomSheetScaffoldState,
     bottomSheetState: BottomSheetScaffoldState,
+    createOrder: () -> Unit
 ) {
     val coroutineScope= rememberCoroutineScope()
     val isDialogOpen=remember{ mutableStateOf(false) }
@@ -92,8 +93,10 @@ fun BottomBar(
         CustomDialog(
             text = "Оформить данный заказ?",
             okBtnClick = {
-                navController.navigate(RoutesName.ORDER_EXECUTION_SCREEN)
-                isDialogOpen.value=false
+                createOrder().let {
+                    navController.navigate(RoutesName.ORDER_EXECUTION_SCREEN)
+                    isDialogOpen.value = false
+                }
                          },
             cancelBtnClick = { isDialogOpen.value=false },
             isDialogOpen = isDialogOpen.value

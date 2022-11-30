@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
@@ -22,6 +24,7 @@ import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingReg
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSelectRegionScreen
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.mainScreen.SearchAddressScreen
 import com.example.gramclient.presentation.orderScreen.OrderExecution
 import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 import com.example.gramclient.presentation.profile.ProfileViewModel
@@ -104,6 +107,12 @@ fun Navigation(
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
             SearchDriverScreen(navController)
+        }
+        composable(
+            "${RoutesName.SEARCH_ADDRESS_SCREEN}/{searchId}",
+            arguments = listOf(navArgument("searchId"){type= NavType.StringType})
+        ) {backStackEntry ->
+            SearchAddressScreen(navController, mainViewModel, preferences, backStackEntry.arguments?.getString("searchId"))
         }
     }
 }

@@ -2,21 +2,24 @@ package com.example.gramclient.presentation.mainScreen
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
 import com.example.gramclient.domain.mainScreen.*
-import com.example.gramclient.presentation.mainScreen.states.AddressByPointResponseState
-import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
-import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
-import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
+import com.example.gramclient.domain.mainScreen.order.AddressModel
+import com.example.gramclient.domain.mainScreen.order.CreateOrderUseCase
+import com.example.gramclient.domain.mainScreen.order.OrderModel
+import com.example.gramclient.domain.mainScreen.order.OrderResponse
+import com.example.gramclient.presentation.mainScreen.states.*
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -27,6 +30,8 @@ class MainViewModel:ViewModel() {
     private val getAllowancesUseCase= GetAllowancesUseCase(repository)
     private val getAddressByPointUseCase= GetAddressByPointUseCase(repository)
     private val searchAddressUseCase= SearchAddressUseCase(repository)
+    private val createOrderUseCase= CreateOrderUseCase(repository)
+
 
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
@@ -41,6 +46,40 @@ class MainViewModel:ViewModel() {
     private val _stateSearchAddress = mutableStateOf(SearchAddressResponseState())
     val stateSearchAddress: State<SearchAddressResponseState> = _stateSearchAddress
 
+    private val _stateCreateOrder = mutableStateOf(OrderResponseState())
+    val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
+
+
+    private val _sendOrder = mutableStateOf(OrderModel(tariff_id = 1))
+    val sendOrder: MutableLiveData<OrderModel> = MutableLiveData<OrderModel>()
+
+    val from_address = MutableLiveData<Address>(Address("Откуда?", 0, "", ""))
+
+    private val _to_address = mutableListOf<Address>(Address("Куда?", 0, "", ""))
+    val to_address = MutableLiveData<MutableList<Address>>(_to_address)
+
+    val selectedTariff = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом"))
+
+
+    fun updateFromAddress(data: MutableLiveData<Address>?, value:Address?) {
+        data?.postValue(value)
+    }
+    fun updateToAddress(index: Int, value:Address?) {
+        if(value != null && index <= _to_address.size){
+            _to_address[index]=value
+            to_address.postValue(_to_address)
+        }
+    }
+
+    fun updateSelectedTariff(data: MutableLiveData<TariffsResult>?, value:TariffsResult?) {
+        data?.postValue(value)
+    }
+
+    fun updateOrderModel(from_address: Int? = null, to_addresses: List<AddressModel>? = null, tariff_id: Int){
+        Log.e("TariffsResponse", "sendOrder->\n ${sendOrder.value}")
+        sendOrder.value=OrderModel(tariff_id = tariff_id, from_address = from_address, to_addresses = to_addresses)
+        Log.e("TariffsResponse", "sendOrder->\n ${sendOrder.value}")
+    }
     fun getTariffs(token:String){
         getTariffsUseCase.invoke(token="Bearer $token").onEach { result: Resource<TariffsResponse> ->
             when (result){
@@ -165,6 +204,35 @@ class MainViewModel:ViewModel() {
                 }
                 is Resource.Loading -> {
                     _stateSearchAddress.value = SearchAddressResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun createOrder(preferences: SharedPreferences) {
+        createOrderUseCase.invoke(
+            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", null, from_address.value?.id, listOf(AddressModel(to_address.value?.get(0)!!.id)),
+            null, selectedTariff.value?.id ?: 1, null
+        ).onEach { result: Resource<OrderResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val response: OrderResponse? = result.data
+                        _stateCreateOrder.value =
+                            OrderResponseState(response = response)
+                        Log.e("TariffsResponse", "OrderResponse->\n ${_stateCreateOrder.value}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("TariffsResponse", "OrderResponseError->\n ${result.message}")
+                    _stateCreateOrder.value = OrderResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateCreateOrder.value = OrderResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

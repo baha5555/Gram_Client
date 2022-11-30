@@ -1,20 +1,29 @@
 package com.example.gramclient.presentation.mainScreen.addressComponents
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.gramclient.domain.mainScreen.Address
+import com.example.gramclient.domain.mainScreen.TariffsResult
+import com.example.gramclient.domain.mainScreen.order.AddressModel
 import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.components.Loader
+import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
 import java.util.*
 
@@ -26,12 +35,14 @@ fun AddressList(
     address: MutableState<String>,
     focusManager: FocusManager,
     stateSearchAddress: SearchAddressResponseState,
-    isToListAddress: MutableState<Boolean>,
+    onclick: (address:Address) -> Unit
 ) {
     val activity = (LocalContext.current as? MainActivity)
     val keyboardController = LocalSoftwareKeyboardController.current
-    Column(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
-       if (isToListAddress.value){
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .clip(shape = RoundedCornerShape(10.dp))
+       ) {
            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
                Loader(isLoading = stateSearchAddress.isLoading)
            }
@@ -45,11 +56,12 @@ fun AddressList(
                                keyboardController?.hide()
                                isVisible.value = !isVisible.value
                                focusManager.clearFocus()
+                               onclick(it)
                            }
                        )
+                       Divider()
                    }
                }
            }
-       }
     }
 }

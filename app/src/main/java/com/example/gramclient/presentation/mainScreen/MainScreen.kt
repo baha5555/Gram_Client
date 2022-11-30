@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,16 +67,23 @@ fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val context= LocalContext.current
 
-    LaunchedEffect(key1 = true){
-        mainViewModel.value.getTariffs(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
-        mainViewModel.value.getAllowancesByTariffId(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), 1)
-        mainViewModel.value.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+    var initialApiCalled by rememberSaveable { mutableStateOf(false) }
+
+    if (!initialApiCalled) {
+        LaunchedEffect(Unit) {
+            mainViewModel.value.getTariffs(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            mainViewModel.value.getAllowancesByTariffId(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), 1)
+            mainViewModel.value.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            initialApiCalled = true
+        }
     }
 
     val stateTariffs by mainViewModel.value.stateTariffs
     val stateAllowances by mainViewModel.value.stateAllowances
     val stateAddressByPoint by mainViewModel.value.stateAddressPoint
     val stateSearchAddress by mainViewModel.value.stateSearchAddress
+
+    val sendOrder = mainViewModel.value.sendOrder.observeAsState()
 
 
 
@@ -229,7 +238,10 @@ fun MainScreen(
                             ) {
                                 Scaffold(scaffoldState = scaffoldState, bottomBar = {
                                     BottomBar(
-                                        navController, mainBottomSheetState, bottomSheetState
+                                        navController, mainBottomSheetState, bottomSheetState,
+                                        createOrder = {
+                                            mainViewModel.value.createOrder(preferences)
+                                        }
                                     )
                                 }) {
                                     BottomSheetScaffold(
@@ -241,7 +253,7 @@ fun MainScreen(
                                                 stateTariffs, stateAllowances, mainViewModel,
                                                 preferences, stateAddressByPoint, stateSearchAddress)
                                         },
-                                        sheetPeekHeight = 360.dp,
+                                        sheetPeekHeight = 320.dp,
                                     ) {
                                         CustomMap()
                                     }
