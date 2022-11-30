@@ -6,6 +6,7 @@ import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.mainScreen.TariffsResponse
+import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
@@ -71,4 +72,18 @@ interface AppRepository {
         @Header("Authorization") token: String,
         @Field("search") addressName: String,
     ): SearchAddressResponse
+
+    @FormUrlEncoded
+    @POST("/api/orders")
+    suspend fun createOrder(
+        @Header("Authorization") token: String,
+        @Field("dop_phone") dop_phone: String?,
+        @Field("search_address_id") from_address: Int?,
+        @Field("to_addresses") to_addresses: String?,
+        @Field("comment") comment: String?,
+        @Query("tariff_id") tariff_id : Int,
+        @Field("allowances") allowances: String?,
+        ): OrderResponse
+
 }
+
