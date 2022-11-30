@@ -40,13 +40,13 @@ class ProfileViewModel:ViewModel() {
                         val tariffsResponse: GetProfileInfoResponse? = result.data
                         _stateGetProfileInfo.value =
                             GetProfileInfoResponseState(response = tariffsResponse?.result)
-                        Log.e("TariffsResponse", "TariffsResponse->\n ${_stateGetProfileInfo.value}")
+                        Log.e("GetProfileResponse", "GetProfileResponseSuccess->\n ${_stateGetProfileInfo.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("TariffsResponse", "TariffsResponseError->\n ${result.message}")
+                    Log.e("GetProfileResponse", "GetProfileResponseError->\n ${result.message}")
                     _stateGetProfileInfo.value = GetProfileInfoResponseState(
                         error = "${result.message}"
                     )

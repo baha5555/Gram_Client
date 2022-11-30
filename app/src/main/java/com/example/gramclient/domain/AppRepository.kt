@@ -39,13 +39,13 @@ interface AppRepository {
     suspend fun getProfileInfo(@Header("Authorization") token: String): GetProfileInfoResponse
 
     @Multipart
-    @PATCH("/api/profile")
+    @POST("/api/profile")
     suspend fun sendProfile(
         @Header("Authorization") token: String,
-        @Query("first_name") first_name: String,
-        @Query("last_name") last_name: String,
-        @Query("gender") gender: String,
-        @Query("birth_date") birth_date: String,
+        @Part("first_name") first_name: String,
+        @Part("last_name") last_name: String,
+        @Part("gender") gender: String,
+        @Part("birth_date") birth_date: String,
         @Query("email") email: String,
         @Part avatar: MultipartBody.Part
     ): ProfileResponse
