@@ -283,6 +283,13 @@ fun ProfileScreen(
                                         ).show()
 //                                    navController.popBackStack()
                                 }catch (e: Exception) {
+                                    if(selectImage == null)
+                                    Toast.makeText(
+                                        context,
+                                        "Выберите аватар",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    else
                                     Toast.makeText(
                                         context,
                                         "Произошла ошибка! Повторите еще раз",
