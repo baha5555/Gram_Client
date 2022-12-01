@@ -70,7 +70,7 @@ fun SearchAddressScreen(
                         mainViewModel.value.updateToAddress(0, address)
                         navController.popBackStack()
                     }else if(string=="fromAddress"){
-                        mainViewModel.value.updateFromAddress(mainViewModel.value.from_address, address)
+                        mainViewModel.value.updateFromAddress(address)
                         navController.popBackStack()
                     }
                 }

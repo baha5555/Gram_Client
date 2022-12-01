@@ -8,6 +8,7 @@ import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.SearchAddressResponse
+import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
@@ -213,6 +214,29 @@ object AppRepositoryImpl:AppRepository {
             .build()
         val createOrderApi = retrofit.create(AppRepository::class.java)
         createOrderApi.createOrder(token, dop_phone, from_address, to_addresses, comment, tariff_id, allowances).let{
+            return it
+        }
+    }
+
+    override suspend fun getPrice(
+        token: String,
+        tariff_id: Int,
+        allowances: String?,
+        from_address: Int?,
+        to_addresses: String?
+    ): CalculateResponse {
+        val retrofit = Retrofit
+            .Builder()
+            .baseUrl(Constants.LOCAL_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder().addInterceptor(
+                    HttpLoggingInterceptor()
+                        .setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .build())
+            .build()
+        val calculateApi = retrofit.create(AppRepository::class.java)
+        calculateApi.getPrice(token, tariff_id, allowances, from_address, to_addresses).let{
             return it
         }
     }
