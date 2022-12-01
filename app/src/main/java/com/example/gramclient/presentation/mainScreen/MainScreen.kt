@@ -84,6 +84,7 @@ fun MainScreen(
     val stateAllowances by mainViewModel.value.stateAllowances
     val stateAddressByPoint by mainViewModel.value.stateAddressPoint
     val stateSearchAddress by mainViewModel.value.stateSearchAddress
+    val stateCalculate by mainViewModel.value.stateCalculate
 
     val sendOrder = mainViewModel.value.sendOrder.observeAsState()
 
@@ -253,7 +254,9 @@ fun MainScreen(
                                         sheetContent = {
                                             MainBottomSheet(navController, mainBottomSheetState,
                                                 stateTariffs, stateAllowances, mainViewModel,
-                                                preferences, stateAddressByPoint, stateSearchAddress)
+                                                preferences, stateAddressByPoint, stateSearchAddress,
+                                                stateCalculate
+                                            )
                                         },
                                         sheetPeekHeight = 320.dp,
                                     ) {
