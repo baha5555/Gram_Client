@@ -18,7 +18,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,13 +28,8 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
-import com.example.gramclient.domain.mainScreen.TariffsResult
-import com.example.gramclient.domain.mainScreen.order.AddressModel
 import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.mainScreen.states.AddressByPointResponseState
-import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
-import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
-import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
+import com.example.gramclient.presentation.mainScreen.states.*
 import com.example.gramclient.ui.theme.PrimaryColor
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -49,6 +43,7 @@ fun MainBottomSheet(
     preferences: SharedPreferences,
     stateAddressByPoint: AddressByPointResponseState,
     stateSearchAddress: SearchAddressResponseState,
+    stateCalculate: CalculateResponseState,
 ) {
     val context = LocalContext.current
     val switchState = remember { mutableStateOf(true) }
@@ -58,7 +53,7 @@ fun MainBottomSheet(
 
     val address_from=mainViewModel.value.from_address.observeAsState()
     val address_to=mainViewModel.value.to_address.observeAsState()
-    val selected_tariff=mainViewModel.value.selectedTariff.observeAsState()
+    val selected_tariff=mainViewModel.value.selectedTariff?.observeAsState()
 
 
     Box(
@@ -115,19 +110,39 @@ fun MainBottomSheet(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = selected_tariff.value!!.name,
+                                text = selected_tariff?.value!!.name,
                                 modifier = Modifier.padding(start = 10.dp),
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 lineHeight = 14.sp
                             )
-                            Text(
-                                text = "10 c",
-                                modifier = Modifier.padding(end = 10.dp),
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Normal,
-                                lineHeight = 14.sp
-                            )
+                            stateCalculate.response?.let {
+                                Text(
+                                    text = "${it.result.amount} c",
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    lineHeight = 14.sp
+                                )
+                            }
+                            if (stateCalculate.response == null){
+                                Text(
+                                    text = "...",
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    lineHeight = 14.sp
+                                )
+                            }
+                            if (stateCalculate.error != ""){
+                                Text(
+                                    text = "...",
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    lineHeight = 14.sp
+                                )
+                            }
                         }
                         Spacer(modifier = Modifier.height(15.dp))
                         Box(
@@ -149,7 +164,7 @@ fun MainBottomSheet(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(89.dp),
-                                painter = painterResource(if(selected_tariff.value!!.id==1) tariffIcons[0] else if(selected_tariff.value!!.id==2) tariffIcons[1] else if(selected_tariff.value!!.id==4) tariffIcons[2] else if(selected_tariff.value!!.id==5) tariffIcons[3] else tariffIcons[4]),
+                                painter = painterResource(if(selected_tariff?.value!!.id==1) tariffIcons[0] else if(selected_tariff.value!!.id==2) tariffIcons[1] else if(selected_tariff.value!!.id==4) tariffIcons[2] else if(selected_tariff.value!!.id==5) tariffIcons[3] else tariffIcons[4]),
                                 contentDescription = "icon"
                             )
                         }
@@ -168,14 +183,14 @@ fun MainBottomSheet(
                                             icon = if (tariff.id == 1) tariffListIcons[0] else if (tariff.id == 2) tariffListIcons[1] else if (tariff.id == 4) tariffListIcons[2] else if (tariff.id == 5) tariffListIcons[3] else tariffListIcons[4],
                                             name = tariff.name,
                                             price = 10,
-                                            isSelected = selected_tariff.value == tariff,
+                                            isSelected = selected_tariff?.value == tariff,
                                             onSelected = {
                                                 mainViewModel.value.getAllowancesByTariffId(
                                                     preferences.getString(
                                                         PreferencesName.ACCESS_TOKEN, ""
-                                                    ).toString(), selected_tariff.value?.id ?: 1
+                                                    ).toString(), selected_tariff?.value?.id ?: 1
                                                 )
-                                                mainViewModel.value.updateSelectedTariff(mainViewModel.value.selectedTariff, tariff)
+                                                mainViewModel.value.updateSelectedTariff(tariff, preferences)
                                             })
                                         Spacer(modifier = Modifier.width(10.dp))
                                     })
@@ -255,7 +270,7 @@ fun MainBottomSheet(
                                             Text(text = " (${allowance.price}c)", fontSize = 16.sp, color = Color.Gray)
                                         }
                                         CustomSwitch(switchON = allowance.isSelected){
-                                            mainViewModel.value.includeAllowance(allowance)
+                                            mainViewModel.value.includeAllowance(allowance, preferences)
                                         }
                                     }
                                     Divider()
@@ -288,7 +303,7 @@ fun MainBottomSheet(
                                 imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                                 contentDescription = "Logo"
                             )
-                            mainViewModel.value.updateFromAddress(mainViewModel.value.from_address, Address(address.name, address.id, address.lat, address.lng))
+                            mainViewModel.value.updateFromAddress(Address(address.name, address.id, address.lat, address.lng))
                         }
                         if(stateAddressByPoint.error != ""){
                             Image(
