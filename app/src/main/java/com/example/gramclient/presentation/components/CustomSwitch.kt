@@ -29,7 +29,8 @@ fun CustomSwitch(
     strokeWidth: Dp = 2.dp,
     checkedTrackColor: Color = PrimaryColor,
     uncheckedTrackColor: Color = Color(0xFF707070),
-    gapBetweenThumbAndTrackEdge: Dp = 3.dp
+    gapBetweenThumbAndTrackEdge: Dp = 3.dp,
+    onClick: () -> Unit
 ) {
     val thumbRadius = (height / 2) - gapBetweenThumbAndTrackEdge
     val animatePosition = animateFloatAsState(
@@ -47,6 +48,7 @@ fun CustomSwitch(
                     onTap = {
                         // This is called when the user taps on the canvas
                         switchON.value = !switchON.value
+                        onClick()
                     }
                 )
             }.background(if(switchON.value)PrimaryColor else  Color.Transparent, shape = CircleShape)

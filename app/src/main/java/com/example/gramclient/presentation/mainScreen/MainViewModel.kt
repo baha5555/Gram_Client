@@ -2,22 +2,23 @@ package com.example.gramclient.presentation.mainScreen
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
 import com.example.gramclient.domain.mainScreen.*
-import com.example.gramclient.presentation.mainScreen.states.AddressByPointResponseState
-import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
-import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
-import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
+import com.example.gramclient.domain.mainScreen.order.*
+import com.example.gramclient.presentation.mainScreen.states.*
 import com.google.android.gms.location.LocationServices
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -27,6 +28,8 @@ class MainViewModel:ViewModel() {
     private val getAllowancesUseCase= GetAllowancesUseCase(repository)
     private val getAddressByPointUseCase= GetAddressByPointUseCase(repository)
     private val searchAddressUseCase= SearchAddressUseCase(repository)
+    private val createOrderUseCase= CreateOrderUseCase(repository)
+
 
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
@@ -40,6 +43,52 @@ class MainViewModel:ViewModel() {
 
     private val _stateSearchAddress = mutableStateOf(SearchAddressResponseState())
     val stateSearchAddress: State<SearchAddressResponseState> = _stateSearchAddress
+
+    private val _stateCreateOrder = mutableStateOf(OrderResponseState())
+
+
+    private val _sendOrder = mutableStateOf(OrderModel(tariff_id = 1))
+    val sendOrder: MutableLiveData<OrderModel> = MutableLiveData<OrderModel>()
+
+    val from_address = MutableLiveData<Address>(Address("Откуда?", 0, "", ""))
+
+    private val _to_address = mutableListOf<Address>(Address("Куда?", 0, "", ""))
+    val to_address = MutableLiveData<MutableList<Address>>(_to_address)
+
+    val selectedTariff = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом"))
+
+    private val _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
+    val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
+
+
+    fun updateFromAddress(data: MutableLiveData<Address>?, value:Address?) {
+        data?.postValue(value)
+    }
+
+    fun updateToAddress(index: Int, value:Address?) {
+        if(value != null && index <= _to_address.size){
+            _to_address[index]=value
+            to_address.postValue(_to_address)
+        }
+    }
+
+    fun updateSelectedTariff(data: MutableLiveData<TariffsResult>?, value:TariffsResult?) {
+        data?.postValue(value)
+    }
+
+    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance){
+        if(toDesiredAllowance.isSelected.value){
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
+            selectedAllowances.postValue(_selectedAllowances)
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+        }else{
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
+            selectedAllowances.postValue(_selectedAllowances)
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+        }
+    }
 
     fun getTariffs(token:String){
         getTariffsUseCase.invoke(token="Bearer $token").onEach { result: Resource<TariffsResponse> ->
@@ -74,7 +123,7 @@ class MainViewModel:ViewModel() {
                     try {
                         val allowancesResponse: AllowancesResponse? = result.data
                         _stateAllowances.value =
-                            AllowancesResponseState(response = allowancesResponse?.result)
+                            AllowancesResponseState(response = allowancesResponse?.result?.map { it.toDesiredAllowance() })
                         Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAllowances.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
@@ -165,6 +214,38 @@ class MainViewModel:ViewModel() {
                 }
                 is Resource.Loading -> {
                     _stateSearchAddress.value = SearchAddressResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun createOrder(preferences: SharedPreferences) {
+        createOrderUseCase.invoke(
+            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
+            null, from_address.value?.id,
+            listOf(AddressModel(to_address.value?.get(0)!!.id)),
+            null, selectedTariff.value?.id ?: 1,
+            allowances= if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null
+        ).onEach { result: Resource<OrderResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val response: OrderResponse? = result.data
+                        _stateCreateOrder.value =
+                            OrderResponseState(response = response)
+                        Log.e("TariffsResponse", "OrderResponse->\n ${_stateCreateOrder.value}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("TariffsResponse", "OrderResponseError->\n ${result.message}")
+                    _stateCreateOrder.value = OrderResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateCreateOrder.value = OrderResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

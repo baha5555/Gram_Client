@@ -312,7 +312,7 @@ fun ProfileScreen(
                         val switchON = remember {
                             mutableStateOf(false) // Initially the switch is ON
                         }
-                        CustomSwitch(switchON)
+                        CustomSwitch(switchON){}
                     }
 
                 }
