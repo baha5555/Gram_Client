@@ -353,7 +353,7 @@ fun OrderExecution(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(text = "Показать водителю, где я")
-                                    CustomSwitch(switchON = showMyLocation)
+                                    CustomSwitch(switchON = showMyLocation){}
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Divider1(color = Color(0x72111111))
