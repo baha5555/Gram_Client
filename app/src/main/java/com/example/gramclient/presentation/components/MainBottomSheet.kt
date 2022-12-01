@@ -254,7 +254,9 @@ fun MainBottomSheet(
                                             Text(text = allowance.name, fontSize = 16.sp)
                                             Text(text = " (${allowance.price}c)", fontSize = 16.sp, color = Color.Gray)
                                         }
-                                        CustomSwitch(switchON = switchState)
+                                        CustomSwitch(switchON = allowance.isSelected){
+                                            mainViewModel.value.includeAllowance(allowance)
+                                        }
                                     }
                                     Divider()
                                 }

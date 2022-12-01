@@ -15,12 +15,10 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
 import com.example.gramclient.domain.mainScreen.*
-import com.example.gramclient.domain.mainScreen.order.AddressModel
-import com.example.gramclient.domain.mainScreen.order.CreateOrderUseCase
-import com.example.gramclient.domain.mainScreen.order.OrderModel
-import com.example.gramclient.domain.mainScreen.order.OrderResponse
+import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.mainScreen.states.*
 import com.google.android.gms.location.LocationServices
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -47,7 +45,6 @@ class MainViewModel:ViewModel() {
     val stateSearchAddress: State<SearchAddressResponseState> = _stateSearchAddress
 
     private val _stateCreateOrder = mutableStateOf(OrderResponseState())
-    val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
 
     private val _sendOrder = mutableStateOf(OrderModel(tariff_id = 1))
@@ -60,10 +57,14 @@ class MainViewModel:ViewModel() {
 
     val selectedTariff = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом"))
 
+    private val _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
+    val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
+
 
     fun updateFromAddress(data: MutableLiveData<Address>?, value:Address?) {
         data?.postValue(value)
     }
+
     fun updateToAddress(index: Int, value:Address?) {
         if(value != null && index <= _to_address.size){
             _to_address[index]=value
@@ -75,11 +76,20 @@ class MainViewModel:ViewModel() {
         data?.postValue(value)
     }
 
-    fun updateOrderModel(from_address: Int? = null, to_addresses: List<AddressModel>? = null, tariff_id: Int){
-        Log.e("TariffsResponse", "sendOrder->\n ${sendOrder.value}")
-        sendOrder.value=OrderModel(tariff_id = tariff_id, from_address = from_address, to_addresses = to_addresses)
-        Log.e("TariffsResponse", "sendOrder->\n ${sendOrder.value}")
+    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance){
+        if(toDesiredAllowance.isSelected.value){
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
+            selectedAllowances.postValue(_selectedAllowances)
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+        }else{
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
+            selectedAllowances.postValue(_selectedAllowances)
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+        }
     }
+
     fun getTariffs(token:String){
         getTariffsUseCase.invoke(token="Bearer $token").onEach { result: Resource<TariffsResponse> ->
             when (result){
@@ -113,7 +123,7 @@ class MainViewModel:ViewModel() {
                     try {
                         val allowancesResponse: AllowancesResponse? = result.data
                         _stateAllowances.value =
-                            AllowancesResponseState(response = allowancesResponse?.result)
+                            AllowancesResponseState(response = allowancesResponse?.result?.map { it.toDesiredAllowance() })
                         Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAllowances.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
@@ -211,8 +221,11 @@ class MainViewModel:ViewModel() {
 
     fun createOrder(preferences: SharedPreferences) {
         createOrderUseCase.invoke(
-            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", null, from_address.value?.id, listOf(AddressModel(to_address.value?.get(0)!!.id)),
-            null, selectedTariff.value?.id ?: 1, null
+            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
+            null, from_address.value?.id,
+            listOf(AddressModel(to_address.value?.get(0)!!.id)),
+            null, selectedTariff.value?.id ?: 1,
+            allowances= if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result){
                 is Resource.Success -> {
