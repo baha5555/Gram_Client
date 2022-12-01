@@ -32,6 +32,7 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -44,7 +45,8 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     navController: NavHostController,
     preferences: SharedPreferences,
-    mainViewModel: Lazy<MainViewModel>
+    mainViewModel: Lazy<MainViewModel>,
+    profileViewModel: Lazy<ProfileViewModel>
 ) {
 
     val mainBottomSheetState = rememberBottomSheetScaffoldState(
@@ -174,7 +176,7 @@ fun MainScreen(
                                     .background(Color.Red),
                                 contentAlignment = Alignment.CenterEnd
                             ) {
-                                SideBarMenu(navController, preferences)
+                                SideBarMenu(navController, preferences,profileViewModel)
                                 Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
                                     contentDescription = "",
                                     modifier = Modifier
