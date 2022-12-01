@@ -71,32 +71,6 @@ fun SideBarMenu(
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            stateGetProfileInfo.response?.let {
-                Image(
-                    painter = rememberAsyncImagePainter(model = it.avatar_url),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .width(150.dp)
-                        .height(150.dp)
-                        .clip(CircleShape),
-                    contentDescription = "",
-                )
-                Spacer(modifier = Modifier.height(15.dp))
-                Text(
-                    modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.PROFILE_SCREEN)
-                    },
-                    text = it.first_name + ' ' + it.last_name, fontSize = 22.sp, color = Color.White
-                )
-                Spacer(modifier = Modifier.height(15.dp))
-                Text(
-                    modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.PROFILE_SCREEN)
-                    },
-                    text = it.email, fontSize = 18.sp, color = Color.White
-                )
-                Spacer(modifier = Modifier.height(30.dp))
-            }
             if(stateGetProfileInfo.response ==null) {
                 Box(
                     modifier = Modifier
@@ -128,6 +102,36 @@ fun SideBarMenu(
                     text = "Добавьте почту...", fontSize = 18.sp, color = Color.White
                 )
                 Spacer(modifier = Modifier.height(30.dp))
+            }
+            else {
+                stateGetProfileInfo.response?.let {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = it.avatar_url),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(150.dp)
+                            .height(150.dp)
+                            .clip(CircleShape),
+                        contentDescription = "",
+                    )
+                    Spacer(modifier = Modifier.height(15.dp))
+                    Text(
+                        modifier = Modifier.clickable {
+                            navController.navigate(RoutesName.PROFILE_SCREEN)
+                        },
+                        text = it.first_name + ' ' + it.last_name,
+                        fontSize = 22.sp,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(15.dp))
+                    Text(
+                        modifier = Modifier.clickable {
+                            navController.navigate(RoutesName.PROFILE_SCREEN)
+                        },
+                        text = it.email, fontSize = 18.sp, color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
             }
         }
         Column(
