@@ -71,7 +71,17 @@ fun SideBarMenu(
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if(stateGetProfileInfo.response ==null) {
+            if (stateGetProfileInfo.response?.avatar_url != null)
+                Image(
+                    painter = rememberAsyncImagePainter(model = stateGetProfileInfo.response?.avatar_url),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(150.dp)
+                        .clip(CircleShape),
+                    contentDescription = "",
+                )
+            else
                 Box(
                     modifier = Modifier
                         .size(90.dp)
@@ -87,52 +97,23 @@ fun SideBarMenu(
                         )
                     }
                 )
-                Spacer(modifier = Modifier.height(15.dp))
-                Text(
-                    modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.PROFILE_SCREEN)
-                    },
-                    text = "Ваше имя...", fontSize = 22.sp, color = Color.White
-                )
-                Spacer(modifier = Modifier.height(15.dp))
-                Text(
-                    modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.PROFILE_SCREEN)
-                    },
-                    text = "Добавьте почту...", fontSize = 18.sp, color = Color.White
-                )
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-            else {
-                stateGetProfileInfo.response?.let {
-                    Image(
-                        painter = rememberAsyncImagePainter(model = it.avatar_url),
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(150.dp)
-                            .clip(CircleShape),
-                        contentDescription = "",
-                    )
-                    Spacer(modifier = Modifier.height(15.dp))
-                    Text(
-                        modifier = Modifier.clickable {
-                            navController.navigate(RoutesName.PROFILE_SCREEN)
-                        },
-                        text = it.first_name + ' ' + it.last_name,
-                        fontSize = 22.sp,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(15.dp))
-                    Text(
-                        modifier = Modifier.clickable {
-                            navController.navigate(RoutesName.PROFILE_SCREEN)
-                        },
-                        text = it.email, fontSize = 18.sp, color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(30.dp))
-                }
-            }
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(
+                modifier = Modifier.clickable {
+                    navController.navigate(RoutesName.PROFILE_SCREEN)
+                },
+                text =if(stateGetProfileInfo.response?.first_name != null && stateGetProfileInfo.response?.last_name != null ) stateGetProfileInfo.response?.first_name + ' ' + stateGetProfileInfo.response?.last_name else "Выбрать Имя...",
+                fontSize = 22.sp,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(
+                modifier = Modifier.clickable {
+                    navController.navigate(RoutesName.PROFILE_SCREEN)
+                },
+                text = if(stateGetProfileInfo.response?.email != null) stateGetProfileInfo.response!!.email else "Выбрать Почту...", fontSize = 18.sp, color = Color.White
+            )
+            Spacer(modifier = Modifier.height(30.dp))
         }
         Column(
             modifier = Modifier
@@ -176,7 +157,6 @@ fun SideBarMenu(
         )
     }
 }
-
 @Composable
 fun ShowItems(
     icon: ImageVector,
