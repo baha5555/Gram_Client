@@ -7,33 +7,37 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.profile.ProfileViewModel
 
 @Composable
 fun SideBarMenu(
     navController: NavHostController,
-    preferences: SharedPreferences
+    preferences: SharedPreferences,
+    viewModel: Lazy<ProfileViewModel>
 ) {
     val isDialogOpen = remember { mutableStateOf(false) }
+    val stateGetProfileInfo by viewModel.value.stateGetProfileInfo
 
     Column(
         modifier = Modifier
@@ -67,36 +71,64 @@ fun SideBarMenu(
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .size(90.dp)
-                    .background(Color.White, shape = RoundedCornerShape(50.dp))
-                    .padding(15.dp),
-                content = {
-                    Image(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(60.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
-                        contentDescription = "",
-                    )
-                }
-            )
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(
-                modifier=Modifier.clickable {
-                    navController.navigate(RoutesName.PROFILE_SCREEN)
-                },
-                text = "Ваше имя...", fontSize = 22.sp, color = Color.White
-            )
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(
-                modifier=Modifier.clickable {
-                    navController.navigate(RoutesName.PROFILE_SCREEN)
-                },
-                text = "Добавьте почту...", fontSize = 18.sp, color = Color.White
-            )
-            Spacer(modifier = Modifier.height(30.dp))
+            stateGetProfileInfo.response?.let {
+                Image(
+                    painter = rememberAsyncImagePainter(model = it.avatar_url),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(150.dp)
+                        .clip(CircleShape),
+                    contentDescription = "",
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(
+                    modifier = Modifier.clickable {
+                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                    },
+                    text = it.first_name + ' ' + it.last_name, fontSize = 22.sp, color = Color.White
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(
+                    modifier = Modifier.clickable {
+                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                    },
+                    text = it.email, fontSize = 18.sp, color = Color.White
+                )
+                Spacer(modifier = Modifier.height(30.dp))
+            }
+            if(stateGetProfileInfo.response ==null) {
+                Box(
+                    modifier = Modifier
+                        .size(90.dp)
+                        .background(Color.White, shape = RoundedCornerShape(50.dp))
+                        .padding(15.dp),
+                    content = {
+                        Image(
+                            modifier = Modifier
+                                .width(60.dp)
+                                .height(60.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
+                            contentDescription = "",
+                        )
+                    }
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(
+                    modifier = Modifier.clickable {
+                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                    },
+                    text = "Ваше имя...", fontSize = 22.sp, color = Color.White
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(
+                    modifier = Modifier.clickable {
+                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                    },
+                    text = "Добавьте почту...", fontSize = 18.sp, color = Color.White
+                )
+                Spacer(modifier = Modifier.height(30.dp))
+            }
         }
         Column(
             modifier = Modifier
@@ -168,9 +200,11 @@ fun ShowItems(
                         navController.navigate(RoutesName.PROMO_CODE_SCREEN)
                     }
                     "Позвонить оператору" -> {
-                        val callIntent: Intent = Uri.parse("tel:0666").let { number ->
-                            Intent(Intent.ACTION_DIAL, number)
-                        }
+                        val callIntent: Intent = Uri
+                            .parse("tel:0666")
+                            .let { number ->
+                                Intent(Intent.ACTION_DIAL, number)
+                            }
                         context.startActivity(callIntent)
                     }
                 }

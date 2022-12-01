@@ -61,7 +61,7 @@ fun Navigation(
             AuthorizationScreen(navController, authViewModel)
         }
         composable(RoutesName.MAIN_SCREEN) {
-            MainScreen(navController, preferences, mainViewModel)
+            MainScreen(navController, preferences, mainViewModel,profileViewModel)
         }
         composable(RoutesName.SETTING_SCREEN) {
             SettingScreen(navController)
