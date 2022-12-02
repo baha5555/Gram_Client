@@ -7,6 +7,7 @@ import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
+import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
@@ -95,6 +96,12 @@ interface AppRepository {
         @Field("search_address_id") from_address: Int?,
         @Field("to_addresses") to_addresses: String?,
     ): CalculateResponse
+
+    @POST("/api/orders/{order_id}/cancel")
+    suspend fun cancelOrder(
+        @Header("Authorization") token: String,
+        @Path("order_id") order_id: Int,
+    ): CancelOrderResponse
 
 }
 
