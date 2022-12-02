@@ -68,8 +68,8 @@ fun CustomMainMap(mainViewModel: Lazy<MainViewModel>) {
             map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
             map.setMultiTouchControls(true)
 
-            map.minZoomLevel = 14.0
-            map.maxZoomLevel = 22.0
+            map.minZoomLevel = 10.0
+            map.maxZoomLevel = 24.0
 
             val myLocationProvider = GpsMyLocationProvider(it.context)
             mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
@@ -133,7 +133,7 @@ fun showRoadAB(
             map.overlays.clear()
             val road = roadManager.getRoad(waypoints)
             val roadOverlay = RoadManager.buildRoadOverlay(road)
-            val blueColorValue: Int = Color.parseColor("#36457C")
+            val blueColorValue: Int = Color.parseColor("#FF6700")
             roadOverlay.color = blueColorValue
             roadOverlay.width = 15f
             roadOverlay.paint.strokeJoin = Paint.Join.ROUND
