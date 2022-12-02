@@ -76,6 +76,7 @@ fun MainScreen(
             mainViewModel.value.getTariffs(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
             mainViewModel.value.getAllowancesByTariffId(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), 1)
             mainViewModel.value.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            mainViewModel.value.getPrice(preferences)
             initialApiCalled = true
         }
     }
