@@ -116,7 +116,7 @@ fun showRoadAB(
             fromAddressPoint.longitude =
                 mainViewModel.value.from_address.value?.lng?.toDouble() ?: 0.0
             waypoints.add(fromAddressPoint)
-            if(fromAddressPoint.latitude!=0.0) map.controller.setCenter(fromAddressPoint)
+
 
             val toAddressesPoints = ArrayList<GeoPoint>()
             val toAddressesNames = ArrayList<String>()
@@ -127,6 +127,8 @@ fun showRoadAB(
                 toAddressesNames.add(address.name)
                 toAddressesPoints.add(toAddressPoint)
             }
+            if (fromAddressPoint.latitude != 0.0 && toAddressesPoints[0].latitude != 0.0 && fromAddressPoint != toAddressesPoints[0])
+                map.controller.setCenter(fromAddressPoint)
             toAddressesPoints.forEach {
                 waypoints.add(it)
             }
@@ -140,23 +142,25 @@ fun showRoadAB(
             roadOverlay.paint.strokeCap = Paint.Cap.ROUND
 
             map.overlays.add(roadOverlay)
-            mainViewModel.value.from_address.value?.let {
-                addMarker(
-                    context,
-                    map,
-                    geoPoint = fromAddressPoint,
-                    title = it.name,
-                    R.drawable.ic_from_address_marker
-                )
-            }
-            toAddressesPoints.forEachIndexed{inx, it->
-                addMarker(
-                    context,
-                    map,
-                    geoPoint = it,
-                    title = toAddressesNames[inx],
-                    R.drawable.ic_to_address_marker
-                )
+            if (fromAddressPoint != toAddressesPoints[0]) {
+                mainViewModel.value.from_address.value?.let {
+                    addMarker(
+                        context,
+                        map,
+                        geoPoint = fromAddressPoint,
+                        title = it.name,
+                        R.drawable.ic_from_address_marker
+                    )
+                }
+                toAddressesPoints.forEachIndexed { inx, it ->
+                    addMarker(
+                        context,
+                        map,
+                        geoPoint = it,
+                        title = toAddressesNames[inx],
+                        R.drawable.ic_to_address_marker
+                    )
+                }
             }
             addOverlays()
 
