@@ -18,14 +18,17 @@ import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.athorization.IdentificationUseCase
 import com.example.gramclient.presentation.authorization.states.IdentificationResponseState
 import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 
-class AuthViewModel: ViewModel() {
-    private val repository=AppRepositoryImpl
-    private val authUseCase= AuthUseCase(repository)
-    private val identificationUseCase= IdentificationUseCase(repository)
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val authUseCase: AuthUseCase ,
+    private val identificationUseCase: IdentificationUseCase
+): ViewModel() {
 
     var phoneNumber = ""
     var client_register_id=""

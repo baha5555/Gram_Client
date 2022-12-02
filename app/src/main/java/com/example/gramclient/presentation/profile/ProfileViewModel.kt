@@ -7,15 +7,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
+import com.example.gramclient.domain.athorization.AuthUseCase
+import com.example.gramclient.domain.athorization.IdentificationUseCase
 import com.example.gramclient.domain.profile.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import okhttp3.MultipartBody
+import javax.inject.Inject
 
-class ProfileViewModel:ViewModel() {
-    private val repository= AppRepositoryImpl
-    private val sendProfileUseCase: SendProfileUseCase = SendProfileUseCase(repository)
-    private val getProfileInfoUseCase:GetProfileInfoUseCase = GetProfileInfoUseCase(repository)
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val sendProfileUseCase: SendProfileUseCase,
+    private val getProfileInfoUseCase: GetProfileInfoUseCase
+):ViewModel() {
     private val _stateprofile = mutableStateOf(ProfileResponseState())
     val stateAllowances: State<ProfileResponseState> = _stateprofile
 

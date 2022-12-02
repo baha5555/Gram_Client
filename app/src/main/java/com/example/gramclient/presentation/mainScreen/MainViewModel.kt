@@ -14,25 +14,28 @@ import androidx.lifecycle.viewModelScope
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
+import com.example.gramclient.domain.athorization.AuthUseCase
+import com.example.gramclient.domain.athorization.IdentificationUseCase
 import com.example.gramclient.domain.mainScreen.*
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.mainScreen.states.*
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class MainViewModel:ViewModel() {
-    private val repository= AppRepositoryImpl
-    private val getTariffsUseCase= GetTariffsUseCase(repository)
-    private val getAllowancesUseCase= GetAllowancesUseCase(repository)
-    private val getAddressByPointUseCase= GetAddressByPointUseCase(repository)
-    private val searchAddressUseCase= SearchAddressUseCase(repository)
-    private val createOrderUseCase= CreateOrderUseCase(repository)
-    private val getPriceUseCase= GetPriceUseCase(repository)
-    private val cancelOrderUseCase= CancelOrderUseCase(repository)
-
-
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val getTariffsUseCase: GetTariffsUseCase,
+    private val getAllowancesUseCase: GetAllowancesUseCase,
+    private val getAddressByPointUseCase: GetAddressByPointUseCase,
+    private val searchAddressUseCase: SearchAddressUseCase,
+    private val createOrderUseCase: CreateOrderUseCase,
+    private val getPriceUseCase: GetPriceUseCase,
+    private val cancelOrderUseCase: CancelOrderUseCase
+):ViewModel() {
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
     val stateTariffs: State<TariffsResponseState> = _stateTariffs

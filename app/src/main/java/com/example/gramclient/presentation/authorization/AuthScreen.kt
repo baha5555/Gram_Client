@@ -22,6 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
@@ -32,7 +33,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AuthorizationScreen(
     navController: NavHostController,
-    viewModel: Lazy<AuthViewModel>
+    viewModel: AuthViewModel= hiltViewModel()
 ) {
     val phone = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
@@ -167,7 +168,7 @@ fun AuthorizationScreen(
                                 ).show()
                             } else {
                                 val phoneNumber = phone.value.toInt()
-                                viewModel.value.authorization(phoneNumber)
+                                viewModel.authorization(phoneNumber)
                                 navController.navigate(RoutesName.IDENTIFICATION_SCREEN) {
                                     popUpTo(RoutesName.AUTH_SCREEN) {
                                         inclusive = true

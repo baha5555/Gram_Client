@@ -6,9 +6,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 
-class IdentificationUseCase(private val repository: AppRepository) {
+class IdentificationUseCase @Inject constructor(private val repository: AppRepository) {
 
     operator fun invoke(client_register_id: String, sms_code: Int): Flow<Resource<IdentificationResponse>> =
         flow{
