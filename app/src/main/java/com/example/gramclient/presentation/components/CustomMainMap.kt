@@ -18,6 +18,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.example.gramclient.R
 import com.example.gramclient.presentation.mainScreen.MainViewModel
@@ -32,6 +33,7 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
@@ -107,16 +109,18 @@ fun showRoadAB(
             val waypoints = ArrayList<GeoPoint>()
             val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
             val startPoint2 = GeoPoint(41.27803692395751, 70.62923931506361)
-            var fromAddressPoint: GeoPoint = GeoPoint(0, 0)
+            val fromAddressPoint: GeoPoint = GeoPoint(0, 0)
             fromAddressPoint.latitude =
                 mainViewModel.value.from_address.value?.lat?.toDouble() ?: 0.0
             fromAddressPoint.longitude =
                 mainViewModel.value.from_address.value?.lng?.toDouble() ?: 0.0
+            if(fromAddressPoint.latitude!=0.0 && fromAddressPoint.longitude!=0.0) jump(fromAddressPoint)
             waypoints.add(fromAddressPoint)
-            var toAddressPoint: GeoPoint = GeoPoint(0, 0)
+            val toAddressesPoints= ArrayList<GeoPoint>()
+            val toAddressPoint: GeoPoint = GeoPoint(0, 0)
             toAddressPoint.latitude = mainViewModel.value.to_address.value?.get(0)?.lat?.toDouble() ?: 0.0
             toAddressPoint.longitude = mainViewModel.value.to_address.value?.get(0)?.lng?.toDouble() ?: 0.0
-            Log.d("Road", ""+fromAddressPoint+" "+toAddressPoint)
+            Log.d("Road", "$fromAddressPoint $toAddressPoint")
 
             waypoints.add(toAddressPoint)
             map.overlays.clear()
@@ -133,8 +137,18 @@ fun showRoadAB(
             roadOverlay.paint.strokeCap = Paint.Cap.ROUND
             // roadOverlay.setGeodesic(true)
             map.overlays.add(roadOverlay)
+            mainViewModel.value.from_address.value?.let {
+                addMarker(
+                    context,
+                    map,
+                    geoPoint = fromAddressPoint,
+                    title = it.name,
+                    R.drawable.ic_from_address_marker
+                )
+            }
             addOverlays()
-        } catch (e: Exception) {
+
+        } catch (_: Exception) {
 
         }
     }
@@ -169,6 +183,14 @@ private fun getBitmap(context: Context, resID: Int): Bitmap? {
         // Handle the error
         null
     }
+}
+fun addMarker(context: Context, map: MapView, geoPoint: GeoPoint, title: String, icon: Int) {
+    val firstMarker = Marker(map)
+    firstMarker.position = geoPoint
+    firstMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+    firstMarker.icon = ContextCompat.getDrawable(context, icon)
+    firstMarker.title = title
+    map.overlays.add(firstMarker)
 }
 
 private fun jump(targetPoint: GeoPoint) {
@@ -254,3 +276,4 @@ private fun setRequiredCenter(newCenter: GeoPoint) {
     requiredCenter = GeoPoint(newCenter)
 //        Log.d("MyApp3", "setRequiredCenter " + newCenter.getLatitude() + " " + newCenter.getLongitude());
 }
+
