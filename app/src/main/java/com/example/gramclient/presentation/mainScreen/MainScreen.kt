@@ -39,7 +39,7 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@SuppressLint("CoroutineCreationDuringComposition", "SuspiciousIndentation")
 @OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun MainScreen(
@@ -48,6 +48,8 @@ fun MainScreen(
     mainViewModel: Lazy<MainViewModel>,
     profileViewModel: Lazy<ProfileViewModel>
 ) {
+    val address_from=mainViewModel.value.from_address.observeAsState()
+    val address_to=mainViewModel.value.to_address.observeAsState()
 
     val mainBottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -261,7 +263,8 @@ fun MainScreen(
                                         },
                                         sheetPeekHeight = 320.dp,
                                     ) {
-                                        CustomMap()
+                                        //CustomMap()
+                                        CustomMainMap(mainViewModel = mainViewModel)
                                     }
                                 }
                                 Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer_blue),
