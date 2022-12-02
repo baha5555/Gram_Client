@@ -10,6 +10,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
@@ -34,8 +35,12 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+
 private lateinit var map: MapView
 private var requiredCenter: GeoPoint? = null
+lateinit var mRotationGestureOverlay: RotationGestureOverlay
+lateinit var mLocationOverlay: MyLocationNewOverlay
+
 @Composable
 fun CustomMainMap(mainViewModel: Lazy<MainViewModel>) {
     AndroidView(factory = {
@@ -44,9 +49,9 @@ fun CustomMainMap(mainViewModel: Lazy<MainViewModel>) {
     },
         update = {
             //val roadManager:RoadManager=OSRMRoadManager(it.context, "GramDriver/1.0")
-            map=it.findViewById(R.id.map)
-            val btnLocation=it.findViewById<ImageButton>(R.id.btnLocation)
-            
+            map = it.findViewById(R.id.map)
+            val btnLocation = it.findViewById<ImageButton>(R.id.btnLocation)
+
 
             Configuration.getInstance()
                 .load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
@@ -56,9 +61,8 @@ fun CustomMainMap(mainViewModel: Lazy<MainViewModel>) {
             mapController.setZoom(18.0)
             map.controller.setCenter(startPoint)
 
-            val mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
+            mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
             mRotationGestureOverlay.isEnabled = true
-            map.overlays.add(mRotationGestureOverlay)
 
             map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
             map.setMultiTouchControls(true)
@@ -67,10 +71,9 @@ fun CustomMainMap(mainViewModel: Lazy<MainViewModel>) {
             map.maxZoomLevel = 22.0
 
             val myLocationProvider = GpsMyLocationProvider(it.context)
-            val mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
+            mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
             myLocationShow(it.context, mLocationOverlay)
-            map.overlays.add(mLocationOverlay)
-            btnLocation.setOnClickListener{
+            btnLocation.setOnClickListener {
                 try {
                     if (map.overlays.contains(mLocationOverlay)) {
                         val myLocation: GeoPoint = mLocationOverlay.myLocation
@@ -80,12 +83,18 @@ fun CustomMainMap(mainViewModel: Lazy<MainViewModel>) {
                             return@setOnClickListener
                         }
                     }
-                }catch (_: Exception){
+                } catch (_: Exception) {
                 }
             }
+            map.overlays.clear()
+            addOverlays()
             showRoadAB(it.context, mainViewModel)
         }
     )
+}
+fun addOverlays() {
+    map.overlays.add(mLocationOverlay)
+    map.overlays.add(mRotationGestureOverlay)
 }
 @OptIn(DelicateCoroutinesApi::class)
 fun showRoadAB(
@@ -95,19 +104,21 @@ fun showRoadAB(
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
     GlobalScope.launch {
         try {
-            val waypoints = java.util.ArrayList<GeoPoint>()
-            val geoPoint =  GeoPoint(mainViewModel.value.from_address.value?.lat?.toInt() ?: 0,
-                mainViewModel.value.from_address.value?.lng?.toInt() ?: 0
-            )
-            if(geoPoint.latitude.toInt()!=0 && geoPoint.longitude.toInt()!=0) {
-                waypoints.add(geoPoint)
-            }else{
-                return@launch
-            }
-            val geoPoint2 = GeoPoint(mainViewModel.value.to_address.value?.get(0)?.lat?.toInt() ?: 0,mainViewModel.value.to_address.value?.get(0)?.lng?.toInt() ?: 0)
-            if(geoPoint2.latitude.toInt()!=0 && geoPoint2.longitude.toInt()!=0) else return@launch
-            waypoints.add(geoPoint2)
+            val waypoints = ArrayList<GeoPoint>()
+            val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
+            val startPoint2 = GeoPoint(41.27803692395751, 70.62923931506361)
+            var fromAddressPoint: GeoPoint = GeoPoint(0, 0)
+            fromAddressPoint.latitude =
+                mainViewModel.value.from_address.value?.lat?.toDouble() ?: 0.0
+            fromAddressPoint.longitude =
+                mainViewModel.value.from_address.value?.lng?.toDouble() ?: 0.0
+            waypoints.add(fromAddressPoint)
+            var toAddressPoint: GeoPoint = GeoPoint(0, 0)
+            toAddressPoint.latitude = mainViewModel.value.to_address.value?.get(0)?.lat?.toDouble() ?: 0.0
+            toAddressPoint.longitude = mainViewModel.value.to_address.value?.get(0)?.lng?.toDouble() ?: 0.0
+            Log.d("Road", ""+fromAddressPoint+" "+toAddressPoint)
 
+            waypoints.add(toAddressPoint)
             map.overlays.clear()
 //            listOfLngLat.forEach { pair ->
 //                val geoPoint = GeoPoint(pair.first.first.toDouble(), pair.first.second.toDouble())
@@ -122,6 +133,7 @@ fun showRoadAB(
             roadOverlay.paint.strokeCap = Paint.Cap.ROUND
             // roadOverlay.setGeodesic(true)
             map.overlays.add(roadOverlay)
+            addOverlays()
         } catch (e: Exception) {
 
         }

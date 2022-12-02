@@ -257,7 +257,8 @@ fun MainScreen(
                                         },
                                         sheetPeekHeight = 320.dp,
                                     ) {
-                                        CustomMap()
+                                        //CustomMap()
+                                        CustomMainMap(mainViewModel = mainViewModel)
                                     }
                                 }
                                 Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer_blue),
