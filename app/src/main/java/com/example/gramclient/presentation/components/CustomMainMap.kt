@@ -107,8 +107,8 @@ fun showRoadAB(
     GlobalScope.launch {
         try {
             val waypoints = ArrayList<GeoPoint>()
-            val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
-            val startPoint2 = GeoPoint(41.27803692395751, 70.62923931506361)
+//            val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
+//            val startPoint2 = GeoPoint(41.27803692395751, 70.62923931506361)
             val fromAddressPoint: GeoPoint = GeoPoint(0, 0)
             fromAddressPoint.latitude =
                 mainViewModel.value.from_address.value?.lat?.toDouble() ?: 0.0
