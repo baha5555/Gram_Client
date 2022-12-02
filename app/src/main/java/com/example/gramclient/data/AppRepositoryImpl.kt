@@ -9,6 +9,7 @@ import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
+import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
@@ -237,6 +238,23 @@ object AppRepositoryImpl:AppRepository {
             .build()
         val calculateApi = retrofit.create(AppRepository::class.java)
         calculateApi.getPrice(token, tariff_id, allowances, from_address, to_addresses).let{
+            return it
+        }
+    }
+
+    override suspend fun cancelOrder(token: String, order_id: Int): CancelOrderResponse {
+        val retrofit = Retrofit
+            .Builder()
+            .baseUrl(Constants.LOCAL_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder().addInterceptor(
+                    HttpLoggingInterceptor()
+                        .setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .build())
+            .build()
+        val cancelOrderApi = retrofit.create(AppRepository::class.java)
+        cancelOrderApi.cancelOrder(token, order_id).let{
             return it
         }
     }

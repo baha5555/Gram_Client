@@ -10,14 +10,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.gramclient.ui.theme.PrimaryColor
 
 
 @Composable
-fun CustomPulseLoader(isLoading:Boolean) {
-    val dotSize = 20.dp
-    val delayUnit = 450
+fun CustomPulseLoader(isLoading:Boolean, dotSize: Dp = 20.dp, delayUnit:Int = 450) {
 
     @Composable
     fun Dot(
