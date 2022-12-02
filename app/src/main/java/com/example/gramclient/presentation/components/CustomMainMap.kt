@@ -10,7 +10,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
@@ -94,10 +93,12 @@ fun CustomMainMap(mainViewModel: Lazy<MainViewModel>) {
         }
     )
 }
+
 fun addOverlays() {
     map.overlays.add(mLocationOverlay)
     map.overlays.add(mRotationGestureOverlay)
 }
+
 @OptIn(DelicateCoroutinesApi::class)
 fun showRoadAB(
     context: Context,
@@ -114,20 +115,22 @@ fun showRoadAB(
                 mainViewModel.value.from_address.value?.lat?.toDouble() ?: 0.0
             fromAddressPoint.longitude =
                 mainViewModel.value.from_address.value?.lng?.toDouble() ?: 0.0
-            if(fromAddressPoint.latitude!=0.0 && fromAddressPoint.longitude!=0.0) jump(fromAddressPoint)
             waypoints.add(fromAddressPoint)
-            val toAddressesPoints= ArrayList<GeoPoint>()
-            val toAddressPoint: GeoPoint = GeoPoint(0, 0)
-            toAddressPoint.latitude = mainViewModel.value.to_address.value?.get(0)?.lat?.toDouble() ?: 0.0
-            toAddressPoint.longitude = mainViewModel.value.to_address.value?.get(0)?.lng?.toDouble() ?: 0.0
-            Log.d("Road", "$fromAddressPoint $toAddressPoint")
+            if(fromAddressPoint.latitude!=0.0) map.controller.setCenter(fromAddressPoint)
 
-            waypoints.add(toAddressPoint)
+            val toAddressesPoints = ArrayList<GeoPoint>()
+            val toAddressesNames = ArrayList<String>()
+            mainViewModel.value.to_address.value?.forEach { address ->
+                val toAddressPoint: GeoPoint = GeoPoint(0, 0)
+                toAddressPoint.latitude = address.lat.toDouble()
+                toAddressPoint.longitude = address.lng.toDouble()
+                toAddressesNames.add(address.name)
+                toAddressesPoints.add(toAddressPoint)
+            }
+            toAddressesPoints.forEach {
+                waypoints.add(it)
+            }
             map.overlays.clear()
-//            listOfLngLat.forEach { pair ->
-//                val geoPoint = GeoPoint(pair.first.first.toDouble(), pair.first.second.toDouble())
-//                waypoints.add(geoPoint)
-//            }
             val road = roadManager.getRoad(waypoints)
             val roadOverlay = RoadManager.buildRoadOverlay(road)
             val blueColorValue: Int = Color.parseColor("#36457C")
@@ -135,7 +138,7 @@ fun showRoadAB(
             roadOverlay.width = 15f
             roadOverlay.paint.strokeJoin = Paint.Join.ROUND
             roadOverlay.paint.strokeCap = Paint.Cap.ROUND
-            // roadOverlay.setGeodesic(true)
+
             map.overlays.add(roadOverlay)
             mainViewModel.value.from_address.value?.let {
                 addMarker(
@@ -144,6 +147,15 @@ fun showRoadAB(
                     geoPoint = fromAddressPoint,
                     title = it.name,
                     R.drawable.ic_from_address_marker
+                )
+            }
+            toAddressesPoints.forEachIndexed{inx, it->
+                addMarker(
+                    context,
+                    map,
+                    geoPoint = it,
+                    title = toAddressesNames[inx],
+                    R.drawable.ic_to_address_marker
                 )
             }
             addOverlays()
@@ -184,6 +196,7 @@ private fun getBitmap(context: Context, resID: Int): Bitmap? {
         null
     }
 }
+
 fun addMarker(context: Context, map: MapView, geoPoint: GeoPoint, title: String, icon: Int) {
     val firstMarker = Marker(map)
     firstMarker.position = geoPoint
