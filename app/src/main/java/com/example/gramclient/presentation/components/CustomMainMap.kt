@@ -133,7 +133,7 @@ fun showRoadAB(
             map.overlays.clear()
             val road = roadManager.getRoad(waypoints)
             val roadOverlay = RoadManager.buildRoadOverlay(road)
-            val blueColorValue: Int = Color.parseColor("#FF6700")
+            val blueColorValue: Int = Color.parseColor("#36457C")
             roadOverlay.color = blueColorValue
             roadOverlay.width = 15f
             roadOverlay.paint.strokeJoin = Paint.Join.ROUND
