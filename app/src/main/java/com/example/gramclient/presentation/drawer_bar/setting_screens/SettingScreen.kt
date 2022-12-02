@@ -100,7 +100,7 @@ fun SettingScreen(navController: NavHostController) {
                 val switchON = remember {
                     mutableStateOf(false) // Initially the switch is ON
                 }
-                CustomSwitch(switchON)
+                CustomSwitch(switchON){}
             }
             Row(
                 Modifier
@@ -113,7 +113,7 @@ fun SettingScreen(navController: NavHostController) {
                 val switchON = remember {
                     mutableStateOf(false) // Initially the switch is ON
                 }
-                CustomSwitch(switchON)
+                CustomSwitch(switchON){}
             }
 
         }

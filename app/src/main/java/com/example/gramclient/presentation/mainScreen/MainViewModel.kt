@@ -15,12 +15,10 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
 import com.example.gramclient.domain.mainScreen.*
-import com.example.gramclient.domain.mainScreen.order.AddressModel
-import com.example.gramclient.domain.mainScreen.order.CreateOrderUseCase
-import com.example.gramclient.domain.mainScreen.order.OrderModel
-import com.example.gramclient.domain.mainScreen.order.OrderResponse
+import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.mainScreen.states.*
 import com.google.android.gms.location.LocationServices
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -31,6 +29,7 @@ class MainViewModel:ViewModel() {
     private val getAddressByPointUseCase= GetAddressByPointUseCase(repository)
     private val searchAddressUseCase= SearchAddressUseCase(repository)
     private val createOrderUseCase= CreateOrderUseCase(repository)
+    private val getPriceUseCase= GetPriceUseCase(repository)
 
 
 
@@ -46,8 +45,10 @@ class MainViewModel:ViewModel() {
     private val _stateSearchAddress = mutableStateOf(SearchAddressResponseState())
     val stateSearchAddress: State<SearchAddressResponseState> = _stateSearchAddress
 
+    private val _stateCalculate = mutableStateOf(CalculateResponseState())
+    val stateCalculate: State<CalculateResponseState> = _stateCalculate
+
     private val _stateCreateOrder = mutableStateOf(OrderResponseState())
-    val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
 
     private val _sendOrder = mutableStateOf(OrderModel(tariff_id = 1))
@@ -58,28 +59,49 @@ class MainViewModel:ViewModel() {
     private val _to_address = mutableListOf<Address>(Address("Куда?", 0, "", ""))
     val to_address = MutableLiveData<MutableList<Address>>(_to_address)
 
-    val selectedTariff = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом"))
+    val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом"))
+
+    private var _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
+    val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
 
 
-    fun updateFromAddress(data: MutableLiveData<Address>?, value:Address?) {
-        data?.postValue(value)
+    fun updateFromAddress(value:Address) {
+        from_address?.value=value
     }
+
     fun updateToAddress(index: Int, value:Address?) {
         if(value != null && index <= _to_address.size){
             _to_address[index]=value
-            to_address.postValue(_to_address)
+            to_address.value=_to_address
         }
     }
 
-    fun updateSelectedTariff(data: MutableLiveData<TariffsResult>?, value:TariffsResult?) {
-        data?.postValue(value)
+    fun updateSelectedTariff(
+        value: TariffsResult,
+        preferences: SharedPreferences
+    ) {
+        selectedTariff?.value=value
+        _selectedAllowances = mutableListOf()
+        selectedAllowances.value=_selectedAllowances
+        getPrice(preferences)
     }
 
-    fun updateOrderModel(from_address: Int? = null, to_addresses: List<AddressModel>? = null, tariff_id: Int){
-        Log.e("TariffsResponse", "sendOrder->\n ${sendOrder.value}")
-        sendOrder.value=OrderModel(tariff_id = tariff_id, from_address = from_address, to_addresses = to_addresses)
-        Log.e("TariffsResponse", "sendOrder->\n ${sendOrder.value}")
+    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance, preferences: SharedPreferences){
+        if(toDesiredAllowance.isSelected.value){
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
+            selectedAllowances.value=_selectedAllowances
+            getPrice(preferences)
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+        }else{
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
+            selectedAllowances.value=_selectedAllowances
+            getPrice(preferences)
+            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+        }
     }
+
     fun getTariffs(token:String){
         getTariffsUseCase.invoke(token="Bearer $token").onEach { result: Resource<TariffsResponse> ->
             when (result){
@@ -113,7 +135,7 @@ class MainViewModel:ViewModel() {
                     try {
                         val allowancesResponse: AllowancesResponse? = result.data
                         _stateAllowances.value =
-                            AllowancesResponseState(response = allowancesResponse?.result)
+                            AllowancesResponseState(response = allowancesResponse?.result?.map { it.toDesiredAllowance() })
                         Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAllowances.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
@@ -211,8 +233,13 @@ class MainViewModel:ViewModel() {
 
     fun createOrder(preferences: SharedPreferences) {
         createOrderUseCase.invoke(
-            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", null, from_address.value?.id, listOf(AddressModel(to_address.value?.get(0)!!.id)),
-            null, selectedTariff.value?.id ?: 1, null
+            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
+            dop_phone = null,
+            from_address = if(from_address.value?.id != 0) from_address.value?.id else null,
+            to_addresses = if(to_address.value?.get(0)!!.id != 0) listOf(AddressModel(to_address.value?.get(0)!!.id)) else null,
+            comment = null,
+            tariff_id = selectedTariff?.value?.id ?: 1,
+            allowances= if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -233,6 +260,38 @@ class MainViewModel:ViewModel() {
                 }
                 is Resource.Loading -> {
                     _stateCreateOrder.value = OrderResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun getPrice(preferences: SharedPreferences) {
+        getPriceUseCase.invoke(
+            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
+            tariff_id = selectedTariff?.value?.id ?: 1,
+            allowances = if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
+            from_address = if(from_address.value?.id != 0) from_address.value?.id else null,
+            to_addresses = if(to_address.value?.get(0)!!.id != 0) listOf(AddressModel(to_address.value?.get(0)!!.id)) else null
+        ).onEach { result: Resource<CalculateResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val response: CalculateResponse? = result.data
+                        _stateCalculate.value =
+                            CalculateResponseState(response = response)
+                        Log.e("TariffsResponse", "CalculateResponse->\n ${_stateCalculate.value}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("TariffsResponse", "CalculateResponseError->\n ${result.message}")
+                    _stateCalculate.value = CalculateResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateCalculate.value = CalculateResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

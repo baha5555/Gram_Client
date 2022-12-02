@@ -32,6 +32,7 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -44,7 +45,8 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     navController: NavHostController,
     preferences: SharedPreferences,
-    mainViewModel: Lazy<MainViewModel>
+    mainViewModel: Lazy<MainViewModel>,
+    profileViewModel: Lazy<ProfileViewModel>
 ) {
     val address_from=mainViewModel.value.from_address.observeAsState()
     val address_to=mainViewModel.value.to_address.observeAsState()
@@ -84,6 +86,7 @@ fun MainScreen(
     val stateAllowances by mainViewModel.value.stateAllowances
     val stateAddressByPoint by mainViewModel.value.stateAddressPoint
     val stateSearchAddress by mainViewModel.value.stateSearchAddress
+    val stateCalculate by mainViewModel.value.stateCalculate
 
     val sendOrder = mainViewModel.value.sendOrder.observeAsState()
 
@@ -176,7 +179,7 @@ fun MainScreen(
                                     .background(Color.Red),
                                 contentAlignment = Alignment.CenterEnd
                             ) {
-                                SideBarMenu(navController, preferences)
+                                SideBarMenu(navController, preferences,profileViewModel)
                                 Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
                                     contentDescription = "",
                                     modifier = Modifier
@@ -253,7 +256,9 @@ fun MainScreen(
                                         sheetContent = {
                                             MainBottomSheet(navController, mainBottomSheetState,
                                                 stateTariffs, stateAllowances, mainViewModel,
-                                                preferences, stateAddressByPoint, stateSearchAddress)
+                                                preferences, stateAddressByPoint, stateSearchAddress,
+                                                stateCalculate
+                                            )
                                         },
                                         sheetPeekHeight = 320.dp,
                                     ) {
