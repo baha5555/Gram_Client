@@ -106,7 +106,7 @@ fun Navigation(
             OrderExecution(navController, preferences, orderExecutionViewModel)
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
-            SearchDriverScreen(navController)
+            SearchDriverScreen(navController, mainViewModel)
         }
         composable(
             "${RoutesName.SEARCH_ADDRESS_SCREEN}/{searchId}",

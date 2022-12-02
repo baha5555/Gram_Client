@@ -14,11 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.presentation.components.CustomDialog
+import com.example.gramclient.presentation.components.CustomMainMap
 import com.example.gramclient.presentation.components.CustomMap
+import com.example.gramclient.presentation.mainScreen.MainViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchDriverScreen(navController: NavHostController) {
+fun SearchDriverScreen(navController: NavHostController, mainViewModel: Lazy<MainViewModel>) {
     val isDialogOpen = remember {
         mutableStateOf(false)
     }
@@ -65,7 +67,7 @@ fun SearchDriverScreen(navController: NavHostController) {
             sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
 
             ) {
-            CustomMap()
+            CustomMainMap(mainViewModel = mainViewModel)
             CustomDialog(
                 text = "Вы дейтсвительно хотите отменить поиск?",
                 okBtnClick = { isDialogOpen.value = false },
