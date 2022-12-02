@@ -66,7 +66,9 @@ class MainViewModel:ViewModel() {
 
 
     fun updateFromAddress(value:Address) {
-        from_address?.value=value
+        Log.e("TariffsResponse", "from_address->\n ${from_address.value}")
+        from_address.value=value
+        Log.e("TariffsResponse", "from_address->\n ${from_address.value}")
     }
 
     fun updateToAddress(index: Int, value:Address?) {
@@ -163,6 +165,12 @@ class MainViewModel:ViewModel() {
                         _stateAddressPoint.value =
                             AddressByPointResponseState(response = addressResponse?.result)
                         Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAddressPoint.value}")
+                        updateFromAddress(
+                            Address(_stateAddressPoint.value.response!!.name,
+                            _stateAddressPoint.value.response!!.id,
+                            _stateAddressPoint.value.response!!.lat,
+                            _stateAddressPoint.value.response!!.lng)
+                        )
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }

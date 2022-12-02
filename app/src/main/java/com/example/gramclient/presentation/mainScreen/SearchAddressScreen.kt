@@ -69,9 +69,11 @@ fun SearchAddressScreen(
                     if(string=="toAddress"){
                         mainViewModel.value.updateToAddress(0, address)
                         navController.popBackStack()
+                        mainViewModel.value.getPrice(preferences)
                     }else if(string=="fromAddress"){
                         mainViewModel.value.updateFromAddress(address)
                         navController.popBackStack()
+                        mainViewModel.value.getPrice(preferences)
                     }
                 }
             }

@@ -118,30 +118,15 @@ fun MainBottomSheet(
                             )
                             stateCalculate.response?.let {
                                 Text(
-                                    text = "${it.result.amount} c",
+                                    text = if(address_to.value!![0].name == "Куда?") "от ${it.result.amount} c" else "${it.result.amount} c",
                                     modifier = Modifier.padding(end = 10.dp),
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Normal,
                                     lineHeight = 14.sp
                                 )
                             }
-                            if (stateCalculate.response == null){
-                                Text(
-                                    text = "...",
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    lineHeight = 14.sp
-                                )
-                            }
-                            if (stateCalculate.error != ""){
-                                Text(
-                                    text = "...",
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    lineHeight = 14.sp
-                                )
+                            if (stateCalculate.response == null || stateCalculate.error != ""){
+                                CustomPulseLoader(isLoading = true)
                             }
                         }
                         Spacer(modifier = Modifier.height(15.dp))
@@ -303,7 +288,6 @@ fun MainBottomSheet(
                                 imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                                 contentDescription = "Logo"
                             )
-                            mainViewModel.value.updateFromAddress(Address(address.name, address.id, address.lat, address.lng))
                         }
                         if(stateAddressByPoint.error != ""){
                             Image(
@@ -317,7 +301,7 @@ fun MainBottomSheet(
                         Spacer(modifier = Modifier.width(15.dp))
                         Column(modifier = Modifier
                             .clip(RoundedCornerShape(50.dp))
-                            .clickable{
+                            .clickable {
                                 navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/fromAddress")
                             }
                             .fillMaxWidth()
@@ -346,7 +330,7 @@ fun MainBottomSheet(
                             Spacer(modifier = Modifier.width(15.dp))
                             Column(modifier = Modifier
                                 .clip(RoundedCornerShape(50.dp))
-                                .clickable{
+                                .clickable {
                                     navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/toAddress")
                                 }
                                 .fillMaxWidth()
@@ -360,7 +344,7 @@ fun MainBottomSheet(
                     }
                 }
             }
-//            Spacer(modifier = Modifier.height(200.dp))
+            Spacer(modifier = Modifier.height(150.dp))
         }
     }
 }
