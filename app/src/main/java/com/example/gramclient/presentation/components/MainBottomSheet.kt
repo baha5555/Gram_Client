@@ -167,7 +167,7 @@ fun MainBottomSheet(
                                         TariffItem(
                                             icon = if (tariff.id == 1) tariffListIcons[0] else if (tariff.id == 2) tariffListIcons[1] else if (tariff.id == 4) tariffListIcons[2] else if (tariff.id == 5) tariffListIcons[3] else tariffListIcons[4],
                                             name = tariff.name,
-                                            price = 10,
+                                            price = tariff.min_price,
                                             isSelected = selected_tariff?.value == tariff,
                                             onSelected = {
                                                 mainViewModel.value.getAllowancesByTariffId(
