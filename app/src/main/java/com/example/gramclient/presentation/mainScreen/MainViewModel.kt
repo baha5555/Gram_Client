@@ -59,7 +59,7 @@ class MainViewModel:ViewModel() {
     private val _to_address = mutableListOf<Address>(Address("Куда?", 0, "", ""))
     val to_address = MutableLiveData<MutableList<Address>>(_to_address)
 
-    val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом"))
+    val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом", 12))
 
     private var _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
     val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)

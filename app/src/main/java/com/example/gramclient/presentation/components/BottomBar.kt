@@ -94,7 +94,7 @@ fun BottomBar(
             text = "Оформить данный заказ?",
             okBtnClick = {
                 createOrder().let {
-                    navController.navigate(RoutesName.ORDER_EXECUTION_SCREEN)
+                    navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN)
                     isDialogOpen.value = false
                 }
                          },
