@@ -27,9 +27,11 @@ import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 
 @Suppress("DEPRECATION")
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var preferences: SharedPreferences
 
@@ -43,13 +45,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             GramClientTheme {
                 val messageViewModel= viewModels<MessageViewModel>()
-                val authViewModel= viewModels<AuthViewModel>()
-                val mainViewModel= viewModels<MainViewModel>()
-                val profileViewModel = viewModels<ProfileViewModel>()
-                val orderExecutionViewModel = viewModels<OrderExecutionViewModel>()
                 val navController= rememberNavController()
-                profileViewModel.value.getProfileInfo(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
-                Navigation(navController =navController, messageViewModel, preferences, authViewModel, mainViewModel,profileViewModel, orderExecutionViewModel)
+//                profileViewModel.value.getProfileInfo(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+                Navigation(navController =navController, messageViewModel, preferences)
             }
         }
         checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)

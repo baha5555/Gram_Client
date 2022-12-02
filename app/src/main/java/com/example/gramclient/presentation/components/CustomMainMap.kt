@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.gramclient.R
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -43,7 +44,7 @@ lateinit var mRotationGestureOverlay: RotationGestureOverlay
 lateinit var mLocationOverlay: MyLocationNewOverlay
 
 @Composable
-fun CustomMainMap(mainViewModel: Lazy<MainViewModel>) {
+fun CustomMainMap(mainViewModel: MainViewModel= hiltViewModel()) {
     AndroidView(factory = {
         View.inflate(it, R.layout.map, null)
 
@@ -102,7 +103,7 @@ fun addOverlays() {
 @OptIn(DelicateCoroutinesApi::class)
 fun showRoadAB(
     context: Context,
-    mainViewModel: Lazy<MainViewModel>
+    mainViewModel: MainViewModel
 ) {
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
     GlobalScope.launch {
@@ -112,15 +113,15 @@ fun showRoadAB(
 //            val startPoint2 = GeoPoint(41.27803692395751, 70.62923931506361)
             val fromAddressPoint: GeoPoint = GeoPoint(0, 0)
             fromAddressPoint.latitude =
-                mainViewModel.value.from_address.value?.lat?.toDouble() ?: 0.0
+                mainViewModel.from_address.value?.lat?.toDouble() ?: 0.0
             fromAddressPoint.longitude =
-                mainViewModel.value.from_address.value?.lng?.toDouble() ?: 0.0
+                mainViewModel.from_address.value?.lng?.toDouble() ?: 0.0
             waypoints.add(fromAddressPoint)
 
 
             val toAddressesPoints = ArrayList<GeoPoint>()
             val toAddressesNames = ArrayList<String>()
-            mainViewModel.value.to_address.value?.forEach { address ->
+            mainViewModel.to_address.value?.forEach { address ->
                 val toAddressPoint: GeoPoint = GeoPoint(0, 0)
                 toAddressPoint.latitude = address.lat.toDouble()
                 toAddressPoint.longitude = address.lng.toDouble()
@@ -143,7 +144,7 @@ fun showRoadAB(
 
             map.overlays.add(roadOverlay)
             if (fromAddressPoint != toAddressesPoints[0]) {
-                mainViewModel.value.from_address.value?.let {
+                mainViewModel.from_address.value?.let {
                     addMarker(
                         context,
                         map,

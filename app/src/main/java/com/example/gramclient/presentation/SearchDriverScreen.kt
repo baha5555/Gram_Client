@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.components.CustomDialog
@@ -28,12 +29,12 @@ import com.example.gramclient.ui.theme.PrimaryColor
 @Composable
 fun SearchDriverScreen(
     navController: NavHostController,
-    mainViewModel: Lazy<MainViewModel>,
+    mainViewModel: MainViewModel= hiltViewModel(),
     preferences: SharedPreferences
 ) {
 
-    val stateCreateOrder by mainViewModel.value.stateCreateOrder
-    val stateCancelOrder by mainViewModel.value.stateCancelOrder
+    val stateCreateOrder by mainViewModel.stateCreateOrder
+    val stateCancelOrder by mainViewModel.stateCancelOrder
 
     val isDialogOpen = remember {
         mutableStateOf(false)
@@ -87,7 +88,7 @@ fun SearchDriverScreen(
                 CustomDialog(
                     text = "Вы дейтсвительно хотите отменить заказ?",
                     okBtnClick = {
-                            mainViewModel.value.cancelOrder(preferences, orderState.result)
+                            mainViewModel.cancelOrder(preferences, orderState.result)
                             isDialogOpen.value = false
                             navController.popBackStack()
                     },
@@ -105,7 +106,7 @@ fun SearchDriverScreen(
                 if(!stateCreateOrder.isLoading){
                     Text(text = "Повторить запрос", color = PrimaryColor,
                         modifier = Modifier.clickable {
-                            mainViewModel.value.createOrder(preferences)
+                            mainViewModel.createOrder(preferences)
                         },
                         textAlign = TextAlign.Center
                     )

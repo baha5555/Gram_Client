@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
@@ -51,13 +52,13 @@ fun IdentificationScreen(
     onFilled: (code: String) -> Unit,
     navController: NavHostController,
     preferences: SharedPreferences,
-    viewModel: Lazy<AuthViewModel>
+    viewModel: AuthViewModel= hiltViewModel()
 ) {
     var code: List<Char> by remember{ mutableStateOf(listOf())}
     var time: Int by remember{ mutableStateOf(25)}
 
     val coroutineScope= rememberCoroutineScope()
-    val stateLogin by viewModel.value.stateLogin
+    val stateLogin by viewModel.stateLogin
 
 
     val focusRequesters: List<FocusRequester> = remember {
@@ -109,7 +110,7 @@ fun IdentificationScreen(
                 .padding(top = 47.dp)
         ){
             Text(text = "Сообщение с кодом отправлено на", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-            Text(text = "+992${viewModel.value.phoneNumber}", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+            Text(text = "+992${viewModel.phoneNumber}", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
         }
 
         Row(modifier = modifier
@@ -199,7 +200,7 @@ fun IdentificationScreen(
                                 time -= 1
                             }
                         }
-                        viewModel.value.authorization(viewModel.value.phoneNumber.toInt())
+                        viewModel.authorization(viewModel.phoneNumber.toInt())
                     },
                 textAlign = TextAlign.Center, color = Color.Blue)
         }
@@ -220,7 +221,7 @@ fun IdentificationScreen(
             textBold = true,
             enabled = code.size==4,
         onClick = {
-            viewModel.value.identification(code, preferences, navController)
+            viewModel.identification(code, preferences, navController)
         })
     }
 }

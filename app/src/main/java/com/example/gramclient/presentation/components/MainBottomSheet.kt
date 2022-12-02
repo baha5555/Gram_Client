@@ -23,6 +23,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
@@ -39,7 +40,7 @@ fun MainBottomSheet(
     bottomSheetState: BottomSheetScaffoldState,
     stateTariffs: TariffsResponseState,
     stateAllowances: AllowancesResponseState,
-    mainViewModel: Lazy<MainViewModel>,
+    mainViewModel: MainViewModel= hiltViewModel(),
     preferences: SharedPreferences,
     stateAddressByPoint: AddressByPointResponseState,
     stateSearchAddress: SearchAddressResponseState,
@@ -51,9 +52,9 @@ fun MainBottomSheet(
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
 
 
-    val address_from=mainViewModel.value.from_address.observeAsState()
-    val address_to=mainViewModel.value.to_address.observeAsState()
-    val selected_tariff=mainViewModel.value.selectedTariff?.observeAsState()
+    val address_from=mainViewModel.from_address.observeAsState()
+    val address_to=mainViewModel.to_address.observeAsState()
+    val selected_tariff=mainViewModel.selectedTariff?.observeAsState()
 
 
     Box(
@@ -170,12 +171,12 @@ fun MainBottomSheet(
                                             price = tariff.min_price,
                                             isSelected = selected_tariff?.value == tariff,
                                             onSelected = {
-                                                mainViewModel.value.getAllowancesByTariffId(
+                                                mainViewModel.getAllowancesByTariffId(
                                                     preferences.getString(
                                                         PreferencesName.ACCESS_TOKEN, ""
                                                     ).toString(), selected_tariff?.value?.id ?: 1
                                                 )
-                                                mainViewModel.value.updateSelectedTariff(tariff, preferences)
+                                                mainViewModel.updateSelectedTariff(tariff, preferences)
                                             })
                                         Spacer(modifier = Modifier.width(10.dp))
                                     })
@@ -255,7 +256,7 @@ fun MainBottomSheet(
                                             Text(text = " (${allowance.price}c)", fontSize = 16.sp, color = Color.Gray)
                                         }
                                         CustomSwitch(switchON = allowance.isSelected){
-                                            mainViewModel.value.includeAllowance(allowance, preferences)
+                                            mainViewModel.includeAllowance(allowance, preferences)
                                         }
                                     }
                                     Divider()

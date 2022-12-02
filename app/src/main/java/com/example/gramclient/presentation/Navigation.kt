@@ -34,10 +34,10 @@ fun Navigation(
     navController: NavHostController,
     messageViewModel: Lazy<MessageViewModel>,
     preferences: SharedPreferences,
-    authViewModel: Lazy<AuthViewModel>,
-    mainViewModel: Lazy<MainViewModel>,
-    profileViewModel: Lazy<ProfileViewModel>,
-    orderExecutionViewModel: Lazy<OrderExecutionViewModel>,
+//    authViewModel: Lazy<AuthViewModel>,
+//    mainViewModel: Lazy<MainViewModel>,
+//    profileViewModel: Lazy<ProfileViewModel>,
+//    orderExecutionViewModel: Lazy<OrderExecutionViewModel>,
 
     ) {
     NavHost(
@@ -53,15 +53,14 @@ fun Navigation(
                 modifier = Modifier.fillMaxWidth(),
                 onFilled = { Log.d("Tag", "Hello") },
                 navController = navController,
-                preferences = preferences,
-                viewModel = authViewModel
+                preferences = preferences
             )
         }
         composable(RoutesName.AUTH_SCREEN) {
-            AuthorizationScreen(navController, authViewModel)
+            AuthorizationScreen(navController)
         }
         composable(RoutesName.MAIN_SCREEN) {
-            MainScreen(navController, preferences, mainViewModel,profileViewModel)
+            MainScreen(navController, preferences)
         }
         composable(RoutesName.SETTING_SCREEN) {
             SettingScreen(navController)
@@ -88,7 +87,7 @@ fun Navigation(
             SupportScreen(navController)
         }
         composable(RoutesName.PROFILE_SCREEN) {
-            ProfileScreen(navController, profileViewModel,preferences)
+            ProfileScreen(navController,preferences=preferences)
         }
         composable(RoutesName.MESSAGE_SCREEN) {
             MessageScreen(navController, messageViewModel)
@@ -103,16 +102,16 @@ fun Navigation(
             PromoCodeScreen(navController)
         }
         composable(RoutesName.ORDER_EXECUTION_SCREEN) {
-            OrderExecution(navController, preferences, orderExecutionViewModel)
+            OrderExecution(navController, preferences)
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
-            SearchDriverScreen(navController, mainViewModel, preferences)
+            SearchDriverScreen(navController, preferences=preferences)
         }
         composable(
             "${RoutesName.SEARCH_ADDRESS_SCREEN}/{searchId}",
             arguments = listOf(navArgument("searchId"){type= NavType.StringType})
         ) {backStackEntry ->
-            SearchAddressScreen(navController, mainViewModel, preferences, backStackEntry.arguments?.getString("searchId"))
+            SearchAddressScreen(navController, preferences=preferences, string = backStackEntry.arguments?.getString("searchId"))
         }
     }
 }

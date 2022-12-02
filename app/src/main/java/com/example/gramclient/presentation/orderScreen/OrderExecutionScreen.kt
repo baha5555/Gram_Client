@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
@@ -38,7 +39,7 @@ import androidx.compose.material.Divider as Divider1
 fun OrderExecution(
     navController: NavHostController,
     preferences: SharedPreferences,
-    orderExecutionViewModel: Lazy<OrderExecutionViewModel>
+    orderExecutionViewModel: OrderExecutionViewModel= hiltViewModel()
 ) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -486,7 +487,7 @@ fun OrderExecution(
                                         scope.launch {
                                             delay(3000)
                                             thumbUpClicked = true
-                                            orderExecutionViewModel.value.sendRating2(
+                                            orderExecutionViewModel.sendRating2(
                                                 token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
                                                 order_id = 590,
                                                 add_rating = ratingState.value*10

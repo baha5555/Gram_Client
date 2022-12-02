@@ -1,6 +1,7 @@
 package com.example.gramclient.data
 
 import com.example.gramclient.Constants
+import com.example.gramclient.data.remote.ApplicationApi
 import com.example.gramclient.domain.AppRepository
 import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.athorization.AuthResponse
@@ -21,94 +22,20 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 
-object AppRepositoryImpl:AppRepository {
-    override suspend fun authorization(phone_number: Long): AuthResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val authApi = retrofit.create(AppRepository::class.java)
-        val phone="${Constants.PREFIX}$phone_number".toLong()
-        authApi.authorization(phone).let{
-            return it
-        }
-    }
+class AppRepositoryImpl(
+    private val api: ApplicationApi
+):AppRepository {
+    override suspend fun authorization(phone_number: Long): AuthResponse = api.authorization(phone_number)
 
-    override suspend fun identification(client_register_id: String, sms_code: Long): IdentificationResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val authApi = retrofit.create(AppRepository::class.java)
-        authApi.identification(client_register_id, sms_code).let{
-            return it
-        }
-    }
+    override suspend fun identification(client_register_id: String, sms_code: Long): IdentificationResponse = api.identification(client_register_id, sms_code)
 
-    override suspend fun getTariffs(token: String): TariffsResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val tariffsApi = retrofit.create(AppRepository::class.java)
-        tariffsApi.getTariffs(token).let{
-            return it
-        }
-    }
+    override suspend fun getTariffs(token: String): TariffsResponse = api.getTariffs(token)
 
-    override suspend fun getProfileInfo(token: String): GetProfileInfoResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val tariffsApi = retrofit.create(AppRepository::class.java)
-        tariffsApi.getProfileInfo(token).let{
-            return it
-        }
-    }
+    override suspend fun getProfileInfo(token: String): GetProfileInfoResponse = api.getProfileInfo(token)
     override suspend fun getAllowancesByTariffId(
         token: String,
         tariff_id: Int
-    ): AllowancesResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val allowancesApi = retrofit.create(AppRepository::class.java)
-        allowancesApi.getAllowancesByTariffId(token, tariff_id).let{
-            return it
-        }
-    }
+    ): AllowancesResponse = api.getAllowancesByTariffId(token, tariff_id)
 
     override suspend fun sendProfile(
         token: String,
@@ -118,81 +45,21 @@ object AppRepositoryImpl:AppRepository {
         birth_date: String,
         email: String,
         avatar: MultipartBody.Part
-    ): ProfileResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val profileApi = retrofit.create(AppRepository::class.java)
-        profileApi.sendProfile(token,first_name,last_name,gender,birth_date,email,avatar).let{
-            return it
-        }
-    }
+    ): ProfileResponse = api.sendProfile(token, first_name, last_name, gender, birth_date, email, avatar)
 
     override suspend fun getAddressByPoint(
         token: String,
         lng: Double,
         lat: Double
-    ): AddressByPointResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val addressApi = retrofit.create(AppRepository::class.java)
-        addressApi.getAddressByPoint(token, lng, lat).let{
-            return it
-        }
-    }
+    ): AddressByPointResponse = api.getAddressByPoint(token, lng, lat)
 
     override suspend fun sendRating(
         token: String,
         order_id: Int,
         add_rating: Int
-    ): AddRatingResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val addRating = retrofit.create(AppRepository::class.java)
-        addRating.sendRating(token, order_id, add_rating).let{
-            return it
-        }
-    }
+    ): AddRatingResponse = api.sendRating(token, order_id, add_rating)
 
-    override suspend fun searchAddress(token: String, addressName: String): SearchAddressResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val searchAddressApi = retrofit.create(AppRepository::class.java)
-        searchAddressApi.searchAddress(token, addressName).let{
-            return it
-        }
-    }
+    override suspend fun searchAddress(token: String, addressName: String): SearchAddressResponse = api.searchAddress(token, addressName)
 
     override suspend fun createOrder(
         token: String,
@@ -202,22 +69,7 @@ object AppRepositoryImpl:AppRepository {
         comment: String?,
         tariff_id: Int,
         allowances: String?
-    ): OrderResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val createOrderApi = retrofit.create(AppRepository::class.java)
-        createOrderApi.createOrder(token, dop_phone, from_address, to_addresses, comment, tariff_id, allowances).let{
-            return it
-        }
-    }
+    ): OrderResponse = api.createOrder(token, dop_phone, from_address, to_addresses, comment, tariff_id, allowances)
 
     override suspend fun getPrice(
         token: String,
@@ -225,37 +77,7 @@ object AppRepositoryImpl:AppRepository {
         allowances: String?,
         from_address: Int?,
         to_addresses: String?
-    ): CalculateResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val calculateApi = retrofit.create(AppRepository::class.java)
-        calculateApi.getPrice(token, tariff_id, allowances, from_address, to_addresses).let{
-            return it
-        }
-    }
+    ): CalculateResponse = api.getPrice(token, tariff_id, allowances, from_address, to_addresses)
 
-    override suspend fun cancelOrder(token: String, order_id: Int): CancelOrderResponse {
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl(Constants.LOCAL_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(
-                OkHttpClient.Builder().addInterceptor(
-                    HttpLoggingInterceptor()
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .build())
-            .build()
-        val cancelOrderApi = retrofit.create(AppRepository::class.java)
-        cancelOrderApi.cancelOrder(token, order_id).let{
-            return it
-        }
-    }
+    override suspend fun cancelOrder(token: String, order_id: Int): CancelOrderResponse = api.cancelOrder(token, order_id)
 }
