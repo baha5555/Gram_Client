@@ -23,6 +23,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
@@ -39,7 +40,7 @@ fun MainBottomSheet(
     bottomSheetState: BottomSheetScaffoldState,
     stateTariffs: TariffsResponseState,
     stateAllowances: AllowancesResponseState,
-    mainViewModel: Lazy<MainViewModel>,
+    mainViewModel: MainViewModel= hiltViewModel(),
     preferences: SharedPreferences,
     stateAddressByPoint: AddressByPointResponseState,
     stateSearchAddress: SearchAddressResponseState,
@@ -51,9 +52,9 @@ fun MainBottomSheet(
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
 
 
-    val address_from=mainViewModel.value.from_address.observeAsState()
-    val address_to=mainViewModel.value.to_address.observeAsState()
-    val selected_tariff=mainViewModel.value.selectedTariff?.observeAsState()
+    val address_from=mainViewModel.from_address.observeAsState()
+    val address_to=mainViewModel.to_address.observeAsState()
+    val selected_tariff=mainViewModel.selectedTariff?.observeAsState()
 
 
     Box(
@@ -118,30 +119,15 @@ fun MainBottomSheet(
                             )
                             stateCalculate.response?.let {
                                 Text(
-                                    text = "${it.result.amount} c",
+                                    text = if(address_to.value!![0].name == "Куда?") "от ${it.result.amount} c" else "${it.result.amount} c",
                                     modifier = Modifier.padding(end = 10.dp),
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Normal,
                                     lineHeight = 14.sp
                                 )
                             }
-                            if (stateCalculate.response == null){
-                                Text(
-                                    text = "...",
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    lineHeight = 14.sp
-                                )
-                            }
-                            if (stateCalculate.error != ""){
-                                Text(
-                                    text = "...",
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    lineHeight = 14.sp
-                                )
+                            if (stateCalculate.response == null || stateCalculate.error != ""){
+                                CustomPulseLoader(isLoading = true)
                             }
                         }
                         Spacer(modifier = Modifier.height(15.dp))
@@ -182,15 +168,15 @@ fun MainBottomSheet(
                                         TariffItem(
                                             icon = if (tariff.id == 1) tariffListIcons[0] else if (tariff.id == 2) tariffListIcons[1] else if (tariff.id == 4) tariffListIcons[2] else if (tariff.id == 5) tariffListIcons[3] else tariffListIcons[4],
                                             name = tariff.name,
-                                            price = 10,
+                                            price = tariff.min_price,
                                             isSelected = selected_tariff?.value == tariff,
                                             onSelected = {
-                                                mainViewModel.value.getAllowancesByTariffId(
+                                                mainViewModel.getAllowancesByTariffId(
                                                     preferences.getString(
                                                         PreferencesName.ACCESS_TOKEN, ""
                                                     ).toString(), selected_tariff?.value?.id ?: 1
                                                 )
-                                                mainViewModel.value.updateSelectedTariff(tariff, preferences)
+                                                mainViewModel.updateSelectedTariff(tariff, preferences)
                                             })
                                         Spacer(modifier = Modifier.width(10.dp))
                                     })
@@ -270,7 +256,7 @@ fun MainBottomSheet(
                                             Text(text = " (${allowance.price}c)", fontSize = 16.sp, color = Color.Gray)
                                         }
                                         CustomSwitch(switchON = allowance.isSelected){
-                                            mainViewModel.value.includeAllowance(allowance, preferences)
+                                            mainViewModel.includeAllowance(allowance, preferences)
                                         }
                                     }
                                     Divider()
@@ -303,7 +289,6 @@ fun MainBottomSheet(
                                 imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                                 contentDescription = "Logo"
                             )
-                            mainViewModel.value.updateFromAddress(Address(address.name, address.id, address.lat, address.lng))
                         }
                         if(stateAddressByPoint.error != ""){
                             Image(
@@ -317,7 +302,7 @@ fun MainBottomSheet(
                         Spacer(modifier = Modifier.width(15.dp))
                         Column(modifier = Modifier
                             .clip(RoundedCornerShape(50.dp))
-                            .clickable{
+                            .clickable {
                                 navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/fromAddress")
                             }
                             .fillMaxWidth()
@@ -346,7 +331,7 @@ fun MainBottomSheet(
                             Spacer(modifier = Modifier.width(15.dp))
                             Column(modifier = Modifier
                                 .clip(RoundedCornerShape(50.dp))
-                                .clickable{
+                                .clickable {
                                     navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/toAddress")
                                 }
                                 .fillMaxWidth()
@@ -360,7 +345,7 @@ fun MainBottomSheet(
                     }
                 }
             }
-//            Spacer(modifier = Modifier.height(200.dp))
+            Spacer(modifier = Modifier.height(150.dp))
         }
     }
 }

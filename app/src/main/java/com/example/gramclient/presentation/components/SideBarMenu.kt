@@ -23,6 +23,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.PreferencesName
@@ -34,10 +35,10 @@ import com.example.gramclient.presentation.profile.ProfileViewModel
 fun SideBarMenu(
     navController: NavHostController,
     preferences: SharedPreferences,
-    viewModel: Lazy<ProfileViewModel>
+    viewModel: ProfileViewModel= hiltViewModel()
 ) {
     val isDialogOpen = remember { mutableStateOf(false) }
-    val stateGetProfileInfo by viewModel.value.stateGetProfileInfo
+    val stateGetProfileInfo by viewModel.stateGetProfileInfo
 
     Column(
         modifier = Modifier

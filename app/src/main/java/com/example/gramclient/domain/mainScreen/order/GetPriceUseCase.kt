@@ -7,9 +7,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 
-class GetPriceUseCase(private val repository: AppRepository) {
+class GetPriceUseCase @Inject constructor(private val repository: AppRepository) {
 
     operator fun invoke(
         token: String,

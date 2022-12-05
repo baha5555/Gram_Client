@@ -8,8 +8,11 @@ import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.*
+import javax.inject.Inject
 
-class SendProfileUseCase (private val repository: AppRepository) {
+class SendProfileUseCase @Inject constructor(
+private val repository: AppRepository
+) {
 
     operator fun invoke(token:String,
                         first_name: String,

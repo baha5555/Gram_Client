@@ -6,8 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
-class SendAddRatingUseCase(private val repository: AppRepository) {
+class SendAddRatingUseCase @Inject constructor(private val repository: AppRepository) {
     operator fun invoke(
         token: String, order_id: Int, add_rating: Int
     ): Flow<Resource<AddRatingResponse>> =

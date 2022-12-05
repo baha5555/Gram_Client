@@ -14,24 +14,28 @@ import androidx.lifecycle.viewModelScope
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
 import com.example.gramclient.data.AppRepositoryImpl
+import com.example.gramclient.domain.athorization.AuthUseCase
+import com.example.gramclient.domain.athorization.IdentificationUseCase
 import com.example.gramclient.domain.mainScreen.*
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.mainScreen.states.*
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class MainViewModel:ViewModel() {
-    private val repository= AppRepositoryImpl
-    private val getTariffsUseCase= GetTariffsUseCase(repository)
-    private val getAllowancesUseCase= GetAllowancesUseCase(repository)
-    private val getAddressByPointUseCase= GetAddressByPointUseCase(repository)
-    private val searchAddressUseCase= SearchAddressUseCase(repository)
-    private val createOrderUseCase= CreateOrderUseCase(repository)
-    private val getPriceUseCase= GetPriceUseCase(repository)
-
-
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val getTariffsUseCase: GetTariffsUseCase,
+    private val getAllowancesUseCase: GetAllowancesUseCase,
+    private val getAddressByPointUseCase: GetAddressByPointUseCase,
+    private val searchAddressUseCase: SearchAddressUseCase,
+    private val createOrderUseCase: CreateOrderUseCase,
+    private val getPriceUseCase: GetPriceUseCase,
+    private val cancelOrderUseCase: CancelOrderUseCase
+):ViewModel() {
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
     val stateTariffs: State<TariffsResponseState> = _stateTariffs
@@ -49,6 +53,7 @@ class MainViewModel:ViewModel() {
     val stateCalculate: State<CalculateResponseState> = _stateCalculate
 
     private val _stateCreateOrder = mutableStateOf(OrderResponseState())
+    val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
 
     private val _sendOrder = mutableStateOf(OrderModel(tariff_id = 1))
@@ -59,14 +64,19 @@ class MainViewModel:ViewModel() {
     private val _to_address = mutableListOf<Address>(Address("Куда?", 0, "", ""))
     val to_address = MutableLiveData<MutableList<Address>>(_to_address)
 
-    val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом"))
+    val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом", 12))
 
     private var _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
     val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
 
+    private val _stateCancelOrder = mutableStateOf(CancelOrderResponseState())
+    val stateCancelOrder: State<CancelOrderResponseState> = _stateCancelOrder
+
 
     fun updateFromAddress(value:Address) {
-        from_address?.value=value
+        Log.e("TariffsResponse", "from_address->\n ${from_address.value}")
+        from_address.value=value
+        Log.e("TariffsResponse", "from_address->\n ${from_address.value}")
     }
 
     fun updateToAddress(index: Int, value:Address?) {
@@ -163,6 +173,12 @@ class MainViewModel:ViewModel() {
                         _stateAddressPoint.value =
                             AddressByPointResponseState(response = addressResponse?.result)
                         Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAddressPoint.value}")
+                        updateFromAddress(
+                            Address(_stateAddressPoint.value.response!!.name,
+                            _stateAddressPoint.value.response!!.id,
+                            _stateAddressPoint.value.response!!.lat,
+                            _stateAddressPoint.value.response!!.lng)
+                        )
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
@@ -292,6 +308,32 @@ class MainViewModel:ViewModel() {
                 }
                 is Resource.Loading -> {
                     _stateCalculate.value = CalculateResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun cancelOrder(preferences: SharedPreferences, order_id: Int){
+        cancelOrderUseCase.invoke(token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", order_id).onEach { result: Resource<CancelOrderResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val response: CancelOrderResponse? = result.data
+                        _stateCancelOrder.value =
+                            CancelOrderResponseState(response = response)
+                        Log.e("TariffsResponse", "CancelOrderResponse->\n ${_stateCancelOrder.value}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("TariffsResponse", "CancelOrderResponseError->\n ${result.message}")
+                    _stateCancelOrder.value = CancelOrderResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateCancelOrder.value = CancelOrderResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

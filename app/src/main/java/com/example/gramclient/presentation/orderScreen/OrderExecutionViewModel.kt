@@ -11,13 +11,18 @@ import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponseState
 import com.example.gramclient.domain.orderExecutionScreen.SendAddRatingUseCase
+import com.example.gramclient.domain.profile.GetProfileInfoUseCase
+import com.example.gramclient.domain.profile.SendProfileUseCase
 import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class OrderExecutionViewModel: ViewModel() {
-    private val repository= AppRepositoryImpl
-    private val sendAddRatingUseCase: SendAddRatingUseCase = SendAddRatingUseCase(repository)
+@HiltViewModel
+class OrderExecutionViewModel  @Inject constructor(
+    private val sendAddRatingUseCase: SendAddRatingUseCase
+): ViewModel() {
 
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateSearchAddress: State<AddRatingResponseState> = _stateAddRating

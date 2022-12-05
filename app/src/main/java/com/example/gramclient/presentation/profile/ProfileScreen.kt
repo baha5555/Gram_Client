@@ -37,6 +37,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
@@ -61,15 +62,15 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
-    viewModel: Lazy<ProfileViewModel>,
+    viewModel: ProfileViewModel= hiltViewModel(),
     preferences: SharedPreferences,
 ) {
-    val stateGetProfileInfo by viewModel.value.stateGetProfileInfo
+    val stateGetProfileInfo by viewModel.stateGetProfileInfo
     val getProfileFirstName = stateGetProfileInfo.response?.first_name
     val profileFirstName = remember { mutableStateOf(stateGetProfileInfo.response?.first_name ?: "") }
     val profileEmail = remember { mutableStateOf(stateGetProfileInfo.response?.email?:"" ) }
     val profileLastName = remember { mutableStateOf(stateGetProfileInfo.response?.last_name?:"" ) }
-    val profileImage = viewModel.value.stateGetProfileInfo.value.response?.avatar_url
+    val profileImage = viewModel.stateGetProfileInfo.value.response?.avatar_url
     var selectImage by mutableStateOf<Uri?>(null)
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
         selectImage = it
@@ -79,7 +80,7 @@ fun ProfileScreen(
     val bitmap = remember{ mutableStateOf<Bitmap?>(null)}
 
     LaunchedEffect(key1 = true ){
-        viewModel.value.getProfileInfo(
+        viewModel.getProfileInfo(
             preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
         )
     }
@@ -123,10 +124,12 @@ fun ProfileScreen(
                         contentDescription = "",
                     )
                     else
-                    Icon(modifier=Modifier.width(120.dp)
-                        .height(120.dp).clickable {
-                        launcher.launch("image/*")
-                    },imageVector = Icons.Default.Camera, contentDescription = null,tint = Color.Black)
+                    Icon(modifier= Modifier
+                        .width(120.dp)
+                        .height(120.dp)
+                        .clickable {
+                            launcher.launch("image/*")
+                        },imageVector = Icons.Default.Camera, contentDescription = null,tint = Color.Black)
                 }
             Spacer(modifier = Modifier.height(75.dp))
 
@@ -190,7 +193,7 @@ fun ProfileScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value =  viewModel.value.stateGetProfileInfo.value.response?.phone.toString(),
+                    value =  viewModel.stateGetProfileInfo.value.response?.phone.toString(),
                     onValueChange = { },
                     label = { Text(text = "Телефон") },
                     colors = TextFieldDefaults.textFieldColors(
@@ -266,7 +269,7 @@ fun ProfileScreen(
                                             )
                                         photos = part
                                     }
-                                        viewModel.value.sendProfile(
+                                        viewModel.sendProfile(
                                             preferences.getString(PreferencesName.ACCESS_TOKEN, "")
                                                 .toString(),
                                             profileFirstName.value,

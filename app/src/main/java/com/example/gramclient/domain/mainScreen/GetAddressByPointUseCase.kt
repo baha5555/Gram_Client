@@ -6,9 +6,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 
-class GetAddressByPointUseCase(private val repository: AppRepository) {
+class GetAddressByPointUseCase @Inject constructor(private val repository: AppRepository) {
 
     operator fun invoke(token: String, lng: Double, lat: Double): Flow<Resource<AddressByPointResponse>> =
         flow{

@@ -6,9 +6,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 
-class GetAllowancesUseCase(private val repository: AppRepository) {
+class GetAllowancesUseCase @Inject constructor(private val repository: AppRepository) {
 
     operator fun invoke(token:String, tariff_id:Int): Flow<Resource<AllowancesResponse>> =
         flow{

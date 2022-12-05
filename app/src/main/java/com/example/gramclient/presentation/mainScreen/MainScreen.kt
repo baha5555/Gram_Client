@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
@@ -39,15 +40,16 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@SuppressLint("CoroutineCreationDuringComposition", "SuspiciousIndentation")
 @OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun MainScreen(
     navController: NavHostController,
     preferences: SharedPreferences,
-    mainViewModel: Lazy<MainViewModel>,
-    profileViewModel: Lazy<ProfileViewModel>
+    mainViewModel: MainViewModel= hiltViewModel(),
 ) {
+    val address_from=mainViewModel.from_address.observeAsState()
+    val address_to=mainViewModel.to_address.observeAsState()
 
     val mainBottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -73,20 +75,21 @@ fun MainScreen(
 
     if (!initialApiCalled) {
         LaunchedEffect(Unit) {
-            mainViewModel.value.getTariffs(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
-            mainViewModel.value.getAllowancesByTariffId(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), 1)
-            mainViewModel.value.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            mainViewModel.getTariffs(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            mainViewModel.getAllowancesByTariffId(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), 1)
+            mainViewModel.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            mainViewModel.getPrice(preferences)
             initialApiCalled = true
         }
     }
 
-    val stateTariffs by mainViewModel.value.stateTariffs
-    val stateAllowances by mainViewModel.value.stateAllowances
-    val stateAddressByPoint by mainViewModel.value.stateAddressPoint
-    val stateSearchAddress by mainViewModel.value.stateSearchAddress
-    val stateCalculate by mainViewModel.value.stateCalculate
+    val stateTariffs by mainViewModel.stateTariffs
+    val stateAllowances by mainViewModel.stateAllowances
+    val stateAddressByPoint by mainViewModel.stateAddressPoint
+    val stateSearchAddress by mainViewModel.stateSearchAddress
+    val stateCalculate by mainViewModel.stateCalculate
 
-    val sendOrder = mainViewModel.value.sendOrder.observeAsState()
+    val sendOrder = mainViewModel.sendOrder.observeAsState()
 
 
 
@@ -177,7 +180,7 @@ fun MainScreen(
                                     .background(Color.Red),
                                 contentAlignment = Alignment.CenterEnd
                             ) {
-                                SideBarMenu(navController, preferences,profileViewModel)
+                                SideBarMenu(navController, preferences)
                                 Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
                                     contentDescription = "",
                                     modifier = Modifier
@@ -243,7 +246,7 @@ fun MainScreen(
                                     BottomBar(
                                         navController, mainBottomSheetState, bottomSheetState,
                                         createOrder = {
-                                            mainViewModel.value.createOrder(preferences)
+                                            mainViewModel.createOrder(preferences)
                                         }
                                     )
                                 }) {
@@ -253,14 +256,15 @@ fun MainScreen(
                                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                                         sheetContent = {
                                             MainBottomSheet(navController, mainBottomSheetState,
-                                                stateTariffs, stateAllowances, mainViewModel,
-                                                preferences, stateAddressByPoint, stateSearchAddress,
-                                                stateCalculate
+                                                stateTariffs, stateAllowances,
+                                                preferences=preferences, stateAddressByPoint = stateAddressByPoint, stateSearchAddress = stateSearchAddress,
+                                                stateCalculate = stateCalculate
                                             )
                                         },
                                         sheetPeekHeight = 320.dp,
                                     ) {
-                                        CustomMap()
+                                        //CustomMap()
+                                        CustomMainMap()
                                     }
                                 }
                                 Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer_blue),
