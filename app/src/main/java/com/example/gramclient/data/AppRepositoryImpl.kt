@@ -25,7 +25,7 @@ import java.util.*
 class AppRepositoryImpl(
     private val api: ApplicationApi
 ):AppRepository {
-    override suspend fun authorization(phone_number: Long): AuthResponse = api.authorization(phone_number)
+    override suspend fun authorization(phone_number: Long): AuthResponse = api.authorization("${Constants.PREFIX}$phone_number".toLong())
 
     override suspend fun identification(client_register_id: String, sms_code: Long): IdentificationResponse = api.identification(client_register_id, sms_code)
 
