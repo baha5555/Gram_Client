@@ -2,6 +2,7 @@ package com.example.gramclient.domain.athorization
 
 import com.example.gramclient.Resource
 import com.example.gramclient.domain.AppRepository
+import com.example.gramclient.domain.mainScreen.TariffsResponse
 import retrofit2.HttpException
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow
@@ -10,11 +11,11 @@ import javax.inject.Inject
 
 class AuthUseCase @Inject constructor(private val repository: AppRepository) {
 
-    operator fun invoke(phone: Int): Flow<Resource<AuthResponse>> =
+    operator fun invoke(phone:Int): Flow<Resource<AuthResponse>> =
         flow{
             try {
                 emit(Resource.Loading<AuthResponse>())
-                val response = repository.authorization(phone.toLong())
+                val response: AuthResponse = repository.authorization(phone.toLong())
                 emit(Resource.Success<AuthResponse>(response))
             }catch (e: HttpException) {
                 emit(

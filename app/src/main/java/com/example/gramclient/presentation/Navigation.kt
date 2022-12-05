@@ -12,7 +12,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
-import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.authorization.AuthorizationScreen
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageScreen
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
@@ -23,11 +22,8 @@ import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingLan
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingRegionScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSelectRegionScreen
-import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.SearchAddressScreen
 import com.example.gramclient.presentation.orderScreen.OrderExecution
-import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
-import com.example.gramclient.presentation.profile.ProfileViewModel
 
 @Composable
 fun Navigation(
@@ -57,7 +53,7 @@ fun Navigation(
             )
         }
         composable(RoutesName.AUTH_SCREEN) {
-            AuthorizationScreen(navController)
+            AuthorizationScreen(navController, preferences=preferences)
         }
         composable(RoutesName.MAIN_SCREEN) {
             MainScreen(navController, preferences)

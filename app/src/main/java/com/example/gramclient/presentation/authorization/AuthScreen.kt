@@ -1,6 +1,6 @@
 package com.example.gramclient.presentation.authorization
 
-import android.widget.Toast
+import android.content.SharedPreferences
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.tween
@@ -25,15 +25,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.ui.theme.BackgroundColor
-import kotlinx.coroutines.launch
 
 @Composable
 fun AuthorizationScreen(
     navController: NavHostController,
-    viewModel: AuthViewModel= hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
+    preferences: SharedPreferences
 ) {
     val phone = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
@@ -158,31 +157,7 @@ fun AuthorizationScreen(
                     textSize = 18,
                     textBold = true,
                 ) {
-                    coroutineScope.launch {
-                        try {
-                            if (phone.value.length < 9) {
-                                Toast.makeText(
-                                    context,
-                                    "Номер телефона не должен быть менее 12 символов!",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            } else {
-                                val phoneNumber = phone.value.toInt()
-                                viewModel.authorization(phoneNumber)
-                                navController.navigate(RoutesName.IDENTIFICATION_SCREEN) {
-                                    popUpTo(RoutesName.AUTH_SCREEN) {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-                        } catch (_: Exception) {
-                            Toast.makeText(
-                                context,
-                                "Номер телефона не должен быть длиннее 12 символов!",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
+                    viewModel.authorization(phone.value.toInt(), preferences, navController)
                 }
             }
         }
