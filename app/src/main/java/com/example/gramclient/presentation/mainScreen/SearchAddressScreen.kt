@@ -37,6 +37,7 @@ fun SearchAddressScreen(
     val stateSearchAddress by mainViewModel.stateSearchAddress
 
     val focusRequester = remember { FocusRequester() }
+    val coroutineScope= rememberCoroutineScope()
 
 
     LaunchedEffect(Unit) {
@@ -68,13 +69,15 @@ fun SearchAddressScreen(
                     stateSearchAddress = stateSearchAddress,
                 ){address ->
                     if(string=="toAddress"){
-                        mainViewModel.updateToAddress(0, address)
-                        navController.popBackStack()
-                        mainViewModel.getPrice(preferences)
+                        mainViewModel.getPrice(preferences).let {
+                            mainViewModel.updateToAddress(0, address)
+                            navController.popBackStack()
+                        }
                     }else if(string=="fromAddress"){
-                        mainViewModel.updateFromAddress(address)
-                        navController.popBackStack()
-                        mainViewModel.getPrice(preferences)
+                        mainViewModel.getPrice(preferences).let {
+                            mainViewModel.updateFromAddress(address)
+                            navController.popBackStack()
+                        }
                     }
                 }
             }
