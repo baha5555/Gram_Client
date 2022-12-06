@@ -22,6 +22,7 @@ import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingLan
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingRegionScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSelectRegionScreen
+import com.example.gramclient.presentation.mainScreen.MainScreen
 import com.example.gramclient.presentation.mainScreen.SearchAddressScreen
 import com.example.gramclient.presentation.orderScreen.OrderExecution
 
