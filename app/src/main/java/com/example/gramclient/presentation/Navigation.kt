@@ -29,11 +29,7 @@ import com.example.gramclient.presentation.orderScreen.OrderExecution
 fun Navigation(
     navController: NavHostController,
     messageViewModel: Lazy<MessageViewModel>,
-    preferences: SharedPreferences,
-//    authViewModel: Lazy<AuthViewModel>,
-//    mainViewModel: Lazy<MainViewModel>,
-//    profileViewModel: Lazy<ProfileViewModel>,
-//    orderExecutionViewModel: Lazy<OrderExecutionViewModel>,
+    preferences: SharedPreferences
 
     ) {
     NavHost(

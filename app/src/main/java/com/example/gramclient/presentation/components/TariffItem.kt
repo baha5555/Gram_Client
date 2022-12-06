@@ -2,9 +2,7 @@
 
 package com.example.gramclient.presentation.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -17,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
 fun TariffItem(
@@ -29,12 +28,14 @@ fun TariffItem(
 
     ConstraintLayout(
         modifier = Modifier
-            .size(90.dp)
+            .width(85.dp)
+            .height(95.dp)
+            .border(border= BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 onSelected()
             }
-            .background(if (isSelected) Color(0xFFE2EAF2) else Color(0xFFFFFFFF))
+            .background(if (isSelected) PrimaryColor else Color(0xFFFFFFFF))
             .padding(10.dp)
 
 
@@ -56,12 +57,12 @@ fun TariffItem(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(prc.top)
-            })
-        Text(text = "$price сомони", fontSize = 13.sp, fontWeight = FontWeight.Bold,
+            }, color = if (isSelected) Color.White else Color.Black)
+        Text(text = "$price c", fontSize = 13.sp, fontWeight = FontWeight.Bold,
             modifier = Modifier.constrainAs(prc) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
-            })
+            }, color = if (isSelected) Color.White else Color.Black)
     }
 }

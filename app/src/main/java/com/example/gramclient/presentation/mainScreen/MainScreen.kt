@@ -33,7 +33,6 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -255,13 +254,20 @@ fun MainScreen(
                                         scaffoldState = mainBottomSheetState,
                                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                                         sheetContent = {
-                                            MainBottomSheet(navController, mainBottomSheetState,
-                                                stateTariffs, stateAllowances,
-                                                preferences=preferences, stateAddressByPoint = stateAddressByPoint, stateSearchAddress = stateSearchAddress,
-                                                stateCalculate = stateCalculate
-                                            )
+//                                            MainBottomSheet(navController, mainBottomSheetState,
+//                                                stateTariffs, stateAllowances,
+//                                                preferences=preferences, stateAddressByPoint = stateAddressByPoint, stateSearchAddress = stateSearchAddress,
+//                                                stateCalculate = stateCalculate
+//                                            )
+                                               MainBottomSheetContent(scaffoldState = mainBottomSheetState,
+                                                   mainViewModel = mainViewModel, stateCalculate = stateCalculate,
+                                               stateTariffs = stateTariffs, preferences=preferences,
+                                                   stateAllowances = stateAllowances,
+                                                   stateAddressByPoint=stateAddressByPoint,
+                                                   navController=navController
+                                               )
                                         },
-                                        sheetPeekHeight = 320.dp,
+                                        sheetPeekHeight = 330.dp,
                                     ) {
                                         //CustomMap()
                                         CustomMainMap()

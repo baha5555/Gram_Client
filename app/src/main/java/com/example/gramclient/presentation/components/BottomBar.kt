@@ -48,16 +48,16 @@ fun BottomBar(
         ) {
             IconButton(onClick = {
                 coroutineScope.launch {
-                    if(mainBottomSheetState.bottomSheetState.isExpanded){
-                        mainBottomSheetState.bottomSheetState.collapse()
+                    if(bottomSheetState.bottomSheetState.isCollapsed){
+                        bottomSheetState.bottomSheetState.expand()
                     } else{
-                        mainBottomSheetState.bottomSheetState.expand()
+                        bottomSheetState.bottomSheetState.collapse()
                     }
                 }
             }) {
                 Image(
                     modifier = Modifier.size(30.dp),
-                    imageVector = ImageVector.vectorResource(if(mainBottomSheetState.bottomSheetState.isCollapsed) R.drawable.options_icon else R.drawable.arrow_down),
+                    imageVector = ImageVector.vectorResource(R.drawable.cash_icon),
                     contentDescription = "icon"
                 )
             }
@@ -76,16 +76,16 @@ fun BottomBar(
             })
             IconButton(onClick = {
                 coroutineScope.launch {
-                    if(bottomSheetState.bottomSheetState.isCollapsed){
-                       bottomSheetState.bottomSheetState.expand()
+                    if(mainBottomSheetState.bottomSheetState.isExpanded){
+                        mainBottomSheetState.bottomSheetState.collapse()
                     } else{
-                        bottomSheetState.bottomSheetState.collapse()
+                        mainBottomSheetState.bottomSheetState.expand()
                     }
                 }
             }) {
                 Image(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.cash_icon),
+                    modifier = Modifier.size(if(mainBottomSheetState.bottomSheetState.isCollapsed) 30.dp else 20.dp),
+                    imageVector = ImageVector.vectorResource(if(mainBottomSheetState.bottomSheetState.isCollapsed) R.drawable.options_icon else R.drawable.arrow_down),
                     contentDescription = "icon"
                 )
             }

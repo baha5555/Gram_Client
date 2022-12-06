@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -32,6 +33,7 @@ import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.states.*
 import com.example.gramclient.ui.theme.PrimaryColor
+import noRippleClickable
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -46,6 +48,10 @@ fun MainBottomSheet(
     stateSearchAddress: SearchAddressResponseState,
     stateCalculate: CalculateResponseState,
 ) {
+    val fraction = bottomSheetState.bottomSheetState.progress.fraction
+    val targetValue = bottomSheetState.bottomSheetState.targetValue
+    val currentValue = bottomSheetState.bottomSheetState.currentValue
+
     val context = LocalContext.current
     val switchState = remember { mutableStateOf(true) }
     val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
@@ -55,7 +61,6 @@ fun MainBottomSheet(
     val address_from=mainViewModel.from_address.observeAsState()
     val address_to=mainViewModel.to_address.observeAsState()
     val selected_tariff=mainViewModel.selectedTariff?.observeAsState()
-
 
     Box(
         modifier = Modifier
@@ -78,7 +83,7 @@ fun MainBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFE2EAF2), shape = RoundedCornerShape(20.dp))
+                .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(20.dp))
         ) {
             var isAnimated by remember { mutableStateOf(true) }
             val transition = updateTransition(targetState = isAnimated, label = "transition")
@@ -154,7 +159,7 @@ fun MainBottomSheet(
                                 contentDescription = "icon"
                             )
                         }
-                        Spacer(modifier = Modifier.height(15.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         CustomRectangleShimmer(stateTariffs.isLoading)
 
@@ -199,7 +204,22 @@ fun MainBottomSheet(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(text = "Коментарий для водителя", fontSize = 16.sp)
+                            Text(text = "Коментарий водителю", fontSize = 16.sp)
+                            Image(
+                                modifier = Modifier.size(18.dp),
+                                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                                contentDescription = "icon"
+                            )
+                        }
+                        Divider()
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(text = "Заказ другому человеку", fontSize = 16.sp)
                             Image(
                                 modifier = Modifier.size(18.dp),
                                 imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
@@ -220,16 +240,6 @@ fun MainBottomSheet(
                                 imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
                                 contentDescription = "icon"
                             )
-                        }
-                        Divider()
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = "Заказ другому человеку", fontSize = 16.sp)
                         }
                     }
                     Spacer(modifier = Modifier.height(15.dp))
@@ -284,8 +294,8 @@ fun MainBottomSheet(
                         stateAddressByPoint.response?.let { address ->
                             Image(
                                 modifier = Modifier
-                                    .width(35.dp)
-                                    .height(35.dp),
+                                    .width(20.dp)
+                                    .height(20.dp),
                                 imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                                 contentDescription = "Logo"
                             )
@@ -293,8 +303,8 @@ fun MainBottomSheet(
                         if(stateAddressByPoint.error != ""){
                             Image(
                                 modifier = Modifier
-                                    .width(35.dp)
-                                    .height(35.dp),
+                                    .width(20.dp)
+                                    .height(20.dp),
                                 imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                                 contentDescription = "Logo"
                             )
@@ -307,7 +317,7 @@ fun MainBottomSheet(
                             }
                             .fillMaxWidth()
                             .height(40.dp)
-                            .background(Color(0xFFE2EAF2), shape = RoundedCornerShape(50.dp))
+                            .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(50.dp))
                             .padding(10.dp)
                         ){
                             Text(address_from.value?.name ?: "")
@@ -318,13 +328,18 @@ fun MainBottomSheet(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 15.dp),
+                                .padding(horizontal = 15.dp)
+                                .graphicsLayer(alpha = 1f - fraction)
+                                .noRippleClickable (
+                                    onClick = {},
+                                    enabled = bottomSheetState.bottomSheetState.isExpanded
+                                ),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Image(
                                 modifier = Modifier
-                                    .width(35.dp)
-                                    .height(35.dp),
+                                    .width(20.dp)
+                                    .height(20.dp),
                                 imageVector = ImageVector.vectorResource(R.drawable.to_marker),
                                 contentDescription = "Logo"
                             )
@@ -336,7 +351,7 @@ fun MainBottomSheet(
                                 }
                                 .fillMaxWidth()
                                 .height(40.dp)
-                                .background(Color(0xFFE2EAF2), shape = RoundedCornerShape(50.dp))
+                                .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(50.dp))
                                 .padding(10.dp)
                             ){
                                 Text(address.name)
@@ -353,6 +368,6 @@ fun MainBottomSheet(
 @Composable
 fun Loader(isLoading:Boolean){
     if(isLoading){
-        CircularProgressIndicator(modifier = Modifier.size(35.dp), color = PrimaryColor)
+        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color(0xFF1E88E5))
     }
 }
