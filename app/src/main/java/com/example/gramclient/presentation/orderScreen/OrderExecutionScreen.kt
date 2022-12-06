@@ -48,7 +48,9 @@ fun OrderExecution(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
     val coroutineScope = rememberCoroutineScope()
-    var text by remember { mutableStateOf("") }
+    var toOrder by remember { mutableStateOf("") }
+    var fromOrder by remember { mutableStateOf("") }
+    var addOrder by remember { mutableStateOf("") }
     val showMyLocation = remember { mutableStateOf(false) }
 
     val isDialogOpen = remember { mutableStateOf(false) }
@@ -62,14 +64,14 @@ fun OrderExecution(
 
     BottomSheetScaffold(
         scaffoldState = sheetState,
-        sheetBackgroundColor = Color.Transparent,
+        sheetBackgroundColor = Color(0xFFffffff),
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         sheetContent = {
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.85f)
+                    .fillMaxHeight(0.90f)
             ) {
                 Box(
                     modifier = Modifier
@@ -90,20 +92,19 @@ fun OrderExecution(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFE2EAF2), shape = RoundedCornerShape(20.dp))
+                        .background(Color(0xFFE2EAF2))
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
                                 Color(0xFFffffff),
-                                shape = RoundedCornerShape(20.dp)
                             )
                             .padding(vertical = 15.dp)
                     ) {
 
                         Text(
-                            text = "5 мин и приедет", modifier = Modifier.fillMaxWidth(),
+                            text = "За рулем Акбар", modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             fontSize = 20.sp, fontWeight = FontWeight.Bold
                         )
@@ -114,17 +115,17 @@ fun OrderExecution(
                             horizontalArrangement = Arrangement.Center
                         )
                         {
-                            Text(text = "серебристый Opel Astra")
+                            Text(text = "серый Opel Astra")
                             Spacer(modifier = Modifier.width(8.dp))
                             Column(
                                 Modifier
                                     .background(
-                                        Color(0xFFE2EAF2),
+                                        Color(0xFFF4B91D),
                                         shape = RoundedCornerShape(5.dp)
                                     )
                                     .padding(vertical = 2.dp, horizontal = 12.dp)
                             ) {
-                                Text(text = "4405", fontWeight = FontWeight.Bold)
+                                Text(text = "0220KK", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                             }
                         }
                         Spacer(modifier = Modifier.height(19.dp))
@@ -144,61 +145,43 @@ fun OrderExecution(
                                     Image(
                                         modifier = Modifier
                                             .fillMaxSize(),
-                                        painter = painterResource(R.drawable.ava),
+                                        painter = painterResource(R.drawable.avatar),
                                         contentDescription = "icon",
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(text = "Акбар", color = Color.Gray)
                             }
-                            Spacer(modifier = Modifier.width(15.dp))
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Card(
-                                    modifier = Modifier
-                                        .size(55.dp),
-                                    elevation = 5.dp,
-                                    shape = RoundedCornerShape(50.dp)
-                                ) {
-                                    IconButton(onClick = {
-                                        showGrade = true
-                                        /*...*/
-                                    }) {
-                                        Icon(
-                                            modifier = Modifier
-                                                .size(24.dp),
-                                            painter = painterResource(R.drawable.phone_icon),
-                                            contentDescription = "icon",
-                                            tint = PrimaryColor
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(text = "Позвонить", color = Color.Gray)
-                            }
-                            Spacer(modifier = Modifier.width(15.dp))
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Card(
-                                    modifier = Modifier
-                                        .size(55.dp),
-                                    elevation = 5.dp,
-                                    shape = RoundedCornerShape(50.dp)
-                                ) {
-                                    IconButton(onClick = {
-                                        /*...*/
-                                    }) {
-                                        Icon(
-                                            modifier = Modifier
-                                                .size(24.dp),
-                                            painter = painterResource(R.drawable.chat_icon),
-                                            contentDescription = "icon",
-                                            tint = PrimaryColor
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(text = "Написать", color = Color.Gray)
-                            }
+                            Spacer(modifier = Modifier.width(20.dp))
+
+                            CustomOrderExecutionButton(
+                                onClick = { showGrade = true },
+                                icon = R.drawable.chat_icon,
+                                text = "Написать"
+                            )
+                            Spacer(modifier = Modifier.width(20.dp))
+
+                            CustomOrderExecutionButton(onClick = { }, icon =R.drawable.phone_icon , text ="Позвонить")
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        CustomOrderExecutionTextField(
+                            value = fromOrder,
+                            onValueChange = { fromOrder = it },
+                            text = "Откуда",
+                            icon = R.drawable.from_marker
+                        )
+                        CustomOrderExecutionTextField(
+                            value = addOrder,
+                            onValueChange = { addOrder = it },
+                            text = "Добавить остановку",
+                            icon = R.drawable.plus_icon
+                        )
+                        CustomOrderExecutionEndTextField(
+                            value = toOrder,
+                            onValueChange = { toOrder = it },
+                            text = "Куда",
+                            icon = R.drawable.to_marker
+                        )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Column(
@@ -206,140 +189,23 @@ fun OrderExecution(
                             .fillMaxWidth()
                             .background(
                                 Color(0xFFffffff),
-                                shape = RoundedCornerShape(20.dp)
                             )
-                            .padding(top = 15.dp, bottom = 15.dp, start = 25.dp, end = 5.dp),
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(28.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                                contentDescription = "Logo"
-                            )
-                            Spacer(modifier = Modifier.width(15.dp))
-                            TextField(
-                                placeholder = { Text("Откуда?") },
-                                value = text,
-                                onValueChange = {
-                                    text = it
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Gray,
-                                    unfocusedIndicatorColor = Color.Gray,
-                                    disabledIndicatorColor = Color.Transparent
-                                )
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(28.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.plus_icon),
-                                contentDescription = "Logo"
-                            )
-                            Spacer(modifier = Modifier.width(15.dp))
-                            TextField(
-                                placeholder = { Text("Добавить остановку") },
-                                value = text,
-                                onValueChange = {
-                                    text = it
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Gray,
-                                    unfocusedIndicatorColor = Color.Gray,
-                                    disabledIndicatorColor = Color.Transparent
-                                )
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(28.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.to_marker),
-                                contentDescription = "Logo"
-                            )
-                            Spacer(modifier = Modifier.width(15.dp))
-                            TextField(
-                                placeholder = { Text("Куда") },
-                                value = text,
-                                onValueChange = {
-                                    text = it
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Gray,
-                                    unfocusedIndicatorColor = Color.Gray,
-                                    disabledIndicatorColor = Color.Transparent
-                                )
-                            )
-                        }
+                        CustomOrderExecutionField(
+                            mainText = "Наличные",
+                            secondaryText = "Способ оплаты",
+                            icon = R.drawable.wallet_icon
+                        )
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 10.dp),
+                                .padding(top = 15.dp, bottom = 15.dp, start = 15.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 modifier = Modifier
-                                    .size(25.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.wallet_icon),
-                                contentDescription = "Logo",
-                                tint = Color(0xFF343B71)
-                            )
-                            Spacer(modifier = Modifier.width(15.dp))
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column {
-                                        Text(text = "Наличные")
-                                        Text(
-                                            text = "Способ оплаты",
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                    }
-                                    Icon(
-                                        modifier = Modifier
-                                            .size(25.dp),
-                                        imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
-                                        contentDescription = "Logo",
-                                        tint = Color.Gray
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Divider1(color = Color(0x72111111))
-                            }
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                modifier = Modifier
-                                    .size(25.dp),
+                                    .size(23.dp),
                                 imageVector = ImageVector.vectorResource(R.drawable.location_icon),
                                 contentDescription = "Logo",
                                 tint = Color(0xFF343B71)
@@ -348,87 +214,54 @@ fun OrderExecution(
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Row(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(end = 15.dp),
+                                        .fillMaxWidth().padding( end = 15.dp)
+                                        .padding(end = 5.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(text = "Показать водителю, где я")
-                                    CustomSwitch(switchON = showMyLocation){}
+                                    CustomSwitch(switchON = showMyLocation) {}
                                 }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Divider1(color = Color(0x72111111))
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Divider1(color = Color(0xFFEEEEEE))
                             }
                         }
+                        CustomOrderExecutionFieldOfWarning(
+                            mainText = "Стоимость поездки",
+                            secondaryText = "11 сомон",
+                            icon = R.drawable.warning_icon
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            Icon(
-                                modifier = Modifier
-                                    .size(25.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.warning_icon),
-                                contentDescription = "Logo",
-                                tint = Color(0xFF343B71)
-                            )
-                            Spacer(modifier = Modifier.width(15.dp))
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column {
-                                        Text(text = "Стоимость поездки")
-                                        Text(
-                                            text = "11 сомон",
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Color(0xFFffffff),
-                                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-                            )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(15.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Card(
-                                modifier = Modifier
-                                    .size(55.dp),
-                                elevation = 5.dp,
-                                shape = RoundedCornerShape(50.dp)
-                            ) {
-                                IconButton(onClick = {
+                            CustomOrderExecutionButton(
+                                onClick = {
                                     isDialogOpen.value = true
-                                }) {
-                                    Image(
-                                        modifier = Modifier
-                                            .size(24.dp),
-                                        painter = painterResource(R.drawable.cancel_icon),
-                                        contentDescription = "icon",
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(text = "Отменить поездку", color = Color.Gray)
+                                },
+                                icon = R.drawable.cancel_icon,
+                                text = "Отменить\nзаказ"
+                            )
+                            Spacer(modifier = Modifier.width(20.dp))
+                            CustomOrderExecutionButton(
+                                onClick = {
+                                    isDialogOpen.value = true
+                                },
+                                icon = R.drawable.share_icon,
+                                text = "Отправить\nмаршрут"
+                            )
+                            Spacer(modifier = Modifier.width(20.dp))
+                            CustomOrderExecutionButton(
+                                onClick = {
+                                    isDialogOpen.value = true
+                                },
+                                icon = R.drawable.safety_icon,
+                                text = "Безопаснос\nть"
+                            )
                         }
+                        Spacer(modifier = Modifier.padding(vertical = 50.dp))
                     }
                 }
             }

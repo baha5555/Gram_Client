@@ -3,6 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/avatar.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/cancel_icon.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/cancel_icons.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/chat_icon.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/from_marker.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/location_icon.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/phone_icon.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/plus_icon.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/safety_icon.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/share_icon.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/to_marker.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/wallet_icon.xml" value="0.245" />
+        <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/warning_icon.xml" value="0.245" />
         <entry key="app/src/main/res/drawable/about_icon.xml" value="0.2055" />
         <entry key="app/src/main/res/drawable/arrow_down.xml" value="0.157" />
         <entry key="app/src/main/res/drawable/arrow_right.xml" value="0.157" />
