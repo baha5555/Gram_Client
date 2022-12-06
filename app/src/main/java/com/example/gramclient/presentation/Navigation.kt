@@ -39,7 +39,7 @@ fun Navigation(
     NavHost(
         navController = navController,
         startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
-            RoutesName.SPLASH_SCREEN else RoutesName.MAIN_SCREEN
+            RoutesName.MAIN_SCREEN else RoutesName.MAIN_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
             SplashScreen(navController)
