@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,7 +36,7 @@ import com.example.gramclient.presentation.profile.ProfileViewModel
 fun SideBarMenu(
     navController: NavHostController,
     preferences: SharedPreferences,
-    viewModel: ProfileViewModel= hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val isDialogOpen = remember { mutableStateOf(false) }
     val stateGetProfileInfo by viewModel.stateGetProfileInfo
@@ -43,79 +44,59 @@ fun SideBarMenu(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2264D1))
+            .background(color = colorResource(id = R.color.primary_color))
     ) {
-        TopAppBar(
-            modifier = Modifier.height(80.dp),
-            backgroundColor = Color.White
+        Spacer(modifier = Modifier.height(40.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.padding(20.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 12.dp, start = 21.dp, end = 21.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Image(
-                    modifier = Modifier
-                        .width(91.dp)
-                        .height(28.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
-                    contentDescription = "",
+            Box {
+                if (stateGetProfileInfo.response?.avatar_url != null)
+                    Image(
+                        painter = rememberAsyncImagePainter(model = stateGetProfileInfo.response?.avatar_url),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape),
+                        contentDescription = "",
+                    )
+                else
+                    Box(
+                        modifier = Modifier
+                            .background(Color.White, shape = RoundedCornerShape(50.dp)),
+                        content = {
+                            Image(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .padding(5.dp),
+                                imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
+                                contentDescription = "",
+                            )
+                        }
+                    )
+            }
+            Column(Modifier.padding(start=15.dp)){
+                Text(
+                    modifier = Modifier.clickable {
+                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                    },
+                    text = if (stateGetProfileInfo.response?.first_name != null && stateGetProfileInfo.response?.last_name != null) stateGetProfileInfo.response?.first_name + ' ' + stateGetProfileInfo.response?.last_name else "Выбрать Имя...",
+                    fontSize = 22.sp,
+                    color = Color.White
                 )
-                Text(text = "Худжанд", fontSize = 18.sp, color = Color.Black)
+                Text(
+                    modifier = Modifier.clickable {
+                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                    },
+                    text = if (stateGetProfileInfo.response?.email != null) stateGetProfileInfo.response!!.email else "Выбрать Почту...",
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
             }
         }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (stateGetProfileInfo.response?.avatar_url != null)
-                Image(
-                    painter = rememberAsyncImagePainter(model = stateGetProfileInfo.response?.avatar_url),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .width(150.dp)
-                        .height(150.dp)
-                        .clip(CircleShape),
-                    contentDescription = "",
-                )
-            else
-                Box(
-                    modifier = Modifier
-                        .size(90.dp)
-                        .background(Color.White, shape = RoundedCornerShape(50.dp))
-                        .padding(15.dp),
-                    content = {
-                        Image(
-                            modifier = Modifier
-                                .width(60.dp)
-                                .height(60.dp),
-                            imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
-                            contentDescription = "",
-                        )
-                    }
-                )
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(
-                modifier = Modifier.clickable {
-                    navController.navigate(RoutesName.PROFILE_SCREEN)
-                },
-                text =if(stateGetProfileInfo.response?.first_name != null && stateGetProfileInfo.response?.last_name != null ) stateGetProfileInfo.response?.first_name + ' ' + stateGetProfileInfo.response?.last_name else "Выбрать Имя...",
-                fontSize = 22.sp,
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(
-                modifier = Modifier.clickable {
-                    navController.navigate(RoutesName.PROFILE_SCREEN)
-                },
-                text = if(stateGetProfileInfo.response?.email != null) stateGetProfileInfo.response!!.email else "Выбрать Почту...", fontSize = 18.sp, color = Color.White
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-        }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -158,6 +139,7 @@ fun SideBarMenu(
         )
     }
 }
+
 @Composable
 fun ShowItems(
     icon: ImageVector,
@@ -165,7 +147,7 @@ fun ShowItems(
     navController: NavHostController,
     isDialogOpen: MutableState<Boolean>
 ) {
-    val context= LocalContext.current
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
