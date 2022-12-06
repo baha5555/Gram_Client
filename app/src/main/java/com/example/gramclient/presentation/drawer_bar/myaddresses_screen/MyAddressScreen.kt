@@ -2,124 +2,82 @@ package com.example.gramclient.presentation.drawer_bar.myaddresses_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
-import com.example.gramclient.presentation.components.CustomTopBar
+import com.example.gramclient.presentation.components.CustomTopAppBar
 
 @Composable
 fun MyAddressesScreen(navController: NavHostController) {
     Scaffold(topBar = {
-        CustomTopBar(title = "Мои Адреса", navController = navController)
+        CustomTopAppBar(navController = navController, action = { AddAddress(navController) })
     }) {
-        Box(contentAlignment = Alignment.BottomEnd) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFEBEBEB))
-            ) {
-                Text(
-                    text = "Адреса",
-                    fontSize = 22.sp,
-                    modifier = Modifier.padding(15.dp),
-                    color = Color(0xFF434B53)
-                )
-                ListAddressesShow(1, "Дом", navController)
-                ListAddressesShow(2, "Работа", navController)
-            }
-            FloatingActionButton(
-                backgroundColor = Color(0xFF2264D1),
-                contentColor = Color.White,
-                onClick = { navController.navigate(RoutesName.ADD_ADDRESSES_SCREEN) },
-                modifier = Modifier.offset((-30).dp, (-35).dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    Modifier.size(35.dp)
-                )
-            }
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(colorResource(id = R.color.white))
+        ) {
+            Text(
+                text = "Мои адреса",
+                fontSize = 28.sp,
+                modifier = Modifier.padding(25.dp),
+                color = Color(0xFF434B53)
+            )
+            ListAddressesShow(R.drawable.ic_home, "Дом","пр. И.Сомони 46а, подъезд 1", navController)
+            ListAddressesShow(R.drawable.ic_work, "Работа", "пр. И.Сомони 46а, подъезд 1", navController)
+            ListAddressesShow(R.drawable.ic_favorites, "Отдых", "пр. И.Сомони 46а, подъезд 1", navController)
+            ListAddressesShow(R.drawable.ic_favorites, "К тёте", "пр. И.Сомони 46а, подъезд 1", navController)
+
         }
     }
 
 }
 
 @Composable
-fun ListAddressesShow(num: Int, title: String, navController: NavHostController) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(95.dp)
-            .padding(horizontal = 15.dp)
-    ) {
-        Box(contentAlignment = Alignment.TopEnd) {
+fun AddAddress(navController: NavHostController) {
+    IconButton(onClick = {navController.navigate(RoutesName.EDIT_ADDRESSES_SCREEN) }) {
+        Image(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_add),
+            contentDescription = "back"
+        )
+    }
+}
+
+
+@Composable
+fun ListAddressesShow(image: Int, title: String, text: String, navController: NavHostController) {
+    Row(Modifier.padding(vertical = 5.dp, horizontal = 10.dp)) {
+        Box(
+            modifier = Modifier
+                .height(50.dp)
+                .fillMaxWidth(0.15f),
+            contentAlignment = Alignment.Center
+        ) {
             Image(
-                modifier = Modifier
-                    .size(24.dp)
-                    .offset((-10).dp, 10.dp)
-                    .clickable { navController.navigate(RoutesName.EDIT_ADDRESSES_SCREEN)},
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_edit_blue),
-                contentDescription = "",
+                imageVector = ImageVector.vectorResource(image),
+                contentDescription = "home"
             )
-            Row(
-                Modifier
-                    .fillMaxSize()
-                    .padding(5.dp)
-            ) {
-                Column(
-                    Modifier.padding(start = 10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "" + num,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF2264D1),
-                        modifier = Modifier
-                            .offset(0.dp, 3.dp)
-                            .size(24.dp)
-                            .border(1.5.dp, Color(0xFF2264D1), CircleShape),
-                        textAlign = TextAlign.Center
-                    )
-                    Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_location_blue),
-                        contentDescription = null,
-                        modifier = Modifier.offset(0.dp, 20.dp)
-                    )
-                }
-                Column(Modifier.padding(start = 10.dp)) {
-                    Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Medium)
-                    Column(Modifier.padding(top = 10.dp)) {
-                        Text(
-                            text = "Паприка (Меҳмонхонаи Суғдиён)",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "Максудчони Танбури улица",
-                            fontSize = 16.sp,
-                        )
-                    }
-                }
-            }
+        }
+        Column(
+            modifier = Modifier
+                .height(50.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text=title, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(text=text, fontSize = 12.sp)
         }
     }
-    Spacer(modifier = Modifier.height(15.dp))
 }

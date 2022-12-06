@@ -1,97 +1,125 @@
 package com.example.gramclient.presentation.drawer_bar.myaddresses_screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
-import com.example.gramclient.presentation.components.CustomButton
-import com.example.gramclient.presentation.components.CustomSearch
-import com.example.gramclient.presentation.components.CustomTopBar
+import com.example.gramclient.presentation.components.CustomTopAppBar
 
 @Composable
 fun EditAddressScreen(navController: NavHostController) {
-    Scaffold(topBar = { CustomTopBar("Редактирование адреса", navController, 2) }) {
-        val search = remember {
-            mutableStateOf("Дом")
-        }
-        Column(Modifier.fillMaxHeight(0.3f)) {
-            CustomSearch(search = search, "Введите название адреса")
-            Row{
+    Scaffold(topBar = {
+        CustomTopAppBar(
+            title = "Название адреса", navController = navController
+        )
+    }) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Column(Modifier.padding(10.dp)) {
+                    val nameState = remember {
+                        mutableStateOf("")
+                    }
+                    CustomTextField(nameState, "Название")
+                    Column(
+                        modifier = Modifier
+                            .height(55.dp)
+                            .padding(horizontal = 15.dp)
+                            .fillMaxWidth(), verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Панчшанбе базар",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(text = "пр. И.Сомони 46а, подъезд 1", fontSize = 12.sp)
+                    }
+                    Divider()
+                    val entranceState = remember {
+                        mutableStateOf("")
+                    }
+                    CustomTextField(entranceState, "Подъезд")
+                    val commentDriver = remember {
+                        mutableStateOf("")
+                    }
+                    CustomTextField(commentDriver, "Комментарий водителю")
+                }
                 Box(
                     modifier = Modifier
-                        .height(100.dp)
-                        .fillMaxWidth(0.2f),
+                        .fillMaxWidth()
+                        .background(colorResource(id = R.color.background_color)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.from_marker),
-                        contentDescription = null
+                    Text(
+                        text = "Доставка", modifier = Modifier.padding(vertical = 5.dp)
                     )
                 }
-                Column(
-                    modifier = Modifier
-                        .height(100.dp)
-                        .fillMaxWidth(1f).padding(end=20.dp),
-                    Arrangement.SpaceEvenly
-                ) {
-                    Column{
-                        Text(
-                            text = "Паприка (Меҳмонхонаи Суғдиён)",
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 18.sp
-                        )
-                        Text(text = "Максудчони Танбури улица", fontSize = 16.sp)
+                Column(Modifier.padding(10.dp)) {
+                    val intercomState = remember {
+                        mutableStateOf("")
                     }
-                    Box(
-                        modifier = Modifier
-                            .size(200.dp, 30.dp)
-                            .background(Color(0xDFE2EAF2), CircleShape)
-                            .border(1.dp, Color(0xFFBAC2CA), CircleShape),
-                        contentAlignment = Alignment.Center
-                        ) {
-                        Text(text = "Куда лучше подъехать?", color = Color(0xFF6A727A))
+                    CustomTextField(intercomState, "Домофон")
+                    val text2 = remember {
+                        mutableStateOf("")
                     }
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(
-                                color = Color(0xFFBAC2CA)
-                            ),
-                    )
+                    CustomTextField(text2, "Комментарий курьеру")
                 }
             }
-        }
-        Box(
-            Modifier
-                .fillMaxHeight()
-                .padding(20.dp),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            CustomButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Сахранить",
-                textSize = 18,
-                textBold = false
+
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
+                    .height(57.dp),
+                shape = RoundedCornerShape(15.dp)
             ) {
+                Text(
+                    text = "Сохранить",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
+                )
             }
+
         }
     }
+}
+
+@Composable
+fun CustomTextField(textState: MutableState<String>, label: String) {
+    TextField(
+        value = textState.value,
+        onValueChange = { newText ->
+            textState.value = newText
+        },
+        label = { Text(text = label) },
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.Transparent,
+            textColor = Color.Gray,
+            disabledTextColor = Color.Transparent,
+            unfocusedIndicatorColor = Color(0xFFDEDEDE),
+            disabledIndicatorColor = Color.Transparent
+        ),
+    )
 }
