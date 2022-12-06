@@ -1,12 +1,13 @@
-package com.example.gramclient.presentation
+package com.example.gramclient.presentation.mainScreen
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -16,7 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.consumeAllChanges
@@ -32,10 +32,7 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
-import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
 
@@ -45,10 +42,10 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     navController: NavHostController,
     preferences: SharedPreferences,
-    mainViewModel: MainViewModel= hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel(),
 ) {
-    val address_from=mainViewModel.from_address.observeAsState()
-    val address_to=mainViewModel.to_address.observeAsState()
+    val address_from = mainViewModel.from_address.observeAsState()
+    val address_to = mainViewModel.to_address.observeAsState()
 
     val mainBottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -68,15 +65,25 @@ fun MainScreen(
     val paymentState = remember { mutableStateOf("") }
 
     val coroutineScope = rememberCoroutineScope()
-    val context= LocalContext.current
+    val context = LocalContext.current
 
     var initialApiCalled by rememberSaveable { mutableStateOf(false) }
 
     if (!initialApiCalled) {
         LaunchedEffect(Unit) {
-            mainViewModel.getTariffs(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
-            mainViewModel.getAllowancesByTariffId(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), 1)
-            mainViewModel.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            mainViewModel.getTariffs(
+                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
+            )
+            mainViewModel.getAllowancesByTariffId(
+                preferences.getString(
+                    PreferencesName.ACCESS_TOKEN,
+                    ""
+                ).toString(), 1
+            )
+            mainViewModel.getActualLocation(
+                context,
+                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
+            )
             mainViewModel.getPrice(preferences)
             initialApiCalled = true
         }
@@ -92,248 +99,185 @@ fun MainScreen(
 
 
 
-            BottomSheetScaffold(
-                sheetBackgroundColor = Color.White,
-                scaffoldState = bottomSheetState,
-                sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                sheetContent = {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 15.dp, start = 30.dp, end = 17.dp, bottom = 20.dp),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Способ оплаты",
-                                fontSize = 22.sp,
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            paymentMethods.forEachIndexed { idx, item ->
-                                Row(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { paymentState.value = item }
-                                    .padding(vertical = 15.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Row {
-                                        Image(
-                                            modifier = Modifier.size(20.dp),
-                                            imageVector = ImageVector.vectorResource(if (idx == 0) R.drawable.wallet_icon else if (idx == 1) R.drawable.payment_card_icon else R.drawable.bonus_icon),
-                                            contentDescription = "Logo"
-                                        )
-                                        Spacer(modifier = Modifier.width(19.dp))
-                                        Text(text = item)
-                                    }
-                                    CustomCheckBox(size = 25.dp,
-                                        isChecked = paymentState.value == item,
-                                        onChecked = { paymentState.value = item })
-                                }
-                                Divider()
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(54.dp))
-                        CustomButton(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(55.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                            text = "Готово",
-                            textSize = 20,
-                            textBold = true,
-                            onClick = {
-                                coroutineScope.launch {
-                                    bottomSheetState.bottomSheetState.collapse()
-                                }
-                            })
-                    }
-                },
-                sheetPeekHeight = 0.dp,
+    BottomSheetScaffold(
+        sheetBackgroundColor = Color.White,
+        scaffoldState = bottomSheetState,
+        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        sheetContent = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 15.dp, start = 30.dp, end = 17.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                val pagerState = rememberPagerState(2)
-                val scope = rememberCoroutineScope()
-                val pageNum = remember {
-                    mutableStateOf(1)
-                }
-
-                Box(
-                    modifier = Modifier.fillMaxSize()
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    HorizontalPager(
-                        state = pagerState,
-                        count = 2,
-                        modifier = Modifier.fillMaxSize(),
-                        userScrollEnabled = false
-                    ) { page ->
-                        pageNum.value = page
-                        var direction by remember { mutableStateOf(-1) }
-
-                        if (page == 0) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Red),
-                                contentAlignment = Alignment.CenterEnd
-                            ) {
-                                SideBarMenu(navController, preferences)
-                                Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .offset(43.dp, (-180).dp)
-                                        .width(100.dp)
-                                        .pointerInput(Unit) {
-                                            detectDragGestures(
-                                                onDrag = { change, dragAmount ->
-                                                    change.consumeAllChanges()
-
-                                                    val (x, y) = dragAmount
-                                                    if (kotlin.math.abs(x) > kotlin.math.abs(y)) {
-                                                        when {
-                                                            x > 0 -> {
-                                                                //right
-                                                                direction = 0
-                                                            }
-                                                            x < 0 -> {
-                                                                // left
-                                                                direction = 1
-                                                            }
-                                                        }
-                                                    } else {
-                                                        when {
-                                                            y > 0 -> {
-                                                                // down
-                                                                direction = 2
-                                                            }
-                                                            y < 0 -> {
-                                                                // up
-                                                                direction = 3
-                                                            }
-                                                        }
-                                                    }
-
-                                                },
-                                                onDragEnd = {
-                                                    when (direction) {
-                                                        0, 1, 2, 3 -> {
-                                                            Log.d("Direction", "Right")
-                                                            if (pageNum.value == 1) scope.launch {
-                                                                pagerState.animateScrollToPage(0)
-                                                                pageNum.value = 0
-                                                            }
-                                                            else scope.launch {
-                                                                pagerState.animateScrollToPage(1)
-                                                                pageNum.value = 1
-                                                            }
-                                                        }
-                                                    }
-
-                                                }
-
-                                            )
-                                        })
+                    Text(
+                        text = "Способ оплаты",
+                        fontSize = 22.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    paymentMethods.forEachIndexed { idx, item ->
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { paymentState.value = item }
+                            .padding(vertical = 15.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween) {
+                            Row {
+                                Image(
+                                    modifier = Modifier.size(20.dp),
+                                    imageVector = ImageVector.vectorResource(if (idx == 0) R.drawable.wallet_icon else if (idx == 1) R.drawable.payment_card_icon else R.drawable.bonus_icon),
+                                    contentDescription = "Logo"
+                                )
+                                Spacer(modifier = Modifier.width(19.dp))
+                                Text(text = item)
                             }
-                        } else {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Scaffold(scaffoldState = scaffoldState, bottomBar = {
-                                    BottomBar(
-                                        navController, mainBottomSheetState, bottomSheetState,
-                                        createOrder = {
-                                            mainViewModel.createOrder(preferences)
-                                        }
-                                    )
-                                }) {
-                                    BottomSheetScaffold(
-                                        sheetBackgroundColor = Color.Transparent,
-                                        scaffoldState = mainBottomSheetState,
-                                        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                                        sheetContent = {
+                            CustomCheckBox(size = 25.dp,
+                                isChecked = paymentState.value == item,
+                                onChecked = { paymentState.value = item })
+                        }
+                        Divider()
+                    }
+                }
+                Spacer(modifier = Modifier.height(54.dp))
+                CustomButton(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                    text = "Готово",
+                    textSize = 20,
+                    textBold = true,
+                    onClick = {
+                        coroutineScope.launch {
+                            bottomSheetState.bottomSheetState.collapse()
+                        }
+                    })
+            }
+        },
+        sheetPeekHeight = 0.dp,
+    ) {
+
+        var expanded by remember { mutableStateOf(false) }
+        val favorite = "2001"
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Scaffold(scaffoldState = scaffoldState, bottomBar = {
+                    BottomBar(
+                        navController, mainBottomSheetState, bottomSheetState,
+                        createOrder = {
+                            mainViewModel.createOrder(preferences)
+                        }
+                    )
+                }) {
+
+                    BottomSheetScaffold(
+                        sheetBackgroundColor = Color.Transparent,
+                        scaffoldState = mainBottomSheetState,
+                        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                        sheetContent = {
 //                                            MainBottomSheet(navController, mainBottomSheetState,
 //                                                stateTariffs, stateAllowances,
 //                                                preferences=preferences, stateAddressByPoint = stateAddressByPoint, stateSearchAddress = stateSearchAddress,
 //                                                stateCalculate = stateCalculate
 //                                            )
-                                               MainBottomSheetContent(scaffoldState = mainBottomSheetState,
-                                                   mainViewModel = mainViewModel, stateCalculate = stateCalculate,
-                                               stateTariffs = stateTariffs, preferences=preferences,
-                                                   stateAllowances = stateAllowances,
-                                                   stateAddressByPoint=stateAddressByPoint,
-                                                   navController=navController
-                                               )
-                                        },
-                                        sheetPeekHeight = 330.dp,
-                                    ) {
-                                        //CustomMap()
-                                        CustomMainMap()
-                                    }
+                            MainBottomSheetContent(
+                                scaffoldState = mainBottomSheetState,
+                                mainViewModel = mainViewModel,
+                                stateCalculate = stateCalculate,
+                                stateTariffs = stateTariffs,
+                                preferences = preferences,
+                                stateAllowances = stateAllowances,
+                                stateAddressByPoint = stateAddressByPoint,
+                                navController = navController
+                            )
+                        },
+                        sheetPeekHeight = 330.dp,
+                    ) {
+                        Box(contentAlignment = Alignment.CenterEnd) {
+                            CustomMainMap()
+                            AnimatedVisibility(
+                                !expanded,
+                                modifier = Modifier.clip(RoundedCornerShape(100.dp))
+                            ) {
+                                FloatingActionButton(
+                                    onClick = { expanded = !expanded },
+                                    backgroundColor = Color(0xff1c1c1c),
+                                    modifier = Modifier.padding(end=15.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
+                                        contentDescription = favorite,
+                                        tint = Color.White
+                                    )
                                 }
-                                Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer_blue),
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .offset(-(47).dp, -(180).dp)
-                                        .width(100.dp)
-                                        .rotate(180f)
-                                        .pointerInput(Unit) {
-                                            detectDragGestures(
-                                                onDrag = { change, dragAmount ->
-                                                    change.consumeAllChanges()
-
-                                                    val (x, y) = dragAmount
-                                                    if (kotlin.math.abs(x) > kotlin.math.abs(y)) {
-                                                        when {
-                                                            x > 0 -> {
-                                                                //right
-                                                                direction = 0
-                                                            }
-                                                            x < 0 -> {
-                                                                // left
-                                                                direction = 1
-                                                            }
-                                                        }
-                                                    } else {
-                                                        when {
-                                                            y > 0 -> {
-                                                                // down
-                                                                direction = 2
-                                                            }
-                                                            y < 0 -> {
-                                                                // up
-                                                                direction = 3
-                                                            }
-                                                        }
-                                                    }
-
-                                                },
-                                                onDragEnd = {
-                                                    when (direction) {
-                                                        0, 1, 2, 3 -> {
-                                                            Log.d("Direction", "Right")
-                                                            if (pageNum.value == 1) scope.launch {
-                                                                pagerState.animateScrollToPage(0)
-                                                                pageNum.value = 0
-                                                            }
-                                                            else scope.launch {
-                                                                pagerState.animateScrollToPage(1)
-                                                                pageNum.value = 1
-                                                            }
-                                                        }
-                                                    }
-
-                                                }
-
-                                            )
-                                        })
                             }
+
                         }
                     }
                 }
+
             }
+
+            AnimatedVisibility(
+                expanded,
+            ) {
+                var direction by remember { mutableStateOf(-1) }
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.8f)
+                        .background(Color(0xFF1c1c1c))
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDrag = { change, dragAmount ->
+                                    change.consumeAllChanges()
+
+                                    val (x, y) = dragAmount
+                                    if (Math.abs(x) > Math.abs(y)) {
+                                        when {
+                                            x > 0 -> direction = 0
+                                            x < 0 -> direction = 1
+                                        }
+                                    }
+
+                                },
+                                onDragEnd = {
+                                    when (direction) {
+                                        0 -> {
+                                            expanded = !expanded
+                                        }
+                                    }
+                                }
+                            )
+                        },
+                ) {
+                    SideBarMenu(navController, preferences)
+                }
+                //Spacer(Modifier.requiredHeight(20.dp))
+            }
+            if (expanded) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.2f)
+                        .fillMaxHeight()
+                        .clickable(indication = null,
+                            interactionSource = remember { MutableInteractionSource() }) {
+                            expanded = !expanded
+                        }
+                        .align(Alignment.CenterStart),
+                )
+            }
+        }
+    }
 }
 
 

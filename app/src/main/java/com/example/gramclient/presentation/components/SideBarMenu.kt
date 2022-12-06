@@ -3,9 +3,7 @@ package com.example.gramclient.presentation.components
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,6 +42,7 @@ fun SideBarMenu(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(color = colorResource(id = R.color.primary_color))
     ) {
         Spacer(modifier = Modifier.height(40.dp))
