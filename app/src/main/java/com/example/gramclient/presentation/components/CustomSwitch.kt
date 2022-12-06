@@ -24,9 +24,9 @@ import com.example.gramclient.ui.theme.PrimaryColor
 fun CustomSwitch(
     switchON: MutableState<Boolean>,
     scale: Float = 1.7f,
-    width: Dp = 25.dp,
-    height: Dp = 14.dp,
-    strokeWidth: Dp = 2.dp,
+    width: Dp = 28.dp,
+    height: Dp = 17.dp,
+    strokeWidth: Dp = 1.dp,
     checkedTrackColor: Color = PrimaryColor,
     uncheckedTrackColor: Color = Color(0xFF707070),
     gapBetweenThumbAndTrackEdge: Dp = 3.dp,
@@ -51,18 +51,17 @@ fun CustomSwitch(
                         onClick()
                     }
                 )
-            }.background(if(switchON.value)PrimaryColor else  Color.Transparent, shape = CircleShape)
+            }.background( Color(0xFF928F8F), shape = CircleShape)
     ) {
         // Track
         drawRoundRect(
-            color = if (switchON.value) checkedTrackColor else uncheckedTrackColor,
+            color = if (switchON.value) PrimaryColor else Color(0xFFB6B4B4),
             cornerRadius = CornerRadius(x = 10.dp.toPx(), y = 10.dp.toPx()),
-            style = Stroke(width = strokeWidth.toPx())
         )
 
         // Thumb
         drawCircle(
-            color = if (switchON.value) Color.White else uncheckedTrackColor,
+            color =  Color.White,
             radius = if (switchON.value) thumbRadius.toPx()+2 else thumbRadius.toPx() ,
             center = Offset(
                 x = animatePosition.value,

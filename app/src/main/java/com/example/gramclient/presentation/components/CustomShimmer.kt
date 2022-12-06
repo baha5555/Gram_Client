@@ -17,13 +17,13 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ShimmerRectangleItem(brush: Brush){
     Row(modifier = Modifier
-        .fillMaxSize()
-        .padding(all = 10.dp), verticalAlignment = Alignment.Top) {
-
+        .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+    ) {
         repeat(4){
             Spacer(modifier = Modifier
-                .size(80.dp)
-                .clip(RoundedCornerShape(10.dp))
+                .weight(1f)
+                .height(90.dp)
+                .clip(RoundedCornerShape(15.dp))
                 .background(brush)
             )
             Spacer(modifier = Modifier.width(10.dp))

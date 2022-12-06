@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.gramclient.ui.theme.PrimaryColor
@@ -26,7 +27,7 @@ fun CustomPulseLoader(isLoading:Boolean, dotSize: Dp = 20.dp, delayUnit:Int = 45
             .size(dotSize)
             .scale(scale)
             .background(
-                color = PrimaryColor,
+                color = Color(0xFF1E88E5),
                 shape = CircleShape
             )
     )
