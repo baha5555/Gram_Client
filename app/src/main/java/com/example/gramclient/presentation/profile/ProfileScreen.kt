@@ -43,6 +43,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.PreferencesName
+import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.presentation.components.CustomSwitch
 import com.example.gramclient.presentation.components.CustomTopBar
@@ -52,7 +53,9 @@ import com.example.gramclient.ui.theme.FontSilver
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -65,25 +68,33 @@ fun ProfileScreen(
     viewModel: ProfileViewModel= hiltViewModel(),
     preferences: SharedPreferences,
 ) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val bitmap = remember{ mutableStateOf<Bitmap?>(null)}
     val stateGetProfileInfo by viewModel.stateGetProfileInfo
     val getProfileFirstName = stateGetProfileInfo.response?.first_name
-    val profileFirstName = remember { mutableStateOf(stateGetProfileInfo.response?.first_name ?: "") }
-    val profileEmail = remember { mutableStateOf(stateGetProfileInfo.response?.email?:"" ) }
-    val profileLastName = remember { mutableStateOf(stateGetProfileInfo.response?.last_name?:"" ) }
+    val getProfileLastName = stateGetProfileInfo.response?.last_name
+    val getProfileEmail = stateGetProfileInfo.response?.email
+    val profileFirstName = remember { mutableStateOf(getProfileFirstName) }
+    val profileEmail = remember { mutableStateOf(getProfileEmail ) }
+    val profileLastName = remember { mutableStateOf(getProfileLastName ) }
     val profileImage = viewModel.stateGetProfileInfo.value.response?.avatar_url
     var selectImage by mutableStateOf<Uri?>(null)
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
         selectImage = it
     }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val bitmap = remember{ mutableStateOf<Bitmap?>(null)}
-
     LaunchedEffect(key1 = true ){
         viewModel.getProfileInfo(
             preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
         )
+        if (getProfileFirstName!=null)
+            profileFirstName.value= getProfileFirstName
+        if (getProfileLastName!=null)
+            profileLastName.value= getProfileLastName
+        if (getProfileEmail!=null)
+            profileEmail.value= getProfileEmail
     }
+
     Scaffold(
         topBar = { CustomTopBar(title = "Профиль", navController = navController, actionNum = 3) }
     ) {
@@ -110,9 +121,8 @@ fun ProfileScreen(
                     )
                 }
             else {
-                if(profileImage!=null)
                     Image(
-                        painter = rememberAsyncImagePainter(model = profileImage),
+                        painter = rememberAsyncImagePainter(model = profileImage ?: R.drawable.avatar),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(150.dp)
@@ -123,13 +133,6 @@ fun ProfileScreen(
 //                    imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
                         contentDescription = "",
                     )
-                    else
-                    Icon(modifier= Modifier
-                        .width(120.dp)
-                        .height(120.dp)
-                        .clickable {
-                            launcher.launch("image/*")
-                        },imageVector = Icons.Default.Camera, contentDescription = null,tint = Color.Black)
                 }
             Spacer(modifier = Modifier.height(75.dp))
 
@@ -139,54 +142,59 @@ fun ProfileScreen(
                     .padding(start = 27.dp, end = 21.dp)
             ) {
 
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = profileFirstName.value,
-                    onValueChange = { profileFirstName.value = it },
-                    label = { Text(text = "Имя*") },
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = BackgroundColor,
-                        unfocusedLabelColor = FontSilver,
-                        focusedLabelColor = FontSilver,
-                        unfocusedIndicatorColor = FontSilver,
-                        focusedIndicatorColor = FontSilver,
-                        cursorColor = FontSilver,
+                (profileFirstName.value?:getProfileFirstName)?.let { it1 ->
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        value = it1,
+                        onValueChange = { profileFirstName.value = it },
+                        label = { Text(text = "Имя*") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = BackgroundColor,
+                            unfocusedLabelColor = FontSilver,
+                            focusedLabelColor = FontSilver,
+                            unfocusedIndicatorColor = FontSilver,
+                            focusedIndicatorColor = FontSilver,
+                            cursorColor = FontSilver,
+                        )
                     )
-                )
+                }
                 Spacer(modifier = Modifier.height(35.dp))
-                TextField(
-//                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = profileLastName.value,
-                    onValueChange = { profileLastName.value = it },
-                    label = { Text(text = "Фамилия") },
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = BackgroundColor,
-                        unfocusedLabelColor = FontSilver,
-                        focusedLabelColor = FontSilver,
-                        unfocusedIndicatorColor = FontSilver,
-                        focusedIndicatorColor = FontSilver,
-                        cursorColor = FontSilver,
+                (profileLastName.value?:getProfileLastName)?.let { it1 ->
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        value = it1,
+                        onValueChange = { profileLastName.value = it },
+                        label = { Text(text = "Фамилия*") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = BackgroundColor,
+                            unfocusedLabelColor = FontSilver,
+                            focusedLabelColor = FontSilver,
+                            unfocusedIndicatorColor = FontSilver,
+                            focusedIndicatorColor = FontSilver,
+                            cursorColor = FontSilver,
+                        )
                     )
-                )
+                }
                 Spacer(modifier = Modifier.height(35.dp))
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = profileEmail.value,
-                    onValueChange = { profileEmail.value = it },
-                    label = { Text(text = "Email") },
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = BackgroundColor,
-                        unfocusedLabelColor = FontSilver,
-                        focusedLabelColor = FontSilver,
-                        unfocusedIndicatorColor = FontSilver,
-                        focusedIndicatorColor = FontSilver,
-                        cursorColor = FontSilver,
+                (profileEmail.value?:getProfileEmail)?.let { it1 ->
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        value = it1,
+                        onValueChange = { profileEmail.value = it },
+                        label = { Text(text = "Email*") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = BackgroundColor,
+                            unfocusedLabelColor = FontSilver,
+                            focusedLabelColor = FontSilver,
+                            unfocusedIndicatorColor = FontSilver,
+                            focusedIndicatorColor = FontSilver,
+                            cursorColor = FontSilver,
+                        )
                     )
-                )
+                }
 
                 Spacer(modifier = Modifier.height(35.dp))
                 TextField(
@@ -208,26 +216,6 @@ fun ProfileScreen(
                 )
 
                 Spacer(modifier = Modifier.height(49.dp))
-//                CustomDropDownMenu(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 32.dp),
-//                    selectedText = selectedTextGender.value,
-//                    suggestions = viewModel.value.stateListOfGenders.value,
-//                    onClick = {
-//                        selectedTextGender.value = it
-//                        when (it) {
-//                            viewModel.value.stateListOfGenders.value[0] -> {
-//                                viewModel.value.setGenderId(1)
-//                            }
-//                            viewModel.value.stateListOfGenders.value[1] -> {
-//                                viewModel.value.setGenderId(0)
-//                            }
-//                        }
-//
-//                    }
-//                )
-//                Spacer(modifier = Modifier.height(49.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -272,18 +260,13 @@ fun ProfileScreen(
                                         viewModel.sendProfile(
                                             preferences.getString(PreferencesName.ACCESS_TOKEN, "")
                                                 .toString(),
-                                            profileFirstName.value,
-                                            profileLastName.value,
-                                            "0",
-                                            "2022-01-01",
-                                            profileEmail.value,
-                                            photos
+                                            (profileFirstName.value?:"").toRequestBody() ,
+                                            (profileLastName.value?:"").toRequestBody() ,
+                                            profileEmail.value!!,
+                                            photos,
+                                            context
                                         )
-                                        Toast.makeText(
-                                            context,
-                                            "Фото успешно отправлено!",
-                                            Toast.LENGTH_LONG
-                                        ).show()
+
 //                                    navController.popBackStack()
                                 }catch (e: Exception) {
                                     if(selectImage == null)

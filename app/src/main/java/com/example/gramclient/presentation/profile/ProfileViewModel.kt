@@ -1,6 +1,8 @@
 package com.example.gramclient.presentation.profile
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -14,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,14 +68,13 @@ class ProfileViewModel @Inject constructor(
 
 
     fun sendProfile(token:String,
-                    first_name: String,
-                    last_name: String,
-                    gender: String,
-                    birth_date: String,
+                    first_name: RequestBody,
+                    last_name: RequestBody,
                     email: String,
-                    images: MultipartBody.Part
+                    images: MultipartBody.Part,
+                    context:Context
                     ){
-        sendProfileUseCase.invoke(token="Bearer $token",first_name,last_name, gender, birth_date, email, avatar = images).onEach { result: Resource<ProfileResponse> ->
+        sendProfileUseCase.invoke(token="Bearer $token",first_name,last_name, email, avatar = images).onEach { result: Resource<ProfileResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -80,6 +82,11 @@ class ProfileViewModel @Inject constructor(
                         _stateprofile.value =
                             ProfileResponseState(response = allowancesResponse?.result)
                         getProfileInfo(token)
+                        Toast.makeText(
+                            context,
+                            "Фото успешно отправлено!",
+                            Toast.LENGTH_LONG
+                        ).show()
                         Log.e("ProfileResponse", "SendProfileSuccess->\n ${_stateprofile.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")

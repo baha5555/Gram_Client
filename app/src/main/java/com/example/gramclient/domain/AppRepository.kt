@@ -13,6 +13,7 @@ import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 import java.util.*
 
@@ -35,13 +36,11 @@ interface AppRepository {
 
 
     suspend fun sendProfile(
-         token: String,
-         first_name: String,
-         last_name: String,
-         gender: String,
-         birth_date: String,
-         email: String,
-         avatar: MultipartBody.Part
+        token: String,
+        first_name: RequestBody,
+        last_name: RequestBody,
+        email: String,
+        avatar: MultipartBody.Part
     ): ProfileResponse
 
 

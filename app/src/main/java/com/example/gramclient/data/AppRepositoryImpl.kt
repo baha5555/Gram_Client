@@ -17,6 +17,7 @@ import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -39,13 +40,11 @@ class AppRepositoryImpl(
 
     override suspend fun sendProfile(
         token: String,
-        first_name: String,
-        last_name: String,
-        gender: String,
-        birth_date: String,
+        first_name: RequestBody,
+        last_name: RequestBody,
         email: String,
         avatar: MultipartBody.Part
-    ): ProfileResponse = api.sendProfile(token, first_name, last_name, gender, birth_date, email, avatar)
+    ): ProfileResponse = api.sendProfile(token, first_name, last_name, email, avatar)
 
     override suspend fun getAddressByPoint(
         token: String,

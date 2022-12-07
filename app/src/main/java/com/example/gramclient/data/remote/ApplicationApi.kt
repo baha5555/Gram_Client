@@ -13,6 +13,7 @@ import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface ApplicationApi {
@@ -43,10 +44,8 @@ interface ApplicationApi {
     @POST("/api/profile")
     suspend fun sendProfile(
         @Header("Authorization") token: String,
-        @Part("first_name") first_name: String,
-        @Part("last_name") last_name: String,
-        @Part("gender") gender: String,
-        @Part("birth_date") birth_date: String,
+        @Part("first_name") first_name: RequestBody,
+        @Part("last_name") last_name: RequestBody,
         @Query("email") email: String,
         @Part avatar: MultipartBody.Part
     ): ProfileResponse
