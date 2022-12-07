@@ -34,6 +34,7 @@ import com.example.gramclient.presentation.mainScreen.states.AddressByPointRespo
 import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
 import com.example.gramclient.presentation.mainScreen.states.CalculateResponseState
 import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
+import com.example.gramclient.ui.theme.BackgroundColor
 import currentFraction
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -117,7 +118,7 @@ fun SheetContent(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Color(0xFFEEEEEE),
+                BackgroundColor,
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             )
             .padding(bottom = 80.dp)
@@ -201,7 +202,7 @@ fun AddressesContent(
                 }
                 .fillMaxWidth()
                 .height(40.dp)
-                .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(50.dp))
+                .background(BackgroundColor, shape = RoundedCornerShape(50.dp))
                 .padding(10.dp)
             ){
                 Text(address_from.value?.name ?: "")
@@ -229,7 +230,7 @@ fun AddressesContent(
                     }
                     .fillMaxWidth()
                     .height(40.dp)
-                    .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(50.dp))
+                    .background(BackgroundColor, shape = RoundedCornerShape(50.dp))
                     .padding(10.dp)
                 ) {
                     Text(address.name)

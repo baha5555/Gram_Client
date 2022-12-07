@@ -12,6 +12,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.gramclient.R
+import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
@@ -69,7 +70,7 @@ fun CustomOrderExecutionTextField(
                     )
                 }
             }
-            Divider(color = Color(0xFFEEEEEE))
+            Divider(color = BackgroundColor)
         }
     }
 }

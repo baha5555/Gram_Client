@@ -12,6 +12,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gramclient.R
+import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
@@ -56,7 +57,7 @@ fun CustomOrderExecutionField(
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Divider(color = Color(0xFFEEEEEE))
+            Divider(color = BackgroundColor)
         }
 
     }
