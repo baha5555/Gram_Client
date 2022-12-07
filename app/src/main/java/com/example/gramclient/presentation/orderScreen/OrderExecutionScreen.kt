@@ -27,6 +27,7 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -223,7 +224,7 @@ fun OrderExecution(
                                     CustomSwitch(switchON = showMyLocation) {}
                                 }
                                 Spacer(modifier = Modifier.height(20.dp))
-                                Divider1(color = Color(0xFFEEEEEE))
+                                Divider1(color = BackgroundColor)
                             }
                         }
                         CustomOrderExecutionFieldOfWarning(

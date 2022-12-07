@@ -32,6 +32,7 @@ import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.states.*
+import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import noRippleClickable
 
@@ -83,7 +84,7 @@ fun MainBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(20.dp))
+                .background(BackgroundColor, shape = RoundedCornerShape(20.dp))
         ) {
             var isAnimated by remember { mutableStateOf(true) }
             val transition = updateTransition(targetState = isAnimated, label = "transition")
@@ -317,7 +318,7 @@ fun MainBottomSheet(
                             }
                             .fillMaxWidth()
                             .height(40.dp)
-                            .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(50.dp))
+                            .background(BackgroundColor, shape = RoundedCornerShape(50.dp))
                             .padding(10.dp)
                         ){
                             Text(address_from.value?.name ?: "")
@@ -351,7 +352,7 @@ fun MainBottomSheet(
                                 }
                                 .fillMaxWidth()
                                 .height(40.dp)
-                                .background(Color(0xFFEEEEEE), shape = RoundedCornerShape(50.dp))
+                                .background(BackgroundColor, shape = RoundedCornerShape(50.dp))
                                 .padding(10.dp)
                             ){
                                 Text(address.name)
