@@ -10,6 +10,7 @@ import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import okhttp3.MultipartBody
@@ -33,6 +34,7 @@ interface AppRepository {
     ): AllowancesResponse
 
     suspend fun getProfileInfo(token: String): GetProfileInfoResponse
+    suspend fun getOrderHistory(token: String): orderHistoryResponse
 
 
     suspend fun sendProfile(
