@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
@@ -34,11 +36,12 @@ fun AddressList(
     isVisible: MutableState<Boolean>,
     address: MutableState<String>,
     focusManager: FocusManager,
-    stateSearchAddress: SearchAddressResponseState,
+    mainViewModel: MainViewModel= hiltViewModel(),
     onclick: (address:Address) -> Unit
 ) {
     val activity = (LocalContext.current as? MainActivity)
     val keyboardController = LocalSoftwareKeyboardController.current
+    val stateSearchAddress by mainViewModel.stateSearchAddress
     Column(modifier = Modifier
         .fillMaxWidth()
         .clip(shape = RoundedCornerShape(10.dp))

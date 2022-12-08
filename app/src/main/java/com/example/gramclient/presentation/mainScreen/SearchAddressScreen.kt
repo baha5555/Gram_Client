@@ -66,7 +66,6 @@ fun SearchAddressScreen(
                     isVisible = isAddressList,
                     address = searchText,
                     focusManager = focusManager,
-                    stateSearchAddress = stateSearchAddress,
                 ){address ->
                     if(string=="toAddress"){
                         mainViewModel.getPrice(preferences).let {

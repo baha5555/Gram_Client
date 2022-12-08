@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,7 +23,9 @@ import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingLan
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingRegionScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSelectRegionScreen
+import com.example.gramclient.presentation.mainScreen.AddressSearchScreen
 import com.example.gramclient.presentation.mainScreen.MainScreen
+import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.SearchAddressScreen
 import com.example.gramclient.presentation.orderScreen.OrderExecution
 
@@ -30,13 +33,14 @@ import com.example.gramclient.presentation.orderScreen.OrderExecution
 fun Navigation(
     navController: NavHostController,
     messageViewModel: Lazy<MessageViewModel>,
-    preferences: SharedPreferences
+    preferences: SharedPreferences,
+    mainViewModel: MainViewModel= hiltViewModel()
 
     ) {
     NavHost(
         navController = navController,
         startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
-            RoutesName.SPLASH_SCREEN else RoutesName.MAIN_SCREEN
+            RoutesName.SPLASH_SCREEN else RoutesName.SEARCH_ADDRESS_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
             SplashScreen(navController)
@@ -53,7 +57,7 @@ fun Navigation(
             AuthorizationScreen(navController, preferences=preferences)
         }
         composable(RoutesName.MAIN_SCREEN) {
-            MainScreen(navController, preferences)
+            MainScreen(navController, preferences, mainViewModel)
         }
         composable(RoutesName.SETTING_SCREEN) {
             SettingScreen(navController)
@@ -105,6 +109,9 @@ fun Navigation(
             arguments = listOf(navArgument("searchId"){type= NavType.StringType})
         ) {backStackEntry ->
             SearchAddressScreen(navController, preferences=preferences, string = backStackEntry.arguments?.getString("searchId"))
+        }
+        composable(RoutesName.SEARCH_ADDRESS_SCREEN) {
+            AddressSearchScreen(navController, preferences, mainViewModel)
         }
     }
 }
