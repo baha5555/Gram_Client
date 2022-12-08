@@ -1,10 +1,5 @@
 package com.example.gramclient.domain.profile
-fun main(){
-    val a = 10
-    when{
-        a > 10 -> println("$a > 10")
-    }
-}
+
 data class GetProfileInfoResult(
     val avatar_url: String,
     val birth_date: String,

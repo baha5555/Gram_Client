@@ -13,6 +13,7 @@ import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
 import okhttp3.MultipartBody
@@ -33,6 +34,9 @@ class AppRepositoryImpl(
     override suspend fun getTariffs(token: String): TariffsResponse = api.getTariffs(token)
 
     override suspend fun getProfileInfo(token: String): GetProfileInfoResponse = api.getProfileInfo(token)
+
+    override suspend fun getOrderHistory(token: String): orderHistoryResponse = api.getOrderHistory(token)
+
     override suspend fun getAllowancesByTariffId(
         token: String,
         tariff_id: Int
