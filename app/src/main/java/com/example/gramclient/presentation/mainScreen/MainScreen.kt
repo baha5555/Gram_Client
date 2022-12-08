@@ -31,8 +31,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.domain.profile.main
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.launch
 
@@ -45,7 +45,7 @@ fun MainScreen(
     preferences: SharedPreferences,
     mainViewModel: MainViewModel,
 ) {
-
+    val profileViewModel:ProfileViewModel = hiltViewModel()
     val mainBottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
@@ -70,6 +70,9 @@ fun MainScreen(
 
     if (!initialApiCalled) {
         LaunchedEffect(Unit) {
+            profileViewModel.getProfileInfo(
+                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
+            )
             mainViewModel.getTariffs(
                 preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
             )
