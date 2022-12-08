@@ -1,78 +1,262 @@
 package com.example.gramclient.presentation.mainScreen
 
-import androidx.compose.animation.AnimatedVisibility
+import android.content.SharedPreferences
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.example.gramclient.Constants
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
+import com.example.gramclient.RoutesName
+import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
+import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
-import currentFraction
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
- fun AddressSearchScreen (){
+ fun AddressSearchScreen(
+    navController: NavHostController,
+    preferences: SharedPreferences,
+    mainViewModel: MainViewModel
+) {
+    var isSearchState = remember{ mutableStateOf(false) }
 
-    val mainBottomSheetState = rememberBottomSheetScaffoldState(
+    var WHICH_ADDRESS = remember{ mutableStateOf("") }
+
+    val bottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
 
-    BottomSheetScaffold(
-        modifier = Modifier.fillMaxSize(),
-        drawerContent = {
-                        Column() {
-                            Text(text = "Drawer")
-                        }
-        },
-        sheetBackgroundColor = Color.White,
-        scaffoldState = mainBottomSheetState,
-        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        sheetGesturesEnabled = false,
-        sheetContent = {
-            AddressSearchBottomSheet()
-        },
-        sheetPeekHeight = 280.dp,
-    ) {
-        CustomMainMap()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+    val coroutineScope= rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var initialApiCalled by rememberSaveable { mutableStateOf(false) }
+
+    val focusRequester = remember { FocusRequester() }
+
+
+
+    if (!initialApiCalled) {
+        LaunchedEffect(Unit) {
+            mainViewModel.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            initialApiCalled = true
+        }
     }
+
+    val fromAddress=mainViewModel.from_address.observeAsState()
+    val toAddress=mainViewModel.to_address.observeAsState()
+
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl ) {
+        ModalDrawer(
+            drawerState = drawerState,
+            gesturesEnabled = !drawerState.isClosed,
+            drawerContent = {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        SideBarMenu(navController, preferences)
+                    }
+                } },
+            content = {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr ) {
+                    BottomSheetScaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        floatingActionButton = {
+                            FloatingButton(scope = coroutineScope, drawerState = drawerState, bottomSheetState=bottomSheetState)
+                        },
+                        drawerGesturesEnabled = false,
+                        sheetBackgroundColor = Color.White,
+                        scaffoldState = bottomSheetState,
+                        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                        sheetGesturesEnabled = false,
+                        sheetContent = {
+                            AddressSearchBottomSheet(
+                                navController=navController, isSearchState=isSearchState,
+                                preferences=preferences, mainViewModel=mainViewModel,
+                                bottomSheetState = bottomSheetState,
+                                focusRequester=focusRequester,
+                                coroutineScope = coroutineScope,
+                                WHICH_ADDRESS=WHICH_ADDRESS,
+                                toAddress=toAddress
+                            )
+                        },
+                        sheetPeekHeight = 280.dp,
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.TopCenter
+                        )
+                        {
+                            CustomMainMap(navController=navController, mainViewModel = mainViewModel)
+                            FromAddressField(fromAddress) {
+                                coroutineScope.launch {
+                                    bottomSheetState.bottomSheetState.expand()
+                                    isSearchState.value=true
+                                    WHICH_ADDRESS.value=Constants.FROM_ADDRESS
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    }
+
  }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TopBar(){
-    Column() {
-        Text(text = "TopBar")
+fun FloatingButton(
+    scope: CoroutineScope,
+    drawerState: DrawerState,
+    bottomSheetState: BottomSheetScaffoldState
+){
+    FloatingActionButton(
+        modifier = Modifier
+            .size(50.dp)
+            .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
+        backgroundColor = PrimaryColor,
+        onClick = {
+            scope.launch {
+                drawerState.open()
+            }
+        }
+    ) {
+        Icon(Icons.Filled.Menu,
+            contentDescription = "Menu", tint = Color.White,
+            modifier = Modifier.size(25.dp)
+        )
     }
 }
+
 @Composable
-fun AddressSearchBottomSheet(heightFraction: Float = 0.95f){
+fun FromAddressField(fromAddress: State<Address?>, onClick: ()-> Unit) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 22.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Column(
             modifier = Modifier
+                .width(177.dp)
+                .height(50.dp)
+                .clip(shape = RoundedCornerShape(percent = 50))
+                .clickable {
+                    onClick()
+                }
+                .background(
+                    Color.Black,
+                    shape = RoundedCornerShape(percent = 50)
+                )
+                .padding(horizontal = 15.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Text(text = "Ваш адрес", color=Color.White, fontSize = 11.sp)
+                Spacer(modifier = Modifier.width(5.dp))
+                Icon(
+                    modifier = Modifier,
+                    painter = painterResource(R.drawable.arrow_right),
+                    contentDescription = "icon",
+                    tint = Color.White
+                )
+            }
+            Text(text = fromAddress.value?.name ?: "",
+                color=Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun AddressSearchBottomSheet(
+    heightFraction: Float = 0.98f,
+    navController: NavHostController,
+    isSearchState: MutableState<Boolean>,
+    preferences: SharedPreferences,
+    mainViewModel: MainViewModel,
+    bottomSheetState: BottomSheetScaffoldState,
+    focusRequester: FocusRequester,
+    coroutineScope: CoroutineScope,
+    WHICH_ADDRESS: MutableState<String>,
+    toAddress: State<MutableList<Address>?>
+){
+    val searchText=remember{ mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+    val isAddressList= remember { mutableStateOf(true) }
+    val stateSearchAddress by mainViewModel.stateSearchAddress
+
+    Column(
+            modifier = Modifier
                 .fillMaxWidth()
+                .focusRequester(focusRequester)
                 .fillMaxHeight(fraction = heightFraction)
                 .background(Color.White)
                 .padding(15.dp)
         ) {
-            ToAddressField()
-            Spacer(modifier = Modifier.height(15.dp))
-            FastAddresses()
-            Spacer(modifier = Modifier.height(15.dp))
-            Services()
+            if(!isSearchState.value){
+                ToAddressField(navController, WHICH_ADDRESS=WHICH_ADDRESS, toAddress=toAddress,
+                    isSearchState=isSearchState, bottomSheetState=bottomSheetState, scope=coroutineScope
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                FastAddresses()
+                Spacer(modifier = Modifier.height(15.dp))
+                Services()
+            }else{
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+                SearchTextField(searchText = searchText, preferences = preferences, navController = navController, focusRequester = focusRequester)
+                SearchResultContent(
+                    searchText = searchText,
+                    focusManager = focusManager,
+                    navController = navController,
+                    isAddressList = isAddressList,
+                    stateSearchAddress = stateSearchAddress,
+                    bottomSheetState=bottomSheetState,
+                    isSearchState=isSearchState,
+                    scope = coroutineScope,
+                    mainViewModel = mainViewModel,
+                    WHICH_ADDRESS=WHICH_ADDRESS
+                )
+            }
         }
 }
 
@@ -140,43 +324,174 @@ fun ServicesCard(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ToAddressField(){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .clip(RoundedCornerShape(percent = 50))
-            .clickable { }
-            .background(PrimaryColor, shape = RoundedCornerShape(percent = 50))
-            .padding(vertical = 10.dp, horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
-    ){
+fun ToAddressField(
+    navController: NavHostController,
+    WHICH_ADDRESS: MutableState<String>,
+    isSearchState: MutableState<Boolean>,
+    bottomSheetState: BottomSheetScaffoldState,
+    scope: CoroutineScope,
+    toAddress: State<MutableList<Address>?>
+) {
+    toAddress.value?.forEach { address ->
         Row(
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start
-        ){
-            Image(
-                modifier = Modifier,
-                alignment = Alignment.Center,
-                imageVector = ImageVector.vectorResource(id = R.drawable.car_econom_icon),
-                contentDescription = "icon"
-            )
-            Text(text = "Куда едем?", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start
-        ){
-            Spacer(modifier = Modifier
-                .fillMaxHeight()
-                .width(2.dp)
-                .background(Color.White))
-            Spacer(modifier = Modifier.width(10.dp))
-            Icon(
-                modifier = Modifier,
-                imageVector = Icons.Default.ArrowForward,
-                contentDescription = "icon",
-                tint = Color.White
-            )
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .clip(RoundedCornerShape(percent = 50))
+                .clickable {
+                    scope.launch {
+                        bottomSheetState.bottomSheetState.expand()
+                        isSearchState.value = true
+                        WHICH_ADDRESS.value = Constants.TO_ADDRESS
+                    }
+                }
+                .background(PrimaryColor, shape = RoundedCornerShape(percent = 50))
+                .padding(vertical = 10.dp, horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.weight(1f)
+            ) {
+                Image(
+                    modifier = Modifier,
+                    alignment = Alignment.Center,
+                    imageVector = ImageVector.vectorResource(id = R.drawable.car_econom_icon),
+                    contentDescription = "icon"
+                )
+                Text(
+                    text = address.name,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.weight(0.1f)
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(2.dp)
+                        .background(Color.White)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Icon(
+                    modifier = Modifier.clickable {
+                        navController.navigate(RoutesName.MAIN_SCREEN)
+                    },
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = "icon",
+                    tint = Color.White
+                )
+            }
         }
     }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SearchResultContent(
+    searchText: MutableState<String>,
+    focusManager: FocusManager,
+    navController: NavHostController,
+    isAddressList: MutableState<Boolean>,
+    stateSearchAddress: SearchAddressResponseState,
+    bottomSheetState: BottomSheetScaffoldState,
+    isSearchState: MutableState<Boolean>,
+    scope: CoroutineScope,
+    mainViewModel: MainViewModel,
+    WHICH_ADDRESS: MutableState<String>
+){
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+    )
+    {
+        AddressList(
+            navController = navController,
+            isVisible = isAddressList,
+            address = searchText,
+            focusManager = focusManager,
+        ){address ->
+            scope.launch {
+                bottomSheetState.bottomSheetState.collapse()
+            }
+            isSearchState.value=false
+            when(WHICH_ADDRESS.value){
+                Constants.FROM_ADDRESS -> { mainViewModel.updateFromAddress(address) }
+                Constants.TO_ADDRESS -> { mainViewModel.updateToAddress(0, address) }
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchTextField(
+    searchText: MutableState<String>,
+    mainViewModel: MainViewModel= hiltViewModel(),
+    preferences: SharedPreferences,
+    navController: NavHostController,
+    focusRequester: FocusRequester
+) {
+
+    TextField(
+        value = searchText.value,
+        onValueChange = { value ->
+            searchText.value = value
+            mainViewModel.searchAddress(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), value)
+        },
+        modifier = Modifier
+            .focusRequester(focusRequester)
+            .fillMaxWidth(),
+        textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
+        leadingIcon = {
+            IconButton(onClick = { /*navController.popBackStack()*/ }) {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .size(24.dp)
+                )
+            }
+        },
+        trailingIcon = {
+            if (searchText.value != "") {
+                IconButton(
+                    onClick = {
+                        searchText.value =
+                            ""
+                    }
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .padding(15.dp)
+                            .size(24.dp)
+                    )
+                }
+            }
+        },
+        placeholder= {Text(text = "Введите адрес для поиска")},
+        singleLine = true,
+        shape = RoundedCornerShape(15.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            textColor = Color.Black,
+            cursorColor = Color.Black,
+            leadingIconColor = Color.Black,
+            trailingIconColor = Color.Black,
+            backgroundColor = BackgroundColor,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        )
+    )
 }

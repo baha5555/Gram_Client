@@ -25,7 +25,6 @@ import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomMainMap
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.ui.theme.PrimaryColor
-import java.nio.file.Files.size
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -163,6 +162,6 @@ fun SearchDriverScreen(
                 }
             }
         }) {
-        CustomMainMap()
+        CustomMainMap(navController = navController, mainViewModel = mainViewModel)
     }
 }
