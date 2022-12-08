@@ -42,27 +42,48 @@ fun SearchDriverScreen(
     BottomSheetScaffold(sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
         scaffoldState = bottomSheetScaffoldState,
         sheetContent = {
-            Box(
+            Column(
                 Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.40f)
+                    .wrapContentHeight()
                     .background(Color(0xFFEEEEEE))
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.50f)
-                        .clip(shape = RoundedCornerShape(25.dp))
-                        .background(Color.White)
-                        .align(Alignment.TopCenter)
-                )
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.45f)
+                        .clip(shape = RoundedCornerShape(25.dp))
+                        .background(Color.White)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(15.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column() {
+                            Text(
+                                text = "Рядом с вами 3 машины",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(text = "Выбираем подходящие", fontSize = 13.sp)
+
+                        }
+                        Text(text = "00:00", fontSize = 15.sp)
+                    }
+                    Divider()
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
                         .clip(shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
                         .background(Color.White)
-                        .align(Alignment.BottomCenter)
                 ) {
                     Box(
                         modifier = Modifier
@@ -74,11 +95,6 @@ fun SearchDriverScreen(
                     ) {
                         Image(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
-                            contentDescription = "car_eco",
-                            modifier = Modifier.align(Alignment.CenterStart)
-                        )
-                        Image(
-                            imageVector = Icons.Default.Atm,
                             contentDescription = "car_eco",
                             modifier = Modifier.align(Alignment.CenterStart)
                         )
@@ -153,13 +169,17 @@ fun SearchDriverScreen(
                                     contentDescription = "ic_box"
                                 )
                                 Text(
-                                    text = "Аренда авто", fontSize = 12.sp, modifier = Modifier.align(
+                                    text = "Аренда авто",
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.align(
                                         Alignment.Center
                                     )
                                 )
                             }
                         }
                     }
+                    Spacer(Modifier.requiredHeight(20.dp))
+
                 }
             }
         }) {
