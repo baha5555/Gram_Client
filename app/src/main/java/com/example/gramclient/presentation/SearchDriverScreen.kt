@@ -1,14 +1,17 @@
 package com.example.gramclient.presentation
 
 import android.content.SharedPreferences
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Atm
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +27,8 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomMainMap
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.ui.theme.BackgroundColor
+import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
 import java.nio.file.Files.size
 
@@ -34,6 +39,10 @@ fun SearchDriverScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     preferences: SharedPreferences
 ) {
+    val searchDriverState = remember {
+        mutableStateOf(true)
+    }
+
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Expanded
@@ -48,35 +57,90 @@ fun SearchDriverScreen(
                     .wrapContentHeight()
                     .background(Color(0xFFEEEEEE))
             ) {
+                val showContentState = remember {
+                    mutableStateOf(false)
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(shape = RoundedCornerShape(25.dp))
                         .background(Color.White)
+                        .clickable {
+                            showContentState.value = !showContentState.value
+                        }
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(15.dp),
+                            .padding(
+                                horizontal = 15.dp,
+                                vertical = if (searchDriverState.value) 15.dp else 5.dp
+                            ),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column() {
+                        Column {
                             Text(
-                                text = "Рядом с вами 3 машины",
+                                text = if (searchDriverState.value) "Рядом с вами 3 машины" else "Через 6 мин приедет",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
-                            Text(text = "Выбираем подходящие", fontSize = 13.sp)
+                            Text(
+                                text = if (searchDriverState.value) "Выбираем подходящие" else "cерый Opel Astra",
+                                fontSize = 13.sp
+                            )
 
                         }
-                        Text(text = "00:00", fontSize = 15.sp)
+                        if (searchDriverState.value) {
+                            Text(text = "00:00", fontSize = 15.sp)
+                        } else {
+                            Box {
+                                Text(
+                                    text = "0220KK",
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier
+                                        .offset(0.dp, 18.dp)
+                                        .background(BackgroundColor)
+                                )
+                                Image(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                                    contentDescription = "car_eco",
+                                    modifier = Modifier.offset(0.dp, 16.dp)
+                                )
+                            }
+                        }
                     }
-                    Divider()
-                    Spacer(modifier = Modifier.height(15.dp))
+                    AnimatedVisibility(visible = showContentState.value) {
+                        Divider()
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            if (searchDriverState.value) {
+                                RoundedButton(
+                                    text = "Отменить\nзаказ",
+                                    icon = Icons.Default.Close
+                                ) {
+                                    //Log.d("clicked", "click")
+                                }
+                            } else {
+                                RoundedButton(text = "Позвонить", icon = Icons.Default.Phone) {
+                                    //Log.d("clicked", "click")
+                                }
+                            }
+                            RoundedButton(text = "Детали", icon = Icons.Default.Menu) {
+                                searchDriverState.value = !searchDriverState.value
+                            }
+                        }
+                    }
                 }
 
                 Spacer(Modifier.height(10.dp))
+
 
                 Column(
                     modifier = Modifier
@@ -184,5 +248,18 @@ fun SearchDriverScreen(
             }
         }) {
         CustomMainMap()
+    }
+}
+
+@Composable
+fun RoundedButton(text: String, icon: ImageVector, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        FloatingActionButton(
+            onClick = { onClick.invoke() },
+        ) {
+            Icon(imageVector = icon, "", modifier = Modifier.size(30.dp))
+        }
+        Spacer(modifier = Modifier.requiredHeight(3.dp))
+        Text(text = text, fontSize = 12.sp, color = FontSilver, textAlign = TextAlign.Center)
     }
 }
