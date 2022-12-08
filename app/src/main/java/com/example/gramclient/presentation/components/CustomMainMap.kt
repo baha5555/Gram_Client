@@ -10,17 +10,23 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.preference.PreferenceManager
+import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.gramclient.R
+import com.example.gramclient.RoutesName
+import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -44,7 +50,11 @@ lateinit var mRotationGestureOverlay: RotationGestureOverlay
 lateinit var mLocationOverlay: MyLocationNewOverlay
 
 @Composable
-fun CustomMainMap(mainViewModel: MainViewModel= hiltViewModel()) {
+fun CustomMainMap(mainViewModel: MainViewModel, navController: NavHostController) {
+
+    val fromAddress=mainViewModel.from_address.observeAsState()
+    val toAddress=mainViewModel.to_address.observeAsState()
+
     AndroidView(factory = {
         View.inflate(it, R.layout.map, null)
 
@@ -53,6 +63,10 @@ fun CustomMainMap(mainViewModel: MainViewModel= hiltViewModel()) {
             //val roadManager:RoadManager=OSRMRoadManager(it.context, "GramDriver/1.0")
             map = it.findViewById(R.id.map)
             val btnLocation = it.findViewById<ImageButton>(R.id.btnLocation)
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if(currentRoute==RoutesName.MAIN_SCREEN){
+                btnLocation.margin(0f, 0f, 0f, 355f)
+            }
 
 
             Configuration.getInstance()
@@ -90,7 +104,7 @@ fun CustomMainMap(mainViewModel: MainViewModel= hiltViewModel()) {
             }
             map.overlays.clear()
             addOverlays()
-            showRoadAB(it.context, mainViewModel)
+            showRoadAB(it.context, fromAddress, toAddress)
         }
     )
 }
@@ -103,7 +117,8 @@ fun addOverlays() {
 @OptIn(DelicateCoroutinesApi::class)
 fun showRoadAB(
     context: Context,
-    mainViewModel: MainViewModel
+    fromAddress: State<Address?>,
+    toAddress: State<MutableList<Address>?>,
 ) {
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
     GlobalScope.launch {
@@ -113,15 +128,15 @@ fun showRoadAB(
 //            val startPoint2 = GeoPoint(41.27803692395751, 70.62923931506361)
             val fromAddressPoint: GeoPoint = GeoPoint(0, 0)
             fromAddressPoint.latitude =
-                mainViewModel.from_address.value?.lat?.toDouble() ?: 0.0
+                fromAddress.value?.lat?.toDouble() ?: 0.0
             fromAddressPoint.longitude =
-                mainViewModel.from_address.value?.lng?.toDouble() ?: 0.0
+                fromAddress.value?.lng?.toDouble() ?: 0.0
             waypoints.add(fromAddressPoint)
 
 
             val toAddressesPoints = ArrayList<GeoPoint>()
             val toAddressesNames = ArrayList<String>()
-            mainViewModel.to_address.value?.forEach { address ->
+            toAddress.value?.forEach { address ->
                 val toAddressPoint: GeoPoint = GeoPoint(0, 0)
                 toAddressPoint.latitude = address.lat.toDouble()
                 toAddressPoint.longitude = address.lng.toDouble()
@@ -144,7 +159,7 @@ fun showRoadAB(
 
             map.overlays.add(roadOverlay)
             if (fromAddressPoint != toAddressesPoints[0]) {
-                mainViewModel.from_address.value?.let {
+                fromAddress.value?.let {
                     addMarker(
                         context,
                         map,
@@ -294,4 +309,20 @@ private fun setRequiredCenter(newCenter: GeoPoint) {
     requiredCenter = GeoPoint(newCenter)
 //        Log.d("MyApp3", "setRequiredCenter " + newCenter.getLatitude() + " " + newCenter.getLongitude());
 }
+
+fun View.margin(left: Float? = null, top: Float? = null, right: Float? = null, bottom: Float? = null) {
+    layoutParams<ViewGroup.MarginLayoutParams> {
+        left?.run { leftMargin = dpToPx(this) }
+        top?.run { topMargin = dpToPx(this) }
+        right?.run { rightMargin = dpToPx(this) }
+        bottom?.run { bottomMargin = dpToPx(this) }
+    }
+}
+
+inline fun <reified T : ViewGroup.LayoutParams> View.layoutParams(block: T.() -> Unit) {
+    if (layoutParams is T) block(layoutParams as T)
+}
+
+fun View.dpToPx(dp: Float): Int = context.dpToPx(dp)
+fun Context.dpToPx(dp: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
 

@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
+import com.example.gramclient.domain.profile.main
 import com.example.gramclient.presentation.components.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.launch
@@ -42,10 +43,8 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     navController: NavHostController,
     preferences: SharedPreferences,
-    mainViewModel: MainViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel,
 ) {
-    val address_from = mainViewModel.from_address.observeAsState()
-    val address_to = mainViewModel.to_address.observeAsState()
 
     val mainBottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -80,10 +79,10 @@ fun MainScreen(
                     ""
                 ).toString(), 1
             )
-            mainViewModel.getActualLocation(
-                context,
-                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
-            )
+//            mainViewModel.getActualLocation(
+//                context,
+//                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
+//            )
             mainViewModel.getPrice(preferences)
             initialApiCalled = true
         }
@@ -92,10 +91,8 @@ fun MainScreen(
     val stateTariffs by mainViewModel.stateTariffs
     val stateAllowances by mainViewModel.stateAllowances
     val stateAddressByPoint by mainViewModel.stateAddressPoint
-    val stateSearchAddress by mainViewModel.stateSearchAddress
     val stateCalculate by mainViewModel.stateCalculate
 
-    val sendOrder = mainViewModel.sendOrder.observeAsState()
 
 
 
@@ -184,11 +181,6 @@ fun MainScreen(
                         scaffoldState = mainBottomSheetState,
                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                         sheetContent = {
-//                                            MainBottomSheet(navController, mainBottomSheetState,
-//                                                stateTariffs, stateAllowances,
-//                                                preferences=preferences, stateAddressByPoint = stateAddressByPoint, stateSearchAddress = stateSearchAddress,
-//                                                stateCalculate = stateCalculate
-//                                            )
                             MainBottomSheetContent(
                                 scaffoldState = mainBottomSheetState,
                                 mainViewModel = mainViewModel,
@@ -200,81 +192,11 @@ fun MainScreen(
                                 navController = navController
                             )
                         },
-                        sheetPeekHeight = 330.dp,
+                        sheetPeekHeight = 355.dp,
                     ) {
-                        Box(contentAlignment = Alignment.CenterEnd) {
-                            CustomMainMap()
-                            AnimatedVisibility(
-                                !expanded,
-                                modifier = Modifier.clip(RoundedCornerShape(100.dp))
-                            ) {
-                                FloatingActionButton(
-                                    onClick = { expanded = !expanded },
-                                    backgroundColor = Color(0xff1c1c1c),
-                                    modifier = Modifier.padding(end=15.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_drawer),
-                                        contentDescription = favorite,
-                                        tint = Color.White
-                                    )
-                                }
-                            }
-
-                        }
+                        CustomMainMap(navController = navController, mainViewModel = mainViewModel)
                     }
                 }
-
-            }
-
-            AnimatedVisibility(
-                expanded,
-            ) {
-                var direction by remember { mutableStateOf(-1) }
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.8f)
-                        .background(Color(0xFF1c1c1c))
-                        .pointerInput(Unit) {
-                            detectDragGestures(
-                                onDrag = { change, dragAmount ->
-                                    change.consumeAllChanges()
-
-                                    val (x, y) = dragAmount
-                                    if (Math.abs(x) > Math.abs(y)) {
-                                        when {
-                                            x > 0 -> direction = 0
-                                            x < 0 -> direction = 1
-                                        }
-                                    }
-
-                                },
-                                onDragEnd = {
-                                    when (direction) {
-                                        0 -> {
-                                            expanded = !expanded
-                                        }
-                                    }
-                                }
-                            )
-                        },
-                ) {
-                    SideBarMenu(navController, preferences)
-                }
-                //Spacer(Modifier.requiredHeight(20.dp))
-            }
-            if (expanded) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.2f)
-                        .fillMaxHeight()
-                        .clickable(indication = null,
-                            interactionSource = remember { MutableInteractionSource() }) {
-                            expanded = !expanded
-                        }
-                        .align(Alignment.CenterStart),
-                )
             }
         }
     }

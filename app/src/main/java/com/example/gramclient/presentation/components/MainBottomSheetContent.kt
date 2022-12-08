@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,7 +43,7 @@ import currentFraction
 fun MainBottomSheetContent(
     heightFraction: Float = 0.95f,
     scaffoldState: BottomSheetScaffoldState,
-    mainViewModel: MainViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel,
     stateCalculate: CalculateResponseState,
     stateTariffs: TariffsResponseState,
     preferences: SharedPreferences,
@@ -126,13 +127,13 @@ fun SheetContent(
         Column {
             addressContent()
             Spacer(modifier = Modifier.height(0.dp+(currentFraction*10).dp))
-            tariffsContent()
-            Spacer(modifier = Modifier.height(10.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
+                tariffsContent()
+                Spacer(modifier = Modifier.height(10.dp))
                 optionsContent()
                 Spacer(modifier = Modifier.height(10.dp))
                 allowancesContent()
@@ -172,8 +173,8 @@ fun AddressesContent(
         }
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth().padding(top = 10.dp),
+            verticalAlignment = Alignment.Top
         ) {
             Loader(isLoading = stateAddressByPoint.isLoading)
             stateAddressByPoint.response?.let { address ->
@@ -194,26 +195,26 @@ fun AddressesContent(
                     contentDescription = "Logo"
                 )
             }
-            Spacer(modifier = Modifier.width(15.dp))
+            Spacer(modifier = Modifier.width(30.dp))
             Column(modifier = Modifier
-                .clip(RoundedCornerShape(50.dp))
-                .clickable {
-                    navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/fromAddress")
-                }
                 .fillMaxWidth()
-                .height(40.dp)
-                .background(BackgroundColor, shape = RoundedCornerShape(50.dp))
-                .padding(10.dp)
+                .height(50.dp)
             ){
-                Text(address_from.value?.name ?: "")
+                Text(
+                    address_from.value?.name ?: "",
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.clickable {
+                    navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/fromAddress")
+                })
+                Spacer(modifier = Modifier.height(20.dp))
+                Divider()
             }
         }
-        Spacer(modifier = Modifier.height(15.dp))
         address_to.value?.forEach { address ->
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth().padding(top = 10.dp),
+                verticalAlignment = Alignment.Top
             ) {
                 Image(
                     modifier = Modifier
@@ -222,18 +223,20 @@ fun AddressesContent(
                     imageVector = ImageVector.vectorResource(R.drawable.to_marker),
                     contentDescription = "Logo"
                 )
-                Spacer(modifier = Modifier.width(15.dp))
+                Spacer(modifier = Modifier.width(30.dp))
                 Column(modifier = Modifier
-                    .clip(RoundedCornerShape(50.dp))
-                    .clickable {
+                    .fillMaxWidth()
+                    .height(50.dp)
+                ){
+                    Text(
+                        address.name,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.clickable {
                         navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/toAddress")
                     }
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .background(BackgroundColor, shape = RoundedCornerShape(50.dp))
-                    .padding(10.dp)
-                ) {
-                    Text(address.name)
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Divider()
                 }
             }
         }
