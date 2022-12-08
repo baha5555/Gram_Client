@@ -52,29 +52,14 @@ fun SideBarMenu(
             modifier = Modifier.padding(20.dp)
         ) {
             Box {
-                if (stateGetProfileInfo.response?.avatar_url != null)
-                    Image(
-                        painter = rememberAsyncImagePainter(model = stateGetProfileInfo.response?.avatar_url),
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clip(CircleShape),
-                        contentDescription = "",
-                    )
-                else
-                    Box(
-                        modifier = Modifier
-                            .background(Color.White, shape = RoundedCornerShape(50.dp)),
-                        content = {
-                            Image(
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .padding(5.dp),
-                                imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
-                                contentDescription = "",
-                            )
-                        }
-                    )
+                Image(
+                    painter = rememberAsyncImagePainter(model = stateGetProfileInfo.response?.avatar_url?:R.drawable.avatar),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape),
+                    contentDescription = "",
+                )
             }
             Column(Modifier.padding(start=15.dp)){
                 Text(
