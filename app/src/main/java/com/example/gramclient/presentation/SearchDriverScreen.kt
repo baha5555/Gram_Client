@@ -153,21 +153,22 @@ fun SearchDriverScreen(
                             .height(50.dp)
                             .clip(RoundedCornerShape(20.dp))
                             .background(PrimaryColor),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
-                            contentDescription = "car_eco",
-                        )
-                        Text(
-                            text = "Заказать ещё одну машину",
-                            textAlign = TextAlign.Center,
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier
-                                .fillMaxWidth(0.7f)
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                                contentDescription = "car_eco",
+                            )
+                            Text(
+                                text = "Заказать ещё одну машину",
+                                textAlign = TextAlign.Center,
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
                         Row(
                             modifier = Modifier.padding(end = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
