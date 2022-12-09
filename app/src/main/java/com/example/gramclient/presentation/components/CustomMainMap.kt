@@ -66,6 +66,7 @@ fun CustomMainMap(mainViewModel: MainViewModel, navController: NavHostController
             val currentRoute = navController.currentBackStackEntry?.destination?.route
             if(currentRoute==RoutesName.MAIN_SCREEN){
                 btnLocation.margin(0f, 0f, 0f, 355f)
+                btnLocation.visibility=View.GONE
             }
 
 
