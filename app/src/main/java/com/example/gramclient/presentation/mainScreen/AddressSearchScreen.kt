@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -335,11 +336,11 @@ fun ToAddressField(
     toAddress: State<MutableList<Address>?>
 ) {
     toAddress.value?.forEach { address ->
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .clip(RoundedCornerShape(percent = 50))
+                .clip(RoundedCornerShape(20.dp))
                 .clickable {
                     scope.launch {
                         bottomSheetState.bottomSheetState.expand()
@@ -347,50 +348,47 @@ fun ToAddressField(
                         WHICH_ADDRESS.value = Constants.TO_ADDRESS
                     }
                 }
-                .background(PrimaryColor, shape = RoundedCornerShape(percent = 50))
-                .padding(vertical = 10.dp, horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .background(PrimaryColor)
+                .padding(horizontal = 5.dp)
         ) {
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                contentDescription = "car_eco",
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    modifier = Modifier,
-                    alignment = Alignment.Center,
-                    imageVector = ImageVector.vectorResource(id = R.drawable.car_econom_icon),
-                    contentDescription = "icon"
-                )
-                Text(
-                    text = address.name,
+                Divider(
                     color = Color.White,
-                    fontSize = 14.sp,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.weight(0.1f)
-            ) {
-                Spacer(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .width(2.dp)
-                        .background(Color.White)
+                        .width(1.dp)
+                        .fillMaxHeight(0.5f)
+                        .offset((-10).dp, 0.dp)
                 )
-                Spacer(modifier = Modifier.width(10.dp))
                 Icon(
-                    modifier = Modifier.clickable {
+                    modifier = Modifier.size(24.dp).clickable {
                         navController.navigate(RoutesName.MAIN_SCREEN)
                     },
                     imageVector = Icons.Default.ArrowForward,
-                    contentDescription = "icon",
+                    contentDescription = "car_eco",
                     tint = Color.White
                 )
             }
+            Text(
+                text = address.name,
+                textAlign = TextAlign.Start,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.Center)
+            )
         }
     }
 }
