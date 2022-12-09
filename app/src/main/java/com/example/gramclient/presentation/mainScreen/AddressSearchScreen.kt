@@ -44,6 +44,7 @@ import com.example.gramclient.presentation.mainScreen.states.SearchAddressRespon
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -107,7 +108,7 @@ import kotlinx.coroutines.launch
                         sheetBackgroundColor = Color.White,
                         scaffoldState = bottomSheetState,
                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                        sheetGesturesEnabled = false,
+                        sheetGesturesEnabled = !bottomSheetState.bottomSheetState.isCollapsed,
                         sheetContent = {
                             AddressSearchBottomSheet(
                                 navController=navController, isSearchState=isSearchState,
@@ -242,6 +243,7 @@ fun AddressSearchBottomSheet(
                 Services()
             }else{
                 LaunchedEffect(Unit) {
+                    delay(200)
                     focusRequester.requestFocus()
                 }
                 SearchTextField(searchText = searchText, preferences = preferences, navController = navController, focusRequester = focusRequester)

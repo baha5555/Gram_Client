@@ -40,6 +40,7 @@ import com.example.gramclient.presentation.mainScreen.states.TariffsResponseStat
 import com.example.gramclient.ui.theme.BackgroundColor
 import currentFraction
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -123,6 +124,7 @@ fun MainBottomSheetContent(
             )
         }else{
             LaunchedEffect(Unit) {
+                delay(200)
                 focusRequester.requestFocus()
             }
             Column(
