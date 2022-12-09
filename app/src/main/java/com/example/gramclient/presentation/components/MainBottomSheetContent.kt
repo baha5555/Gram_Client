@@ -8,48 +8,52 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.gramclient.Constants
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.mainScreen.states.AddressByPointResponseState
+import com.example.gramclient.presentation.mainScreen.SearchResultContent
+import com.example.gramclient.presentation.mainScreen.SearchTextField
 import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
 import com.example.gramclient.presentation.mainScreen.states.CalculateResponseState
 import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
 import com.example.gramclient.ui.theme.BackgroundColor
 import currentFraction
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainBottomSheetContent(
-    heightFraction: Float = 0.95f,
+    heightFraction: Float = 0.92f,
     scaffoldState: BottomSheetScaffoldState,
     mainViewModel: MainViewModel,
     stateCalculate: CalculateResponseState,
     stateTariffs: TariffsResponseState,
     preferences: SharedPreferences,
     stateAllowances: AllowancesResponseState,
-    stateAddressByPoint: AddressByPointResponseState,
-    navController: NavHostController
+    navController: NavHostController,
+    isSearchState: MutableState<Boolean>,
 ){
     val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
@@ -59,47 +63,96 @@ fun MainBottomSheetContent(
     val address_to=mainViewModel.to_address.observeAsState()
     val selected_tariff=mainViewModel.selectedTariff?.observeAsState()
 
+    var WHICH_ADDRESS = remember{ mutableStateOf("") }
+    val isAddressList= remember { mutableStateOf(true) }
+
+    val searchText=remember{ mutableStateOf("") }
+
+    val focusManager = LocalFocusManager.current
+
+    val stateSearchAddress by mainViewModel.stateSearchAddress
+    val focusRequester = remember { FocusRequester() }
+
+    val coroutineScope= rememberCoroutineScope()
+
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(fraction = heightFraction)
     ) {
-        SheetContent (
-            currentFraction=scaffoldState.currentFraction,
-            addressContent = {
-                AddressesContent(
-                    currentFraction = scaffoldState.currentFraction,
-                    stateAddressByPoint=stateAddressByPoint,
-                    navController=navController,
-                    address_from=address_from,
-                    address_to=address_to
+        if(!isSearchState.value){
+            SheetContent (
+                currentFraction=scaffoldState.currentFraction,
+                addressContent = {
+                    AddressesContent(
+                        currentFraction = scaffoldState.currentFraction,
+                        navController=navController,
+                        address_from=address_from,
+                        address_to=address_to,
+                        bottomSheetState=scaffoldState,
+                        isSearchState=isSearchState,
+                        WHICH_ADDRESS=WHICH_ADDRESS,
+                        scope=coroutineScope
+                    )
+                },
+                tariffsContent = {
+                    TariffsContent(
+                        scaffoldState = scaffoldState,
+                        currentFraction = scaffoldState.currentFraction,
+                        selected_tariff=selected_tariff,
+                        stateCalculate=stateCalculate,
+                        address_to=address_to,
+                        stateTariffs=stateTariffs,
+                        tariffListIcons=tariffListIcons,
+                        mainViewModel=mainViewModel,
+                        preferences=preferences,
+                        tariffIcons=tariffIcons
+                    )
+                },
+                optionsContent = {
+                    OptionsContent()
+                },
+                allowancesContent = {
+                    AllowancesContent(
+                        stateAllowances=stateAllowances,
+                        mainViewModel=mainViewModel,
+                        preferences=preferences
+                    )
+                }
+            )
+        }else{
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Color.White,
+                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                    )
+                    .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)) {
+                SearchTextField(
+                    searchText = searchText,
+                    preferences = preferences,
+                    navController = navController,
+                    focusRequester = focusRequester
                 )
-                             },
-            tariffsContent = {
-                TariffsContent(
-                    scaffoldState = scaffoldState,
-                    currentFraction = scaffoldState.currentFraction,
-                    selected_tariff=selected_tariff,
-                    stateCalculate=stateCalculate,
-                    address_to=address_to,
-                    stateTariffs=stateTariffs,
-                    tariffListIcons=tariffListIcons,
-                    mainViewModel=mainViewModel,
-                    preferences=preferences,
-                    tariffIcons=tariffIcons
-                )
-            },
-            optionsContent = {
-                OptionsContent()
-            },
-            allowancesContent = {
-                AllowancesContent(
-                    stateAllowances=stateAllowances,
-                    mainViewModel=mainViewModel,
-                    preferences=preferences
+                SearchResultContent(
+                    searchText = searchText,
+                    focusManager = focusManager,
+                    navController = navController,
+                    isAddressList = isAddressList,
+                    stateSearchAddress = stateSearchAddress,
+                    bottomSheetState = scaffoldState,
+                    isSearchState = isSearchState,
+                    scope = coroutineScope,
+                    mainViewModel = mainViewModel,
+                    WHICH_ADDRESS = WHICH_ADDRESS
                 )
             }
-        )
+        }
     }
 }
 
@@ -142,13 +195,17 @@ fun SheetContent(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AddressesContent(
     currentFraction: Float,
-    stateAddressByPoint: AddressByPointResponseState,
     navController: NavHostController,
     address_from: State<Address?>,
-    address_to: State<MutableList<Address>?>
+    address_to: State<MutableList<Address>?>,
+    bottomSheetState: BottomSheetScaffoldState,
+    WHICH_ADDRESS: MutableState<String>,
+    isSearchState: MutableState<Boolean>,
+    scope: CoroutineScope,
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -156,7 +213,7 @@ fun AddressesContent(
             Color.White,
             shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
         )
-        .padding(horizontal = 20.dp, vertical = 15.dp)
+        .padding(top = 15.dp, bottom = 0.dp + (currentFraction * 15).dp)
     ){
         Row(
             modifier = Modifier
@@ -173,71 +230,64 @@ fun AddressesContent(
         }
         Row(
             modifier = Modifier
-                .fillMaxWidth().padding(top = 10.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            Loader(isLoading = stateAddressByPoint.isLoading)
-            stateAddressByPoint.response?.let { address ->
-                Image(
-                    modifier = Modifier
-                        .width(20.dp)
-                        .height(20.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                    contentDescription = "Logo"
-                )
-            }
-            if(stateAddressByPoint.error != ""){
-                Image(
-                    modifier = Modifier
-                        .width(20.dp)
-                        .height(20.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                    contentDescription = "Logo"
-                )
-            }
-            Spacer(modifier = Modifier.width(30.dp))
-            Column(modifier = Modifier
+                .clickable {
+                    scope.launch {
+                        bottomSheetState.bottomSheetState.expand()
+                        isSearchState.value = true
+                        WHICH_ADDRESS.value = Constants.FROM_ADDRESS
+                    }
+                }
                 .fillMaxWidth()
-                .height(50.dp)
-            ){
-                Text(
-                    address_from.value?.name ?: "",
-                    maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.clickable {
-                    navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/fromAddress")
-                })
-                Spacer(modifier = Modifier.height(20.dp))
-                Divider()
-            }
+                .padding(horizontal = 20.dp, vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                modifier = Modifier
+                    .size(20.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                contentDescription = "Logo"
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Text(
+                address_from.value?.name ?: "",
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 60.dp, end = 20.dp)) {
+            Divider()
         }
         address_to.value?.forEach { address ->
             Row(
                 modifier = Modifier
-                    .fillMaxWidth().padding(top = 10.dp),
-                verticalAlignment = Alignment.Top
+                    .clickable {
+                        scope.launch {
+                            bottomSheetState.bottomSheetState.expand()
+                            isSearchState.value = true
+                            WHICH_ADDRESS.value = Constants.TO_ADDRESS
+                        }
+                    }
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 15.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     modifier = Modifier
-                        .width(20.dp)
-                        .height(20.dp),
+                        .size(20.dp),
                     imageVector = ImageVector.vectorResource(R.drawable.to_marker),
                     contentDescription = "Logo"
                 )
-                Spacer(modifier = Modifier.width(30.dp))
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                ){
-                    Text(
-                        address.name,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.clickable {
-                        navController.navigate("${RoutesName.SEARCH_ADDRESS_SCREEN}/toAddress")
-                    }
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Divider()
-                }
+                Spacer(modifier = Modifier.width(20.dp))
+                Text(
+                    address.name,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
+            }
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 60.dp, end = 20.dp)) {
+                Divider()
             }
         }
     }
@@ -276,7 +326,7 @@ fun TariffsContent(
         ) {
             Text(text = selected_tariff?.value!!.name, fontWeight = FontWeight.Bold, fontSize = 25.sp)
             stateCalculate.response?.let {
-                Text(text = if(address_to.value!![0].name == "Куда?") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
+                Text(text = if(address_to.value!![0].name == "Куда едем?") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
             }
             if (stateCalculate.response == null || stateCalculate.error != ""){
                 CustomPulseLoader(isLoading = true)

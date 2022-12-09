@@ -125,7 +125,7 @@ fun MainBottomSheet(
                             )
                             stateCalculate.response?.let {
                                 Text(
-                                    text = if(address_to.value!![0].name == "Куда?") "от ${it.result.amount} c" else "${it.result.amount} c",
+                                    text = if(address_to.value!![0].name == "Куда едем?") "от ${it.result.amount} c" else "${it.result.amount} c",
                                     modifier = Modifier.padding(end = 10.dp),
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Normal,
