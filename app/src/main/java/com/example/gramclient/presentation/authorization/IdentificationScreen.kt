@@ -1,6 +1,5 @@
 package com.example.gramclient.presentation
 
-import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
@@ -18,10 +17,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,6 +26,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.gramclient.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -38,11 +36,14 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.presentation.components.CustomPulseLoader
+import com.example.gramclient.presentation.components.OTP_VIEW_TYPE_BORDER
+import com.example.gramclient.presentation.components.VerificationFieldsView
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun IdentificationScreen(
@@ -53,14 +54,13 @@ fun IdentificationScreen(
     preferences: SharedPreferences,
     viewModel: AuthViewModel= hiltViewModel()
 ) {
-    var code: List<Char> by remember{ mutableStateOf(listOf())}
     var time: Int by remember{ mutableStateOf(25)}
+    var codes by remember { mutableStateOf("") }
+
+
 
     val coroutineScope= rememberCoroutineScope()
     val stateLogin by viewModel.stateLogin
-
-
-
 
 
     val focusRequesters: List<FocusRequester> = remember {
@@ -123,46 +123,22 @@ fun IdentificationScreen(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(top = 65.dp)
+                .padding(top = 20.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
-                (0 until length).forEach { index ->
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(vertical = 2.dp)
-                            .focusRequester(focusRequesters[index]),
-                        textStyle = MaterialTheme.typography.h4.copy(textAlign = TextAlign.Center),
-                        singleLine = true,
-                        value = code.getOrNull(index)?.takeIf { it.isDigit() }?.toString() ?: "",
-                        onValueChange = { value: String ->
-                            if (focusRequesters[index].freeFocus()) {
-                                val temp = code.toMutableList()
-                                if (value == "") {
-                                    if (temp.size > index) {
-                                        temp.removeAt(index)
-                                    code=temp
-                                        focusRequesters.getOrNull(index - 1)?.requestFocus()
-                                    }
-                                } else {
-                                    if (code.size > index) {
-                                        temp[index] = value.getOrNull(0) ?: ' '
-                                    } else if (value.getOrNull(0)?.isDigit() == true) {
-                                        temp.add(value.getOrNull(0) ?: ' ')
-                                    code = temp
-                                        focusRequesters.getOrNull(index + 1)?.requestFocus() ?: onFilled(
-                                            code.joinToString(separator = "")
-                                        )
-                                    }
-                                }
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Number
-                        ),
-                        )
-                    Spacer(modifier = Modifier.width(16.dp))
-                }
+                VerificationFieldsView(
+                    otpText = codes,
+                    onOtpTextChange = {
+                        codes = it
+                        Log.e("ActualValue", codes)
+                    },
+                    type = OTP_VIEW_TYPE_BORDER,
+                    password = false,
+                    containerSize = 65.dp,
+                    passwordChar = "•",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    charColor = Color.White
+                )
             }
             ErrorMessage(
                 modifier = Modifier
@@ -229,9 +205,9 @@ fun IdentificationScreen(
                 text = "Подтвердить",
                 textSize = 18,
                 textBold = true,
-                enabled = code.size==4,
+                enabled = codes.length==4,
             onClick = {
-                viewModel.identification(code, preferences, navController)
+                viewModel.identification(codes, preferences, navController)
             })
         }
     }
@@ -264,3 +240,4 @@ fun LoadingIndicator(isLoading: Boolean, backgroundColor: Color = Color(0x00E5E5
         }
     }
 }
+

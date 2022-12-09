@@ -27,7 +27,7 @@ fun CustomPulseLoader(isLoading:Boolean, dotSize: Dp = 20.dp, delayUnit:Int = 45
             .size(dotSize)
             .scale(scale)
             .background(
-                color = Color(0xFF1E88E5),
+                color = PrimaryColor,
                 shape = CircleShape
             )
     )

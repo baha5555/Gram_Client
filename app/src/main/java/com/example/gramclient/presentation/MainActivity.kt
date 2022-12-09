@@ -14,9 +14,11 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
@@ -33,6 +35,10 @@ import dagger.hilt.android.AndroidEntryPoint
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private var pressedTime: Long = 0
+
     private lateinit var preferences: SharedPreferences
 
     val FINE_LOCATION_RQ = 101
@@ -46,13 +52,23 @@ class MainActivity : ComponentActivity() {
             GramClientTheme {
                 val messageViewModel= viewModels<MessageViewModel>()
                 val navController= rememberNavController()
-//                profileViewModel.value.getProfileInfo(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
                 Navigation(navController =navController, messageViewModel, preferences)
             }
         }
         checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
         statusCheck()
         preferences=getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onBackPressed() {
+        if (pressedTime + 2000 > System.currentTimeMillis()) {
+            super.onBackPressed()
+            finish()
+        } else {
+            Toast.makeText(getBaseContext(), "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+        }
+        pressedTime = System.currentTimeMillis();
     }
 
     override fun onResume() {

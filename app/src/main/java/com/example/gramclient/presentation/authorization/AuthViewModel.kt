@@ -80,11 +80,11 @@ class AuthViewModel @Inject constructor(
     }
 
     fun identification(
-        sms_code: List<Char>,
+        sms_code: String,
         preferences: SharedPreferences,
         navController: NavHostController
     ){
-        var code=String(sms_code.toCharArray()).toInt()
+        var code=sms_code.toInt()
         identificationUseCase.invoke(preferences.getString(PreferencesName.CLIENT_REGISTER_ID, "").toString(), code).onEach { result: Resource<IdentificationResponse> ->
             when (result) {
                 is Resource.Success -> {
@@ -95,7 +95,7 @@ class AuthViewModel @Inject constructor(
                     preferences.edit()
                         .putString(PreferencesName.ACCESS_TOKEN, response?.result?.access_token)
                         .apply()
-                    navController.navigate(RoutesName.MAIN_SCREEN) {
+                    navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
                         popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
                             inclusive = true
                         }
