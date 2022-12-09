@@ -280,18 +280,17 @@ fun FastAddressCard(
     Column(
         modifier = Modifier
             .width(115.dp)
-            .height(115.dp)
+//            .height(115.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable { }
             .background(color = Color(0xFFCFF5FF), shape = RoundedCornerShape(20.dp))
-            .padding(15.dp)
+            .padding(top = 15.dp, start = 15.dp, end = 15.dp)
     ){
         Text(text = title, color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Bold)
         Text(text = "15 мин", color = Color.Black, fontSize = 12.sp)
         Image(
-            modifier = Modifier,
-            painter = painterResource(R.drawable.car_econom_icon),
-            contentDescription = "icon"
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+            contentDescription = "car_eco",
         )
     }
 }
@@ -312,16 +311,21 @@ fun Services(){
 fun ServicesCard(
     serviceName:String
 ){
-    Column(
+    Row(
         modifier = Modifier
             .width(147.dp)
             .height(30.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable { }
             .border(border = BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(20.dp)),
-        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start
     ){
-        Text(text = serviceName, color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        Image(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
+            contentDescription = "ic_box"
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(text = serviceName, color = Color.Black, fontSize = 14.sp)
     }
 }
 
@@ -370,9 +374,11 @@ fun ToAddressField(
                         .offset((-10).dp, 0.dp)
                 )
                 Icon(
-                    modifier = Modifier.size(24.dp).clickable {
-                        navController.navigate(RoutesName.MAIN_SCREEN)
-                    },
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {
+                            navController.navigate(RoutesName.MAIN_SCREEN)
+                        },
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = "car_eco",
                     tint = Color.White
@@ -424,7 +430,10 @@ fun SearchResultContent(
             isSearchState.value=false
             when(WHICH_ADDRESS.value){
                 Constants.FROM_ADDRESS -> { mainViewModel.updateFromAddress(address) }
-                Constants.TO_ADDRESS -> { mainViewModel.updateToAddress(0, address) }
+                Constants.TO_ADDRESS -> {
+                    mainViewModel.updateToAddress(0, address)
+                    navController.navigate(RoutesName.MAIN_SCREEN)
+                }
             }
         }
     }

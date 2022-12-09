@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.gramclient.ui.theme.BackgroundColor
+import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
 fun CustomDialog(
@@ -48,7 +50,7 @@ fun CustomDialog(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .weight(1f),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFE2EAF2), contentColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = BackgroundColor, contentColor = Color.Black),
                             onClick = { cancelBtnClick() }
                         ) {
                             Text(text = "Нет", fontSize = 18.sp)
@@ -58,10 +60,10 @@ fun CustomDialog(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .weight(1f),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2264D1), contentColor = Color.White),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor, contentColor = Color.White),
                             onClick = { okBtnClick() }
                         ) {
-                            Text(text = "Да", fontSize = 18.sp)
+                            Text(text = "Да", fontSize = 18.sp, color = Color.White)
                         }
                     }
                 }

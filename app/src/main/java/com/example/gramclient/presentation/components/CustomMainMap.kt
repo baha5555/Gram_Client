@@ -67,6 +67,8 @@ fun CustomMainMap(mainViewModel: MainViewModel, navController: NavHostController
             if(currentRoute==RoutesName.MAIN_SCREEN){
                 btnLocation.margin(0f, 0f, 0f, 355f)
                 btnLocation.visibility=View.GONE
+            }else if(currentRoute==RoutesName.SEARCH_DRIVER_SCREEN){
+                btnLocation.visibility=View.GONE
             }
 
 
