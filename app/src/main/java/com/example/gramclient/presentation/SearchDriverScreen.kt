@@ -152,7 +152,9 @@ fun SearchDriverScreen(
                                     contentDescription = "ic_box"
                                 )
                                 Text(
-                                    text = "Аренда авто", fontSize = 12.sp, modifier = Modifier.align(
+                                    text = "Аренда авто",
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.align(
                                         Alignment.Center
                                     )
                                 )
