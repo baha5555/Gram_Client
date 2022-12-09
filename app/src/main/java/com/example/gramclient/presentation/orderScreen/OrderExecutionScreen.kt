@@ -10,6 +10,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.outlined.Message
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +34,7 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.ui.theme.BackgroundColor
+import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -40,7 +47,7 @@ import androidx.compose.material.Divider as Divider1
 fun OrderExecution(
     navController: NavHostController,
     preferences: SharedPreferences,
-    orderExecutionViewModel: OrderExecutionViewModel= hiltViewModel()
+    orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel(),
 ) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -101,7 +108,8 @@ fun OrderExecution(
                             .background(
                                 Color(0xFFffffff),
                             )
-                            .padding(vertical = 15.dp)
+                            .padding(vertical = 15.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
                         Text(
@@ -126,43 +134,34 @@ fun OrderExecution(
                                     )
                                     .padding(vertical = 2.dp, horizontal = 12.dp)
                             ) {
-                                Text(text = "0220KK", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                Text(text = "0220KK",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp)
                             }
                         }
                         Spacer(modifier = Modifier.height(19.dp))
                         Row(
-                            Modifier.fillMaxWidth(),
+                            Modifier.fillMaxWidth(0.8f),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         )
                         {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Card(
-                                    modifier = Modifier
-                                        .size(55.dp),
-                                    elevation = 5.dp,
-                                    shape = RoundedCornerShape(50.dp)
-                                ) {
-                                    Image(
-                                        modifier = Modifier
-                                            .fillMaxSize(),
-                                        painter = painterResource(R.drawable.avatar),
-                                        contentDescription = "icon",
-                                    )
-                                }
+                            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center) {
+                                Image(painter = painterResource(id = R.drawable.avatar),
+                                    "",
+                                    modifier = Modifier.size(55.dp))
                                 Spacer(modifier = Modifier.height(10.dp))
-                                Text(text = "Акбар", color = Color.Gray)
+                                Text(text = "Акбар",
+                                    color = FontSilver,
+                                    textAlign = TextAlign.Center)
                             }
-                            Spacer(modifier = Modifier.width(20.dp))
-
-                            CustomOrderExecutionButton(
-                                onClick = { showGrade = true },
-                                icon = R.drawable.chat_icon,
-                                text = "Написать"
-                            )
-                            Spacer(modifier = Modifier.width(20.dp))
-
-                            CustomOrderExecutionButton(onClick = { }, icon =R.drawable.phone_icon , text ="Позвонить")
+                            CustomCircleButton(text = "Написать", icon = Icons.Outlined.Message) {
+                                showGrade = true
+                            }
+                            CustomCircleButton(text = "Позвонить",
+                                icon = Icons.Default.Phone,
+                                onClick = { })
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         CustomOrderExecutionTextField(
@@ -215,7 +214,8 @@ fun OrderExecution(
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Row(
                                     modifier = Modifier
-                                        .fillMaxWidth().padding( end = 15.dp)
+                                        .fillMaxWidth()
+                                        .padding(end = 15.dp)
                                         .padding(end = 5.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
@@ -232,42 +232,35 @@ fun OrderExecution(
                             secondaryText = "11 сомон",
                             icon = R.drawable.warning_icon
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.requiredHeight(10.dp))
                         Row(
                             Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            CustomOrderExecutionButton(
-                                onClick = {
-                                    isDialogOpen.value = true
-                                },
-                                icon = R.drawable.cancel_icon,
-                                text = "Отменить\nзаказ"
-                            )
+                            CustomCircleButton(text = "Отменить\nзаказ",
+                                icon = Icons.Default.Close) {
+                                isDialogOpen.value = true
+                            }
                             Spacer(modifier = Modifier.width(20.dp))
-                            CustomOrderExecutionButton(
-                                onClick = {
-                                    isDialogOpen.value = true
-                                },
-                                icon = R.drawable.share_icon,
-                                text = "Отправить\nмаршрут"
-                            )
+                            CustomCircleButton(text = "Отправить\nмаршрут",
+                                icon = R.drawable.share_icon) {
+                                isDialogOpen.value = true
+
+                            }
                             Spacer(modifier = Modifier.width(20.dp))
-                            CustomOrderExecutionButton(
-                                onClick = {
-                                    isDialogOpen.value = true
-                                },
-                                icon = R.drawable.safety_icon,
-                                text = "Безопаснос\nть"
-                            )
+                            CustomCircleButton(text = "Безопас-\nность",
+                                icon = R.drawable.safety_icon) {
+                                isDialogOpen.value = true
+
+                            }
                         }
-                        Spacer(modifier = Modifier.padding(vertical = 50.dp))
                     }
+
                 }
             }
         },
-        sheetPeekHeight = 205.dp,
+        sheetPeekHeight = 210.dp,
     ) {
         Box {
             CustomMap()
@@ -322,11 +315,12 @@ fun OrderExecution(
                                             delay(3000)
                                             thumbUpClicked = true
                                             orderExecutionViewModel.sendRating2(
-                                                token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                                                token = preferences.getString(PreferencesName.ACCESS_TOKEN,
+                                                    "").toString(),
                                                 order_id = 590,
-                                                add_rating = ratingState.value*10
+                                                add_rating = ratingState.value * 10
                                             )
-                                            Log.d("balll", ""+ratingState.value*10)
+                                            Log.d("balll", "" + ratingState.value * 10)
                                         }
 
                                     }) {
