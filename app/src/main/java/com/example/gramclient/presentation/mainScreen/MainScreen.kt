@@ -2,25 +2,20 @@ package com.example.gramclient.presentation.mainScreen
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -162,26 +157,48 @@ fun MainScreen(
         sheetPeekHeight = 0.dp,
     ) {
 
-        var expanded by remember { mutableStateOf(false) }
-        val favorite = "2001"
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        var isSearchState = remember{ mutableStateOf(false) }
 
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Scaffold(scaffoldState = scaffoldState, bottomBar = {
-                    BottomBar(
-                        navController, mainBottomSheetState, bottomSheetState,
-                        createOrder = {
-                            mainViewModel.createOrder(preferences)
-                        }
-                    )
+                    if(!isSearchState.value) {
+                        BottomBar(
+                            navController, mainBottomSheetState, bottomSheetState,
+                            createOrder = {
+                                mainViewModel.createOrder(preferences)
+                            }
+                        )
+                    }
                 }) {
-
                     BottomSheetScaffold(
                         sheetBackgroundColor = Color.Transparent,
                         scaffoldState = mainBottomSheetState,
+                        floatingActionButton = {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(start = 30.dp)
+                                    .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
+                                horizontalAlignment = Alignment.Start
+                            ){
+                                FloatingActionButton(
+                                    modifier = Modifier
+                                        .size(50.dp),
+                                    backgroundColor = Color.White,
+                                    onClick = {
+                                        navController.popBackStack()
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Filled.ArrowBack,
+                                        contentDescription = "Menu", tint = Color.Black,
+                                        modifier = Modifier.size(25.dp)
+                                    )
+                                }
+                            }
+                        },
                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                         sheetContent = {
                             MainBottomSheetContent(
@@ -191,11 +208,11 @@ fun MainScreen(
                                 stateTariffs = stateTariffs,
                                 preferences = preferences,
                                 stateAllowances = stateAllowances,
-                                stateAddressByPoint = stateAddressByPoint,
-                                navController = navController
+                                navController = navController,
+                                isSearchState=isSearchState
                             )
                         },
-                        sheetPeekHeight = 355.dp,
+                        sheetPeekHeight = 325.dp,
                     ) {
                         CustomMainMap(navController = navController, mainViewModel = mainViewModel)
                     }

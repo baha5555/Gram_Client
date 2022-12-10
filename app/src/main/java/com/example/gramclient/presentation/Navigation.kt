@@ -4,13 +4,12 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.authorization.AuthorizationScreen
@@ -26,8 +25,8 @@ import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSel
 import com.example.gramclient.presentation.mainScreen.AddressSearchScreen
 import com.example.gramclient.presentation.mainScreen.MainScreen
 import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.mainScreen.SearchAddressScreen
 import com.example.gramclient.presentation.orderScreen.OrderExecution
+
 
 @Composable
 fun Navigation(
@@ -52,6 +51,7 @@ fun Navigation(
                 navController = navController,
                 preferences = preferences
             )
+
         }
         composable(RoutesName.AUTH_SCREEN) {
             AuthorizationScreen(navController, preferences=preferences)
@@ -103,12 +103,6 @@ fun Navigation(
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
             SearchDriverScreen(navController, preferences=preferences)
-        }
-        composable(
-            "${RoutesName.SEARCH_ADDRESS_SCREEN}/{searchId}",
-            arguments = listOf(navArgument("searchId"){type= NavType.StringType})
-        ) {backStackEntry ->
-            SearchAddressScreen(navController, preferences=preferences, string = backStackEntry.arguments?.getString("searchId"))
         }
         composable(RoutesName.SEARCH_ADDRESS_SCREEN) {
             AddressSearchScreen(navController, preferences, mainViewModel)

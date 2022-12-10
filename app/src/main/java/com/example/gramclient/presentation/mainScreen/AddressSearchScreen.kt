@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import com.example.gramclient.presentation.mainScreen.states.SearchAddressRespon
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -106,7 +108,7 @@ import kotlinx.coroutines.launch
                         sheetBackgroundColor = Color.White,
                         scaffoldState = bottomSheetState,
                         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                        sheetGesturesEnabled = false,
+                        sheetGesturesEnabled = !bottomSheetState.bottomSheetState.isCollapsed,
                         sheetContent = {
                             AddressSearchBottomSheet(
                                 navController=navController, isSearchState=isSearchState,
@@ -241,6 +243,7 @@ fun AddressSearchBottomSheet(
                 Services()
             }else{
                 LaunchedEffect(Unit) {
+                    delay(200)
                     focusRequester.requestFocus()
                 }
                 SearchTextField(searchText = searchText, preferences = preferences, navController = navController, focusRequester = focusRequester)
@@ -279,18 +282,17 @@ fun FastAddressCard(
     Column(
         modifier = Modifier
             .width(115.dp)
-            .height(115.dp)
+//            .height(115.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable { }
             .background(color = Color(0xFFCFF5FF), shape = RoundedCornerShape(20.dp))
-            .padding(15.dp)
+            .padding(top = 15.dp, start = 15.dp, end = 15.dp)
     ){
         Text(text = title, color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Bold)
         Text(text = "15 мин", color = Color.Black, fontSize = 12.sp)
         Image(
-            modifier = Modifier,
-            painter = painterResource(R.drawable.car_econom_icon),
-            contentDescription = "icon"
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+            contentDescription = "car_eco",
         )
     }
 }
@@ -311,16 +313,21 @@ fun Services(){
 fun ServicesCard(
     serviceName:String
 ){
-    Column(
+    Row(
         modifier = Modifier
             .width(147.dp)
             .height(30.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable { }
             .border(border = BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(20.dp)),
-        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start
     ){
-        Text(text = serviceName, color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        Image(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
+            contentDescription = "ic_box"
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(text = serviceName, color = Color.Black, fontSize = 14.sp)
     }
 }
 
@@ -335,11 +342,11 @@ fun ToAddressField(
     toAddress: State<MutableList<Address>?>
 ) {
     toAddress.value?.forEach { address ->
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .clip(RoundedCornerShape(percent = 50))
+                .clip(RoundedCornerShape(20.dp))
                 .clickable {
                     scope.launch {
                         bottomSheetState.bottomSheetState.expand()
@@ -347,50 +354,49 @@ fun ToAddressField(
                         WHICH_ADDRESS.value = Constants.TO_ADDRESS
                     }
                 }
-                .background(PrimaryColor, shape = RoundedCornerShape(percent = 50))
-                .padding(vertical = 10.dp, horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .background(PrimaryColor)
+                .padding(horizontal = 5.dp)
         ) {
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                contentDescription = "car_eco",
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    modifier = Modifier,
-                    alignment = Alignment.Center,
-                    imageVector = ImageVector.vectorResource(id = R.drawable.car_econom_icon),
-                    contentDescription = "icon"
-                )
-                Text(
-                    text = address.name,
+                Divider(
                     color = Color.White,
-                    fontSize = 14.sp,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.weight(0.1f)
-            ) {
-                Spacer(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .width(2.dp)
-                        .background(Color.White)
+                        .width(1.dp)
+                        .fillMaxHeight(0.5f)
+                        .offset((-10).dp, 0.dp)
                 )
-                Spacer(modifier = Modifier.width(10.dp))
                 Icon(
-                    modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.MAIN_SCREEN)
-                    },
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {
+                            navController.navigate(RoutesName.MAIN_SCREEN)
+                        },
                     imageVector = Icons.Default.ArrowForward,
-                    contentDescription = "icon",
+                    contentDescription = "car_eco",
                     tint = Color.White
                 )
             }
+            Text(
+                text = address.name,
+                textAlign = TextAlign.Start,
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.Center)
+            )
         }
     }
 }
@@ -426,7 +432,10 @@ fun SearchResultContent(
             isSearchState.value=false
             when(WHICH_ADDRESS.value){
                 Constants.FROM_ADDRESS -> { mainViewModel.updateFromAddress(address) }
-                Constants.TO_ADDRESS -> { mainViewModel.updateToAddress(0, address) }
+                Constants.TO_ADDRESS -> {
+                    mainViewModel.updateToAddress(0, address)
+                    navController.navigate(RoutesName.MAIN_SCREEN)
+                }
             }
         }
     }

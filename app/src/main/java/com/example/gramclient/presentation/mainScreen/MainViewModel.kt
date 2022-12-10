@@ -62,7 +62,7 @@ class MainViewModel @Inject constructor(
 
     val from_address = MutableLiveData<Address>(Address("Откуда?", 0, "", ""))
 
-    private val _to_address = mutableListOf<Address>(Address("Куда?", 0, "", ""))
+    private val _to_address = mutableListOf<Address>(Address("Куда едем?", 0, "", ""))
     val to_address = MutableLiveData<MutableList<Address>>(_to_address)
 
     val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом", 12))
