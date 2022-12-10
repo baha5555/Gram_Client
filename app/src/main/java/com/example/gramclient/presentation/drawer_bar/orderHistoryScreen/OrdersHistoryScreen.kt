@@ -71,7 +71,7 @@ fun OrdersHistoryScreen(
             ) {
                 LazyColumn {
                     items(taxiOrdersNonNull) { item: OrderHistoryResult ->
-                        if (item.status == "Выполнен" || item.status == "Отменён") {
+                        if (item.status == "Выполнен" || item.status == "Отменен") {
                             ListHistoryItem(
                                 status = item.status,
                                 createdAt = item.created_at,
