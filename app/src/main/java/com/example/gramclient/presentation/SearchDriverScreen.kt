@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -15,31 +14,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
+import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomMainMap
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
-import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
-import java.nio.file.Files.size
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchDriverScreen(
     navController: NavHostController,
     mainViewModel: MainViewModel = hiltViewModel(),
-    preferences: SharedPreferences
+    preferences: SharedPreferences,
 ) {
     val searchDriverState = remember {
         mutableStateOf(true)
@@ -124,18 +118,18 @@ fun SearchDriverScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             if (searchDriverState.value) {
-                                RoundedButton(
+                                CustomCircleButton(
                                     text = "Отменить\nзаказ",
                                     icon = Icons.Default.Close
                                 ) {
                                     //Log.d("clicked", "click")
                                 }
                             } else {
-                                RoundedButton(text = "Позвонить", icon = Icons.Default.Phone) {
+                                CustomCircleButton(text = "Позвонить", icon = Icons.Default.Phone) {
                                     //Log.d("clicked", "click")
                                 }
                             }
-                            RoundedButton(text = "Детали", icon = Icons.Default.Menu) {
+                            CustomCircleButton(text = "Детали", icon = Icons.Default.Menu) {
                                 searchDriverState.value = !searchDriverState.value
                             }
                         }
@@ -152,23 +146,31 @@ fun SearchDriverScreen(
                         .clip(shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
                         .background(Color.White)
                 ) {
-                    Box(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(15.dp)
                             .height(50.dp)
                             .clip(RoundedCornerShape(20.dp))
-                            .background(PrimaryColor)
+                            .background(PrimaryColor),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
-                            contentDescription = "car_eco",
-                            modifier = Modifier.align(Alignment.CenterStart)
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                                contentDescription = "car_eco",
+                            )
+                            Text(
+                                text = "Заказать ещё одну машину",
+                                textAlign = TextAlign.Center,
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
                         Row(
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .padding(end = 10.dp),
+                            modifier = Modifier.padding(end = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Divider(
@@ -185,16 +187,7 @@ fun SearchDriverScreen(
                                 tint = Color.White
                             )
                         }
-                        Text(
-                            text = "Заказать ещё одну машину",
-                            textAlign = TextAlign.Center,
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier
-                                .fillMaxWidth(0.7f)
-                                .align(Alignment.Center)
-                        )
+
                     }
 
                     Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
@@ -250,19 +243,6 @@ fun SearchDriverScreen(
             }
         }, sheetPeekHeight = 83.dp
     ) {
-        CustomMainMap(navController=navController, mainViewModel=mainViewModel)
-    }
-}
-
-@Composable
-fun RoundedButton(text: String, icon: ImageVector, onClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        FloatingActionButton(
-            onClick = { onClick.invoke() },
-        ) {
-            Icon(imageVector = icon, "", modifier = Modifier.size(30.dp))
-        }
-        Spacer(modifier = Modifier.requiredHeight(3.dp))
-        Text(text = text, fontSize = 12.sp, color = FontSilver, textAlign = TextAlign.Center)
+        CustomMainMap(navController = navController, mainViewModel = mainViewModel)
     }
 }
