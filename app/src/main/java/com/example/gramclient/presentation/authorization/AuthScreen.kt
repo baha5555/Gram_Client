@@ -31,12 +31,10 @@ import com.example.gramclient.ui.theme.BackgroundColor
 @Composable
 fun AuthorizationScreen(
     navController: NavHostController,
-    viewModel: AuthViewModel = hiltViewModel(),
+    viewModel: AuthViewModel,
     preferences: SharedPreferences
 ) {
     val phone = remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
     val nextBtnEnabled = remember {
         mutableStateOf(false)
     }
@@ -157,7 +155,7 @@ fun AuthorizationScreen(
                     textSize = 18,
                     textBold = true,
                 ) {
-                    viewModel.authorization(phone.value.toInt(), preferences, navController)
+                    viewModel.authorization(phone.value.toInt(), navController)
                 }
             }
         }

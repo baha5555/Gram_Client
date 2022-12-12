@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -12,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.authorization.AuthorizationScreen
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageScreen
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
@@ -33,9 +33,10 @@ fun Navigation(
     navController: NavHostController,
     messageViewModel: Lazy<MessageViewModel>,
     preferences: SharedPreferences,
-    mainViewModel: MainViewModel= hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel
 
-    ) {
+) {
     NavHost(
         navController = navController,
         startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
@@ -47,14 +48,14 @@ fun Navigation(
         composable(RoutesName.IDENTIFICATION_SCREEN) {
             IdentificationScreen(
                 modifier = Modifier.fillMaxWidth(),
-                onFilled = { Log.d("Tag", "Hello") },
                 navController = navController,
-                preferences = preferences
+                preferences = preferences,
+                viewModel = authViewModel
             )
 
         }
         composable(RoutesName.AUTH_SCREEN) {
-            AuthorizationScreen(navController, preferences=preferences)
+            AuthorizationScreen(navController, preferences=preferences, viewModel = authViewModel)
         }
         composable(RoutesName.MAIN_SCREEN) {
             MainScreen(navController, preferences, mainViewModel)
