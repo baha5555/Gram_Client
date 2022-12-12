@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -19,17 +20,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.gramclient.PreferencesName
+import com.example.gramclient.SmsBroadcastReceiver
 import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
-import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
-import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
+import com.google.android.gms.auth.api.phone.SmsRetriever
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 
 
 @Suppress("DEPRECATION")
@@ -40,6 +44,12 @@ class MainActivity : ComponentActivity() {
     private var pressedTime: Long = 0
 
     private lateinit var preferences: SharedPreferences
+    private lateinit var authViewModel: AuthViewModel
+    private lateinit var navController: NavHostController
+    private lateinit var scope: CoroutineScope
+
+    private val REQ_USER_CONSENT = 200
+    var smsBroadcastReceiver: SmsBroadcastReceiver? = null
 
     val FINE_LOCATION_RQ = 101
     val CAMERA_RQ = 102
@@ -51,13 +61,64 @@ class MainActivity : ComponentActivity() {
         setContent {
             GramClientTheme {
                 val messageViewModel= viewModels<MessageViewModel>()
-                val navController= rememberNavController()
-                Navigation(navController =navController, messageViewModel, preferences)
+                authViewModel = hiltViewModel()
+                 navController= rememberNavController()
+                scope= rememberCoroutineScope()
+                Navigation(navController =navController, messageViewModel, preferences, authViewModel=authViewModel)
             }
         }
+        startSmartUserConsent()
         checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
         statusCheck()
         preferences=getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
+
+    }
+
+    private fun startSmartUserConsent() {
+        val client = SmsRetriever.getClient(this)
+        client.startSmsUserConsent(null)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQ_USER_CONSENT) {
+            if (resultCode == RESULT_OK && data != null) {
+                val message = data.getStringExtra(SmsRetriever.EXTRA_SMS_MESSAGE)
+                if (message != null) {
+                    getOtpFromMessage(message, authViewModel = authViewModel)
+                }
+            }
+        }
+    }
+
+    private fun getOtpFromMessage(message: String, authViewModel:AuthViewModel) {
+        var code = message.filter { it.isDigit() }
+        Log.e("setEditValue", code)
+        authViewModel.setCodeAutomaticly(code, preferences, navController, scope)
+    }
+
+    private fun registerBroadcastReceiver() {
+        smsBroadcastReceiver = SmsBroadcastReceiver()
+        smsBroadcastReceiver!!.smsBroadcastReceiverListener =
+            object : SmsBroadcastReceiver.SmsBroadcastReceiverListener {
+                override fun onSuccess(intent: Intent?) {
+                    startActivityForResult(intent, REQ_USER_CONSENT)
+                }
+
+                override fun onFailure() {}
+            }
+        val intentFilter = IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION)
+        registerReceiver(smsBroadcastReceiver, intentFilter)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerBroadcastReceiver()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(smsBroadcastReceiver)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)

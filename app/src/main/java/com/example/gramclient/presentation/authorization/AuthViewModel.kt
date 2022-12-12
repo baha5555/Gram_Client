@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -16,10 +17,12 @@ import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.athorization.IdentificationUseCase
 import com.example.gramclient.presentation.authorization.states.AuthResponseState
 import com.example.gramclient.presentation.authorization.states.IdentificationResponseState
-import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -31,19 +34,30 @@ class AuthViewModel @Inject constructor(
 
 
 
-     val _stateAuth = mutableStateOf(AuthResponseState())
+    private val _stateAuth = mutableStateOf(AuthResponseState())
     val stateAuth: State<AuthResponseState> = _stateAuth
-
 
     private val _stateLogin = mutableStateOf(IdentificationResponseState())
     val stateLogin: State<IdentificationResponseState> = _stateLogin
 
+    val smsCode=MutableLiveData("")
+    val client_regiter_id=MutableLiveData("")
+    val phoneNumber=MutableLiveData("")
 
+    fun setCodeAutomaticly(code:String, preferences:SharedPreferences, navController: NavHostController, scope:CoroutineScope){
+        scope.launch {
+            smsCode.value = code
+            delay(2000)
+            identification(smsCode.value!!, client_regiter_id.value!!, preferences, navController)
+        }
+    }
 
-    fun authorization(phone: Int, preferences: SharedPreferences, navController: NavHostController){
-        preferences.edit()
-            .putString(PreferencesName.PHONE_NUMBER, phone.toString())
-            .apply()
+    fun updateCode(code: String){
+        smsCode.value=code
+    }
+
+    fun authorization(phone: Int, navController: NavHostController){
+        phoneNumber.value=phone.toString()
         authUseCase.invoke(phone).onEach { result: Resource<AuthResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -52,11 +66,7 @@ class AuthViewModel @Inject constructor(
                         _stateAuth.value =
                             AuthResponseState(response = response)
                         Log.e("TariffsResponse", "AuthResponse->\n ${_stateAuth.value}")
-                        if (response != null) {
-                            preferences.edit()
-                                .putString(PreferencesName.CLIENT_REGISTER_ID, response.result.client_register_id)
-                                .apply()
-                        }
+                        client_regiter_id.value=response?.result?.client_register_id
                         navController.navigate(RoutesName.IDENTIFICATION_SCREEN) {
                             popUpTo(RoutesName.AUTH_SCREEN) {
                                 inclusive = true
@@ -81,11 +91,12 @@ class AuthViewModel @Inject constructor(
 
     fun identification(
         sms_code: String,
+        client_regiter_id:String,
         preferences: SharedPreferences,
         navController: NavHostController
     ){
         var code=sms_code.toInt()
-        identificationUseCase.invoke(preferences.getString(PreferencesName.CLIENT_REGISTER_ID, "").toString(), code).onEach { result: Resource<IdentificationResponse> ->
+        identificationUseCase.invoke(client_regiter_id, code).onEach { result: Resource<IdentificationResponse> ->
             when (result) {
                 is Resource.Success -> {
                     val response = result.data
@@ -100,6 +111,7 @@ class AuthViewModel @Inject constructor(
                             inclusive = true
                         }
                     }
+                    smsCode.value=""
                 }
                 is Resource.Error -> {
                     Log.e("authresponse", "authresponseError->\n ${result.message}")
