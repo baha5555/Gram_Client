@@ -243,6 +243,10 @@ fun SearchDriverScreen(
             }
         }, sheetPeekHeight = 83.dp
     ) {
-        CustomMainMap(navController = navController, mainViewModel = mainViewModel)
+        CustomMainMap(
+            mainViewModel = mainViewModel,
+            navController = navController,
+            preferences = preferences
+        )
     }
 }

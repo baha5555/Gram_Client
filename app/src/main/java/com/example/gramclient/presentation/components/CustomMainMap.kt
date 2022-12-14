@@ -2,112 +2,314 @@
 
 package com.example.gramclient.presentation.components
 
+import TwoFingerDrag
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.content.SharedPreferences
+import android.graphics.*
 import android.preference.PreferenceManager
+import android.util.Log
 import android.util.TypedValue
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.map.UserTouchSurface
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 private lateinit var map: MapView
+
+private lateinit var userTouchSurface: UserTouchSurface
 private var requiredCenter: GeoPoint? = null
 lateinit var mRotationGestureOverlay: RotationGestureOverlay
 lateinit var mLocationOverlay: MyLocationNewOverlay
 
 @Composable
-fun CustomMainMap(mainViewModel: MainViewModel, navController: NavHostController) {
+fun CustomMainMap(
+    mainViewModel: MainViewModel,
+    navController: NavHostController,
+    preferences: SharedPreferences
+) {
 
-    val fromAddress=mainViewModel.from_address.observeAsState()
-    val toAddress=mainViewModel.to_address.observeAsState()
+    val toAddress by mainViewModel.toAddress
+    val fromAddress by mainViewModel.fromAddress
 
-    AndroidView(factory = {
-        View.inflate(it, R.layout.map, null)
+    val context= LocalContext.current
+    val startPointForMarker=remember{ mutableStateOf(GeoPoint(if(toAddress[0].lat != "") toAddress[0].lat.toDouble() else 40.27803692395751, if(toAddress[0].lng != "") toAddress[0].lng.toDouble() else 69.62923931506361)) }
+    val zoomLevel=remember{ mutableStateOf(18.0) }
 
-    },
+    AndroidView(
+        factory = {
+            View.inflate(it, R.layout.map, null)
+        },
         update = {
-            //val roadManager:RoadManager=OSRMRoadManager(it.context, "GramDriver/1.0")
             map = it.findViewById(R.id.map)
+            userTouchSurface=it.findViewById(R.id.userTouchSurface)
+
+
             val btnLocation = it.findViewById<ImageButton>(R.id.btnLocation)
+            val getAddressMarker = it.findViewById<ImageView>(R.id.getAddressMarker)
+            val centerTarget = it.findViewById<ImageView>(R.id.center_target)
             val currentRoute = navController.currentBackStackEntry?.destination?.route
+
+            //Checking current route
             if(currentRoute==RoutesName.MAIN_SCREEN){
                 btnLocation.margin(0f, 0f, 0f, 355f)
                 btnLocation.visibility=View.GONE
-            }else if(currentRoute==RoutesName.SEARCH_DRIVER_SCREEN){
-                btnLocation.visibility=View.GONE
+                getAddressMarker.visibility=View.GONE
+                centerTarget.visibility=View.GONE
+
+                Configuration.getInstance().load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
+                map.setTileSource(TileSourceFactory.MAPNIK)
+                val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
+                val mapController = map.controller
+                mapController.setZoom(18.0)
+                map.controller.setCenter(startPoint)
+
+                mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
+                mRotationGestureOverlay.isEnabled = false
+
+                map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                map.setMultiTouchControls(true)
+
+                map.minZoomLevel = 10.0
+                map.maxZoomLevel = 24.0
+
+                val myLocationProvider = GpsMyLocationProvider(it.context)
+                mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
+                myLocationShow(it.context, mLocationOverlay)
+                btnLocation.setOnClickListener {
+                    try {
+                        if (map.overlays.contains(mLocationOverlay)) {
+                            val myLocation: GeoPoint = mLocationOverlay.myLocation
+                            if (myLocation.latitude != 0.0 && myLocation.longitude != 0.0) {
+                                //Log.d("MyApp3", "jumpToLocation " + myLocation.getLatitude() + ";" + myLocation.getLongitude());
+                                jump(myLocation)
+                                return@setOnClickListener
+                            }
+                        }
+                    } catch (_: Exception) {
+                    }
+                }
+                map.overlays.clear()
+                addOverlays()
+                showRoadAB(it.context, fromAddress, toAddress)
+
             }
+            else if(currentRoute==RoutesName.SEARCH_DRIVER_SCREEN) {
+                btnLocation.visibility = View.GONE
+                getAddressMarker.visibility=View.GONE
+                centerTarget.visibility=View.GONE
 
+                Configuration.getInstance().load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
+                map.setTileSource(TileSourceFactory.MAPNIK)
+                val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
+                val mapController = map.controller
+                mapController.setZoom(18.0)
+                map.controller.setCenter(startPoint)
 
-            Configuration.getInstance()
-                .load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
-            map.setTileSource(TileSourceFactory.MAPNIK)
-            val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
-            val mapController = map.controller
-            mapController.setZoom(18.0)
-            map.controller.setCenter(startPoint)
+                mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
+                mRotationGestureOverlay.isEnabled = false
 
-            mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
-            mRotationGestureOverlay.isEnabled = true
+                map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                map.setMultiTouchControls(true)
 
-            map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-            map.setMultiTouchControls(true)
+                map.minZoomLevel = 10.0
+                map.maxZoomLevel = 24.0
 
-            map.minZoomLevel = 10.0
-            map.maxZoomLevel = 24.0
+                val myLocationProvider = GpsMyLocationProvider(it.context)
+                mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
+                myLocationShow(it.context, mLocationOverlay)
+                btnLocation.setOnClickListener {
+                    try {
+                        if (map.overlays.contains(mLocationOverlay)) {
+                            val myLocation: GeoPoint = mLocationOverlay.myLocation
+                            if (myLocation.latitude != 0.0 && myLocation.longitude != 0.0) {
+                                //Log.d("MyApp3", "jumpToLocation " + myLocation.getLatitude() + ";" + myLocation.getLongitude());
+                                jump(myLocation)
+                                return@setOnClickListener
+                            }
+                        }
+                    } catch (_: Exception) {
+                    }
+                }
+                map.overlays.clear()
+                addOverlays()
+                showRoadAB(it.context, fromAddress, toAddress)
+            }
+            else if(currentRoute==RoutesName.SEARCH_ADDRESS_SCREEN){
 
-            val myLocationProvider = GpsMyLocationProvider(it.context)
-            mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
-            myLocationShow(it.context, mLocationOverlay)
-            btnLocation.setOnClickListener {
-                try {
-                    if (map.overlays.contains(mLocationOverlay)) {
-                        val myLocation: GeoPoint = mLocationOverlay.myLocation
-                        if (myLocation.latitude != 0.0 && myLocation.longitude != 0.0) {
-                            //Log.d("MyApp3", "jumpToLocation " + myLocation.getLatitude() + ";" + myLocation.getLongitude());
-                            jump(myLocation)
-                            return@setOnClickListener
+                Configuration.getInstance().load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
+                map.setTileSource(TileSourceFactory.MAPNIK)
+                val startPoint = startPointForMarker.value
+                val mapController = map.controller
+                mapController.setZoom(zoomLevel.value)
+                map.controller.setCenter(startPoint)
+
+                mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
+                mRotationGestureOverlay.isEnabled = false
+
+                map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                map.setMultiTouchControls(true)
+
+                map.minZoomLevel = 10.0
+                map.maxZoomLevel = 24.0
+
+                val myLocationProvider = GpsMyLocationProvider(it.context)
+                mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
+                myLocationShow(it.context, mLocationOverlay)
+                btnLocation.setOnClickListener {
+                    try {
+                        if (map.overlays.contains(mLocationOverlay)) {
+                            val myLocation: GeoPoint = mLocationOverlay.myLocation
+                            if (myLocation.latitude != 0.0 && myLocation.longitude != 0.0) {
+                                //Log.d("MyApp3", "jumpToLocation " + myLocation.getLatitude() + ";" + myLocation.getLongitude());
+                                jump(myLocation)
+                                return@setOnClickListener
+                            }
+                        }
+                    } catch (_: Exception) {
+                    }
+                }
+
+                map.overlays.clear()
+                addOverlays()
+
+//                val matrixA = ColorMatrix()
+//                matrixA.setSaturation(0.9f)
+//                val matrixB = ColorMatrix()
+//                matrixB.setScale(1.12f, 1.13f, 1.13f, 1.0f)
+//                matrixA.setConcat(matrixB, matrixA)
+//                val filter = ColorMatrixColorFilter(matrixA)
+//                map.overlayManager.tilesOverlay.setColorFilter(filter)
+
+                userTouchSurface.setCallback(TwoFingerDrag(context, object : TwoFingerDrag.Listener {
+                    override fun onOneFinger(event: MotionEvent?) {
+                        map.dispatchTouchEvent(event)
+                        if (event != null) {
+                            when (event.action) {
+                                MotionEvent.ACTION_MOVE-> {
+                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
+                                }
+                                MotionEvent.ACTION_DOWN -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was DOWN")
+
+                                }
+                                MotionEvent.ACTION_UP -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was UP")
+                                    mainViewModel.getAddressFromMap(
+                                        preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                                        map.mapCenter.longitude, map.mapCenter.latitude
+                                    )
+                                    Log.e("singleTapConfirmedHelper", "${toAddress}")
+                                    map.postInvalidate()
+                                    startPointForMarker.value=GeoPoint(map.mapCenter.latitude, map.mapCenter.longitude)
+                                    zoomLevel.value=map.zoomLevelDouble
+                                }
+                                MotionEvent.ACTION_CANCEL -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was CANCEL")
+
+                                }
+                                MotionEvent.ACTION_OUTSIDE -> {
+                                    Log.e("singleTapConfirmedHelper", "Movement occurred outside bounds of current screen element")
+
+                                }
+                                else-> {
+                                    Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
+                                }
+                            }
                         }
                     }
-                } catch (_: Exception) {
-                }
+                    override fun onTwoFingers(event: MotionEvent?) {
+                        map.dispatchTouchEvent(event)
+                        if (event != null) {
+                            when (event.action) {
+                                MotionEvent.ACTION_MOVE-> {
+                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
+                                }
+                                MotionEvent.ACTION_DOWN -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was DOWN")
+
+                                }
+                                MotionEvent.ACTION_UP -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was UP")
+                                    mainViewModel.getAddressFromMap(
+                                        preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                                        map.mapCenter.longitude, map.mapCenter.latitude
+                                    )
+                                }
+                                MotionEvent.ACTION_CANCEL -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was CANCEL")
+
+                                }
+                                MotionEvent.ACTION_POINTER_DOWN -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was ACTION_POINTER_DOWN")
+
+                                }
+                                MotionEvent.ACTION_OUTSIDE -> {
+                                    Log.e("singleTapConfirmedHelper", "Movement occurred outside bounds of current screen element")
+                                }
+                                else-> {
+                                    Log.e("singleTapConfirmedHelper", "111")
+                                }
+                            }
+                        }
+                    }
+                }))
+
+                map.overlays.add(MapEventsOverlay(object : MapEventsReceiver {
+                    override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+//                        Toast.makeText(context, "${p.longitude}-${p.latitude}", Toast.LENGTH_SHORT).show()
+                        map.postInvalidate()
+                        startPointForMarker.value=GeoPoint(p.latitude, p.longitude)
+                        mainViewModel.getAddressFromMap(
+                            preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                            p.longitude, p.latitude
+                        )
+                        zoomLevel.value=map.zoomLevelDouble
+                        return true
+                    }
+                    override fun longPressHelper(p: GeoPoint): Boolean {
+                        return false
+                    }
+                    })
+                )
             }
-            map.overlays.clear()
-            addOverlays()
-            showRoadAB(it.context, fromAddress, toAddress)
         }
     )
 }
@@ -120,8 +322,8 @@ fun addOverlays() {
 @OptIn(DelicateCoroutinesApi::class)
 fun showRoadAB(
     context: Context,
-    fromAddress: State<Address?>,
-    toAddress: State<MutableList<Address>?>,
+    fromAddress: Address,
+    toAddress: List<Address>,
 ) {
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
     GlobalScope.launch {
@@ -131,15 +333,15 @@ fun showRoadAB(
 //            val startPoint2 = GeoPoint(41.27803692395751, 70.62923931506361)
             val fromAddressPoint: GeoPoint = GeoPoint(0, 0)
             fromAddressPoint.latitude =
-                fromAddress.value?.lat?.toDouble() ?: 0.0
+                fromAddress.lat.toDouble() ?: 0.0
             fromAddressPoint.longitude =
-                fromAddress.value?.lng?.toDouble() ?: 0.0
+                fromAddress.lng.toDouble() ?: 0.0
             waypoints.add(fromAddressPoint)
 
 
             val toAddressesPoints = ArrayList<GeoPoint>()
             val toAddressesNames = ArrayList<String>()
-            toAddress.value?.forEach { address ->
+            toAddress.forEach { address ->
                 val toAddressPoint: GeoPoint = GeoPoint(0, 0)
                 toAddressPoint.latitude = address.lat.toDouble()
                 toAddressPoint.longitude = address.lng.toDouble()
@@ -162,7 +364,7 @@ fun showRoadAB(
 
             map.overlays.add(roadOverlay)
             if (fromAddressPoint != toAddressesPoints[0]) {
-                fromAddress.value?.let {
+                fromAddress.let {
                     addMarker(
                         context,
                         map,
@@ -329,3 +531,27 @@ inline fun <reified T : ViewGroup.LayoutParams> View.layoutParams(block: T.() ->
 fun View.dpToPx(dp: Float): Int = context.dpToPx(dp)
 fun Context.dpToPx(dp: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
 
+//class MapEventsReceiverImpl : MapEventsReceiver {
+//    var lat=0.0
+//    var lng=0.0
+//
+//    fun getLocation(lat:Double, lng:Double):MapLocation{
+//        return MapLocation(lat, lng)
+//    }
+//
+//    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+//        lat=p?.latitude ?: 0.0
+//        lng=p?.longitude ?: 0.0
+//        Log.e("singleTapConfirmedHelper", "${lat} - ${lng}")
+//        getLocation(lat, lng)
+//        return true
+//    }
+//    override fun longPressHelper(p: GeoPoint?): Boolean {
+//        Log.e("longPressHelper", "${p?.latitude} - ${p?.longitude}")
+//        return false
+//    }
+//    data class MapLocation(
+//        val latitude: Double,
+//        val longitude: Double
+//    )
+//}
