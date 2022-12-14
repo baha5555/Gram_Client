@@ -14,39 +14,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.presentation.components.CustomCircleButton
-import com.example.gramclient.presentation.components.CustomTopBar
-import com.example.gramclient.presentation.drawer_bar.myaddresses_screen.ListAddressesShow
-import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
 fun SupportScreen(navController: NavHostController) {
-    val stateContent = remember {
-        mutableStateOf(false)
-    }
-    val stateContent2 = remember {
-        mutableStateOf(false)
-    }
+    val stateContent = remember { mutableStateOf("") }
+
     Scaffold(topBar = {
         TopAppBar(backgroundColor = colorResource(id = R.color.white)) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 //Back
                 Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        if (stateContent.value.isNotEmpty()) stateContent.value = ""
+                        else navController.popBackStack()
+                    }) {
                         Image(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_back),
                             contentDescription = "back"
@@ -72,64 +63,73 @@ fun SupportScreen(navController: NavHostController) {
 
                 }
                 CustomCircleButton(text = "Доверенные\nконтакты", icon = R.drawable.ic_contact) {
-
+                    stateContent.value = "Contact"
                 }
                 CustomCircleButton(text = "Скорая \nи полиция", icon = R.drawable.ic_alarm_light) {
-
+                    stateContent.value = "AmbulancePolice"
                 }
 
             }
         }
-        showContent()
-
+        when( stateContent.value){
+            "Contact"->{showContent(
+                "Доверенные контакты", "Эти контакты всегда будут под рукой. Сможете\n" +
+                        "отправить им ваш маршрут и просьбу\n" +
+                        "позвонить.",
+                "Добавить контакт", PrimaryColor, R.drawable.ic_contact
+            )}
+            "AmbulancePolice"->{showContent(
+                "Скорая и полиция", "Приготовьтесь рассказать, что призошло и где\n" +
+                        "вы находитесь.", "Позвонить", Color(0xFFF93E2B), R.drawable.ic_alarm_light
+            )}
+        }
     }
 }
 
 @Composable
-fun showContent() {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)
-        .padding(20.dp),
+private fun showContent(title: String, text: String, textBtn: String, color: Color, icon: Int) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(20.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_contact),
+                    imageVector = ImageVector.vectorResource(icon),
                     contentDescription = "",
                     tint = Color.White,
                     modifier = Modifier
                         .size(50.dp)
                         .clip(RoundedCornerShape(100))
-                        .background(PrimaryColor)
+                        .background(color)
                         .padding(8.dp)
                 )
                 Text(
-                    text = "Доверенные контакты",
+                    text = title,
                     fontSize = 24.sp,
-                    color = PrimaryColor,
-                    modifier = Modifier.padding(start=10.dp)
+                    color = com.example.gramclient.ui.theme.PrimaryColor,
+                    modifier = Modifier.padding(start = 10.dp)
                 )
             }
             Spacer(modifier = Modifier.requiredHeight(20.dp))
-            Text(text = "Эти контакты всегда будут под рукой. Сможете\n" +
-                    "отправить им ваш маршрут и просьбу\n" +
-                    "позвонить.", fontSize = 15.sp)
+            Text(
+                text = text, fontSize = 15.sp
+            )
         }
-        Button(
-            onClick = { /*TODO*/ },
+
+        CustomButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(57.dp),
-            shape = RoundedCornerShape(15.dp)
+            text = textBtn,
+            textSize = 16,
+            textBold = true,
+            color = color
         ) {
-            Text(
-                text = "Сохранить",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White
-            )
+
         }
     }
 }
