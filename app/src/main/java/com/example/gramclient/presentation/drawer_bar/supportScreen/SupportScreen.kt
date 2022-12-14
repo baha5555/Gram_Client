@@ -8,6 +8,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +35,12 @@ import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
 fun SupportScreen(navController: NavHostController) {
+    val stateContent = remember {
+        mutableStateOf(false)
+    }
+    val stateContent2 = remember {
+        mutableStateOf(false)
+    }
     Scaffold(topBar = {
         TopAppBar(backgroundColor = colorResource(id = R.color.white)) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -72,6 +80,56 @@ fun SupportScreen(navController: NavHostController) {
 
             }
         }
+        showContent()
 
+    }
+}
+
+@Composable
+fun showContent() {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.White)
+        .padding(20.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_contact),
+                    contentDescription = "",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(RoundedCornerShape(100))
+                        .background(PrimaryColor)
+                        .padding(8.dp)
+                )
+                Text(
+                    text = "Доверенные контакты",
+                    fontSize = 24.sp,
+                    color = PrimaryColor,
+                    modifier = Modifier.padding(start=10.dp)
+                )
+            }
+            Spacer(modifier = Modifier.requiredHeight(20.dp))
+            Text(text = "Эти контакты всегда будут под рукой. Сможете\n" +
+                    "отправить им ваш маршрут и просьбу\n" +
+                    "позвонить.", fontSize = 15.sp)
+        }
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(57.dp),
+            shape = RoundedCornerShape(15.dp)
+        ) {
+            Text(
+                text = "Сохранить",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )
+        }
     }
 }
