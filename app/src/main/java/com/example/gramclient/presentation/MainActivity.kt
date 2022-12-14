@@ -68,8 +68,8 @@ class MainActivity : ComponentActivity() {
             }
         }
         startSmartUserConsent()
-        checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
-        statusCheck()
+//        checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
+//        statusCheck()
         preferences=getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
 
     }
@@ -132,16 +132,16 @@ class MainActivity : ComponentActivity() {
         pressedTime = System.currentTimeMillis();
     }
 
-    override fun onResume() {
-        super.onResume()
-        checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
-        statusCheck()
-    }
-    override fun onRestart() {
-        super.onRestart()
-        checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
-        statusCheck()
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
+//        statusCheck()
+//    }
+//    override fun onRestart() {
+//        super.onRestart()
+//        checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
+//        statusCheck()
+//    }
 
     fun statusCheck() {
         val manager = getSystemService(LOCATION_SERVICE) as LocationManager

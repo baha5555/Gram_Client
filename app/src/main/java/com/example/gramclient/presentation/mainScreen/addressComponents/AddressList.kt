@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -24,7 +26,6 @@ import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.domain.mainScreen.order.AddressModel
 import com.example.gramclient.presentation.MainActivity
-import com.example.gramclient.presentation.components.Loader
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
 import java.util.*
@@ -66,5 +67,11 @@ fun AddressList(
                    }
                }
            }
+    }
+}
+@Composable
+fun Loader(isLoading:Boolean){
+    if(isLoading){
+        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color(0xFF1E88E5))
     }
 }

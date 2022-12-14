@@ -28,7 +28,6 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.Constants
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.presentation.mainScreen.MainViewModel
@@ -60,8 +59,8 @@ fun MainBottomSheetContent(
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
 
 
-    val address_from=mainViewModel.from_address.observeAsState()
-    val address_to=mainViewModel.to_address.observeAsState()
+    val fromAddress by mainViewModel.fromAddress
+    val toAddress by mainViewModel.toAddress
     val selected_tariff=mainViewModel.selectedTariff?.observeAsState()
 
     var WHICH_ADDRESS = remember{ mutableStateOf("") }
@@ -88,27 +87,27 @@ fun MainBottomSheetContent(
                 addressContent = {
                     AddressesContent(
                         currentFraction = scaffoldState.currentFraction,
-                        navController=navController,
-                        address_from=address_from,
-                        address_to=address_to,
-                        bottomSheetState=scaffoldState,
-                        isSearchState=isSearchState,
-                        WHICH_ADDRESS=WHICH_ADDRESS,
-                        scope=coroutineScope
+                        navController =navController,
+                        address_from =fromAddress,
+                        address_to =toAddress,
+                        bottomSheetState =scaffoldState,
+                        isSearchState =isSearchState,
+                        WHICH_ADDRESS =WHICH_ADDRESS,
+                        scope =coroutineScope
                     )
                 },
                 tariffsContent = {
                     TariffsContent(
                         scaffoldState = scaffoldState,
                         currentFraction = scaffoldState.currentFraction,
-                        selected_tariff=selected_tariff,
-                        stateCalculate=stateCalculate,
-                        address_to=address_to,
-                        stateTariffs=stateTariffs,
-                        tariffListIcons=tariffListIcons,
-                        mainViewModel=mainViewModel,
-                        preferences=preferences,
-                        tariffIcons=tariffIcons
+                        selected_tariff =selected_tariff,
+                        stateCalculate =stateCalculate,
+                        address_to =toAddress,
+                        stateTariffs =stateTariffs,
+                        tariffListIcons =tariffListIcons,
+                        mainViewModel =mainViewModel,
+                        preferences =preferences,
+                        tariffIcons =tariffIcons
                     )
                 },
                 optionsContent = {
@@ -146,7 +145,6 @@ fun MainBottomSheetContent(
                     focusManager = focusManager,
                     navController = navController,
                     isAddressList = isAddressList,
-                    stateSearchAddress = stateSearchAddress,
                     bottomSheetState = scaffoldState,
                     isSearchState = isSearchState,
                     scope = coroutineScope,
@@ -202,8 +200,8 @@ fun SheetContent(
 fun AddressesContent(
     currentFraction: Float,
     navController: NavHostController,
-    address_from: State<Address?>,
-    address_to: State<MutableList<Address>?>,
+    address_from: Address,
+    address_to: List<Address>,
     bottomSheetState: BottomSheetScaffoldState,
     WHICH_ADDRESS: MutableState<String>,
     isSearchState: MutableState<Boolean>,
@@ -251,7 +249,7 @@ fun AddressesContent(
             )
             Spacer(modifier = Modifier.width(20.dp))
             Text(
-                address_from.value?.name ?: "",
+                address_from.name,
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
         }
@@ -260,7 +258,7 @@ fun AddressesContent(
             .padding(start = 60.dp, end = 20.dp)) {
             Divider()
         }
-        address_to.value?.forEach { address ->
+        address_to.forEach { address ->
             Row(
                 modifier = Modifier
                     .clickable {
@@ -302,7 +300,7 @@ fun TariffsContent(
     scaffoldState: BottomSheetScaffoldState,
     selected_tariff: State<TariffsResult?>?,
     stateCalculate: CalculateResponseState,
-    address_to: State<MutableList<Address>?>,
+    address_to: List<Address>,
     stateTariffs: TariffsResponseState,
     tariffListIcons: Array<Int>,
     mainViewModel: MainViewModel,
@@ -328,7 +326,7 @@ fun TariffsContent(
         ) {
             Text(text = selected_tariff?.value!!.name, fontWeight = FontWeight.Bold, fontSize = 25.sp)
             stateCalculate.response?.let {
-                Text(text = if(address_to.value!![0].name == "Куда едем?") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
+                Text(text = if(address_to[0].name == "") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
             }
             if (stateCalculate.response == null || stateCalculate.error != ""){
                 CustomPulseLoader(isLoading = true)
@@ -360,7 +358,7 @@ fun TariffsContent(
                                 mainViewModel.getAllowancesByTariffId(
                                     preferences.getString(
                                         PreferencesName.ACCESS_TOKEN, ""
-                                    ).toString(), selected_tariff?.value?.id ?: 1
+                                    ).toString(), tariff.id
                                 )
                                 mainViewModel.updateSelectedTariff(tariff, preferences)
                             })
