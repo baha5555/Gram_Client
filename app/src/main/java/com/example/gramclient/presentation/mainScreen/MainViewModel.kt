@@ -13,16 +13,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
-import com.example.gramclient.data.AppRepositoryImpl
-import com.example.gramclient.domain.athorization.AuthUseCase
-import com.example.gramclient.domain.athorization.IdentificationUseCase
 import com.example.gramclient.domain.mainScreen.*
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.mainScreen.states.*
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -57,13 +53,8 @@ class MainViewModel @Inject constructor(
     val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
 
-    private val _sendOrder = mutableStateOf(OrderModel(tariff_id = 1))
-    val sendOrder: MutableLiveData<OrderModel> = MutableLiveData<OrderModel>()
 
-    val from_address = MutableLiveData<Address>(Address("Откуда?", 0, "", ""))
 
-    private val _to_address = mutableListOf<Address>(Address("Куда едем?", 0, "", ""))
-    val to_address = MutableLiveData<MutableList<Address>>(_to_address)
 
     val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом", 12))
 
@@ -73,19 +64,23 @@ class MainViewModel @Inject constructor(
     private val _stateCancelOrder = mutableStateOf(CancelOrderResponseState())
     val stateCancelOrder: State<CancelOrderResponseState> = _stateCancelOrder
 
+    private val _toAddress = mutableStateOf(listOf<Address>(Address("", 0, "", "")))
+    val toAddress: State<List<Address>> = _toAddress
 
-    fun updateFromAddress(value:Address) {
-        Log.e("TariffsResponse", "from_address->\n ${from_address.value}")
-        from_address.value=value
-        Log.e("TariffsResponse", "from_address->\n ${from_address.value}")
+    private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
+    val fromAddress: State<Address> = _fromAddress
+
+
+    fun updateFromAddress(address:Address) {
+        _fromAddress.value = address
     }
 
-    fun updateToAddress(index: Int, value:Address?) {
-        if(value != null && index <= _to_address.size){
-            _to_address[index]=value
-            to_address.value=_to_address
+    fun updateToAddress(index: Int, address:Address?) {
+        if(address != null){
+            _toAddress.value = listOf(address)
         }
     }
+
 
     fun updateSelectedTariff(
         value: TariffsResult,
@@ -252,8 +247,8 @@ class MainViewModel @Inject constructor(
         createOrderUseCase.invoke(
             token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
             dop_phone = null,
-            from_address = if(from_address.value?.id != 0) from_address.value?.id else null,
-            to_addresses = if(to_address.value?.get(0)!!.id != 0) listOf(AddressModel(to_address.value?.get(0)!!.id)) else null,
+            from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
+            to_addresses = if(toAddress.value[0].id != 0) listOf(AddressModel(toAddress.value.get(0).id)) else null,
             comment = null,
             tariff_id = selectedTariff?.value?.id ?: 1,
             allowances= if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null
@@ -287,8 +282,8 @@ class MainViewModel @Inject constructor(
             token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
             tariff_id = selectedTariff?.value?.id ?: 1,
             allowances = if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
-            from_address = if(from_address.value?.id != 0) from_address.value?.id else null,
-            to_addresses = if(to_address.value?.get(0)!!.id != 0) listOf(AddressModel(to_address.value?.get(0)!!.id)) else null
+            from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
+            to_addresses = if(toAddress.value[0].id != 0) listOf(AddressModel(toAddress.value[0].id)) else null
         ).onEach { result: Resource<CalculateResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -335,6 +330,41 @@ class MainViewModel @Inject constructor(
                 }
                 is Resource.Loading -> {
                     _stateCancelOrder.value = CancelOrderResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun getAddressFromMap(token: String, lng: Double, lat: Double){
+        getAddressByPointUseCase.invoke(token="Bearer $token", lng, lat).onEach { result: Resource<AddressByPointResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val addressResponse: AddressByPointResponse? = result.data
+                        _stateAddressPoint.value =
+                            AddressByPointResponseState(response = addressResponse?.result)
+                        Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAddressPoint.value}")
+                        updateToAddress(
+                            0,
+                            Address(_stateAddressPoint.value.response!!.name,
+                                _stateAddressPoint.value.response!!.id,
+                                _stateAddressPoint.value.response!!.lat,
+                                _stateAddressPoint.value.response!!.lng)
+                        )
+                        Log.e("singleTapConfirmedHelper", "${toAddress}")
+
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("AllowancesResponse", "AllowancesResponse->\n ${result.message}")
+                    _stateAddressPoint.value = AddressByPointResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

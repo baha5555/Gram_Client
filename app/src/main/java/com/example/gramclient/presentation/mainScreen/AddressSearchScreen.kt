@@ -40,7 +40,6 @@ import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
-import com.example.gramclient.presentation.mainScreen.states.SearchAddressResponseState
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.CoroutineScope
@@ -81,8 +80,8 @@ import kotlinx.coroutines.launch
         }
     }
 
-    val fromAddress=mainViewModel.from_address.observeAsState()
-    val toAddress=mainViewModel.to_address.observeAsState()
+    val toAddress by mainViewModel.toAddress
+    val fromAddress by mainViewModel.fromAddress
 
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl ) {
@@ -111,13 +110,13 @@ import kotlinx.coroutines.launch
                         sheetGesturesEnabled = !bottomSheetState.bottomSheetState.isCollapsed,
                         sheetContent = {
                             AddressSearchBottomSheet(
-                                navController=navController, isSearchState=isSearchState,
-                                preferences=preferences, mainViewModel=mainViewModel,
+                                navController =navController, isSearchState =isSearchState,
+                                preferences =preferences, mainViewModel =mainViewModel,
                                 bottomSheetState = bottomSheetState,
-                                focusRequester=focusRequester,
+                                focusRequester =focusRequester,
                                 coroutineScope = coroutineScope,
-                                WHICH_ADDRESS=WHICH_ADDRESS,
-                                toAddress=toAddress
+                                WHICH_ADDRESS =WHICH_ADDRESS,
+                                toAddress =toAddress
                             )
                         },
                         sheetPeekHeight = 280.dp,
@@ -127,7 +126,7 @@ import kotlinx.coroutines.launch
                             contentAlignment = Alignment.TopCenter
                         )
                         {
-                            CustomMainMap(navController=navController, mainViewModel = mainViewModel)
+                            CustomMainMap(navController =navController, mainViewModel = mainViewModel, preferences = preferences)
                             FromAddressField(fromAddress) {
                                 coroutineScope.launch {
                                     bottomSheetState.bottomSheetState.expand()
@@ -170,7 +169,7 @@ fun FloatingButton(
 }
 
 @Composable
-fun FromAddressField(fromAddress: State<Address?>, onClick: ()-> Unit) {
+fun FromAddressField(fromAddress: Address, onClick: ()-> Unit) {
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(top = 22.dp),
@@ -201,8 +200,17 @@ fun FromAddressField(fromAddress: State<Address?>, onClick: ()-> Unit) {
                     tint = Color.White
                 )
             }
-            Text(text = fromAddress.value?.name ?: "",
-                color=Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            if(fromAddress.name == "") {
+                Text(
+                    text = "Откуда?", color = Color.Gray, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
+                )
+            }else{
+                Text(
+                    text = fromAddress.name ?: "", color = Color.White, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
@@ -218,12 +226,11 @@ fun AddressSearchBottomSheet(
     focusRequester: FocusRequester,
     coroutineScope: CoroutineScope,
     WHICH_ADDRESS: MutableState<String>,
-    toAddress: State<MutableList<Address>?>
+    toAddress: List<Address>
 ){
     val searchText=remember{ mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val isAddressList= remember { mutableStateOf(true) }
-    val stateSearchAddress by mainViewModel.stateSearchAddress
 
     Column(
             modifier = Modifier
@@ -234,8 +241,8 @@ fun AddressSearchBottomSheet(
                 .padding(15.dp)
         ) {
             if(!isSearchState.value){
-                ToAddressField(navController, WHICH_ADDRESS=WHICH_ADDRESS, toAddress=toAddress,
-                    isSearchState=isSearchState, bottomSheetState=bottomSheetState, scope=coroutineScope
+                ToAddressField(navController, WHICH_ADDRESS =WHICH_ADDRESS, toAddress =toAddress,
+                    isSearchState =isSearchState, bottomSheetState =bottomSheetState, scope =coroutineScope
                 )
                 Spacer(modifier = Modifier.height(15.dp))
                 FastAddresses()
@@ -252,7 +259,6 @@ fun AddressSearchBottomSheet(
                     focusManager = focusManager,
                     navController = navController,
                     isAddressList = isAddressList,
-                    stateSearchAddress = stateSearchAddress,
                     bottomSheetState=bottomSheetState,
                     isSearchState=isSearchState,
                     scope = coroutineScope,
@@ -339,9 +345,9 @@ fun ToAddressField(
     isSearchState: MutableState<Boolean>,
     bottomSheetState: BottomSheetScaffoldState,
     scope: CoroutineScope,
-    toAddress: State<MutableList<Address>?>
+    toAddress: List<Address>
 ) {
-    toAddress.value?.forEach { address ->
+    toAddress.forEach { address ->
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -386,17 +392,31 @@ fun ToAddressField(
                     tint = Color.White
                 )
             }
-            Text(
-                text = address.name,
-                textAlign = TextAlign.Start,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1, overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.Center)
-            )
+            if(address.name=="") {
+                Text(
+                    text = "Куда едем?",
+                    textAlign = TextAlign.Start,
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .align(Alignment.Center)
+                )
+            }else{
+                Text(
+                    text = address.name,
+                    textAlign = TextAlign.Start,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .align(Alignment.Center)
+                )
+            }
         }
     }
 }
@@ -408,13 +428,13 @@ fun SearchResultContent(
     focusManager: FocusManager,
     navController: NavHostController,
     isAddressList: MutableState<Boolean>,
-    stateSearchAddress: SearchAddressResponseState,
     bottomSheetState: BottomSheetScaffoldState,
     isSearchState: MutableState<Boolean>,
     scope: CoroutineScope,
     mainViewModel: MainViewModel,
     WHICH_ADDRESS: MutableState<String>
 ){
+    val currentRoute = navController.currentBackStackEntry?.destination?.route
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(start = 10.dp, end = 10.dp, top = 10.dp)
@@ -434,7 +454,9 @@ fun SearchResultContent(
                 Constants.FROM_ADDRESS -> { mainViewModel.updateFromAddress(address) }
                 Constants.TO_ADDRESS -> {
                     mainViewModel.updateToAddress(0, address)
-                    navController.navigate(RoutesName.MAIN_SCREEN)
+                    if(currentRoute==RoutesName.SEARCH_ADDRESS_SCREEN) {
+                        navController.navigate(RoutesName.MAIN_SCREEN)
+                    }
                 }
             }
         }
@@ -449,58 +471,80 @@ fun SearchTextField(
     navController: NavHostController,
     focusRequester: FocusRequester
 ) {
-
-    TextField(
-        value = searchText.value,
-        onValueChange = { value ->
-            searchText.value = value
-            mainViewModel.searchAddress(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), value)
-        },
-        modifier = Modifier
-            .focusRequester(focusRequester)
-            .fillMaxWidth(),
-        textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
-        leadingIcon = {
-            IconButton(onClick = { /*navController.popBackStack()*/ }) {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .size(24.dp)
+    Box(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = searchText.value,
+            onValueChange = { value ->
+                searchText.value = value
+                mainViewModel.searchAddress(
+                    preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), value
                 )
-            }
-        },
-        trailingIcon = {
-            if (searchText.value != "") {
-                IconButton(
-                    onClick = {
-                        searchText.value =
-                            ""
-                    }
-                ) {
+            },
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
+            leadingIcon = {
+                IconButton(onClick = { /*navController.popBackStack()*/ }) {
                     Icon(
-                        Icons.Default.Close,
+                        Icons.Default.Search,
                         contentDescription = "",
                         modifier = Modifier
-                            .padding(15.dp)
+                            .padding(start = 15.dp, top = 15.dp, bottom = 15.dp)
                             .size(24.dp)
                     )
                 }
-            }
-        },
-        placeholder= {Text(text = "Введите адрес для поиска")},
-        singleLine = true,
-        shape = RoundedCornerShape(15.dp),
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color.Black,
-            cursorColor = Color.Black,
-            leadingIconColor = Color.Black,
-            trailingIconColor = Color.Black,
-            backgroundColor = BackgroundColor,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
+            },
+            trailingIcon = {
+                if (searchText.value != "") {
+                    IconButton(
+                        modifier = Modifier.offset(x = (-40).dp),
+                        onClick = {
+                            searchText.value =
+                                ""
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(vertical = 15.dp, horizontal = 40.dp)
+                                .size(24.dp)
+                        )
+                    }
+                }
+            },
+            placeholder = { Text(text = "Введите адрес для поиска") },
+            singleLine = true,
+            shape = RoundedCornerShape(15.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
+                backgroundColor = BackgroundColor,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            )
         )
-    )
+        Box(modifier = Modifier
+            .align(Alignment.CenterEnd)
+            .padding(end = 20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Spacer(
+                    modifier =
+                    Modifier
+                        .width(2.dp)
+                        .height(55.dp)
+                        .padding(vertical = 10.dp)
+                        .background(Color(0xFFE0DBDB))
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Карта", fontSize = 14.sp, color = Color.Black)
+            }
+        }
+    }
 }
