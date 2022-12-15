@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation
+package com.example.gramclient.presentation.drawer_bar.supportScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,47 +48,55 @@ fun SupportScreen(navController: NavHostController) {
             }
         }
     }) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .background(colorResource(id = R.color.white))
-        ) {
-            Text(
-                text = "Поддержка",
-                fontSize = 28.sp,
-                modifier = Modifier.padding(25.dp),
-                color = PrimaryColor
-            )
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                CustomCircleButton(text = "Экстренная\nситуация", icon = Icons.Default.Headphones) {
-
-                }
-                CustomCircleButton(text = "Доверенные\nконтакты", icon = R.drawable.ic_contact) {
-                    stateContent.value = "Contact"
-                }
-                CustomCircleButton(text = "Скорая \nи полиция", icon = R.drawable.ic_alarm_light) {
-                    stateContent.value = "AmbulancePolice"
-                }
-
-            }
-        }
         when( stateContent.value){
-            "Contact"->{showContent(
+            ""->{ SupportContent(stateContent)
+            }
+            "Contact"->{
+                ShowContent(
                 "Доверенные контакты", "Эти контакты всегда будут под рукой. Сможете\n" +
                         "отправить им ваш маршрут и просьбу\n" +
                         "позвонить.",
                 "Добавить контакт", PrimaryColor, R.drawable.ic_contact
-            )}
-            "AmbulancePolice"->{showContent(
+            )
+            }
+            "AmbulancePolice"->{
+                ShowContent(
                 "Скорая и полиция", "Приготовьтесь рассказать, что призошло и где\n" +
                         "вы находитесь.", "Позвонить", Color(0xFFF93E2B), R.drawable.ic_alarm_light
-            )}
+            )
+            }
         }
     }
 }
-
 @Composable
-private fun showContent(title: String, text: String, textBtn: String, color: Color, icon: Int) {
+fun SupportContent(stateContent: MutableState<String>) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.white))
+    ) {
+        Text(
+            text = "Поддержка",
+            fontSize = 28.sp,
+            modifier = Modifier.padding(25.dp),
+            color = PrimaryColor
+        )
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            CustomCircleButton(text = "Экстренная\nситуация", icon = Icons.Default.Headphones) {
+
+            }
+            CustomCircleButton(text = "Доверенные\nконтакты", icon = R.drawable.ic_contact) {
+                stateContent.value = "Contact"
+            }
+            CustomCircleButton(text = "Скорая \nи полиция", icon = R.drawable.ic_alarm_light) {
+                stateContent.value = "AmbulancePolice"
+            }
+
+        }
+    }
+}
+@Composable
+private fun ShowContent(title: String, text: String, textBtn: String, color: Color, icon: Int) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -110,7 +119,7 @@ private fun showContent(title: String, text: String, textBtn: String, color: Col
                 Text(
                     text = title,
                     fontSize = 24.sp,
-                    color = com.example.gramclient.ui.theme.PrimaryColor,
+                    color = PrimaryColor,
                     modifier = Modifier.padding(start = 10.dp)
                 )
             }

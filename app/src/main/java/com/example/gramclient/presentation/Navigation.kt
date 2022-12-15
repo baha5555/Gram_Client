@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,6 +21,7 @@ import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingLan
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingRegionScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingScreen
 import com.example.gramclient.presentation.drawer_bar.setting_screens.SettingSelectRegionScreen
+import com.example.gramclient.presentation.drawer_bar.supportScreen.SupportScreen
 import com.example.gramclient.presentation.mainScreen.AddressSearchScreen
 import com.example.gramclient.presentation.mainScreen.MainScreen
 import com.example.gramclient.presentation.mainScreen.MainViewModel
