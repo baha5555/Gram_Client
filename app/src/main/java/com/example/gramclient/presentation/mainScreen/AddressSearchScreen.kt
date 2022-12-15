@@ -471,58 +471,80 @@ fun SearchTextField(
     navController: NavHostController,
     focusRequester: FocusRequester
 ) {
-
-    TextField(
-        value = searchText.value,
-        onValueChange = { value ->
-            searchText.value = value
-            mainViewModel.searchAddress(preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), value)
-        },
-        modifier = Modifier
-            .focusRequester(focusRequester)
-            .fillMaxWidth(),
-        textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
-        leadingIcon = {
-            IconButton(onClick = { /*navController.popBackStack()*/ }) {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .size(24.dp)
+    Box(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = searchText.value,
+            onValueChange = { value ->
+                searchText.value = value
+                mainViewModel.searchAddress(
+                    preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), value
                 )
-            }
-        },
-        trailingIcon = {
-            if (searchText.value != "") {
-                IconButton(
-                    onClick = {
-                        searchText.value =
-                            ""
-                    }
-                ) {
+            },
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
+            leadingIcon = {
+                IconButton(onClick = { /*navController.popBackStack()*/ }) {
                     Icon(
-                        Icons.Default.Close,
+                        Icons.Default.Search,
                         contentDescription = "",
                         modifier = Modifier
-                            .padding(15.dp)
+                            .padding(start = 15.dp, top = 15.dp, bottom = 15.dp)
                             .size(24.dp)
                     )
                 }
-            }
-        },
-        placeholder= {Text(text = "Введите адрес для поиска")},
-        singleLine = true,
-        shape = RoundedCornerShape(15.dp),
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color.Black,
-            cursorColor = Color.Black,
-            leadingIconColor = Color.Black,
-            trailingIconColor = Color.Black,
-            backgroundColor = BackgroundColor,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
+            },
+            trailingIcon = {
+                if (searchText.value != "") {
+                    IconButton(
+                        modifier = Modifier.offset(x = (-40).dp),
+                        onClick = {
+                            searchText.value =
+                                ""
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(vertical = 15.dp, horizontal = 40.dp)
+                                .size(24.dp)
+                        )
+                    }
+                }
+            },
+            placeholder = { Text(text = "Введите адрес для поиска") },
+            singleLine = true,
+            shape = RoundedCornerShape(15.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
+                backgroundColor = BackgroundColor,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            )
         )
-    )
+        Box(modifier = Modifier
+            .align(Alignment.CenterEnd)
+            .padding(end = 20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Spacer(
+                    modifier =
+                    Modifier
+                        .width(2.dp)
+                        .height(55.dp)
+                        .padding(vertical = 10.dp)
+                        .background(Color(0xFFE0DBDB))
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Карта", fontSize = 14.sp, color = Color.Black)
+            }
+        }
+    }
 }
