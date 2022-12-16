@@ -169,8 +169,6 @@ fun IdentificationScreen(
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }
-                        .clip(RoundedCornerShape(5.dp))
-                        .background(Color.Black)
                         .width(303.dp)
                         .height(54.dp)
                         .padding(top = 0.dp),
