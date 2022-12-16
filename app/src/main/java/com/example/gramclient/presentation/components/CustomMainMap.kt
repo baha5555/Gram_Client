@@ -19,10 +19,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.ImageView
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -59,11 +56,16 @@ private var requiredCenter: GeoPoint? = null
 lateinit var mRotationGestureOverlay: RotationGestureOverlay
 lateinit var mLocationOverlay: MyLocationNewOverlay
 
+lateinit var btnLocation: ImageButton
+lateinit var getAddressMarker: ImageView
+ var currentRoute: String?=null
+
 @Composable
 fun CustomMainMap(
     mainViewModel: MainViewModel,
     navController: NavHostController,
-    preferences: SharedPreferences
+    preferences: SharedPreferences,
+    WHICH_ADDRESS: MutableState<String>?=null
 ) {
 
     val toAddress by mainViewModel.toAddress
@@ -75,113 +77,21 @@ fun CustomMainMap(
 
     AndroidView(
         factory = {
-            View.inflate(it, R.layout.map, null)
-        },
-        update = {
-            map = it.findViewById(R.id.map)
-            userTouchSurface=it.findViewById(R.id.userTouchSurface)
+            View.inflate(it, R.layout.map, null).apply {
+                map = this.findViewById(R.id.map)
+                userTouchSurface=this.findViewById(R.id.userTouchSurface)
+                btnLocation = this.findViewById<ImageButton>(R.id.btnLocation)
+                getAddressMarker = this.findViewById<ImageView>(R.id.getAddressMarker)
+                currentRoute = navController.currentBackStackEntry?.destination?.route
 
-
-            val btnLocation = it.findViewById<ImageButton>(R.id.btnLocation)
-            val getAddressMarker = it.findViewById<ImageView>(R.id.getAddressMarker)
-            val centerTarget = it.findViewById<ImageView>(R.id.center_target)
-            val currentRoute = navController.currentBackStackEntry?.destination?.route
-
-            //Checking current route
-            if(currentRoute==RoutesName.MAIN_SCREEN){
-                btnLocation.margin(0f, 0f, 0f, 355f)
-                btnLocation.visibility=View.GONE
-                getAddressMarker.visibility=View.GONE
-                centerTarget.visibility=View.GONE
-
-                Configuration.getInstance().load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
-                map.setTileSource(TileSourceFactory.MAPNIK)
-                val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
-                val mapController = map.controller
-                mapController.setZoom(18.0)
-                map.controller.setCenter(startPoint)
-
-                mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
-                mRotationGestureOverlay.isEnabled = false
-
-                map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-                map.setMultiTouchControls(true)
-
-                map.minZoomLevel = 10.0
-                map.maxZoomLevel = 24.0
-
-                val myLocationProvider = GpsMyLocationProvider(it.context)
-                mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
-                myLocationShow(it.context, mLocationOverlay)
-                btnLocation.setOnClickListener {
-                    try {
-                        if (map.overlays.contains(mLocationOverlay)) {
-                            val myLocation: GeoPoint = mLocationOverlay.myLocation
-                            if (myLocation.latitude != 0.0 && myLocation.longitude != 0.0) {
-                                //Log.d("MyApp3", "jumpToLocation " + myLocation.getLatitude() + ";" + myLocation.getLongitude());
-                                jump(myLocation)
-                                return@setOnClickListener
-                            }
-                        }
-                    } catch (_: Exception) {
-                    }
-                }
-                map.overlays.clear()
-                addOverlays()
-                showRoadAB(it.context, fromAddress, toAddress)
-
-            }
-            else if(currentRoute==RoutesName.SEARCH_DRIVER_SCREEN) {
-                btnLocation.visibility = View.GONE
-                getAddressMarker.visibility=View.GONE
-                centerTarget.visibility=View.GONE
-
-                Configuration.getInstance().load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
-                map.setTileSource(TileSourceFactory.MAPNIK)
-                val startPoint = GeoPoint(40.27803692395751, 69.62923931506361)
-                val mapController = map.controller
-                mapController.setZoom(18.0)
-                map.controller.setCenter(startPoint)
-
-                mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
-                mRotationGestureOverlay.isEnabled = false
-
-                map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-                map.setMultiTouchControls(true)
-
-                map.minZoomLevel = 10.0
-                map.maxZoomLevel = 24.0
-
-                val myLocationProvider = GpsMyLocationProvider(it.context)
-                mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
-                myLocationShow(it.context, mLocationOverlay)
-                btnLocation.setOnClickListener {
-                    try {
-                        if (map.overlays.contains(mLocationOverlay)) {
-                            val myLocation: GeoPoint = mLocationOverlay.myLocation
-                            if (myLocation.latitude != 0.0 && myLocation.longitude != 0.0) {
-                                //Log.d("MyApp3", "jumpToLocation " + myLocation.getLatitude() + ";" + myLocation.getLongitude());
-                                jump(myLocation)
-                                return@setOnClickListener
-                            }
-                        }
-                    } catch (_: Exception) {
-                    }
-                }
-                map.overlays.clear()
-                addOverlays()
-                showRoadAB(it.context, fromAddress, toAddress)
-            }
-            else if(currentRoute==RoutesName.SEARCH_ADDRESS_SCREEN){
-
-                Configuration.getInstance().load(it.context, PreferenceManager.getDefaultSharedPreferences(it.context))
+                Configuration.getInstance().load(it, PreferenceManager.getDefaultSharedPreferences(it))
                 map.setTileSource(TileSourceFactory.MAPNIK)
                 val startPoint = startPointForMarker.value
                 val mapController = map.controller
                 mapController.setZoom(zoomLevel.value)
                 map.controller.setCenter(startPoint)
 
-                mRotationGestureOverlay = RotationGestureOverlay(it.context, map)
+                mRotationGestureOverlay = RotationGestureOverlay(it, map)
                 mRotationGestureOverlay.isEnabled = false
 
                 map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
@@ -190,15 +100,14 @@ fun CustomMainMap(
                 map.minZoomLevel = 10.0
                 map.maxZoomLevel = 24.0
 
-                val myLocationProvider = GpsMyLocationProvider(it.context)
+                val myLocationProvider = GpsMyLocationProvider(it)
                 mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
-                myLocationShow(it.context, mLocationOverlay)
+                myLocationShow(it, mLocationOverlay)
                 btnLocation.setOnClickListener {
                     try {
                         if (map.overlays.contains(mLocationOverlay)) {
                             val myLocation: GeoPoint = mLocationOverlay.myLocation
                             if (myLocation.latitude != 0.0 && myLocation.longitude != 0.0) {
-                                //Log.d("MyApp3", "jumpToLocation " + myLocation.getLatitude() + ";" + myLocation.getLongitude());
                                 jump(myLocation)
                                 return@setOnClickListener
                             }
@@ -206,9 +115,38 @@ fun CustomMainMap(
                     } catch (_: Exception) {
                     }
                 }
+                if(currentRoute==RoutesName.MAIN_SCREEN){
+                    btnLocation.margin(0f, 0f, 0f, 355f)
+                    btnLocation.visibility=View.GONE
+                    getAddressMarker.visibility=View.GONE
 
+                    map.overlays.clear()
+                    addOverlays()
+                    showRoadAB(it, fromAddress, toAddress)
+                }
+                else if(currentRoute==RoutesName.SEARCH_DRIVER_SCREEN){
+                    btnLocation.visibility = View.GONE
+                    getAddressMarker.visibility=View.GONE
+
+                    map.overlays.clear()
+                    addOverlays()
+                    showRoadAB(it, fromAddress, toAddress)
+                }
+                else if(currentRoute==RoutesName.SEARCH_ADDRESS_SCREEN){
+                    map.overlays.clear()
+                    addOverlays()
+                }
+            }
+        },
+        update = {
+            if(currentRoute==RoutesName.MAIN_SCREEN){
+                showRoadAB(it.context, fromAddress, toAddress)
+            }
+            else if(currentRoute==RoutesName.SEARCH_DRIVER_SCREEN) {
+                showRoadAB(it.context, fromAddress, toAddress)
+            }
+            else if(currentRoute==RoutesName.SEARCH_ADDRESS_SCREEN){
                 map.overlays.clear()
-                addOverlays()
 
 //                val matrixA = ColorMatrix()
 //                matrixA.setSaturation(0.9f)
@@ -232,10 +170,12 @@ fun CustomMainMap(
                                 }
                                 MotionEvent.ACTION_UP -> {
                                     Log.e("singleTapConfirmedHelper", "Action was UP")
-                                    mainViewModel.getAddressFromMap(
-                                        preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
-                                        map.mapCenter.longitude, map.mapCenter.latitude
-                                    )
+                                    if(WHICH_ADDRESS != null) {
+                                        mainViewModel.getAddressFromMap(
+                                            preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                                            map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
+                                        )
+                                    }
                                     Log.e("singleTapConfirmedHelper", "${toAddress}")
                                     map.postInvalidate()
                                     startPointForMarker.value=GeoPoint(map.mapCenter.latitude, map.mapCenter.longitude)
@@ -260,32 +200,29 @@ fun CustomMainMap(
                         if (event != null) {
                             when (event.action) {
                                 MotionEvent.ACTION_MOVE-> {
-                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
+//                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
                                 }
-                                MotionEvent.ACTION_DOWN -> {
-                                    Log.e("singleTapConfirmedHelper", "Action was DOWN")
-
+                                MotionEvent.ACTION_POINTER_2_DOWN -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was ACTION_POINTER_2_DOWN")
                                 }
-                                MotionEvent.ACTION_UP -> {
+                                MotionEvent.TOOL_TYPE_FINGER -> {
+                                    Log.e("singleTapConfirmedHelper", "Action was TOOL_TYPE_FINGER")
+                                }
+                                MotionEvent.ACTION_POINTER_2_UP -> {
                                     Log.e("singleTapConfirmedHelper", "Action was UP")
-                                    mainViewModel.getAddressFromMap(
-                                        preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
-                                        map.mapCenter.longitude, map.mapCenter.latitude
-                                    )
-                                }
-                                MotionEvent.ACTION_CANCEL -> {
-                                    Log.e("singleTapConfirmedHelper", "Action was CANCEL")
-
-                                }
-                                MotionEvent.ACTION_POINTER_DOWN -> {
-                                    Log.e("singleTapConfirmedHelper", "Action was ACTION_POINTER_DOWN")
-
-                                }
-                                MotionEvent.ACTION_OUTSIDE -> {
-                                    Log.e("singleTapConfirmedHelper", "Movement occurred outside bounds of current screen element")
+                                    if(WHICH_ADDRESS != null) {
+                                        mainViewModel.getAddressFromMap(
+                                            preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                                            map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
+                                        )
+                                    }
+                                    Log.e("singleTapConfirmedHelper", "${toAddress}")
+                                    map.postInvalidate()
+                                    startPointForMarker.value=GeoPoint(map.mapCenter.latitude, map.mapCenter.longitude)
+                                    zoomLevel.value=map.zoomLevelDouble
                                 }
                                 else-> {
-                                    Log.e("singleTapConfirmedHelper", "111")
+                                    Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
                                 }
                             }
                         }
@@ -297,10 +234,12 @@ fun CustomMainMap(
 //                        Toast.makeText(context, "${p.longitude}-${p.latitude}", Toast.LENGTH_SHORT).show()
                         map.postInvalidate()
                         startPointForMarker.value=GeoPoint(p.latitude, p.longitude)
-                        mainViewModel.getAddressFromMap(
-                            preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
-                            p.longitude, p.latitude
-                        )
+                        if(WHICH_ADDRESS != null) {
+                            mainViewModel.getAddressFromMap(
+                                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                                map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
+                            )
+                        }
                         zoomLevel.value=map.zoomLevelDouble
                         return true
                     }

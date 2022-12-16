@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,6 +56,7 @@ fun MainBottomSheetContent(
     stateAllowances: AllowancesResponseState,
     navController: NavHostController,
     isSearchState: MutableState<Boolean>,
+    focusRequester: FocusRequester,
 ){
     val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
@@ -71,7 +74,6 @@ fun MainBottomSheetContent(
     val focusManager = LocalFocusManager.current
 
     val stateSearchAddress by mainViewModel.stateSearchAddress
-    val focusRequester = remember { FocusRequester() }
 
     val coroutineScope= rememberCoroutineScope()
 
@@ -79,6 +81,7 @@ fun MainBottomSheetContent(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .focusRequester(focusRequester)
             .fillMaxHeight(fraction = heightFraction)
     ) {
         if(!isSearchState.value){
@@ -138,7 +141,10 @@ fun MainBottomSheetContent(
                     searchText = searchText,
                     preferences = preferences,
                     navController = navController,
-                    focusRequester = focusRequester
+                    focusRequester = focusRequester,
+                    isSearchState = isSearchState,
+                    bottomSheetState = scaffoldState,
+                    scope = coroutineScope
                 )
                 SearchResultContent(
                     searchText = searchText,
@@ -248,10 +254,14 @@ fun AddressesContent(
                 contentDescription = "Logo"
             )
             Spacer(modifier = Modifier.width(20.dp))
-            Text(
-                address_from.name,
-                maxLines = 1, overflow = TextOverflow.Ellipsis,
-            )
+            if(address_from.name == "") {
+                Text(text = "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
+            }else {
+                Text(
+                    address_from.name,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
         Column(modifier = Modifier
             .fillMaxWidth()
@@ -279,10 +289,17 @@ fun AddressesContent(
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                Text(
-                    address.name,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis
-                )
+                if(address.name=="") {
+                    Text(
+                        text = "Куда едем?", color=Color.Gray,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                }else {
+                    Text(
+                        address.name,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
             Column(modifier = Modifier
                 .fillMaxWidth()

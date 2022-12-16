@@ -2,6 +2,7 @@ package com.example.gramclient.presentation.mainScreen
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -62,6 +64,10 @@ fun MainScreen(
     val context = LocalContext.current
 
     var initialApiCalled by rememberSaveable { mutableStateOf(false) }
+    var isSearchState = remember{ mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+
 
     if (!initialApiCalled) {
         LaunchedEffect(Unit) {
@@ -77,12 +83,17 @@ fun MainScreen(
                     ""
                 ).toString(), 1
             )
-//            mainViewModel.getActualLocation(
-//                context,
-//                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
-//            )
             mainViewModel.getPrice(preferences)
             initialApiCalled = true
+        }
+    }
+
+    LaunchedEffect(mainBottomSheetState.bottomSheetState.currentValue) {
+        if(mainBottomSheetState.bottomSheetState.isCollapsed) {
+            isSearchState.value=false
+            Log.e("singleTapConfirmedHelper", "isCollapsed")
+        }else{
+            Log.e("singleTapConfirmedHelper", "isExpanded")
         }
     }
 
@@ -156,9 +167,6 @@ fun MainScreen(
         },
         sheetPeekHeight = 0.dp,
     ) {
-
-        var isSearchState = remember{ mutableStateOf(false) }
-
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -209,7 +217,8 @@ fun MainScreen(
                                 preferences = preferences,
                                 stateAllowances = stateAllowances,
                                 navController = navController,
-                                isSearchState=isSearchState
+                                isSearchState=isSearchState,
+                                focusRequester=focusRequester
                             )
                         },
                         sheetPeekHeight = 325.dp,
