@@ -25,4 +25,12 @@ class UserTouchSurface : View {
     fun setCallback(a: TwoFingerDrag?) {
         this.a = a
     }
+    interface Listener {
+        /**
+         *
+         * @param event can be null if the one finger event series is interrupted
+         */
+        fun onOneFinger(event: MotionEvent?)
+        fun onTwoFingers(event: MotionEvent?)
+    }
 }

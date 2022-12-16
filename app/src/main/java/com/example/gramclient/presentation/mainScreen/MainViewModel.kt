@@ -5,14 +5,17 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gramclient.Constants
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
+import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.*
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.mainScreen.states.*
@@ -335,7 +338,12 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getAddressFromMap(token: String, lng: Double, lat: Double){
+    fun getAddressFromMap(
+        token: String,
+        lng: Double,
+        lat: Double,
+        WHICH_ADDRESS: MutableState<String>
+    ){
         getAddressByPointUseCase.invoke(token="Bearer $token", lng, lat).onEach { result: Resource<AddressByPointResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -344,13 +352,25 @@ class MainViewModel @Inject constructor(
                         _stateAddressPoint.value =
                             AddressByPointResponseState(response = addressResponse?.result)
                         Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAddressPoint.value}")
-                        updateToAddress(
-                            0,
-                            Address(_stateAddressPoint.value.response!!.name,
-                                _stateAddressPoint.value.response!!.id,
-                                _stateAddressPoint.value.response!!.lat,
-                                _stateAddressPoint.value.response!!.lng)
-                        )
+                        when(WHICH_ADDRESS.value){
+                            Constants.FROM_ADDRESS -> {
+                                updateFromAddress(
+                                    Address(_stateAddressPoint.value.response!!.name,
+                                        _stateAddressPoint.value.response!!.id,
+                                        _stateAddressPoint.value.response!!.lat,
+                                        _stateAddressPoint.value.response!!.lng)
+                                )
+                            }
+                            Constants.TO_ADDRESS -> {
+                                updateToAddress(
+                                    0,
+                                    Address(_stateAddressPoint.value.response!!.name,
+                                        _stateAddressPoint.value.response!!.id,
+                                        _stateAddressPoint.value.response!!.lat,
+                                        _stateAddressPoint.value.response!!.lng)
+                                )
+                            }
+                        }
                         Log.e("singleTapConfirmedHelper", "${toAddress}")
 
                     }catch (e: Exception) {

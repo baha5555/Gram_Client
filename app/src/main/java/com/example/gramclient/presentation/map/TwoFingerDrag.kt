@@ -3,6 +3,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
+import kotlin.math.hypot
 
 class TwoFingerDrag(context: Context, private val listener: Listener) {
     //    private long timeDrawStarted;
@@ -38,22 +39,27 @@ class TwoFingerDrag(context: Context, private val listener: Listener) {
                 MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
                     if (!panStarted) {
                         if (oneFingerOperationStatus == NOT_STARTED) {
-                            val distance = Math.hypot(
-                                (event.x - oneFingerStartEvent!!.x).toDouble(),
-                                (event.y - oneFingerStartEvent!!.y).toDouble()
-                            )
+                            val distance =
+                                if(oneFingerStartEvent != null) {
+                                    hypot(
+                                        (event.x - oneFingerStartEvent!!.x).toDouble(),
+                                        (event.y - oneFingerStartEvent!!.y).toDouble()
+                                    )
+                                }else null
                             Log.d(
                                 "MyApp3",
                                 "   distance " + distance + " vs " + DISTANCE_TOLERANCE_PX
                             )
-                            if (distance < DISTANCE_TOLERANCE_PX) {
-                                Log.d("MyApp3", "   cancelling draw by distance")
-                            } else {
-                                Log.d("MyApp3", "   confirming draw by distance")
-                                handlerConfirmDrawByTime.removeCallbacks(confirmDrawByTime)
-                                oneFingerOperationStatus = IN_PROGRESS
-                                listener.onOneFinger(oneFingerStartEvent)
-                                listener.onOneFinger(event)
+                            if(distance != null){
+                                if (distance < DISTANCE_TOLERANCE_PX) {
+                                    Log.d("MyApp3", "   cancelling draw by distance")
+                                } else {
+                                    Log.d("MyApp3", "   confirming draw by distance")
+                                    handlerConfirmDrawByTime.removeCallbacks(confirmDrawByTime)
+                                    oneFingerOperationStatus = IN_PROGRESS
+                                    listener.onOneFinger(oneFingerStartEvent)
+                                    listener.onOneFinger(event)
+                                }
                             }
                         } else {
                             if (event.action == MotionEvent.ACTION_UP) oneFingerOperationStatus =

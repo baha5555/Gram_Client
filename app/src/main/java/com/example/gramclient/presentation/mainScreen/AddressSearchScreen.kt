@@ -1,6 +1,7 @@
 package com.example.gramclient.presentation.mainScreen
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -9,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,8 +55,9 @@ import kotlinx.coroutines.launch
     mainViewModel: MainViewModel
 ) {
     var isSearchState = remember{ mutableStateOf(false) }
+    var sheetPeekHeight=remember{ mutableStateOf(280) }
 
-    var WHICH_ADDRESS = remember{ mutableStateOf("") }
+    var WHICH_ADDRESS = remember{ mutableStateOf(Constants.TO_ADDRESS) }
 
     val bottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -72,11 +73,18 @@ import kotlinx.coroutines.launch
     val focusRequester = remember { FocusRequester() }
 
 
-
     if (!initialApiCalled) {
         LaunchedEffect(Unit) {
             mainViewModel.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
             initialApiCalled = true
+        }
+    }
+    LaunchedEffect(bottomSheetState.bottomSheetState.currentValue) {
+        if(bottomSheetState.bottomSheetState.isCollapsed) {
+            isSearchState.value=false
+            Log.e("singleTapConfirmedHelper", "isCollapsed")
+        }else{
+            Log.e("singleTapConfirmedHelper", "isExpanded")
         }
     }
 
@@ -119,14 +127,14 @@ import kotlinx.coroutines.launch
                                 toAddress =toAddress
                             )
                         },
-                        sheetPeekHeight = 280.dp,
+                        sheetPeekHeight = sheetPeekHeight.value.dp,
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.TopCenter
                         )
                         {
-                            CustomMainMap(navController =navController, mainViewModel = mainViewModel, preferences = preferences)
+                            CustomMainMap(navController =navController, mainViewModel = mainViewModel, preferences = preferences, WHICH_ADDRESS=WHICH_ADDRESS)
                             FromAddressField(fromAddress) {
                                 coroutineScope.launch {
                                     bottomSheetState.bottomSheetState.expand()
@@ -253,7 +261,10 @@ fun AddressSearchBottomSheet(
                     delay(200)
                     focusRequester.requestFocus()
                 }
-                SearchTextField(searchText = searchText, preferences = preferences, navController = navController, focusRequester = focusRequester)
+                SearchTextField(searchText = searchText, preferences = preferences,
+                    navController = navController, focusRequester = focusRequester,
+                    isSearchState=isSearchState, scope = coroutineScope, bottomSheetState=bottomSheetState
+                )
                 SearchResultContent(
                     searchText = searchText,
                     focusManager = focusManager,
@@ -463,13 +474,17 @@ fun SearchResultContent(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchTextField(
     searchText: MutableState<String>,
-    mainViewModel: MainViewModel= hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel(),
     preferences: SharedPreferences,
     navController: NavHostController,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    isSearchState: MutableState<Boolean>,
+    bottomSheetState: BottomSheetScaffoldState,
+    scope: CoroutineScope
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         TextField(
@@ -530,20 +545,26 @@ fun SearchTextField(
         )
         Box(modifier = Modifier
             .align(Alignment.CenterEnd)
-            .padding(end = 20.dp),
+            .padding(end = 20.dp)
+            .clickable {
+                scope.launch {
+                    bottomSheetState.bottomSheetState.collapse()
+                }
+                isSearchState.value=false
+            },
             contentAlignment = Alignment.Center
         ) {
             Row(verticalAlignment = Alignment.CenterVertically){
                 Spacer(
                     modifier =
                     Modifier
-                        .width(2.dp)
+                        .width(1.dp)
                         .height(55.dp)
                         .padding(vertical = 10.dp)
                         .background(Color(0xFFE0DBDB))
                 )
                 Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "Карта", fontSize = 14.sp, color = Color.Black)
+                Text(text = "Карта", fontSize = 14.sp, color = Color.Black, modifier = Modifier)
             }
         }
     }
