@@ -82,8 +82,11 @@ class MainActivity : ComponentActivity() {
             if (resultCode == RESULT_OK && data != null) {
                 val message = data.getStringExtra(SmsRetriever.EXTRA_SMS_MESSAGE)
                 if (message != null) {
+                    authViewModel.updateIsAutoInsert(true)
                     getOtpFromMessage(message, authViewModel = authViewModel)
                 }
+            }else{
+                authViewModel.updateIsAutoInsert(false)
             }
         }
     }
@@ -100,7 +103,7 @@ class MainActivity : ComponentActivity() {
             object : SmsBroadcastReceiver.SmsBroadcastReceiverListener {
                 override fun onSuccess(intent: Intent?) {
                     startActivityForResult(intent, REQ_USER_CONSENT)
-                }
+                    }
 
                 override fun onFailure() {}
             }

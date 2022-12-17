@@ -15,6 +15,7 @@ import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.AuthUseCase
 import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.athorization.IdentificationUseCase
+import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.authorization.states.AuthResponseState
 import com.example.gramclient.presentation.authorization.states.IdentificationResponseState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +44,13 @@ class AuthViewModel @Inject constructor(
     val smsCode=MutableLiveData("")
     val client_regiter_id=MutableLiveData("")
     val phoneNumber=MutableLiveData("")
+
+    private val _isAutoInsert = mutableStateOf(false)
+    val isAutoInsert: State<Boolean> = _isAutoInsert
+
+    fun updateIsAutoInsert(value:Boolean) {
+        _isAutoInsert.value = value
+    }
 
     fun setCodeAutomaticly(code:String, preferences:SharedPreferences, navController: NavHostController, scope:CoroutineScope){
         scope.launch {
