@@ -23,6 +23,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.gramclient.R
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.draw.clip
@@ -54,6 +55,10 @@ fun IdentificationScreen(
     val stateLogin by viewModel.stateLogin
     val stateAuth by viewModel.stateAuth
 
+    var initialApiCalled by rememberSaveable { mutableStateOf(false) }
+    val isAutoInsert by viewModel.isAutoInsert
+
+
 
     LaunchedEffect(key1 = true ){
         while (time>0) {
@@ -65,6 +70,19 @@ fun IdentificationScreen(
         LoadingIndicator(isLoading = true)
     }else{
         stateAuth.response?.let{
+            if (!initialApiCalled) {
+                LaunchedEffect(code.value) {
+                    if (code.value!!.length == 4 && !isAutoInsert) {
+                        viewModel.identification(
+                            code.value!!,
+                            it.result.client_register_id,
+                            preferences,
+                            navController
+                        )
+                        initialApiCalled = true
+                    }
+                }
+            }
             ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
@@ -113,6 +131,9 @@ fun IdentificationScreen(
                         initialCode = code.value!!
                     ) {
                         viewModel.updateCode(it)
+                        if(it.length ==4){
+                            initialApiCalled = false
+                        }
                     }
                 }
                 ErrorMessage(
@@ -162,23 +183,6 @@ fun IdentificationScreen(
                             },
                         textAlign = TextAlign.Center, color = Color.Blue)
                 }
-                CustomButton(
-                    modifier = Modifier
-                        .constrainAs(btn) {
-                            top.linkTo(text2.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .width(303.dp)
-                        .height(54.dp)
-                        .padding(top = 0.dp),
-                    text = "Подтвердить",
-                    textSize = 18,
-                    textBold = true,
-                    enabled = code.value!!.length==4,
-                onClick = {
-                    viewModel.identification(code.value!!, it.result.client_register_id,preferences, navController)
-                })
             }
         }
     }
