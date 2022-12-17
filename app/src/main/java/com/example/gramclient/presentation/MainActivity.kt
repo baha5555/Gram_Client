@@ -40,9 +40,6 @@ import kotlinx.coroutines.CoroutineScope
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    private var pressedTime: Long = 0
-
     private lateinit var preferences: SharedPreferences
     private lateinit var authViewModel: AuthViewModel
     private lateinit var navController: NavHostController
@@ -119,17 +116,6 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         unregisterReceiver(smsBroadcastReceiver)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    override fun onBackPressed() {
-        if (pressedTime + 2000 > System.currentTimeMillis()) {
-            super.onBackPressed()
-            finish()
-        } else {
-            Toast.makeText(getBaseContext(), "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
-        }
-        pressedTime = System.currentTimeMillis();
     }
 
 //    override fun onResume() {
