@@ -1,9 +1,12 @@
 package com.example.gramclient.presentation
 
 import android.content.SharedPreferences
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -37,6 +40,10 @@ fun Navigation(
     authViewModel: AuthViewModel
 
 ) {
+    var pressedTime: Long = 0
+    val activity = (LocalContext.current as? MainActivity)
+    val context= LocalContext.current
+
     NavHost(
         navController = navController,
         startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
@@ -104,9 +111,25 @@ fun Navigation(
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
             SearchDriverScreen(navController, preferences=preferences)
+            BackHandler(enabled = true) {
+                if (pressedTime + 2000 > System.currentTimeMillis()) {
+                    activity?.finish()
+                } else {
+                    Toast.makeText(context, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+                }
+                pressedTime = System.currentTimeMillis();
+            }
         }
         composable(RoutesName.SEARCH_ADDRESS_SCREEN) {
             AddressSearchScreen(navController, preferences, mainViewModel)
+            BackHandler(enabled = true) {
+                if (pressedTime + 2000 > System.currentTimeMillis()) {
+                    activity?.finish()
+                } else {
+                    Toast.makeText(context, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+                }
+                pressedTime = System.currentTimeMillis();
+            }
         }
     }
 }
