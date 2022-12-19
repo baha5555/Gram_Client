@@ -172,7 +172,6 @@ fun CustomMainMap(
                                     Log.e("singleTapConfirmedHelper", "Action was UP")
                                     if(WHICH_ADDRESS != null) {
                                         mainViewModel.getAddressFromMap(
-                                            preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
                                             map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
                                         )
                                     }
@@ -212,7 +211,6 @@ fun CustomMainMap(
                                     Log.e("singleTapConfirmedHelper", "Action was UP")
                                     if(WHICH_ADDRESS != null) {
                                         mainViewModel.getAddressFromMap(
-                                            preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
                                             map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
                                         )
                                     }
@@ -236,7 +234,6 @@ fun CustomMainMap(
                         startPointForMarker.value=GeoPoint(p.latitude, p.longitude)
                         if(WHICH_ADDRESS != null) {
                             mainViewModel.getAddressFromMap(
-                                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
                                 map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
                             )
                         }

@@ -13,7 +13,6 @@ import javax.inject.Inject
 class GetPriceUseCase @Inject constructor(private val repository: AppRepository) {
 
     operator fun invoke(
-        token: String,
         tariff_id: Int,
         allowances: String?,
         from_address: Int?,
@@ -26,7 +25,7 @@ class GetPriceUseCase @Inject constructor(private val repository: AppRepository)
                 if(to_addresses != null) {
                     jsonToAddress = Gson().toJson(to_addresses)
                 }
-                val response: CalculateResponse = repository.getPrice(token, tariff_id, allowances, from_address, jsonToAddress)
+                val response: CalculateResponse = repository.getPrice(tariff_id, allowances, from_address, jsonToAddress)
                 emit(Resource.Success<CalculateResponse>(response))
             }catch (e: HttpException) {
                 emit(

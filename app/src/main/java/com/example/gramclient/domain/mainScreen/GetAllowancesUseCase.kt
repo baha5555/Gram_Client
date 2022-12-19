@@ -11,11 +11,11 @@ import javax.inject.Inject
 
 class GetAllowancesUseCase @Inject constructor(private val repository: AppRepository) {
 
-    operator fun invoke(token:String, tariff_id:Int): Flow<Resource<AllowancesResponse>> =
+    operator fun invoke(tariff_id:Int): Flow<Resource<AllowancesResponse>> =
         flow{
             try {
                 emit(Resource.Loading<AllowancesResponse>())
-                val response: AllowancesResponse = repository.getAllowancesByTariffId(token, tariff_id)
+                val response: AllowancesResponse = repository.getAllowancesByTariffId(tariff_id)
                 emit(Resource.Success<AllowancesResponse>(response))
             }catch (e: HttpException) {
                 emit(

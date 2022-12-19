@@ -75,7 +75,7 @@ import kotlinx.coroutines.launch
 
     if (!initialApiCalled) {
         LaunchedEffect(Unit) {
-            mainViewModel.getActualLocation(context, preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+            mainViewModel.getActualLocation(context)
             initialApiCalled = true
         }
     }
@@ -491,9 +491,7 @@ fun SearchTextField(
             value = searchText.value,
             onValueChange = { value ->
                 searchText.value = value
-                mainViewModel.searchAddress(
-                    preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), value
-                )
+                mainViewModel.searchAddress(value)
             },
             modifier = Modifier
                 .focusRequester(focusRequester)

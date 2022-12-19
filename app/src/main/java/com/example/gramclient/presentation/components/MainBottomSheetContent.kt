@@ -120,7 +120,6 @@ fun MainBottomSheetContent(
                     AllowancesContent(
                         stateAllowances=stateAllowances,
                         mainViewModel=mainViewModel,
-                        preferences=preferences
                     )
                 }
             )
@@ -372,12 +371,8 @@ fun TariffsContent(
                             price = tariff.min_price,
                             isSelected = selected_tariff?.value == tariff,
                             onSelected = {
-                                mainViewModel.getAllowancesByTariffId(
-                                    preferences.getString(
-                                        PreferencesName.ACCESS_TOKEN, ""
-                                    ).toString(), tariff.id
-                                )
-                                mainViewModel.updateSelectedTariff(tariff, preferences)
+                                mainViewModel.getAllowancesByTariffId(tariff.id)
+                                mainViewModel.updateSelectedTariff(tariff)
                             })
                         Spacer(modifier = Modifier.width(10.dp))
                     })
@@ -452,7 +447,6 @@ fun OptionsContent() {
 fun AllowancesContent(
     stateAllowances: AllowancesResponseState,
     mainViewModel: MainViewModel,
-    preferences: SharedPreferences
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -477,7 +471,7 @@ fun AllowancesContent(
                             Text(text = " (${allowance.price}c)", fontSize = 16.sp, color = Color.Gray)
                         }
                         CustomSwitch(switchON = allowance.isSelected) {
-                            mainViewModel.includeAllowance(allowance, preferences)
+                            mainViewModel.includeAllowance(allowance)
                         }
                     }
                     Divider()

@@ -2,10 +2,7 @@ package com.example.gramclient.presentation
 
 import android.Manifest
 import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.SharedPreferences
+import android.content.*
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.Uri
@@ -20,14 +17,39 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.gramclient.PreferencesName
+import com.example.gramclient.R
 import com.example.gramclient.SmsBroadcastReceiver
+import com.example.gramclient.extension.checkInternet.ConnectionState
+import com.example.gramclient.extension.checkInternet.connectivityState
 import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
@@ -61,7 +83,31 @@ class MainActivity : ComponentActivity() {
                 authViewModel = hiltViewModel()
                  navController= rememberNavController()
                 scope= rememberCoroutineScope()
-                Navigation(navController =navController, messageViewModel, preferences, authViewModel=authViewModel)
+
+                val connection by connectivityState()
+
+                    Navigation(
+                        navController = navController,
+                        messageViewModel,
+                        preferences,
+                        authViewModel = authViewModel
+                    )
+                    if(connection == ConnectionState.Unavailable) {
+                        SimpleAlertDialog(
+                            title = "Внимание",
+                            text = "Нет доступа к интернету. Проверьте подключение к сети",
+                            confirmText = "позвонить оператору",
+                            dismissText = "Выход",
+                            onConfirm = {
+                                val callIntent: Intent = Uri
+                                    .parse("tel:0666")
+                                    .let { number ->
+                                        Intent(Intent.ACTION_DIAL, number)
+                                    }
+                                this.startActivity(callIntent)
+                            },
+                        onDismiss = {this@MainActivity.finish()})
+                    }
             }
         }
         startSmartUserConsent()
@@ -213,4 +259,126 @@ class MainActivity : ComponentActivity() {
         dialog.show()
     }
 
+}
+
+@Composable
+fun noConnectionScreen(
+    title: String?="",
+    desc: String?=""
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(
+                color = Color.Transparent,
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(25.dp, 5.dp, 25.dp, 5.dp)
+                )
+                .align(Alignment.Center),
+        ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.no_connection_icon),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .height(180.dp)
+                    .fillMaxWidth(),
+                )
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = title!!,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(top = 130.dp)
+                        .fillMaxWidth(),
+                    color = Color.Black,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = desc!!,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(top = 10.dp, start = 25.dp, end = 25.dp)
+                        .fillMaxWidth(),
+                    color = Color.Black,
+                )
+
+            }
+        }
+    }
+}
+@Composable
+fun SimpleAlertDialog(
+    title: String,
+    text: String,
+    confirmText: String,
+    dismissText:String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+){
+    Dialog(
+        onDismissRequest = { /*TODO*/ },
+    ) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(15.dp))
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(15.dp)
+        ) {
+            Text(
+                text = title,
+                fontSize = 22.sp,
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = text,
+                fontSize = 16.sp,
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Black
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .weight(1f),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black, contentColor = Color.Black),
+                    onClick = { onDismiss() }
+                ) {
+                    Text(text = dismissText, fontSize = 16.sp, color = Color.White)
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    modifier=Modifier
+                        .clickable { onConfirm() }
+                        .padding(2.dp)
+                        .clip(shape = RoundedCornerShape(5.dp))
+                    ,
+                    text = confirmText, fontSize = 18.sp, color = Color(0xFF1E88E5)
+                )
+            }
+        }
+    }
 }
