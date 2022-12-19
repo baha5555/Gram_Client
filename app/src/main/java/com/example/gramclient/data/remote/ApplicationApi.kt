@@ -30,11 +30,10 @@ interface ApplicationApi {
     ): IdentificationResponse
 
     @GET("/api/orders/tariffs")
-    suspend fun getTariffs(@Header("Authorization") token: String): TariffsResponse
+    suspend fun getTariffs(): TariffsResponse
 
     @GET("api/orders/tariff-allowances")
     suspend fun getAllowancesByTariffId(
-        @Header("Authorization") token: String,
         @Query("tariff_id") tariff_id: Int
     ): AllowancesResponse
 
@@ -57,7 +56,6 @@ interface ApplicationApi {
     @FormUrlEncoded
     @POST("/api/get-address-by-point")
     suspend fun getAddressByPoint(
-        @Header("Authorization") token: String,
         @Field("lng") lng: Double,
         @Field("lat") lat: Double
     ): AddressByPointResponse
@@ -73,7 +71,6 @@ interface ApplicationApi {
     @FormUrlEncoded
     @POST("/api/orders/search-addresses")
     suspend fun searchAddress(
-        @Header("Authorization") token: String,
         @Field("search") addressName: String,
     ): SearchAddressResponse
 
@@ -92,7 +89,6 @@ interface ApplicationApi {
     @FormUrlEncoded
     @POST("/api/orders/calculate")
     suspend fun getPrice(
-        @Header("Authorization") token: String,
         @Query("tariff_id") tariff_id : Int,
         @Field("allowances") allowances: String?,
         @Field("search_address_id") from_address: Int?,

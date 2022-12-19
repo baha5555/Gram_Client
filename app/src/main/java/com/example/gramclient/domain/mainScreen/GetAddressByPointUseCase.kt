@@ -11,11 +11,11 @@ import javax.inject.Inject
 
 class GetAddressByPointUseCase @Inject constructor(private val repository: AppRepository) {
 
-    operator fun invoke(token: String, lng: Double, lat: Double): Flow<Resource<AddressByPointResponse>> =
+    operator fun invoke(lng: Double, lat: Double): Flow<Resource<AddressByPointResponse>> =
         flow{
             try {
                 emit(Resource.Loading<AddressByPointResponse>())
-                val response: AddressByPointResponse = repository.getAddressByPoint(token, lng, lat)
+                val response: AddressByPointResponse = repository.getAddressByPoint(lng, lat)
                 emit(Resource.Success<AddressByPointResponse>(response))
             }catch (e: HttpException) {
                 emit(

@@ -74,16 +74,9 @@ fun MainScreen(
             profileViewModel.getProfileInfo(
                 preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
             )
-            mainViewModel.getTariffs(
-                preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()
-            )
-            mainViewModel.getAllowancesByTariffId(
-                preferences.getString(
-                    PreferencesName.ACCESS_TOKEN,
-                    ""
-                ).toString(), 1
-            )
-            mainViewModel.getPrice(preferences)
+            mainViewModel.getTariffs()
+            mainViewModel.getAllowancesByTariffId(1)
+            mainViewModel.getPrice()
             initialApiCalled = true
         }
     }

@@ -31,16 +31,15 @@ class AppRepositoryImpl(
 
     override suspend fun identification(client_register_id: String, sms_code: Long): IdentificationResponse = api.identification(client_register_id, sms_code)
 
-    override suspend fun getTariffs(token: String): TariffsResponse = api.getTariffs(token)
+    override suspend fun getTariffs(): TariffsResponse = api.getTariffs()
 
     override suspend fun getProfileInfo(token: String): GetProfileInfoResponse = api.getProfileInfo(token)
 
     override suspend fun getOrderHistory(token: String): orderHistoryResponse = api.getOrderHistory(token)
 
     override suspend fun getAllowancesByTariffId(
-        token: String,
         tariff_id: Int
-    ): AllowancesResponse = api.getAllowancesByTariffId(token, tariff_id)
+    ): AllowancesResponse = api.getAllowancesByTariffId(tariff_id)
 
     override suspend fun sendProfile(
         token: String,
@@ -51,10 +50,9 @@ class AppRepositoryImpl(
     ): ProfileResponse = api.sendProfile(token, first_name, last_name, email, avatar)
 
     override suspend fun getAddressByPoint(
-        token: String,
         lng: Double,
         lat: Double
-    ): AddressByPointResponse = api.getAddressByPoint(token, lng, lat)
+    ): AddressByPointResponse = api.getAddressByPoint(lng, lat)
 
     override suspend fun sendRating(
         token: String,
@@ -62,7 +60,7 @@ class AppRepositoryImpl(
         add_rating: Int
     ): AddRatingResponse = api.sendRating(token, order_id, add_rating)
 
-    override suspend fun searchAddress(token: String, addressName: String): SearchAddressResponse = api.searchAddress(token, addressName)
+    override suspend fun searchAddress(addressName: String): SearchAddressResponse = api.searchAddress(addressName)
 
     override suspend fun createOrder(
         token: String,
@@ -75,12 +73,11 @@ class AppRepositoryImpl(
     ): OrderResponse = api.createOrder(token, dop_phone, from_address, to_addresses, comment, tariff_id, allowances)
 
     override suspend fun getPrice(
-        token: String,
         tariff_id: Int,
         allowances: String?,
         from_address: Int?,
         to_addresses: String?
-    ): CalculateResponse = api.getPrice(token, tariff_id, allowances, from_address, to_addresses)
+    ): CalculateResponse = api.getPrice(tariff_id, allowances, from_address, to_addresses)
 
     override suspend fun cancelOrder(token: String, order_id: Int): CancelOrderResponse = api.cancelOrder(token, order_id)
 }

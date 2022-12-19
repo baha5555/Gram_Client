@@ -26,10 +26,9 @@ interface AppRepository {
         sms_code: Long
     ): IdentificationResponse
 
-    suspend fun getTariffs(token: String): TariffsResponse
+    suspend fun getTariffs(): TariffsResponse
 
     suspend fun getAllowancesByTariffId(
-         token: String,
          tariff_id: Int
     ): AllowancesResponse
 
@@ -47,7 +46,6 @@ interface AppRepository {
 
 
     suspend fun getAddressByPoint(
-        token: String,
         lng: Double,
         lat: Double
     ): AddressByPointResponse
@@ -61,7 +59,6 @@ interface AppRepository {
 
 
     suspend fun searchAddress(
-         token: String,
          addressName: String,
     ): SearchAddressResponse
 
@@ -78,7 +75,6 @@ interface AppRepository {
 
 
     suspend fun getPrice(
-        token: String,
         tariff_id : Int,
         allowances: String?,
         from_address: Int?,

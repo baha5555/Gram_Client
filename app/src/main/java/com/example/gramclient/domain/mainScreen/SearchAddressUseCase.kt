@@ -9,11 +9,11 @@ import java.io.IOException
 import javax.inject.Inject
 
 class SearchAddressUseCase @Inject constructor(private val repository: AppRepository) {
-    operator fun invoke(token: String, addressName: String): Flow<Resource<SearchAddressResponse>> =
+    operator fun invoke(addressName: String): Flow<Resource<SearchAddressResponse>> =
         flow{
             try {
                 emit(Resource.Loading<SearchAddressResponse>())
-                val response: SearchAddressResponse = repository.searchAddress(token, addressName)
+                val response: SearchAddressResponse = repository.searchAddress(addressName)
                 emit(Resource.Success<SearchAddressResponse>(response))
             }catch (e: HttpException) {
                 emit(

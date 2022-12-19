@@ -87,32 +87,31 @@ class MainViewModel @Inject constructor(
 
     fun updateSelectedTariff(
         value: TariffsResult,
-        preferences: SharedPreferences
     ) {
         selectedTariff?.value=value
         _selectedAllowances = mutableListOf()
         selectedAllowances.value=_selectedAllowances
-        getPrice(preferences)
+        getPrice()
     }
 
-    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance, preferences: SharedPreferences){
+    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance){
         if(toDesiredAllowance.isSelected.value){
             Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
             _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value=_selectedAllowances
-            getPrice(preferences)
+            getPrice()
             Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
         }else{
             Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
             _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value=_selectedAllowances
-            getPrice(preferences)
+            getPrice()
             Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
         }
     }
 
-    fun getTariffs(token:String){
-        getTariffsUseCase.invoke(token="Bearer $token").onEach { result: Resource<TariffsResponse> ->
+    fun getTariffs(){
+        getTariffsUseCase.invoke().onEach { result: Resource<TariffsResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -137,8 +136,8 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getAllowancesByTariffId(token:String, tariff_id:Int){
-        getAllowancesUseCase.invoke(token="Bearer $token", tariff_id = tariff_id).onEach { result: Resource<AllowancesResponse> ->
+    fun getAllowancesByTariffId(tariff_id:Int){
+        getAllowancesUseCase.invoke(tariff_id = tariff_id).onEach { result: Resource<AllowancesResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -163,8 +162,8 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getAddressByPoint(token: String, lng: Double, lat: Double){
-        getAddressByPointUseCase.invoke(token="Bearer $token", lng, lat).onEach { result: Resource<AddressByPointResponse> ->
+    fun getAddressByPoint(lng: Double, lat: Double){
+        getAddressByPointUseCase.invoke(lng, lat).onEach { result: Resource<AddressByPointResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -194,7 +193,7 @@ class MainViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-    fun getActualLocation(context: Context, token: String) {
+    fun getActualLocation(context: Context) {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(
             context)
         val task = fusedLocationProviderClient.lastLocation
@@ -211,7 +210,7 @@ class MainViewModel @Inject constructor(
 
         task.addOnSuccessListener {
             if (it != null){
-                getAddressByPoint(token, it.longitude, it.latitude)
+                getAddressByPoint(it.longitude, it.latitude)
                 Log.e("TariffsResponse","Location - > ${it.longitude}  + ${it.latitude}")
             }
             else{
@@ -220,8 +219,8 @@ class MainViewModel @Inject constructor(
         }
 
     }
-    fun searchAddress(token: String, addressName: String){
-        searchAddressUseCase.invoke(token="Bearer $token", addressName).onEach { result: Resource<SearchAddressResponse> ->
+    fun searchAddress(addressName: String){
+        searchAddressUseCase.invoke(addressName).onEach { result: Resource<SearchAddressResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -280,9 +279,8 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getPrice(preferences: SharedPreferences) {
+    fun getPrice() {
         getPriceUseCase.invoke(
-            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
             tariff_id = selectedTariff?.value?.id ?: 1,
             allowances = if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
             from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
@@ -339,12 +337,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun getAddressFromMap(
-        token: String,
         lng: Double,
         lat: Double,
         WHICH_ADDRESS: MutableState<String>
     ){
-        getAddressByPointUseCase.invoke(token="Bearer $token", lng, lat).onEach { result: Resource<AddressByPointResponse> ->
+        getAddressByPointUseCase.invoke(lng, lat).onEach { result: Resource<AddressByPointResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
