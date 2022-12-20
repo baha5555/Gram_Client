@@ -34,7 +34,6 @@ class MainViewModel @Inject constructor(
     private val searchAddressUseCase: SearchAddressUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
     private val getPriceUseCase: GetPriceUseCase,
-    private val cancelOrderUseCase: CancelOrderUseCase
 ):ViewModel() {
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
@@ -63,9 +62,6 @@ class MainViewModel @Inject constructor(
 
     private var _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
     val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
-
-    private val _stateCancelOrder = mutableStateOf(CancelOrderResponseState())
-    val stateCancelOrder: State<CancelOrderResponseState> = _stateCancelOrder
 
     private val _toAddress = mutableStateOf(listOf<Address>(Address("", 0, "", "")))
     val toAddress: State<List<Address>> = _toAddress
@@ -305,32 +301,6 @@ class MainViewModel @Inject constructor(
                 }
                 is Resource.Loading -> {
                     _stateCalculate.value = CalculateResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun cancelOrder(preferences: SharedPreferences, order_id: Int){
-        cancelOrderUseCase.invoke(token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", order_id).onEach { result: Resource<CancelOrderResponse> ->
-            when (result){
-                is Resource.Success -> {
-                    try {
-                        val response: CancelOrderResponse? = result.data
-                        _stateCancelOrder.value =
-                            CancelOrderResponseState(response = response)
-                        Log.e("TariffsResponse", "CancelOrderResponse->\n ${_stateCancelOrder.value}")
-                    }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
-                    }
-                }
-                is Resource.Error -> {
-                    Log.e("TariffsResponse", "CancelOrderResponseError->\n ${result.message}")
-                    _stateCancelOrder.value = CancelOrderResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateCancelOrder.value = CancelOrderResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)
