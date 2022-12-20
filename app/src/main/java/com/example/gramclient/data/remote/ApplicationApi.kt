@@ -9,6 +9,7 @@ import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
+import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
@@ -100,5 +101,10 @@ interface ApplicationApi {
         @Header("Authorization") token: String,
         @Path("order_id") order_id: Int,
     ): CancelOrderResponse
+
+    @GET("/api/orders/active")
+    suspend fun getActiveOrders(
+        @Header("Authorization") token: String,
+    ): ActiveOrdersResponse
 
 }

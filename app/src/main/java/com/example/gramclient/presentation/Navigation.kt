@@ -29,6 +29,7 @@ import com.example.gramclient.presentation.mainScreen.AddressSearchScreen
 import com.example.gramclient.presentation.mainScreen.MainScreen
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.orderScreen.OrderExecution
+import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 
 
 @Composable
@@ -37,7 +38,8 @@ fun Navigation(
     messageViewModel: Lazy<MessageViewModel>,
     preferences: SharedPreferences,
     mainViewModel: MainViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
 
 ) {
     var pressedTime: Long = 0
@@ -107,10 +109,10 @@ fun Navigation(
             PromoCodeScreen(navController)
         }
         composable(RoutesName.ORDER_EXECUTION_SCREEN) {
-            OrderExecution(navController, preferences)
+            OrderExecution(navController, preferences, orderExecutionViewModel)
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
-            SearchDriverScreen(navController, preferences=preferences)
+            SearchDriverScreen(navController, preferences=preferences, orderExecutionViewModel=orderExecutionViewModel)
             BackHandler(enabled = true) {
                 if (pressedTime + 2000 > System.currentTimeMillis()) {
                     activity?.finish()

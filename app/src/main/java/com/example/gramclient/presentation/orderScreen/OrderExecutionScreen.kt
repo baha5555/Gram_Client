@@ -12,9 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.outlined.Message
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,19 +24,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
+import com.example.gramclient.domain.orderExecutionScreen.Order
+import com.example.gramclient.domain.orderHistoryScreen.Performer
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.compose.material.Divider as Divider1
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -47,7 +46,7 @@ import androidx.compose.material.Divider as Divider1
 fun OrderExecution(
     navController: NavHostController,
     preferences: SharedPreferences,
-    orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel(),
+    orderExecutionViewModel: OrderExecutionViewModel,
 ) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -70,6 +69,11 @@ fun OrderExecution(
         mutableStateOf(0)
     }
 
+    val selectedOrder by orderExecutionViewModel.selectedOrder
+    LaunchedEffect(key1 = true){
+        Log.e("ActiveOrdersResponse", selectedOrder.toString())
+    }
+
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetBackgroundColor = Color(0xFFffffff),
@@ -79,184 +83,17 @@ fun OrderExecution(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.90f)
+                    .wrapContentHeight(unbounded = true)
+                    .background(BackgroundColor)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.TopCenter
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(67.dp)
-                            .height(8.dp)
-                            .background(
-                                Color(0xFFA1ACB6),
-                                shape = RoundedCornerShape(50.dp)
-                            )
-                            .padding(bottom = 7.dp),
-                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFE2EAF2))
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Color(0xFFffffff),
-                            )
-                            .padding(vertical = 15.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-                        Text(
-                            text = "За рулем Акбар", modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 20.sp, fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        )
-                        {
-                            Text(text = "серый Opel Astra")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column(
-                                Modifier
-                                    .background(
-                                        Color(0xFFF4B91D),
-                                        shape = RoundedCornerShape(5.dp)
-                                    )
-                                    .padding(vertical = 2.dp, horizontal = 12.dp)
-                            ) {
-                                Text(text = "0220KK",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp)
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(19.dp))
-                        Row(
-                            Modifier.fillMaxWidth(0.8f),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        )
-                        {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center) {
-                                Image(painter = painterResource(id = R.drawable.avatar),
-                                    "",
-                                    modifier = Modifier.size(55.dp))
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(text = "Акбар",
-                                    color = FontSilver,
-                                    textAlign = TextAlign.Center)
-                            }
-                            CustomCircleButton(text = "Написать", icon = Icons.Outlined.Message) {
-                                showGrade = true
-                            }
-                            CustomCircleButton(text = "Позвонить",
-                                icon = Icons.Default.Phone,
-                                onClick = { })
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        CustomOrderExecutionTextField(
-                            value = fromOrder,
-                            onValueChange = { fromOrder = it },
-                            text = "Откуда",
-                            icon = R.drawable.from_marker
-                        )
-                        CustomOrderExecutionTextField(
-                            value = addOrder,
-                            onValueChange = { addOrder = it },
-                            text = "Добавить остановку",
-                            icon = R.drawable.plus_icon
-                        )
-                        CustomOrderExecutionEndTextField(
-                            value = toOrder,
-                            onValueChange = { toOrder = it },
-                            text = "Куда",
-                            icon = R.drawable.to_marker
-                        )
+                selectedOrder.let { order ->
+                    if(order.performer != null) {
+                        performerSection(performer = order.performer)
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Color(0xFFffffff),
-                            )
-                    ) {
-                        CustomOrderExecutionField(
-                            mainText = "Наличные",
-                            secondaryText = "Способ оплаты",
-                            icon = R.drawable.wallet_icon
-                        )
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 15.dp, bottom = 15.dp, start = 15.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                modifier = Modifier
-                                    .size(23.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.location_icon),
-                                contentDescription = "Logo",
-                                tint = Color(0xFF343B71)
-                            )
-                            Spacer(modifier = Modifier.width(15.dp))
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(end = 15.dp)
-                                        .padding(end = 5.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(text = "Показать водителю, где я")
-                                    CustomSwitch(switchON = showMyLocation) {}
-                                }
-                                Spacer(modifier = Modifier.height(20.dp))
-                                Divider1(color = BackgroundColor)
-                            }
-                        }
-                        CustomOrderExecutionFieldOfWarning(
-                            mainText = "Стоимость поездки",
-                            secondaryText = "11 сомон",
-                            icon = R.drawable.warning_icon
-                        )
-                        Spacer(modifier = Modifier.requiredHeight(10.dp))
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CustomCircleButton(text = "Отменить\nзаказ",
-                                icon = Icons.Default.Close) {
-                                isDialogOpen.value = true
-                            }
-                            Spacer(modifier = Modifier.width(20.dp))
-                            CustomCircleButton(text = "Отправить\nмаршрут",
-                                icon = R.drawable.share_icon) {
-                                isDialogOpen.value = true
-
-                            }
-                            Spacer(modifier = Modifier.width(20.dp))
-                            CustomCircleButton(text = "Безопас-\nность",
-                                icon = R.drawable.safety_icon) {
-                                isDialogOpen.value = true
-
-                            }
-                        }
-                    }
-
+                    orderSection(order)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    optionSection()
+                    actionSection()
                 }
             }
         },
@@ -353,6 +190,293 @@ fun OrderExecution(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun performerSection(
+    performer: Performer
+){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                color = Color.White
+            )
+            .padding(20.dp)
+    ){
+        Text(
+            modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
+            text = "За рулем ${performer.first_name}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+        ){
+            Text(text = "${performer.transport.color} ${performer.transport.model}", fontSize = 16.sp, color = Color.Black)
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                modifier = Modifier
+                    .background(shape = RoundedCornerShape(3.dp), color = Color(0xFFF4B91D))
+                    .padding(3.dp), textAlign = TextAlign.Center,
+                text = performer.transport.car_number, fontSize = 16.sp, color = Color.Black)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+        ) {
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.avatar),
+                    "",
+                    modifier = Modifier.size(55.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "${performer.first_name}",
+                    color = FontSilver,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(modifier = Modifier.width(20.dp))
+            CustomCircleButton(text = "Сообщение", icon = Icons.Outlined.Message) { }
+            Spacer(modifier = Modifier.width(20.dp))
+            CustomCircleButton(text = "Позвонить",
+                icon = Icons.Default.Phone,
+                onClick = { })
+        }
+    }
+}
+
+@Composable
+fun orderSection(order: Order) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White)
+        .padding(bottom = 10.dp)
+    ){
+        Row(
+            modifier = Modifier
+                .clickable {
+//                    scope.launch {
+//                        bottomSheetState.bottomSheetState.expand()
+//                        isSearchState.value = true
+//                        WHICH_ADDRESS.value = Constants.FROM_ADDRESS
+//                    }
+                }
+                .fillMaxWidth()
+                .padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                    contentDescription = "Logo"
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+//                Text(text = "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
+                Text(text = order.from_address?.name ?: "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Black)
+            }
+            Image(
+                modifier = Modifier.size(18.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                contentDescription = "icon"
+            )
+        }
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 55.dp, end = 15.dp)) {
+            Divider()
+        }
+        Row(
+            modifier = Modifier
+                .clickable {
+//                    scope.launch {
+//                        bottomSheetState.bottomSheetState.expand()
+//                        isSearchState.value = true
+//                        WHICH_ADDRESS.value = Constants.FROM_ADDRESS
+//                    }
+                }
+                .fillMaxWidth()
+                .padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.plus_icon),
+                    contentDescription = "Logo"
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                Text(text = "Добавить остановку", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
+            }
+            Image(
+                modifier = Modifier.size(18.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                contentDescription = "icon"
+            )
+        }
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 55.dp, end = 15.dp)) {
+            androidx.compose.material.Divider()
+        }
+
+        order.to_addresses?.forEach { address ->
+            Row(
+                modifier = Modifier
+                    .clickable {
+    //                    scope.launch {
+    //                        bottomSheetState.bottomSheetState.expand()
+    //                        isSearchState.value = true
+    //                        WHICH_ADDRESS.value = Constants.FROM_ADDRESS
+    //                    }
+                    }
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row() {
+                    Image(
+                        modifier = Modifier
+                            .size(20.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.to_marker),
+                        contentDescription = "Logo"
+                    )
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Text(
+                        text = address.name,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.Black
+                    )
+                }
+                Image(
+                    modifier = Modifier.size(18.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                    contentDescription = "icon"
+                )
+            }
+        }
+    }
+}
+@Composable
+fun optionSection(){
+
+    val switch=remember{ mutableStateOf(false) }
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White)
+        .padding(bottom = 10.dp)
+    ){
+        Row(
+            modifier = Modifier
+                .clickable {
+//                    scope.launch {
+//                        bottomSheetState.bottomSheetState.expand()
+//                        isSearchState.value = true
+//                        WHICH_ADDRESS.value = Constants.FROM_ADDRESS
+//                    }
+                }
+                .fillMaxWidth()
+                .padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.wallet_icon),
+                    contentDescription = "Logo"
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                Column(){
+                    Text(text = "Наличные", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Black, fontSize = 18.sp)
+                    Text(text = "Изменить способ оплаты", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray, fontSize = 14.sp)
+                }
+            }
+            Image(
+                modifier = Modifier.size(18.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                contentDescription = "icon"
+            )
+        }
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 55.dp, end = 15.dp)) {
+            androidx.compose.material.Divider()
+        }
+        Row(
+            modifier = Modifier
+                .clickable {
+//                        scope.launch {
+//                            bottomSheetState.bottomSheetState.expand()
+//                            isSearchState.value = true
+//                            WHICH_ADDRESS.value = Constants.TO_ADDRESS
+//                        }
+                }
+                .fillMaxWidth()
+                .padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row() {
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.location_icon),
+                    contentDescription = "Logo"
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                Text(
+                    text = "Показать водителю, где я", color = Color.Gray,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
+            }
+            Row(){
+                CustomSwitch(switchON = switch) {
+
+                }
+                Spacer(modifier = Modifier.width(15.dp))
+            }
+        }
+    }
+}
+@Composable
+fun actionSection(){
+    Row(
+        modifier = Modifier.fillMaxWidth().fillMaxHeight()
+            .background(Color.White)
+            .padding(20.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.Center
+    ){
+        CustomCircleButton(text = "Отменить\nзаказ",
+            icon = Icons.Default.Close) {
+            //method
+        }
+        Spacer(modifier = Modifier.width(20.dp))
+        CustomCircleButton(text = "Отправить\nмаршрут",
+            icon = R.drawable.share_icon) {
+            //method
+        }
+        Spacer(modifier = Modifier.width(20.dp))
+        CustomCircleButton(text = "Безопас-\nность",
+            icon = R.drawable.safety_icon) {
+            //method
         }
     }
 }
