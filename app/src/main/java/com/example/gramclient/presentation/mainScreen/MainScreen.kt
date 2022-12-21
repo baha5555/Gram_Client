@@ -171,7 +171,8 @@ fun MainScreen(
                             navController, mainBottomSheetState, bottomSheetState,
                             createOrder = {
                                 mainViewModel.createOrder(preferences)
-                            }
+                            },
+                            preferences
                         )
                     }
                 }) {

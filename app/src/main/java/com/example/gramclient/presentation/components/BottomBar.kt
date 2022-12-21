@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
 import kotlinx.coroutines.launch
@@ -27,7 +29,8 @@ fun BottomBar(
     navController: NavHostController,
     mainBottomSheetState: BottomSheetScaffoldState,
     bottomSheetState: BottomSheetScaffoldState,
-    createOrder: () -> Unit
+    createOrder: () -> Unit,
+    preferences: SharedPreferences
 ) {
     val coroutineScope= rememberCoroutineScope()
     val isDialogOpen=remember{ mutableStateOf(false) }
@@ -72,7 +75,15 @@ fun BottomBar(
                 textSize = 18,
                 textBold = true,
             onClick = {
-                isDialogOpen.value=true
+                if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "") {
+                    navController.navigate(RoutesName.AUTH_SCREEN){
+                        popUpTo(RoutesName.MAIN_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }else {
+                    isDialogOpen.value = true
+                }
             })
             IconButton(onClick = {
                 coroutineScope.launch {
