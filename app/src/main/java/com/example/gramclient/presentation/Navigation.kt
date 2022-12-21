@@ -11,7 +11,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.gramclient.PreferencesName
 import com.example.gramclient.RoutesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.authorization.AuthorizationScreen
@@ -46,15 +45,13 @@ fun Navigation(
     val activity = (LocalContext.current as? MainActivity)
     val context= LocalContext.current
 
-//    startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
-//        RoutesName.SPLASH_SCREEN else RoutesName.SEARCH_ADDRESS_SCREEN
 
     NavHost(
         navController = navController,
         startDestination = RoutesName.SPLASH_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
-            SplashScreen(navController)
+            SplashScreen(navController, orderExecutionViewModel, preferences)
         }
         composable(RoutesName.IDENTIFICATION_SCREEN) {
             IdentificationScreen(
@@ -69,7 +66,7 @@ fun Navigation(
             AuthorizationScreen(navController, preferences=preferences, viewModel = authViewModel)
         }
         composable(RoutesName.MAIN_SCREEN) {
-            MainScreen(navController, preferences, mainViewModel)
+            MainScreen(navController, preferences, mainViewModel, orderExecutionViewModel)
         }
         composable(RoutesName.SETTING_SCREEN) {
             SettingScreen(navController)

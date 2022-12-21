@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.gramclient.Constants
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
@@ -19,6 +20,7 @@ import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.*
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.mainScreen.states.*
+import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -241,7 +243,7 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun createOrder(preferences: SharedPreferences) {
+    fun createOrder(preferences: SharedPreferences, orderExecutionViewModel: OrderExecutionViewModel, navController:NavController) {
         createOrderUseCase.invoke(
             token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
             dop_phone = null,
@@ -258,6 +260,7 @@ class MainViewModel @Inject constructor(
                         _stateCreateOrder.value =
                             OrderResponseState(response = response)
                         Log.e("TariffsResponse", "OrderResponse->\n ${_stateCreateOrder.value}")
+                        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }

@@ -6,12 +6,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
+import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderUseCase
 import com.example.gramclient.domain.orderExecutionScreen.*
+import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.presentation.mainScreen.states.CancelOrderResponseState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -69,7 +73,7 @@ class OrderExecutionViewModel  @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getActiveOrders(token:String){
+    fun getActiveOrders(token:String, navController: NavController){
         getActiveOrdersUseCase.invoke(token="Bearer $token").onEach { result: Resource<ActiveOrdersResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -78,6 +82,22 @@ class OrderExecutionViewModel  @Inject constructor(
                         _stateActiveOrders.value =
                             ActiveOrdersResponseState(response = response?.result)
                         Log.e("ActiveOrdersResponse", "ActiveOrdersResponse->\n ${_stateActiveOrders.value}")
+                        currentRoute = navController.currentBackStackEntry?.destination?.route
+                        if(navController.currentBackStackEntry?.destination?.route == RoutesName.SPLASH_SCREEN) {
+                            if (_stateActiveOrders.value.response!!.isEmpty()) {
+                                navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                    popUpTo(RoutesName.SPLASH_SCREEN) {
+                                        inclusive = true
+                                    }
+                                }
+                            } else {
+                                navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN) {
+                                    popUpTo(RoutesName.SPLASH_SCREEN) {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
@@ -94,7 +114,7 @@ class OrderExecutionViewModel  @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-    fun cancelOrder(preferences: SharedPreferences, order_id: Int){
+    fun cancelOrder(preferences: SharedPreferences, order_id: Int, navController: NavController){
         cancelOrderUseCase.invoke(token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", order_id).onEach { result: Resource<CancelOrderResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -102,7 +122,7 @@ class OrderExecutionViewModel  @Inject constructor(
                         val response: CancelOrderResponse? = result.data
                         _stateCancelOrder.value =
                             CancelOrderResponseState(response = response)
-                        getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+                        getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
                         Log.e("TariffsResponse", "CancelOrderResponse->\n ${_stateCancelOrder.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")

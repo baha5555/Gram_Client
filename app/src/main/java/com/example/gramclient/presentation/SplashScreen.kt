@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation
 
+import android.content.SharedPreferences
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.tween
@@ -22,25 +23,23 @@ import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.gramclient.PreferencesName
 import kotlinx.coroutines.delay
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 
 @Composable
-fun SplashScreen(navController: NavController){
+fun SplashScreen(
+    navController: NavController,
+    orderExecutionViewModel: OrderExecutionViewModel,
+    preferences: SharedPreferences
+){
+
     LaunchedEffect(key1 = true) {
         delay(2200L)
-//        navController.navigate(RoutesName.AUTH_SCREEN) {
-//            popUpTo(RoutesName.SPLASH_SCREEN) {
-//                inclusive = true
-//            }
-//        }
-        navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
-            popUpTo(RoutesName.SPLASH_SCREEN) {
-                inclusive = true
-            }
-        }
+        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
     }
     Splash()
 
