@@ -114,7 +114,7 @@ class AuthViewModel @Inject constructor(
                     preferences.edit()
                         .putString(PreferencesName.ACCESS_TOKEN, response?.result?.access_token)
                         .apply()
-                    navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                    navController.navigate(RoutesName.MAIN_SCREEN) {
                         popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
                             inclusive = true
                         }

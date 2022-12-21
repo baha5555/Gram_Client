@@ -31,7 +31,12 @@ import com.example.gramclient.ui.theme.BackgroundColor
 fun SplashScreen(navController: NavController){
     LaunchedEffect(key1 = true) {
         delay(2200L)
-        navController.navigate(RoutesName.AUTH_SCREEN) {
+//        navController.navigate(RoutesName.AUTH_SCREEN) {
+//            popUpTo(RoutesName.SPLASH_SCREEN) {
+//                inclusive = true
+//            }
+//        }
+        navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
             popUpTo(RoutesName.SPLASH_SCREEN) {
                 inclusive = true
             }

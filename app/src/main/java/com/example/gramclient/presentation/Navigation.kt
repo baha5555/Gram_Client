@@ -46,10 +46,12 @@ fun Navigation(
     val activity = (LocalContext.current as? MainActivity)
     val context= LocalContext.current
 
+//    startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
+//        RoutesName.SPLASH_SCREEN else RoutesName.SEARCH_ADDRESS_SCREEN
+
     NavHost(
         navController = navController,
-        startDestination = if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "")
-            RoutesName.SPLASH_SCREEN else RoutesName.SEARCH_ADDRESS_SCREEN
+        startDestination = RoutesName.SPLASH_SCREEN
     ) {
         composable(RoutesName.SPLASH_SCREEN) {
             SplashScreen(navController)
