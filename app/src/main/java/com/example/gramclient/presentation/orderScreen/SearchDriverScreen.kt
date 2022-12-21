@@ -50,7 +50,7 @@ fun SearchDriverScreen(
     )
 
     LaunchedEffect(key1 = true){
-        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
     }
 
     val stateActiveOrders by orderExecutionViewModel.stateActiveOrders
@@ -84,7 +84,14 @@ fun SearchDriverScreen(
                             .padding(15.dp)
                             .height(50.dp)
                             .clip(RoundedCornerShape(20.dp))
-                            .background(PrimaryColor),
+                            .background(PrimaryColor)
+                            .clickable {
+                               navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN){
+                                   popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
+                                       inclusive = true
+                                   }
+                               }
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -267,7 +274,7 @@ fun orderCard(
         text = "Вы уверены что хотите отменить заказ?",
         okBtnClick = {
             isDialogOpen.value = false
-            orderExecutionViewModel.cancelOrder(preferences = preferences, order.id)
+            orderExecutionViewModel.cancelOrder(preferences = preferences, order.id, navController)
         },
         cancelBtnClick = { isDialogOpen.value = false },
         isDialogOpen = isDialogOpen.value

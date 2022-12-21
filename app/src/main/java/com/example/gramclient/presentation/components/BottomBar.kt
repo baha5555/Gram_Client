@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
+import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -30,7 +31,7 @@ fun BottomBar(
     mainBottomSheetState: BottomSheetScaffoldState,
     bottomSheetState: BottomSheetScaffoldState,
     createOrder: () -> Unit,
-    preferences: SharedPreferences
+    preferences: SharedPreferences,
 ) {
     val coroutineScope= rememberCoroutineScope()
     val isDialogOpen=remember{ mutableStateOf(false) }

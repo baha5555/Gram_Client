@@ -29,6 +29,7 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
 import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.launch
@@ -41,6 +42,7 @@ fun MainScreen(
     navController: NavHostController,
     preferences: SharedPreferences,
     mainViewModel: MainViewModel,
+    orderExecutionViewModel: OrderExecutionViewModel,
 ) {
     val profileViewModel:ProfileViewModel = hiltViewModel()
     val mainBottomSheetState = rememberBottomSheetScaffoldState(
@@ -170,7 +172,7 @@ fun MainScreen(
                         BottomBar(
                             navController, mainBottomSheetState, bottomSheetState,
                             createOrder = {
-                                mainViewModel.createOrder(preferences)
+                                mainViewModel.createOrder(preferences, orderExecutionViewModel, navController)
                             },
                             preferences
                         )
