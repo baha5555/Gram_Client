@@ -1,8 +1,10 @@
 package com.example.gramclient.presentation
 
 import android.content.SharedPreferences
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,6 +12,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -86,11 +89,11 @@ fun SearchDriverScreen(
                             .clip(RoundedCornerShape(20.dp))
                             .background(PrimaryColor)
                             .clickable {
-                               navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN){
-                                   popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
-                                       inclusive = true
-                                   }
-                               }
+                                navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                    popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
+                                        inclusive = true
+                                    }
+                                }
                             },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
@@ -207,16 +210,34 @@ fun orderCard(
             .fillMaxWidth()
             .background(color = Color.White, shape = RoundedCornerShape(20.dp))
     ){
+        if(order.performer == null){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = 10.dp,
+                        start = 20.dp,
+                        end = 20.dp
+                    )
+            ){
+                LinearProgressIndicator(color = Color(0xFF4285F4), modifier = Modifier.fillMaxWidth().clip(shape = RoundedCornerShape(percent = 50)))
+            }
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top=20.dp, bottom = if(order.performer == null) 20.dp else 5.dp, start = 20.dp, end = 20.dp),
+                .padding(
+                    top = if (order.performer == null) 10.dp else 20.dp,
+                    bottom = if (order.performer == null) 20.dp else 5.dp,
+                    start = 20.dp,
+                    end = 20.dp
+                ),
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Column(){
-                Text(text =  if(order.performer == null) "Рядом с вами 3 машины" else "Через 6 мин приедет", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text(text =  if(order.performer == null) "Выбираем подходящие" else "${order.performer.transport.color} ${order.performer.transport.model}", fontSize = 14.sp, color = Color.Black)
+                Text(text =  if(order.performer == null) "Ищем ближайших водителей..." else "Через 6 мин приедет", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(text =  if(order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport.color} ${order.performer.transport.model}", fontSize = 14.sp, color = Color.Black)
             }
             if(order.performer == null) {
                 Text(text = "00:00", fontSize = 14.sp, color = Color.Black)
@@ -279,4 +300,44 @@ fun orderCard(
         cancelBtnClick = { isDialogOpen.value = false },
         isDialogOpen = isDialogOpen.value
     )
+}
+
+@Composable
+fun PulseLoading(
+    durationMillis:Int = 1000,
+    maxPulseSize:Float = 300f,
+    minPulseSize:Float = 50f,
+    pulseColor:Color = Color(234,240,246),
+    centreColor:Color =  Color(66,133,244)
+){
+    val infiniteTransition = rememberInfiniteTransition()
+    val size by infiniteTransition.animateFloat(
+        initialValue = minPulseSize,
+        targetValue = maxPulseSize,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+    Box(contentAlignment = Alignment.Center,modifier = Modifier.fillMaxSize()) {
+        Card(
+            shape = CircleShape,
+            modifier = Modifier.size(size.dp).align(Alignment.Center).alpha(alpha),
+            backgroundColor = pulseColor,
+            elevation = 0.dp
+        ) {}
+        Card(modifier = Modifier
+            .size(minPulseSize.dp)
+            .align(Alignment.Center),
+            shape = CircleShape,
+            backgroundColor = centreColor){}
+    }
 }
