@@ -39,7 +39,16 @@ fun SplashScreen(
 
     LaunchedEffect(key1 = true) {
         delay(2200L)
-        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
+        if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") != "") {
+            orderExecutionViewModel.getActiveOrders(
+                token = preferences.getString(
+                    PreferencesName.ACCESS_TOKEN,
+                    ""
+                ).toString(), navController
+            )
+        }else{
+            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
+        }
     }
     Splash()
 
