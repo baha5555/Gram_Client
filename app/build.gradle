@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -127,6 +128,11 @@ dependencies {
     implementation "com.google.accompanist:accompanist-pager:0.24.1-alpha"
 
     implementation "com.google.accompanist:accompanist-insets:0.6.2"
+
+    //FireBase
+    implementation platform('com.google.firebase:firebase-bom:31.1.1')
+   // implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
+
 
 
 }
