@@ -9,6 +9,7 @@ import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
+import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
@@ -106,5 +107,18 @@ interface ApplicationApi {
     suspend fun getActiveOrders(
         @Header("Authorization") token: String,
     ): ActiveOrdersResponse
+
+    @PATCH("/api/orders/{order_id}")
+    suspend fun editOrder(
+        @Header("Authorization") token: String,
+        @Path("order_id") order_id: Int,
+        @Query("dop_phone") dop_phone: String?,
+        @Query("search_address_id") from_address: Int?,
+        @Query("meeting_info") meeting_info: String?,
+        @Query("to_addresses") to_addresses: String?,
+        @Query("comment") comment: String?,
+        @Query("tariff_id") tariff_id : Int,
+        @Query("allowances") allowances: String?,
+    ): UpdateOrderResponse
 
 }

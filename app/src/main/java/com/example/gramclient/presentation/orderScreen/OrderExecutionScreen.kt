@@ -13,29 +13,39 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Message
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.domain.orderExecutionScreen.Order
 import com.example.gramclient.domain.orderHistoryScreen.Performer
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -47,18 +57,13 @@ fun OrderExecution(
     navController: NavHostController,
     preferences: SharedPreferences,
     orderExecutionViewModel: OrderExecutionViewModel,
+    mainViewModel: MainViewModel= hiltViewModel()
 ) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
-    val bottomSheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
-    )
     val coroutineScope = rememberCoroutineScope()
-    var toOrder by remember { mutableStateOf("") }
-    var fromOrder by remember { mutableStateOf("") }
-    var addOrder by remember { mutableStateOf("") }
-    val showMyLocation = remember { mutableStateOf(false) }
+
 
     val isDialogOpen = remember { mutableStateOf(false) }
     var showGrade by remember {
@@ -68,6 +73,16 @@ fun OrderExecution(
     val ratingState = remember {
         mutableStateOf(0)
     }
+
+    // searchState dependencies ->
+    var WHICH_ADDRESS = remember{ mutableStateOf("") }
+    val isAddressList= remember { mutableStateOf(true) }
+    val searchText=remember{ mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+    val isSearchState = remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    //searchState dependencies <-
 
     val selectedOrder by orderExecutionViewModel.selectedOrder
     LaunchedEffect(key1 = true){
@@ -86,14 +101,21 @@ fun OrderExecution(
                     .wrapContentHeight(unbounded = true)
                     .background(BackgroundColor)
             ) {
-                selectedOrder.let { order ->
-                    if(order.performer != null) {
-                        performerSection(performer = order.performer)
+                if(!isSearchState.value) {
+                    selectedOrder.let { order ->
+                        if (order.performer != null) {
+                            performerSection(performer = order.performer)
+                        }
+                        orderSection(order, scope, sheetState, isSearchState)
+                        Spacer(modifier = Modifier.height(10.dp))
+                        optionSection()
+                        actionSection()
                     }
-                    orderSection(order)
-                    Spacer(modifier = Modifier.height(10.dp))
-                    optionSection()
-                    actionSection()
+                }else{
+                    searchSection(
+                        searchText, focusRequester, isSearchState, sheetState, scope, orderExecutionViewModel,
+                        navController, isAddressList, focusManager, mainViewModel, preferences
+                    )
                 }
             }
         },
@@ -253,8 +275,14 @@ fun performerSection(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun orderSection(order: Order) {
+fun orderSection(
+    order: Order,
+    scope: CoroutineScope,
+    bottomSheetState: BottomSheetScaffoldState,
+    isSearchState: MutableState<Boolean>
+) {
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(Color.White)
@@ -336,11 +364,10 @@ fun orderSection(order: Order) {
             Row(
                 modifier = Modifier
                     .clickable {
-    //                    scope.launch {
-    //                        bottomSheetState.bottomSheetState.expand()
-    //                        isSearchState.value = true
-    //                        WHICH_ADDRESS.value = Constants.FROM_ADDRESS
-    //                    }
+                        scope.launch {
+                            bottomSheetState.bottomSheetState.expand()
+                            isSearchState.value = true
+                        }
                     }
                     .fillMaxWidth()
                     .padding(15.dp),
@@ -458,7 +485,9 @@ fun optionSection(){
 @Composable
 fun actionSection(){
     Row(
-        modifier = Modifier.fillMaxWidth().fillMaxHeight()
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
             .background(Color.White)
             .padding(20.dp),
         verticalAlignment = Alignment.Top,
@@ -477,6 +506,121 @@ fun actionSection(){
         CustomCircleButton(text = "Безопас-\nность",
             icon = R.drawable.safety_icon) {
             //method
+        }
+    }
+}
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun searchSection(
+    searchText: MutableState<String>,
+    focusRequester: FocusRequester,
+    isSearchState: MutableState<Boolean>,
+    bottomSheetState: BottomSheetScaffoldState,
+    scope: CoroutineScope,
+    orderExecutionViewModel: OrderExecutionViewModel,
+    navController: NavHostController,
+    isAddressList: MutableState<Boolean>,
+    focusManager: FocusManager,
+    mainViewModel: MainViewModel,
+    preferences: SharedPreferences
+){
+    Box(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = searchText.value,
+            onValueChange = { value ->
+                searchText.value = value
+                mainViewModel.searchAddress(value)
+            },
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .fillMaxWidth(),
+            textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
+            leadingIcon = {
+                IconButton(onClick = { /*navController.popBackStack()*/ }) {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .padding(start = 15.dp, top = 15.dp, bottom = 15.dp)
+                            .size(24.dp)
+                    )
+                }
+            },
+            trailingIcon = {
+                if (searchText.value != "") {
+                    IconButton(
+                        modifier = Modifier.offset(x = (-40).dp),
+                        onClick = {
+                            searchText.value =
+                                ""
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(vertical = 15.dp, horizontal = 40.dp)
+                                .size(24.dp)
+                        )
+                    }
+                }
+            },
+            placeholder = { Text(text = "Введите адрес для поиска") },
+            singleLine = true,
+            shape = RoundedCornerShape(15.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                leadingIconColor = Color.Black,
+                trailingIconColor = Color.Black,
+                backgroundColor = BackgroundColor,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            )
+        )
+        Box(modifier = Modifier
+            .align(Alignment.CenterEnd)
+            .padding(end = 20.dp)
+            .clickable {
+                scope.launch {
+                    bottomSheetState.bottomSheetState.collapse()
+                }
+                isSearchState.value = false
+            },
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Spacer(
+                    modifier =
+                    Modifier
+                        .width(1.dp)
+                        .height(55.dp)
+                        .padding(vertical = 10.dp)
+                        .background(Color(0xFFE0DBDB))
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Карта", fontSize = 14.sp, color = Color.Black, modifier = Modifier)
+            }
+        }
+    }
+    //Search response content
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+    )
+    {
+        AddressList(
+            navController = navController,
+            isVisible = isAddressList,
+            address = searchText,
+            focusManager = focusManager,
+        ){address ->
+            scope.launch {
+                bottomSheetState.bottomSheetState.collapse()
+            }
+            isSearchState.value=false
+                orderExecutionViewModel.editOrder(preferences, address.id)
         }
     }
 }
