@@ -9,6 +9,7 @@ import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
+import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
@@ -91,6 +92,18 @@ interface AppRepository {
     suspend fun getActiveOrders(
         token: String,
     ): ActiveOrdersResponse
+
+    suspend fun editOrder(
+        token: String,
+        order_id: Int,
+        dop_phone: String?,
+        from_address: Int?,
+        meeting_info: String?,
+        to_addresses: String?,
+        comment: String?,
+        tariff_id : Int,
+        allowances: String?,
+    ): UpdateOrderResponse
 
 }
 

@@ -12,11 +12,12 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.Resource
 import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
-import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
-import com.example.gramclient.domain.mainScreen.order.CancelOrderUseCase
+import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.domain.orderExecutionScreen.*
 import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.presentation.mainScreen.states.CancelOrderResponseState
+import com.example.gramclient.presentation.mainScreen.states.OrderResponseState
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -26,7 +27,8 @@ import javax.inject.Inject
 class OrderExecutionViewModel  @Inject constructor(
     private val sendAddRatingUseCase: SendAddRatingUseCase,
     private val getActiveOrdersUseCase: GetActiveOrdersUseCase,
-    private val cancelOrderUseCase: CancelOrderUseCase
+    private val cancelOrderUseCase: CancelOrderUseCase,
+    private val editOrderUseCase: EditOrderUseCase,
 ): ViewModel() {
 
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
@@ -38,6 +40,9 @@ class OrderExecutionViewModel  @Inject constructor(
     private val _stateCancelOrder = mutableStateOf(CancelOrderResponseState())
     val stateCancelOrder: State<CancelOrderResponseState> = _stateCancelOrder
 
+    private val _stateEditOrder = mutableStateOf(EditOrderResponseState())
+    val stateEditOrder: State<EditOrderResponseState> = _stateEditOrder
+
     private val _selectedOrder = mutableStateOf(Order(listOf(), "", "", "", null, 1, "", null, "", 1, "", "", "", 1, null))
     val selectedOrder: State<Order> = _selectedOrder
 
@@ -45,9 +50,10 @@ class OrderExecutionViewModel  @Inject constructor(
         _selectedOrder.value = order
     }
 
+
     fun sendRating2(token:String,
-                      order_id: Int,
-                      add_rating: Int){
+      order_id: Int,
+      add_rating: Int){
         sendAddRatingUseCase.invoke(token="Bearer $token",order_id, add_rating).onEach { result: Resource<AddRatingResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -136,6 +142,42 @@ class OrderExecutionViewModel  @Inject constructor(
                 }
                 is Resource.Loading -> {
                     _stateCancelOrder.value = CancelOrderResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun editOrder(preferences: SharedPreferences, toAddressId: Int) {
+        editOrderUseCase.invoke(
+            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
+            order_id = selectedOrder.value.id,
+            dop_phone = null,
+            from_address = selectedOrder.value.from_address?.id,
+            meeting_info = null,
+            to_addresses = listOf(AddressModel(toAddressId)),
+            comment = null,
+            tariff_id = selectedOrder.value.tariff_id,
+            allowances= if(selectedOrder.value.allowances.isNotEmpty()) Gson().toJson(selectedOrder.value.allowances) else null
+        ).onEach { result: Resource<UpdateOrderResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val response: UpdateOrderResponse? = result.data
+                        _stateEditOrder.value =
+                            EditOrderResponseState(response = response)
+                        Log.e("EditOrderResponse", "EditOrderResponse->\n ${_stateEditOrder.value}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("EditOrderResponse", "EditOrderResponseError->\n ${result.message}")
+                    _stateEditOrder.value = EditOrderResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateEditOrder.value = EditOrderResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

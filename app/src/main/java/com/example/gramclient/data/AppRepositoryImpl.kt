@@ -12,6 +12,7 @@ import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
+import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
@@ -81,5 +82,18 @@ class AppRepositoryImpl(
     ): CalculateResponse = api.getPrice(tariff_id, allowances, from_address, to_addresses)
 
     override suspend fun cancelOrder(token: String, order_id: Int): CancelOrderResponse = api.cancelOrder(token, order_id)
+
     override suspend fun getActiveOrders(token: String): ActiveOrdersResponse = api.getActiveOrders(token)
+
+    override suspend fun editOrder(
+        token: String,
+        order_id: Int,
+        dop_phone: String?,
+        from_address: Int?,
+        meeting_info: String?,
+        to_addresses: String?,
+        comment: String?,
+        tariff_id: Int,
+        allowances: String?
+    ): UpdateOrderResponse = api.editOrder(token, order_id, dop_phone, from_address, meeting_info, to_addresses, comment, tariff_id, allowances)
 }
