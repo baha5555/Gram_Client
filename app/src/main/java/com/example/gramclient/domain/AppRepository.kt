@@ -1,5 +1,7 @@
 package com.example.gramclient.domain
 
+import androidx.lifecycle.LiveData
+import com.example.firebaserealtimedatabase.orders.Order
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
@@ -22,6 +24,7 @@ import java.util.*
 
 interface AppRepository {
     suspend fun authorization(phone_number: Long): AuthResponse
+    val readAll: LiveData<List<Order>>
 
     suspend fun identification(
         client_register_id: String,

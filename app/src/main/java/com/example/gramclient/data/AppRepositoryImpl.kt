@@ -1,5 +1,7 @@
 package com.example.gramclient.data
 
+import androidx.lifecycle.LiveData
+import com.example.firebaserealtimedatabase.orders.Order
 import com.example.gramclient.Constants
 import com.example.gramclient.data.remote.ApplicationApi
 import com.example.gramclient.domain.AppRepository
@@ -18,6 +20,7 @@ import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
+import com.example.gramclient.domain.realtimeDatabase.AllNotesLiveData
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -29,6 +32,8 @@ import java.util.*
 class AppRepositoryImpl(
     private val api: ApplicationApi
 ):AppRepository {
+    override val readAll: LiveData<List<Order>> = AllNotesLiveData()
+
     override suspend fun authorization(phone_number: Long): AuthResponse = api.authorization("${Constants.PREFIX}$phone_number".toLong())
 
     override suspend fun identification(client_register_id: String, sms_code: Long): IdentificationResponse = api.identification(client_register_id, sms_code)
