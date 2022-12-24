@@ -4,16 +4,19 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.example.gramclient.PreferencesName
-import com.example.gramclient.Resource
-import com.example.gramclient.RoutesName
+import com.example.gramclient.*
+import com.example.gramclient.data.AppRepositoryImpl
+import com.example.gramclient.data.remote.ApplicationApi
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.domain.orderExecutionScreen.*
+import com.example.gramclient.domain.realtimeDatabase.RealtimeDatabaseUseCase
+import com.example.gramclient.domain.realtimeDatabase.realtimeDatabaseResponseState
 import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.presentation.mainScreen.states.CancelOrderResponseState
 import com.example.gramclient.presentation.mainScreen.states.OrderResponseState
@@ -29,10 +32,13 @@ class OrderExecutionViewModel  @Inject constructor(
     private val getActiveOrdersUseCase: GetActiveOrdersUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase,
     private val editOrderUseCase: EditOrderUseCase,
+    private val realtimeDatabaseUseCase: RealtimeDatabaseUseCase
 ): ViewModel() {
-
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateSearchAddress: State<AddRatingResponseState> = _stateAddRating
+
+    private val _stateRealtimeDatabase = mutableStateOf(realtimeDatabaseResponseState())
+    val stateRealtimeDatabase: State<realtimeDatabaseResponseState> = _stateRealtimeDatabase
 
     private val _stateActiveOrders = mutableStateOf(ActiveOrdersResponseState())
     val stateActiveOrders: State<ActiveOrdersResponseState> = _stateActiveOrders
@@ -50,6 +56,32 @@ class OrderExecutionViewModel  @Inject constructor(
         _selectedOrder.value = order
     }
 
+    fun readAllOrders() {
+            realtimeDatabaseUseCase.invoke().onEach { result: Resource<LiveData<List<com.example.firebaserealtimedatabase.orders.Order>>> ->
+                when (result){
+                    is Resource.Success -> {
+                        try {
+                            val addressResponse: LiveData<List<com.example.firebaserealtimedatabase.orders.Order>>? = result.data
+
+                                _stateRealtimeDatabase.value =
+                                    realtimeDatabaseResponseState(response = addressResponse)
+                            Log.e("AddRatingResponse", "SendRatingResponse->\n ${_stateAddRating.value}")
+                        }catch (e: Exception) {
+                            Log.d("Exception", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
+                        Log.e("AddRatingResponse", "AddRatingResponseError->\n ${result.message}")
+                        _stateRealtimeDatabase.value = realtimeDatabaseResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateRealtimeDatabase.value = realtimeDatabaseResponseState(isLoading = true)
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
 
     fun sendRating2(token:String,
       order_id: Int,

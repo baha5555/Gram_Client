@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Message
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,10 +39,10 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.domain.orderExecutionScreen.Order
-import com.example.gramclient.domain.orderHistoryScreen.Performer
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
@@ -57,14 +58,15 @@ fun OrderExecution(
     navController: NavHostController,
     preferences: SharedPreferences,
     orderExecutionViewModel: OrderExecutionViewModel,
-    mainViewModel: MainViewModel= hiltViewModel()
+    mainViewModel: MainViewModel= hiltViewModel(),
+    profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
     val coroutineScope = rememberCoroutineScope()
-
-
+    val ordersFromRealtime = orderExecutionViewModel.readAllOrders()
+    val stateRealtimeDatabase = orderExecutionViewModel.stateRealtimeDatabase.value.response?.observeAsState()?.value
     val isDialogOpen = remember { mutableStateOf(false) }
     var showGrade by remember {
         mutableStateOf(false)
@@ -73,7 +75,9 @@ fun OrderExecution(
     val ratingState = remember {
         mutableStateOf(0)
     }
-
+    LaunchedEffect(key1 = true){
+        ordersFromRealtime
+    }
     // searchState dependencies ->
     var WHICH_ADDRESS = remember{ mutableStateOf("") }
     val isAddressList= remember { mutableStateOf(true) }
@@ -104,7 +108,11 @@ fun OrderExecution(
                 if(!isSearchState.value) {
                     selectedOrder.let { order ->
                         if (order.performer != null) {
-                            performerSection(performer = order.performer)
+                            stateRealtimeDatabase?.forEach {
+                                if(it.phone != null && it.phone == order.phone){
+                                    performerSection(performer = it)
+                                }
+                            }
                         }
                         orderSection(order, scope, sheetState, isSearchState)
                         Spacer(modifier = Modifier.height(10.dp))
@@ -218,7 +226,7 @@ fun OrderExecution(
 
 @Composable
 fun performerSection(
-    performer: Performer
+    performer: com.example.firebaserealtimedatabase.orders.Order
 ){
     Column(
         modifier = Modifier
@@ -231,18 +239,18 @@ fun performerSection(
     ){
         Text(
             modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
-            text = "За рулем ${performer.first_name}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            text = "За рулем ${performer.phone}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
         ){
-            Text(text = "${performer.transport.color} ${performer.transport.model}", fontSize = 16.sp, color = Color.Black)
+            Text(text = "${performer.created_at} ${performer.created_at}", fontSize = 16.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 modifier = Modifier
                     .background(shape = RoundedCornerShape(3.dp), color = Color(0xFFF4B91D))
                     .padding(3.dp), textAlign = TextAlign.Center,
-                text = performer.transport.car_number, fontSize = 16.sp, color = Color.Black)
+                text = performer.tariff?:"tariff", fontSize = 16.sp, color = Color.Black)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Row(
@@ -260,7 +268,7 @@ fun performerSection(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "${performer.first_name}",
+                    text = "${performer.status}",
                     color = FontSilver,
                     textAlign = TextAlign.Center
                 )
