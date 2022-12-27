@@ -10,6 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,11 +28,13 @@ import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.orderExecutionScreen.Order
+import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomMainMap
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 
@@ -43,9 +46,11 @@ fun SearchDriverScreen(
     preferences: SharedPreferences,
     orderExecutionViewModel: OrderExecutionViewModel,
 ) {
+    val profileViewModel:ProfileViewModel = hiltViewModel()
     val isDialogOpen = remember { mutableStateOf(false) }
 
 
+    val profilePhone = profileViewModel.stateGetProfileInfo.value.response?.phone
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Expanded
@@ -54,10 +59,12 @@ fun SearchDriverScreen(
 
     LaunchedEffect(key1 = true){
         orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
+        profileViewModel.getProfileInfo(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+        orderExecutionViewModel.readAllOrders()
     }
 
     val stateActiveOrders by orderExecutionViewModel.stateActiveOrders
-
+    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeDatabase
 
     BottomSheetScaffold(sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
         scaffoldState = bottomSheetScaffoldState,
@@ -68,10 +75,18 @@ fun SearchDriverScreen(
                     .wrapContentHeight()
                     .background(Color(0xFFEEEEEE))
             ) {
-                stateActiveOrders.response?.let { orders->
-                    orders.forEach { order->
-                        orderCard(orderExecutionViewModel, preferences, order, navController, isDialogOpen)
-                        Spacer(Modifier.height(10.dp))
+                stateRealtimeDatabaseOrders.response?.let { orders->
+                    orders.observeAsState().value?.forEach { order->
+                        if(order.phone == profilePhone) {
+                            orderCard(
+                                orderExecutionViewModel,
+                                preferences,
+                                order,
+                                navController,
+                                isDialogOpen
+                            )
+                            Spacer(Modifier.height(10.dp))
+                        }
                     }
                 }
                 Column(
@@ -197,7 +212,7 @@ fun SearchDriverScreen(
 fun orderCard(
     orderExecutionViewModel: OrderExecutionViewModel,
     preferences: SharedPreferences,
-    order: Order,
+    order: RealtimeDatabaseOrder,
     navController: NavHostController,
     isDialogOpen: MutableState<Boolean>
 ){
@@ -220,7 +235,9 @@ fun orderCard(
                         end = 20.dp
                     )
             ){
-                LinearProgressIndicator(color = Color(0xFF4285F4), modifier = Modifier.fillMaxWidth().clip(shape = RoundedCornerShape(percent = 50)))
+                LinearProgressIndicator(color = Color(0xFF4285F4), modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(percent = 50)))
             }
         }
         Row(
@@ -237,14 +254,14 @@ fun orderCard(
         ){
             Column(){
                 Text(text =  if(order.performer == null) "Ищем ближайших водителей..." else "Через 6 мин приедет", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text(text =  if(order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport.color} ${order.performer.transport.model}", fontSize = 14.sp, color = Color.Black)
+                Text(text =  if(order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color} ${order.performer.transport?.model}", fontSize = 14.sp, color = Color.Black)
             }
             if(order.performer == null) {
                 Text(text = "00:00", fontSize = 14.sp, color = Color.Black)
             }else{
                 Box {
                     Text(
-                        text = order.performer.transport.car_number,
+                        text = order.performer.transport?.car_number?:"",
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp,
                         modifier = Modifier
@@ -330,7 +347,10 @@ fun PulseLoading(
     Box(contentAlignment = Alignment.Center,modifier = Modifier.fillMaxSize()) {
         Card(
             shape = CircleShape,
-            modifier = Modifier.size(size.dp).align(Alignment.Center).alpha(alpha),
+            modifier = Modifier
+                .size(size.dp)
+                .align(Alignment.Center)
+                .alpha(alpha),
             backgroundColor = pulseColor,
             elevation = 0.dp
         ) {}

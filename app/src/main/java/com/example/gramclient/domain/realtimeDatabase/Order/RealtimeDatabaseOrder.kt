@@ -1,11 +1,12 @@
-package com.example.firebaserealtimedatabase.orders
+package com.example.gramclient.domain.realtimeDatabase.Order
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.gramclient.domain.orderHistoryScreen.Performer
 
 @Entity(tableName = "orders_table")
-data class Order(
+data class RealtimeDatabaseOrder(
     @PrimaryKey(autoGenerate = true)
     val userid: Int = 0,
     @ColumnInfo
@@ -29,5 +30,8 @@ data class Order(
     @ColumnInfo
     val tariff_id: Int?=null,
     @ColumnInfo
-    val to_addresses: List<ToAddresse>? = null
+    val to_addresses: List<ToAddresse>? = null,
+    @ColumnInfo
+    val performer: RealtimeDatabasePerformer? = null,
+
 )

@@ -39,6 +39,7 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.domain.orderExecutionScreen.Order
+import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
@@ -65,7 +66,6 @@ fun OrderExecution(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
     val coroutineScope = rememberCoroutineScope()
-    val ordersFromRealtime = orderExecutionViewModel.readAllOrders()
     val stateRealtimeDatabase = orderExecutionViewModel.stateRealtimeDatabase.value.response?.observeAsState()?.value
     val isDialogOpen = remember { mutableStateOf(false) }
     var showGrade by remember {
@@ -76,7 +76,11 @@ fun OrderExecution(
         mutableStateOf(0)
     }
     LaunchedEffect(key1 = true){
-        ordersFromRealtime
+        orderExecutionViewModel.readAllOrders()
+
+    }
+    var selectRealtimeDatabaseOrder:RealtimeDatabaseOrder by remember {
+        mutableStateOf(RealtimeDatabaseOrder())
     }
     // searchState dependencies ->
     var WHICH_ADDRESS = remember{ mutableStateOf("") }
@@ -92,7 +96,14 @@ fun OrderExecution(
     LaunchedEffect(key1 = true){
         Log.e("ActiveOrdersResponse", selectedOrder.toString())
     }
-
+    stateRealtimeDatabase.let {orders->
+        orders?.forEach {order->
+            if(order.id == selectedOrder.id){
+                Log.e("Select Order","$selectRealtimeDatabaseOrder")
+                selectRealtimeDatabaseOrder = order
+            }
+        }
+    }
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetBackgroundColor = Color(0xFFffffff),
@@ -106,14 +117,10 @@ fun OrderExecution(
                     .background(BackgroundColor)
             ) {
                 if(!isSearchState.value) {
-                    selectedOrder.let { order ->
-                        if (order.performer != null) {
-                            stateRealtimeDatabase?.forEach {
-                                if(it.phone != null && it.phone == order.phone){
-                                    performerSection(performer = it)
-                                }
+                    selectRealtimeDatabaseOrder.let { order ->
+                            if (order.performer != null) {
+                                    performerSection(performer = order)
                             }
-                        }
                         orderSection(order, scope, sheetState, isSearchState)
                         Spacer(modifier = Modifier.height(10.dp))
                         optionSection()
@@ -226,7 +233,7 @@ fun OrderExecution(
 
 @Composable
 fun performerSection(
-    performer: com.example.firebaserealtimedatabase.orders.Order
+    performer: RealtimeDatabaseOrder
 ){
     Column(
         modifier = Modifier
@@ -239,18 +246,18 @@ fun performerSection(
     ){
         Text(
             modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
-            text = "За рулем ${performer.phone}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            text = "За рулем ${performer.performer?.first_name?:"first_name"}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
         ){
-            Text(text = "${performer.created_at} ${performer.created_at}", fontSize = 16.sp, color = Color.Black)
+            Text(text = "${performer.performer?.transport?:"Color"} ${performer.performer?.transport?.model?:"model"}", fontSize = 16.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 modifier = Modifier
                     .background(shape = RoundedCornerShape(3.dp), color = Color(0xFFF4B91D))
                     .padding(3.dp), textAlign = TextAlign.Center,
-                text = performer.tariff?:"tariff", fontSize = 16.sp, color = Color.Black)
+                text = performer.tariff?:"Тариф отсутствует", fontSize = 16.sp, color = Color.Black)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Row(
@@ -286,7 +293,7 @@ fun performerSection(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun orderSection(
-    order: Order,
+    order: RealtimeDatabaseOrder,
     scope: CoroutineScope,
     bottomSheetState: BottomSheetScaffoldState,
     isSearchState: MutableState<Boolean>
