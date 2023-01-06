@@ -4,12 +4,15 @@ import android.content.SharedPreferences
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -26,14 +29,16 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.RoutesName
-import com.example.gramclient.domain.orderExecutionScreen.Order
+import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomMainMap
 import com.example.gramclient.presentation.mainScreen.MainViewModel
 import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -43,153 +48,204 @@ fun SearchDriverScreen(
     preferences: SharedPreferences,
     orderExecutionViewModel: OrderExecutionViewModel,
 ) {
-    val isDialogOpen = remember { mutableStateOf(false) }
+    val profileViewModel:ProfileViewModel = hiltViewModel()
+    val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
 
 
+    val profilePhone = profileViewModel.stateGetProfileInfo.value.response?.phone
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Expanded
         )
     )
-
+    val scope = rememberCoroutineScope()
+    var sheetPeekHeight by remember {
+        mutableStateOf(200)
+    }
     LaunchedEffect(key1 = true){
-        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
+//        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
+        profileViewModel.getProfileInfo(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+        orderExecutionViewModel.readAllOrders()
     }
 
     val stateActiveOrders by orderExecutionViewModel.stateActiveOrders
+    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeDatabase
 
-
-    BottomSheetScaffold(sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
-        scaffoldState = bottomSheetScaffoldState,
-        sheetContent = {
+    Scaffold(
+        backgroundColor =Color(0xFFEEEEEE) ,
+        bottomBar = {
             Column(
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .background(Color(0xFFEEEEEE))
+                    .clip(shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
+                    .background(Color.White)
             ) {
-                stateActiveOrders.response?.let { orders->
-                    orders.forEach { order->
-                        orderCard(orderExecutionViewModel, preferences, order, navController, isDialogOpen)
-                        Spacer(Modifier.height(10.dp))
-                    }
-                }
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .wrapContentHeight()
-                        .clip(shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
-                        .background(Color.White)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(15.dp)
-                            .height(50.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(PrimaryColor)
-                            .clickable {
-                                navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                    popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
-                                        inclusive = true
-                                    }
+                        .padding(15.dp)
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(PrimaryColor)
+                        .clickable {
+                            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
+                                    inclusive = true
                                 }
-                            },
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                            }
+                        },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                            contentDescription = "car_eco",
+                        )
+                        Text(
+                            text = "Заказать ещё одну машину",
+                            textAlign = TextAlign.Center,
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.padding(end = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Divider(
+                            color = Color.White,
+                            modifier = Modifier
+                                .width(1.dp)
+                                .fillMaxHeight(0.5f)
+                                .offset((-10).dp, 0.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = "car_eco",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.White
+                        )
+                    }
+
+                }
+
+                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                    repeat(5) {
+                        Box(
+                            modifier = Modifier
+                                .size(150.dp, 30.dp)
+                                .padding(start = 15.dp)
+                                .border(
+                                    width = 1.dp,
+                                    color = PrimaryColor,
+                                    shape = RoundedCornerShape(35.dp)
+                                )
+                                .clip(RoundedCornerShape(35.dp))
+                        ) {
                             Image(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
-                                contentDescription = "car_eco",
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
+                                contentDescription = "ic_box"
                             )
                             Text(
-                                text = "Заказать ещё одну машину",
-                                textAlign = TextAlign.Center,
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
+                                text = "Доставка", fontSize = 12.sp, modifier = Modifier.align(
+                                    Alignment.Center
+                                )
                             )
                         }
-                        Row(
-                            modifier = Modifier.padding(end = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        Box(
+                            modifier = Modifier
+                                .size(150.dp, 30.dp)
+                                .padding(start = 15.dp)
+                                .border(
+                                    width = 1.dp,
+                                    color = PrimaryColor,
+                                    shape = RoundedCornerShape(35.dp)
+                                )
+                                .clip(RoundedCornerShape(35.dp))
                         ) {
-                            Divider(
-                                color = Color.White,
-                                modifier = Modifier
-                                    .width(1.dp)
-                                    .fillMaxHeight(0.5f)
-                                    .offset((-10).dp, 0.dp)
+                            Image(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
+                                contentDescription = "ic_box"
                             )
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = "car_eco",
-                                modifier = Modifier.size(24.dp),
-                                tint = Color.White
+                            Text(
+                                text = "Аренда авто",
+                                fontSize = 12.sp,
+                                modifier = Modifier.align(
+                                    Alignment.Center
+                                )
                             )
                         }
-
                     }
-
-                    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                        repeat(5) {
-                            Box(
-                                modifier = Modifier
-                                    .size(150.dp, 30.dp)
-                                    .padding(start = 15.dp)
-                                    .border(
-                                        width = 1.dp,
-                                        color = PrimaryColor,
-                                        shape = RoundedCornerShape(35.dp)
-                                    )
-                                    .clip(RoundedCornerShape(35.dp))
-                            ) {
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
-                                    contentDescription = "ic_box"
-                                )
-                                Text(
-                                    text = "Доставка", fontSize = 12.sp, modifier = Modifier.align(
-                                        Alignment.Center
-                                    )
-                                )
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .size(150.dp, 30.dp)
-                                    .padding(start = 15.dp)
-                                    .border(
-                                        width = 1.dp,
-                                        color = PrimaryColor,
-                                        shape = RoundedCornerShape(35.dp)
-                                    )
-                                    .clip(RoundedCornerShape(35.dp))
-                            ) {
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
-                                    contentDescription = "ic_box"
-                                )
-                                Text(
-                                    text = "Аренда авто",
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.align(
-                                        Alignment.Center
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    Spacer(Modifier.requiredHeight(20.dp))
                 }
+                Spacer(Modifier.requiredHeight(20.dp))
             }
-        }, sheetPeekHeight = 83.dp
+        }
     ) {
-        CustomMainMap(
-            mainViewModel = mainViewModel,
-            navController = navController,
-            preferences = preferences
-        )
+
+        BottomSheetScaffold(sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
+            scaffoldState = bottomSheetScaffoldState,
+            sheetContent = {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .background(Color(0xFFEEEEEE))
+                ) {
+                    if(stateRealtimeDatabaseOrders.isLoading) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = PrimaryColor)
+                        }
+                    }
+                    stateRealtimeDatabaseOrders.response?.let { response ->
+                            response.observeAsState().value?.let { orders ->
+                                LazyColumn() {
+                                    items(orders) { order ->
+                                        var isOpen = remember{ mutableStateOf(false)}
+                                        val cancelOrderIsDialogOpen = remember { mutableStateOf(false) }
+                                        if (order.phone == profilePhone) {
+                                            orderCard(
+                                                orderExecutionViewModel,
+                                                preferences,
+                                                order,
+                                                navController,
+                                                sheetPeekHeightUpOnClick = {
+                                                    scope.launch {
+                                                        isOpen.value = !isOpen.value
+                                                        sheetPeekHeight = if (isOpen.value)
+                                                            367
+                                                        else
+                                                            200
+
+                                                    }
+                                                },
+                                                isOpen = isOpen,
+                                            )
+                                            Spacer(Modifier.height(10.dp))
+                                        }
+                                    }
+                                    item{
+                                        Spacer(modifier=Modifier.height(120.dp))
+                                    }
+                                }
+                            }
+                        }
+
+
+                }
+            }, sheetPeekHeight = sheetPeekHeight.dp
+        ) {
+            CustomMainMap(
+                mainViewModel = mainViewModel,
+                navController = navController,
+                preferences = preferences
+            )
+        }
     }
 }
 
@@ -197,16 +253,17 @@ fun SearchDriverScreen(
 fun orderCard(
     orderExecutionViewModel: OrderExecutionViewModel,
     preferences: SharedPreferences,
-    order: Order,
+    order: RealtimeDatabaseOrder,
     navController: NavHostController,
-    isDialogOpen: MutableState<Boolean>
+    sheetPeekHeightUpOnClick:()->Unit,
+    isOpen:MutableState<Boolean>,
 ){
-    val isOpen = remember{ mutableStateOf(false)}
-
+    val cancelOrderIsDialogOpen = remember{ mutableStateOf(false)}
+    val connectClientWithDriverIsDialogOpen = remember{ mutableStateOf(false)}
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .clickable { isOpen.value = !isOpen.value }
+            .clickable { sheetPeekHeightUpOnClick() }
             .fillMaxWidth()
             .background(color = Color.White, shape = RoundedCornerShape(20.dp))
     ){
@@ -220,7 +277,9 @@ fun orderCard(
                         end = 20.dp
                     )
             ){
-                LinearProgressIndicator(color = Color(0xFF4285F4), modifier = Modifier.fillMaxWidth().clip(shape = RoundedCornerShape(percent = 50)))
+                LinearProgressIndicator(color = Color(0xFF4285F4), modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(percent = 50)))
             }
         }
         Row(
@@ -237,14 +296,14 @@ fun orderCard(
         ){
             Column(){
                 Text(text =  if(order.performer == null) "Ищем ближайших водителей..." else "Через 6 мин приедет", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text(text =  if(order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport.color} ${order.performer.transport.model}", fontSize = 14.sp, color = Color.Black)
+                Text(text =  if(order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color?:""} ${order.performer.transport?.model?:""}", fontSize = 14.sp, color = Color.Black)
             }
             if(order.performer == null) {
                 Text(text = "00:00", fontSize = 14.sp, color = Color.Black)
             }else{
                 Box {
                     Text(
-                        text = order.performer.transport.car_number,
+                        text = order.performer.transport?.car_number?:"",
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp,
                         modifier = Modifier
@@ -273,14 +332,14 @@ fun orderCard(
                         text = "Отменить\nзаказ",
                         icon = Icons.Default.Close
                     ) {
-                        isDialogOpen.value = true
+                        cancelOrderIsDialogOpen.value = true
                     }
                 }else {
                     CustomCircleButton(
                         text = "Позвонить",
                         icon = Icons.Default.Phone
                     ) {
-                        //Log.d("clicked", "click")
+                        connectClientWithDriverIsDialogOpen.value = true
                     }
                 }
                 Spacer(modifier = Modifier.width(50.dp))
@@ -294,11 +353,23 @@ fun orderCard(
     CustomDialog(
         text = "Вы уверены что хотите отменить заказ?",
         okBtnClick = {
-            isDialogOpen.value = false
-            orderExecutionViewModel.cancelOrder(preferences = preferences, order.id, navController)
+            cancelOrderIsDialogOpen.value = false
+            orderExecutionViewModel.cancelOrder(preferences = preferences, order.id, navController,{})
         },
-        cancelBtnClick = { isDialogOpen.value = false },
-        isDialogOpen = isDialogOpen.value
+        cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
+        isDialogOpen = cancelOrderIsDialogOpen.value
+    )
+    CustomDialog(
+        text = "Позвонить водителю?",
+        okBtnClick = {
+            connectClientWithDriverIsDialogOpen.value = false
+            orderExecutionViewModel.connectClientWithDriver(
+                token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                order_id = order.id.toString()
+            )
+        },
+        cancelBtnClick = { connectClientWithDriverIsDialogOpen.value = false },
+        isDialogOpen = connectClientWithDriverIsDialogOpen.value
     )
 }
 
@@ -330,7 +401,10 @@ fun PulseLoading(
     Box(contentAlignment = Alignment.Center,modifier = Modifier.fillMaxSize()) {
         Card(
             shape = CircleShape,
-            modifier = Modifier.size(size.dp).align(Alignment.Center).alpha(alpha),
+            modifier = Modifier
+                .size(size.dp)
+                .align(Alignment.Center)
+                .alpha(alpha),
             backgroundColor = pulseColor,
             elevation = 0.dp
         ) {}

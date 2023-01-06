@@ -45,9 +45,9 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.gramclient.PreferencesName
+import com.example.gramclient.*
+import com.example.gramclient.Constants.FCM_TOKEN
 import com.example.gramclient.R
-import com.example.gramclient.SmsBroadcastReceiver
 import com.example.gramclient.extension.checkInternet.ConnectionState
 import com.example.gramclient.extension.checkInternet.connectivityState
 import com.example.gramclient.presentation.authorization.AuthViewModel
@@ -92,7 +92,9 @@ class MainActivity : ComponentActivity() {
                         preferences,
                         authViewModel = authViewModel
                     )
-                    if(connection == ConnectionState.Unavailable) {
+                MyFirebaseMessagingService().onCreate()
+
+                if(connection == ConnectionState.Unavailable) {
                         SimpleAlertDialog(
                             title = "Внимание",
                             text = "Нет доступа к интернету. Проверьте подключение к сети",
@@ -140,7 +142,9 @@ class MainActivity : ComponentActivity() {
     private fun getOtpFromMessage(message: String, authViewModel:AuthViewModel) {
         var code = message.filter { it.isDigit() }
         Log.e("setEditValue", code)
-        authViewModel.setCodeAutomaticly(code, preferences, navController, scope)
+        FCM_TOKEN?.let {
+            authViewModel.setCodeAutomaticly(code, preferences, navController, scope,it)
+        }
     }
 
     private fun registerBroadcastReceiver() {

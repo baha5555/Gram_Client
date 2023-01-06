@@ -8,18 +8,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.gramclient.*
-import com.example.gramclient.data.AppRepositoryImpl
-import com.example.gramclient.data.remote.ApplicationApi
-import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.order.*
+import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.*
+import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.domain.realtimeDatabase.RealtimeDatabaseUseCase
 import com.example.gramclient.domain.realtimeDatabase.realtimeDatabaseResponseState
 import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.presentation.mainScreen.states.CancelOrderResponseState
-import com.example.gramclient.presentation.mainScreen.states.OrderResponseState
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -32,11 +29,14 @@ class OrderExecutionViewModel  @Inject constructor(
     private val getActiveOrdersUseCase: GetActiveOrdersUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase,
     private val editOrderUseCase: EditOrderUseCase,
-    private val realtimeDatabaseUseCase: RealtimeDatabaseUseCase
+    private val realtimeDatabaseUseCase: RealtimeDatabaseUseCase,
+    private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase
 ): ViewModel() {
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateSearchAddress: State<AddRatingResponseState> = _stateAddRating
 
+    private val _stateConnectClientWithDriver = mutableStateOf(ConnectClientWithDriverResponseState())
+    val stateConnectClientWithDriver = _stateConnectClientWithDriver
     private val _stateRealtimeDatabase = mutableStateOf(realtimeDatabaseResponseState())
     val stateRealtimeDatabase: State<realtimeDatabaseResponseState> = _stateRealtimeDatabase
 
@@ -49,19 +49,20 @@ class OrderExecutionViewModel  @Inject constructor(
     private val _stateEditOrder = mutableStateOf(EditOrderResponseState())
     val stateEditOrder: State<EditOrderResponseState> = _stateEditOrder
 
-    private val _selectedOrder = mutableStateOf(Order(listOf(), "", "", "", null, 1, "", null, "", 1, "", "", "", 1, null))
-    val selectedOrder: State<Order> = _selectedOrder
+//    private val _selectedOrder = mutableStateOf(Order(listOf(), "", "", "", null, 1, "", null, "", 1, "", "", "", 1, null))
+private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
+    val selectedOrder: State<RealtimeDatabaseOrder> = _selectedOrder
 
-    fun updateSelectedOrder(order: Order) {
+    fun updateSelectedOrder(order: RealtimeDatabaseOrder) {
         _selectedOrder.value = order
     }
 
     fun readAllOrders() {
-            realtimeDatabaseUseCase.invoke().onEach { result: Resource<LiveData<List<com.example.firebaserealtimedatabase.orders.Order>>> ->
+            realtimeDatabaseUseCase.invoke().onEach { result: Resource<LiveData<List<RealtimeDatabaseOrder>>> ->
                 when (result){
                     is Resource.Success -> {
                         try {
-                            val addressResponse: LiveData<List<com.example.firebaserealtimedatabase.orders.Order>>? = result.data
+                            val addressResponse: LiveData<List<RealtimeDatabaseOrder>>? = result.data
 
                                 _stateRealtimeDatabase.value =
                                     realtimeDatabaseResponseState(response = addressResponse)
@@ -111,6 +112,34 @@ class OrderExecutionViewModel  @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    fun connectClientWithDriver(
+        token:String,
+        order_id: String
+    ){
+        connectClientWithDriverUseCase.invoke(token="Bearer $token",order_id).onEach { result: Resource<connectClientWithDriverResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val connectClientWithDriverResponse: connectClientWithDriverResponse? = result.data
+                        _stateConnectClientWithDriver.value =
+                            ConnectClientWithDriverResponseState(response = connectClientWithDriverResponse)
+                        Log.e("ConnectClientWithDriverResponseSuccess", "ConnectClientWithDriverResponse->\n ${_stateConnectClientWithDriver.value.response}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("ConnectClientWithDriverResponse", "ConnectClientWithDriverResponseError->\n ${result.message}")
+                    _stateConnectClientWithDriver.value = ConnectClientWithDriverResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateConnectClientWithDriver.value = ConnectClientWithDriverResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
     fun getActiveOrders(token:String, navController: NavController){
         getActiveOrdersUseCase.invoke(token="Bearer $token").onEach { result: Resource<ActiveOrdersResponse> ->
             when (result){
@@ -152,7 +181,7 @@ class OrderExecutionViewModel  @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-    fun cancelOrder(preferences: SharedPreferences, order_id: Int, navController: NavController){
+    fun cancelOrder(preferences: SharedPreferences, order_id: Int, navController: NavController,onSuccess:()->Unit){
         cancelOrderUseCase.invoke(token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", order_id).onEach { result: Resource<CancelOrderResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -160,6 +189,7 @@ class OrderExecutionViewModel  @Inject constructor(
                         val response: CancelOrderResponse? = result.data
                         _stateCancelOrder.value =
                             CancelOrderResponseState(response = response)
+                        onSuccess()
                         getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
                         Log.e("TariffsResponse", "CancelOrderResponse->\n ${_stateCancelOrder.value}")
                     }catch (e: Exception) {
@@ -180,6 +210,7 @@ class OrderExecutionViewModel  @Inject constructor(
     }
 
     fun editOrder(preferences: SharedPreferences, toAddressId: Int) {
+
         editOrderUseCase.invoke(
             token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
             order_id = selectedOrder.value.id,
@@ -188,8 +219,8 @@ class OrderExecutionViewModel  @Inject constructor(
             meeting_info = null,
             to_addresses = listOf(AddressModel(toAddressId)),
             comment = null,
-            tariff_id = selectedOrder.value.tariff_id,
-            allowances= if(selectedOrder.value.allowances.isNotEmpty()) Gson().toJson(selectedOrder.value.allowances) else null
+            tariff_id = selectedOrder.value.tariff_id?:0,
+            allowances= if(selectedOrder.value.allowances!=null) Gson().toJson(selectedOrder.value.allowances) else null
         ).onEach { result: Resource<UpdateOrderResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -197,6 +228,7 @@ class OrderExecutionViewModel  @Inject constructor(
                         val response: UpdateOrderResponse? = result.data
                         _stateEditOrder.value =
                             EditOrderResponseState(response = response)
+                        readAllOrders()
                         Log.e("EditOrderResponse", "EditOrderResponse->\n ${_stateEditOrder.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")

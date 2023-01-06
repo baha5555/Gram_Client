@@ -1,5 +1,5 @@
-package com.example.firebaserealtimedatabase.orders
+package com.example.gramclient.domain.realtimeDatabase.Order
 
 data class OrderResponse(
-    val orderResponse :List<Order>
+    val orderResponse :List<RealtimeDatabaseOrder>
 )

@@ -3,20 +3,19 @@ package com.example.gramclient.presentation.profile
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.Resource
-import com.example.gramclient.data.AppRepositoryImpl
-import com.example.gramclient.domain.athorization.AuthUseCase
-import com.example.gramclient.domain.athorization.IdentificationUseCase
 import com.example.gramclient.domain.profile.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,12 +66,13 @@ class ProfileViewModel @Inject constructor(
     }
 
 
-    fun sendProfile(token:String,
-                    first_name: RequestBody,
-                    last_name: RequestBody,
-                    email: String,
-                    images: MultipartBody.Part,
-                    context:Context
+    fun sendProfile(
+        token:String,
+        first_name: RequestBody,
+        last_name: RequestBody,
+        email: String,
+        images: MutableState<File?>?,
+        context:Context
                     ){
         sendProfileUseCase.invoke(token="Bearer $token",first_name,last_name, email, avatar = images).onEach { result: Resource<ProfileResponse> ->
             when (result){

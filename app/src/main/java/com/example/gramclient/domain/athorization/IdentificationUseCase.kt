@@ -11,11 +11,11 @@ import javax.inject.Inject
 
 class IdentificationUseCase @Inject constructor(private val repository: AppRepository) {
 
-    operator fun invoke(client_register_id: String, sms_code: Int): Flow<Resource<IdentificationResponse>> =
+    operator fun invoke(client_register_id: String, sms_code: Int,fcm_token:String): Flow<Resource<IdentificationResponse>> =
         flow{
             try {
                 emit(Resource.Loading<IdentificationResponse>())
-                val response = repository.identification(client_register_id, sms_code.toLong())
+                val response = repository.identification(client_register_id, sms_code.toLong(),fcm_token)
                 emit(Resource.Success<IdentificationResponse>(response))
             }catch (e: HttpException) {
                 emit(

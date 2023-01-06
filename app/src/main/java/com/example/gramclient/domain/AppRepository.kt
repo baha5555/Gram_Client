@@ -1,7 +1,6 @@
 package com.example.gramclient.domain
 
 import androidx.lifecycle.LiveData
-import com.example.firebaserealtimedatabase.orders.Order
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
@@ -12,23 +11,24 @@ import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
+import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
+import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.http.*
-import java.util.*
 
 interface AppRepository {
     suspend fun authorization(phone_number: Long): AuthResponse
-    val readAll: LiveData<List<Order>>
+    val readAll: LiveData<List<RealtimeDatabaseOrder>>
 
     suspend fun identification(
         client_register_id: String,
-        sms_code: Long
+        sms_code: Long,
+        fcm_token:String
     ): IdentificationResponse
 
     suspend fun getTariffs(): TariffsResponse
@@ -41,12 +41,16 @@ interface AppRepository {
     suspend fun getOrderHistory(token: String): orderHistoryResponse
 
 
+    suspend fun connectClientWithDriver(
+    token: String,
+    order_id: String
+    ): connectClientWithDriverResponse
     suspend fun sendProfile(
         token: String,
         first_name: RequestBody,
         last_name: RequestBody,
         email: String,
-        avatar: MultipartBody.Part
+        avatar: MultipartBody.Part?
     ): ProfileResponse
 
 
