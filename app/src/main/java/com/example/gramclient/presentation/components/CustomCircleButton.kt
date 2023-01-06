@@ -1,6 +1,7 @@
 package com.example.gramclient.presentation.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -8,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -21,6 +23,7 @@ fun CustomCircleButton(text: String, icon: ImageVector, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         FloatingActionButton(
             onClick = { onClick.invoke() },
+            backgroundColor = Color(0xFFFFFFFF)
         ) {
             Icon(imageVector = icon, "", modifier = Modifier.size(30.dp))
         }
@@ -33,6 +36,7 @@ fun CustomCircleButton(text: String, icon: Int, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         FloatingActionButton(
             onClick = { onClick.invoke() },
+            backgroundColor = Color(0xFFFFFFFF)
         ) {
             Image(painter = painterResource(id = icon), "", modifier = Modifier.size(30.dp))
         }

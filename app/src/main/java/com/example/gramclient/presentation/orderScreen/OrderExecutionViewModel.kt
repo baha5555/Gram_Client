@@ -10,8 +10,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.gramclient.*
 import com.example.gramclient.domain.mainScreen.order.*
+import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.*
-import com.example.gramclient.domain.orderHistoryScreen.Allowance
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.domain.realtimeDatabase.RealtimeDatabaseUseCase
 import com.example.gramclient.domain.realtimeDatabase.realtimeDatabaseResponseState
@@ -29,11 +29,14 @@ class OrderExecutionViewModel  @Inject constructor(
     private val getActiveOrdersUseCase: GetActiveOrdersUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase,
     private val editOrderUseCase: EditOrderUseCase,
-    private val realtimeDatabaseUseCase: RealtimeDatabaseUseCase
+    private val realtimeDatabaseUseCase: RealtimeDatabaseUseCase,
+    private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase
 ): ViewModel() {
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateSearchAddress: State<AddRatingResponseState> = _stateAddRating
 
+    private val _stateConnectClientWithDriver = mutableStateOf(ConnectClientWithDriverResponseState())
+    val stateConnectClientWithDriver = _stateConnectClientWithDriver
     private val _stateRealtimeDatabase = mutableStateOf(realtimeDatabaseResponseState())
     val stateRealtimeDatabase: State<realtimeDatabaseResponseState> = _stateRealtimeDatabase
 
@@ -109,6 +112,34 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
         }.launchIn(viewModelScope)
     }
 
+    fun connectClientWithDriver(
+        token:String,
+        order_id: String
+    ){
+        connectClientWithDriverUseCase.invoke(token="Bearer $token",order_id).onEach { result: Resource<connectClientWithDriverResponse> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val connectClientWithDriverResponse: connectClientWithDriverResponse? = result.data
+                        _stateConnectClientWithDriver.value =
+                            ConnectClientWithDriverResponseState(response = connectClientWithDriverResponse)
+                        Log.e("ConnectClientWithDriverResponseSuccess", "ConnectClientWithDriverResponse->\n ${_stateConnectClientWithDriver.value.response}")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("ConnectClientWithDriverResponse", "ConnectClientWithDriverResponseError->\n ${result.message}")
+                    _stateConnectClientWithDriver.value = ConnectClientWithDriverResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateConnectClientWithDriver.value = ConnectClientWithDriverResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
     fun getActiveOrders(token:String, navController: NavController){
         getActiveOrdersUseCase.invoke(token="Bearer $token").onEach { result: Resource<ActiveOrdersResponse> ->
             when (result){
@@ -150,7 +181,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
             }
         }.launchIn(viewModelScope)
     }
-    fun cancelOrder(preferences: SharedPreferences, order_id: Int, navController: NavController){
+    fun cancelOrder(preferences: SharedPreferences, order_id: Int, navController: NavController,onSuccess:()->Unit){
         cancelOrderUseCase.invoke(token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", order_id).onEach { result: Resource<CancelOrderResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -158,6 +189,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         val response: CancelOrderResponse? = result.data
                         _stateCancelOrder.value =
                             CancelOrderResponseState(response = response)
+                        onSuccess()
                         getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
                         Log.e("TariffsResponse", "CancelOrderResponse->\n ${_stateCancelOrder.value}")
                     }catch (e: Exception) {

@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
+import com.example.gramclient.Constants.FCM_TOKEN
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.presentation.authorization.AuthViewModel
 import com.example.gramclient.presentation.components.*
@@ -73,12 +74,15 @@ fun IdentificationScreen(
             if (!initialApiCalled) {
                 LaunchedEffect(code.value) {
                     if (code.value!!.length == 4 && !isAutoInsert) {
-                        viewModel.identification(
-                            code.value!!,
-                            it.result.client_register_id,
-                            preferences,
-                            navController
-                        )
+                        FCM_TOKEN?.let { fcm_token ->
+                            viewModel.identification(
+                                code.value!!,
+                                it.result.client_register_id,
+                                preferences,
+                                navController,
+                                fcm_token
+                            )
+                        }
                         initialApiCalled = true
                     }
                 }

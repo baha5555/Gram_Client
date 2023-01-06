@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,8 +25,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,12 +52,12 @@ import com.example.gramclient.ui.theme.FontSilver
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
-import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 import java.io.File
+import java.io.IOException
+import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 
@@ -250,16 +249,10 @@ fun ProfileScreen(
                                     textBold = true,
                                     onClick = {
                                         scope.launch {
-                                            try {
-                                                lateinit var photos: MultipartBody.Part
-                                                selectImage?.let {
-                                                    val okHttpClient: OkHttpClient =
-                                                        OkHttpClient.Builder()
-                                                            .readTimeout(600, TimeUnit.SECONDS)
-                                                            .connectTimeout(60, TimeUnit.SECONDS)
-                                                            .build()
-                                                    okHttpClient
-                                                    val photo = mutableStateOf(
+                                            lateinit var photos: MutableState<File?>
+                                            selectImage?.let {
+                                                try {
+                                                    val photo by  mutableStateOf(
                                                         File(
                                                             getRealPathFromURI(
                                                                 context,
@@ -267,45 +260,55 @@ fun ProfileScreen(
                                                             )
                                                         )
                                                     )
-                                                    val part = MultipartBody.Part
-                                                        .createFormData(
-                                                            name = "avatar",
-                                                            filename = photo.value.name,
-                                                            body = photo.value.asRequestBody()
-                                                        )
-                                                    photos = part
-                                                }
-                                                viewModel.sendProfile(
-                                                    preferences.getString(
-                                                        PreferencesName.ACCESS_TOKEN,
-                                                        ""
+                                                    photos = photo as MutableState<File?>
+
+                                                    viewModel.sendProfile(
+                                                        preferences.getString(
+                                                            PreferencesName.ACCESS_TOKEN,
+                                                            ""
+                                                        ).toString(),
+                                                        (profileFirstName.value
+                                                            ?: getProfileFirstName
+                                                            ?: "").toRequestBody(),
+                                                        (profileLastName.value ?: getProfileLastName
+                                                        ?: "").toRequestBody(),
+                                                        profileEmail.value ?: getProfileEmail ?: "",
+                                                        photos,
+                                                        context
                                                     )
-                                                        .toString(),
-                                                    (profileFirstName.value ?: getProfileFirstName?:"").toRequestBody(),
-                                                    (profileLastName.value ?: getProfileLastName?:"").toRequestBody(),
-                                                    profileEmail.value ?:  getProfileEmail?:"",
-                                                    photos,
-                                                    context
-                                                )
-
+                                                } catch (e: HttpException) {
+                                                    Log.e(
+                                                        "HELO",
+                                                        e.localizedMessage
+                                                            ?: "Произошла непредвиденная ошибка"
+                                                    )
+                                                } catch (e: IOException) {
+                                                    Log.e(
+                                                        "HELO",
+                                                        "NOT Network"
+                                                    )
+                                                }catch (e:Exception) {
 //                                    navController.popBackStack()
-                                            } catch (e: Exception) {
-                                                if (selectImage == null)
-                                                    Toast.makeText(
-                                                        context,
-                                                        "Выберите аватар",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-                                                else
-                                                    Toast.makeText(
-                                                        context,
-                                                        "Произошла ошибка! Повторите еще раз",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
+                                                    if (selectImage == null)
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Выберите аватар",
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    else {
+                                                        Log.e("HELLO","$e")
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Произошла ошибка! Повторите еще раз $e ",
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    }
+                                                }
                                             }
-                                        }
 
-                                    })
+                                        }
+                                    }
+                                )
                             }
                             Spacer(modifier = Modifier.height(49.dp))
                             Row(
@@ -336,7 +339,6 @@ fun ProfileScreen(
         }
     }
 }
-
 fun getRealPathFromURI(context: Context, uri: Uri): String? {
     when {
         // DocumentProvider

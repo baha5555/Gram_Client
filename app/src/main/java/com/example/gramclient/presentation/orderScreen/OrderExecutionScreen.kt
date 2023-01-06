@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
@@ -77,7 +78,6 @@ fun OrderExecution(
     }
     LaunchedEffect(key1 = true){
         orderExecutionViewModel.readAllOrders()
-
     }
     var selectRealtimeDatabaseOrder:RealtimeDatabaseOrder by remember {
         mutableStateOf(RealtimeDatabaseOrder())
@@ -89,21 +89,26 @@ fun OrderExecution(
     val focusManager = LocalFocusManager.current
     val isSearchState = remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
-
+    var orderId by remember {
+        mutableStateOf(-1)
+    }
     //searchState dependencies <-
 
     val selectedOrder by orderExecutionViewModel.selectedOrder
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         Log.e("ActiveOrdersResponse", selectedOrder.toString())
-    }
-    stateRealtimeDatabase.let {orders->
-        orders?.forEach {order->
-            if(order.id == selectedOrder.id){
-                Log.e("Select Order","$selectRealtimeDatabaseOrder")
-                selectRealtimeDatabaseOrder = order
+        scope.launch {
+            stateRealtimeDatabase.let { orders ->
+                orders?.forEach { order ->
+                    if (order.id == selectedOrder.id) {
+                        Log.e("Select Order", "$selectRealtimeDatabaseOrder")
+                        selectRealtimeDatabaseOrder = order
+                    }
+                }
             }
         }
     }
+
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetBackgroundColor = Color(0xFFffffff),
@@ -119,12 +124,15 @@ fun OrderExecution(
                 if(!isSearchState.value) {
                     selectRealtimeDatabaseOrder.let { order ->
                             if (order.performer != null) {
-                                    performerSection(performer = order)
+                                    performerSection(performer = order, orderExecutionViewModel,preferences)
                             }
                         orderSection(order, scope, sheetState, isSearchState)
                         Spacer(modifier = Modifier.height(10.dp))
                         optionSection()
-                        actionSection()
+                        actionSection(cancelOrderOnClick = {
+                            isDialogOpen.value = true
+                            orderId = order.id
+                        })
                     }
                 }else{
                     searchSection(
@@ -144,6 +152,10 @@ fun OrderExecution(
                     coroutineScope.launch {
                         isDialogOpen.value = false
                         sheetState.bottomSheetState.collapse()
+                        if(orderId!=-1)
+                        orderExecutionViewModel.cancelOrder(preferences = preferences, orderId, navController) {
+                            navController.popBackStack()
+                        }
                     }
                 },
                 cancelBtnClick = { isDialogOpen.value = false },
@@ -233,8 +245,11 @@ fun OrderExecution(
 
 @Composable
 fun performerSection(
-    performer: RealtimeDatabaseOrder
-){
+    performer: RealtimeDatabaseOrder,
+    orderExecutionViewModel: OrderExecutionViewModel,
+    preferences: SharedPreferences
+    ){
+    val connectClientWithDriverIsDialogOpen = remember{ mutableStateOf(false)}
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -246,27 +261,28 @@ fun performerSection(
     ){
         Text(
             modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
-            text = "За рулем ${performer.performer?.first_name?:"first_name"}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            text = "За рулем ${performer.performer?.first_name?:"Водитель"}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
         ){
-            Text(text = "${performer.performer?.transport?:"Color"} ${performer.performer?.transport?.model?:"model"}", fontSize = 16.sp, color = Color.Black)
+            Text(text = "${performer.performer?.transport?.color?:"Не указан"} ${performer.performer?.transport?.model?:"Не указан"}", fontSize = 16.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 modifier = Modifier
                     .background(shape = RoundedCornerShape(3.dp), color = Color(0xFFF4B91D))
                     .padding(3.dp), textAlign = TextAlign.Center,
-                text = performer.tariff?:"Тариф отсутствует", fontSize = 16.sp, color = Color.Black)
+                text = performer.performer?.transport?.car_number?:"номер не указан", fontSize = 16.sp, color = Color.Black)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Row(
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
         ) {
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.width(80.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.avatar),
@@ -275,19 +291,31 @@ fun performerSection(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "${performer.status}",
+                    text = "${performer.performer?.first_name}",
                     color = FontSilver,
                     textAlign = TextAlign.Center
                 )
             }
             Spacer(modifier = Modifier.width(20.dp))
-            CustomCircleButton(text = "Сообщение", icon = Icons.Outlined.Message) { }
+//            CustomCircleButton(text = "Сообщение", icon = Icons.Outlined.Message) { }
             Spacer(modifier = Modifier.width(20.dp))
-            CustomCircleButton(text = "Позвонить",
-                icon = Icons.Default.Phone,
-                onClick = { })
+            CustomCircleButton(text = "Связаться", icon = R.drawable.phone) {
+                connectClientWithDriverIsDialogOpen.value = true
+            }
         }
     }
+    CustomDialog(
+        text = "Позвонить водителю?",
+        okBtnClick = {
+            connectClientWithDriverIsDialogOpen.value = false
+            orderExecutionViewModel.connectClientWithDriver(
+                token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                order_id = performer.id.toString()
+            )
+        },
+        cancelBtnClick = { connectClientWithDriverIsDialogOpen.value = false },
+        isDialogOpen = connectClientWithDriverIsDialogOpen.value
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -498,7 +526,7 @@ fun optionSection(){
     }
 }
 @Composable
-fun actionSection(){
+fun actionSection(cancelOrderOnClick:()->Unit){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -509,9 +537,7 @@ fun actionSection(){
         horizontalArrangement = Arrangement.Center
     ){
         CustomCircleButton(text = "Отменить\nзаказ",
-            icon = Icons.Default.Close) {
-            //method
-        }
+            icon = Icons.Default.Close,cancelOrderOnClick)
         Spacer(modifier = Modifier.width(20.dp))
         CustomCircleButton(text = "Отправить\nмаршрут",
             icon = R.drawable.share_icon) {

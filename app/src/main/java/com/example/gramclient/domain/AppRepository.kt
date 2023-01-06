@@ -11,6 +11,7 @@ import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
+import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
@@ -26,7 +27,8 @@ interface AppRepository {
 
     suspend fun identification(
         client_register_id: String,
-        sms_code: Long
+        sms_code: Long,
+        fcm_token:String
     ): IdentificationResponse
 
     suspend fun getTariffs(): TariffsResponse
@@ -39,12 +41,16 @@ interface AppRepository {
     suspend fun getOrderHistory(token: String): orderHistoryResponse
 
 
+    suspend fun connectClientWithDriver(
+    token: String,
+    order_id: String
+    ): connectClientWithDriverResponse
     suspend fun sendProfile(
         token: String,
         first_name: RequestBody,
         last_name: RequestBody,
         email: String,
-        avatar: MultipartBody.Part
+        avatar: MultipartBody.Part?
     ): ProfileResponse
 
 

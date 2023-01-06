@@ -52,11 +52,11 @@ class AuthViewModel @Inject constructor(
         _isAutoInsert.value = value
     }
 
-    fun setCodeAutomaticly(code:String, preferences:SharedPreferences, navController: NavHostController, scope:CoroutineScope){
+    fun setCodeAutomaticly(code:String, preferences:SharedPreferences, navController: NavHostController, scope:CoroutineScope,fcm_token:String){
         scope.launch {
             smsCode.value = code
             delay(2000)
-            identification(smsCode.value!!, client_regiter_id.value!!, preferences, navController)
+            identification(smsCode.value!!, client_regiter_id.value!!, preferences, navController,fcm_token)
         }
     }
 
@@ -101,16 +101,17 @@ class AuthViewModel @Inject constructor(
         sms_code: String,
         client_regiter_id:String,
         preferences: SharedPreferences,
-        navController: NavHostController
+        navController: NavHostController,
+        fcm_token:String
     ){
         var code=sms_code.toInt()
-        identificationUseCase.invoke(client_regiter_id, code).onEach { result: Resource<IdentificationResponse> ->
+        identificationUseCase.invoke(client_regiter_id, code,fcm_token).onEach { result: Resource<IdentificationResponse> ->
             when (result) {
                 is Resource.Success -> {
                     val response = result.data
                     _stateLogin.value =
                         IdentificationResponseState(response = response?.result)
-                    Log.e("authresponse", "authresponse->\n ${_stateLogin.value}")
+                    Log.e("authresponse", "authresponse->\n ${_stateLogin.value}\n")
                     preferences.edit()
                         .putString(PreferencesName.ACCESS_TOKEN, response?.result?.access_token)
                         .apply()
