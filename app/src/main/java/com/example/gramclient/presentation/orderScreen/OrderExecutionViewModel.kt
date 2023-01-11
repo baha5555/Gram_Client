@@ -3,6 +3,7 @@ package com.example.gramclient.presentation.orderScreen
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -13,7 +14,10 @@ import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.*
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
+import com.example.gramclient.domain.realtimeDatabase.RealtimeClientDatabaseUseCase
 import com.example.gramclient.domain.realtimeDatabase.RealtimeDatabaseUseCase
+import com.example.gramclient.domain.realtimeDatabase.profile.Client
+import com.example.gramclient.domain.realtimeDatabase.realtimeClientOrderIdDatabaseResponseState
 import com.example.gramclient.domain.realtimeDatabase.realtimeDatabaseResponseState
 import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.presentation.mainScreen.states.CancelOrderResponseState
@@ -30,6 +34,7 @@ class OrderExecutionViewModel  @Inject constructor(
     private val cancelOrderUseCase: CancelOrderUseCase,
     private val editOrderUseCase: EditOrderUseCase,
     private val realtimeDatabaseUseCase: RealtimeDatabaseUseCase,
+    private val realtimeClientDatabaseUseCase: RealtimeClientDatabaseUseCase,
     private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase
 ): ViewModel() {
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
@@ -37,8 +42,11 @@ class OrderExecutionViewModel  @Inject constructor(
 
     private val _stateConnectClientWithDriver = mutableStateOf(ConnectClientWithDriverResponseState())
     val stateConnectClientWithDriver = _stateConnectClientWithDriver
-    private val _stateRealtimeDatabase = mutableStateOf(realtimeDatabaseResponseState())
-    val stateRealtimeDatabase: State<realtimeDatabaseResponseState> = _stateRealtimeDatabase
+    private val _stateRealtimeOrdersDatabase = mutableStateOf(realtimeDatabaseResponseState())
+    val stateRealtimeOrdersDatabase: State<realtimeDatabaseResponseState> = _stateRealtimeOrdersDatabase
+
+    private val _stateRealtimeClientOrderIdDatabase = mutableStateOf(realtimeClientOrderIdDatabaseResponseState())
+    val stateRealtimeClientOrderIdDatabase: State<realtimeClientOrderIdDatabaseResponseState> = _stateRealtimeClientOrderIdDatabase
 
     private val _stateActiveOrders = mutableStateOf(ActiveOrdersResponseState())
     val stateActiveOrders: State<ActiveOrdersResponseState> = _stateActiveOrders
@@ -64,7 +72,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         try {
                             val addressResponse: LiveData<List<RealtimeDatabaseOrder>>? = result.data
 
-                                _stateRealtimeDatabase.value =
+                                _stateRealtimeOrdersDatabase.value =
                                     realtimeDatabaseResponseState(response = addressResponse)
                             Log.e("AddRatingResponse", "SendRatingResponse->\n ${_stateAddRating.value}")
                         }catch (e: Exception) {
@@ -73,15 +81,42 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                     }
                     is Resource.Error -> {
                         Log.e("AddRatingResponse", "AddRatingResponseError->\n ${result.message}")
-                        _stateRealtimeDatabase.value = realtimeDatabaseResponseState(
+                        _stateRealtimeOrdersDatabase.value = realtimeDatabaseResponseState(
                             error = "${result.message}"
                         )
                     }
                     is Resource.Loading -> {
-                        _stateRealtimeDatabase.value = realtimeDatabaseResponseState(isLoading = true)
+                        _stateRealtimeOrdersDatabase.value = realtimeDatabaseResponseState(isLoading = true)
                     }
                 }
             }.launchIn(viewModelScope)
+    }
+    fun readAllClient(client:String) {
+        realtimeClientDatabaseUseCase.invoke(client).onEach { result: Resource<LiveData<Client>> ->
+            when (result){
+                is Resource.Success -> {
+                    try {
+                        val realtimeClientOrderIdDatabaseResponseResponse: LiveData<Client>? = result.data
+
+                        _stateRealtimeClientOrderIdDatabase.value =
+                            realtimeClientOrderIdDatabaseResponseState(response = realtimeClientOrderIdDatabaseResponseResponse)
+
+                        Log.e("RealtimeClientOrderIdDatabaseResponse", "Success->\n ${_stateRealtimeClientOrderIdDatabase.value.response!!.value }")
+                    }catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("RealtimeClientOrderIdDatabaseResponse", "RealtimeClientOrderIdDatabaseResponseError->\n ${result.message}")
+                    _stateRealtimeClientOrderIdDatabase.value = realtimeClientOrderIdDatabaseResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateRealtimeClientOrderIdDatabase.value = realtimeClientOrderIdDatabaseResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun sendRating2(token:String,

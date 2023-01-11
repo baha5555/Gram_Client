@@ -67,10 +67,13 @@ fun SearchDriverScreen(
         profileViewModel.getProfileInfo(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
         orderExecutionViewModel.readAllOrders()
     }
+    LaunchedEffect(key1 = true){
+            orderExecutionViewModel.readAllClient("992555425858")
+    }
 
     val stateActiveOrders by orderExecutionViewModel.stateActiveOrders
-    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeDatabase
-
+    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
+    val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
     Scaffold(
         backgroundColor =Color(0xFFEEEEEE) ,
         bottomBar = {
@@ -194,43 +197,52 @@ fun SearchDriverScreen(
                         .wrapContentHeight()
                         .background(Color(0xFFEEEEEE))
                 ) {
-                    if(stateRealtimeDatabaseOrders.isLoading) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = PrimaryColor)
-                        }
-                    }
+//                    if(stateRealtimeDatabaseOrders.isLoading) {
+//                        Box(
+//                            modifier = Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            CircularProgressIndicator(color = PrimaryColor)
+//                        }
+//                    }
                     stateRealtimeDatabaseOrders.response?.let { response ->
                             response.observeAsState().value?.let { orders ->
-                                LazyColumn() {
-                                    items(orders) { order ->
-                                        var isOpen = remember{ mutableStateOf(false)}
-                                        val cancelOrderIsDialogOpen = remember { mutableStateOf(false) }
-                                        if (order.phone == profilePhone) {
-                                            orderCard(
-                                                orderExecutionViewModel,
-                                                preferences,
-                                                order,
-                                                navController,
-                                                sheetPeekHeightUpOnClick = {
-                                                    scope.launch {
-                                                        isOpen.value = !isOpen.value
-                                                        sheetPeekHeight = if (isOpen.value)
-                                                            367
-                                                        else
-                                                            200
+                                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId->
+                                    responseClientOrderId.observeAsState().value?.let { clientOrdersId->
+                                        LazyColumn() {
+                                            items(orders) { order ->
+                                                clientOrdersId.active_orders?.let { active ->
+                                                    active.forEach { clientOrderId ->
+                                                        var isOpen =
+                                                            remember { mutableStateOf(false) }
+                                                        if (order.id == clientOrderId) {
+                                                            orderCard(
+                                                                orderExecutionViewModel,
+                                                                preferences,
+                                                                order,
+                                                                navController,
+                                                                sheetPeekHeightUpOnClick = {
+                                                                    scope.launch {
+                                                                        isOpen.value = !isOpen.value
+                                                                        sheetPeekHeight =
+                                                                            if (isOpen.value)
+                                                                                367
+                                                                            else
+                                                                                200
 
+                                                                    }
+                                                                },
+                                                                isOpen = isOpen,
+                                                            )
+                                                            Spacer(Modifier.height(10.dp))
+                                                        }
                                                     }
-                                                },
-                                                isOpen = isOpen,
-                                            )
-                                            Spacer(Modifier.height(10.dp))
+                                                }
+                                            }
+                                            item {
+                                                Spacer(modifier = Modifier.height(120.dp))
+                                            }
                                         }
-                                    }
-                                    item{
-                                        Spacer(modifier=Modifier.height(120.dp))
                                     }
                                 }
                             }
@@ -335,9 +347,8 @@ fun orderCard(
                         cancelOrderIsDialogOpen.value = true
                     }
                 }else {
-                    CustomCircleButton(
-                        text = "Позвонить",
-                        icon = Icons.Default.Phone
+                    CustomCircleButton(text = "Связаться",
+                        icon = R.drawable.phone
                     ) {
                         connectClientWithDriverIsDialogOpen.value = true
                     }

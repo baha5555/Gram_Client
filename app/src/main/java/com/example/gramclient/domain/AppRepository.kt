@@ -23,7 +23,7 @@ import okhttp3.RequestBody
 
 interface AppRepository {
     suspend fun authorization(phone_number: Long): AuthResponse
-    val readAll: LiveData<List<RealtimeDatabaseOrder>>
+    val readAllOrders: LiveData<List<RealtimeDatabaseOrder>>
 
     suspend fun identification(
         client_register_id: String,

@@ -2,8 +2,8 @@ package com.example.gramclient.domain.realtimeDatabase.Order
 
 data class ToAddresse(
     val id: Int=0,
-    val lat: String="",
-    val lng: String="",
-    val name: String="",
-    val search_address_id: Int=0
+    val address_lat: String="",
+    val address_lng: String="",
+    val address: String="",
+    val city: String = ""
 )

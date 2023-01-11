@@ -12,9 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Message
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -35,11 +33,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.domain.orderExecutionScreen.Order
+import com.example.gramclient.domain.realtimeDatabase.Order.FromAddress
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.mainScreen.MainViewModel
@@ -53,7 +50,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@SuppressLint("CoroutineCreationDuringComposition", "UnrememberedMutableState")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OrderExecution(
@@ -67,7 +64,7 @@ fun OrderExecution(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
     val coroutineScope = rememberCoroutineScope()
-    val stateRealtimeDatabase = orderExecutionViewModel.stateRealtimeDatabase.value.response?.observeAsState()?.value
+    val stateRealtimeDatabase = orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
     val isDialogOpen = remember { mutableStateOf(false) }
     var showGrade by remember {
         mutableStateOf(false)
@@ -97,18 +94,18 @@ fun OrderExecution(
     val selectedOrder by orderExecutionViewModel.selectedOrder
     LaunchedEffect(key1 = true) {
         Log.e("ActiveOrdersResponse", selectedOrder.toString())
-        scope.launch {
-            stateRealtimeDatabase.let { orders ->
-                orders?.forEach { order ->
-                    if (order.id == selectedOrder.id) {
-                        Log.e("Select Order", "$selectRealtimeDatabaseOrder")
-                        selectRealtimeDatabaseOrder = order
-                    }
+
+    }
+    scope.launch {
+        stateRealtimeDatabase.let { orders ->
+            orders?.forEach { order ->
+                if (order.id == selectedOrder.id) {
+                    Log.e("Select Order", "$selectRealtimeDatabaseOrder")
+                    selectRealtimeDatabaseOrder = order
                 }
             }
         }
     }
-
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetBackgroundColor = Color(0xFFffffff),
@@ -354,7 +351,7 @@ fun orderSection(
                 )
                 Spacer(modifier = Modifier.width(20.dp))
 //                Text(text = "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
-                Text(text = order.from_address?.name ?: "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Black)
+                Text(text = order.from_address?.address ?: "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Black)
             }
             Image(
                 modifier = Modifier.size(18.dp),
@@ -403,7 +400,7 @@ fun orderSection(
             androidx.compose.material.Divider()
         }
 
-        order.to_addresses?.forEach { address ->
+        order.to_address?.forEach { address ->
             Row(
                 modifier = Modifier
                     .clickable {
@@ -426,7 +423,7 @@ fun orderSection(
                     )
                     Spacer(modifier = Modifier.width(20.dp))
                     Text(
-                        text = address.name,
+                        text = address.address,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = Color.Black
