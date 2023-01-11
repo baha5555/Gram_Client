@@ -1,7 +1,7 @@
 package com.example.gramclient.domain.profile
 
 import androidx.compose.runtime.MutableState
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,7 +17,7 @@ class SendProfileUseCase @Inject constructor(
 private val repository: AppRepository
 ) {
 
-    operator fun invoke(token:String,
+    operator fun invoke(
                         first_name: RequestBody,
                         last_name: RequestBody,
                         email: String,
@@ -26,7 +26,7 @@ private val repository: AppRepository
         flow{
             try {
                 emit(Resource.Loading<ProfileResponse>())
-                val response: ProfileResponse = repository.sendProfile(token,first_name,last_name,email,
+                val response: ProfileResponse = repository.sendProfile(first_name,last_name,email,
                     avatar?.value?.let {
                         MultipartBody.Part
                             .createFormData(

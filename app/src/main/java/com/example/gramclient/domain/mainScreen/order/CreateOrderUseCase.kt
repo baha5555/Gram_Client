@@ -1,8 +1,7 @@
 package com.example.gramclient.domain.mainScreen.order
 
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
-import com.example.gramclient.domain.mainScreen.TariffsResponse
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,7 +13,6 @@ import javax.inject.Inject
 class CreateOrderUseCase @Inject constructor(private val repository: AppRepository) {
 
     operator fun invoke(
-        token: String,
         dop_phone: String?,
         from_address: Int?,
         to_addresses: List<AddressModel>?,
@@ -29,7 +27,7 @@ class CreateOrderUseCase @Inject constructor(private val repository: AppReposito
                 if(to_addresses != null) {
                     jsonToAddress = Gson().toJson(to_addresses)
                 }
-                val response: OrderResponse = repository.createOrder(token, dop_phone, from_address, jsonToAddress, comment, tariff_id, allowances)
+                val response: OrderResponse = repository.createOrder(dop_phone, from_address, jsonToAddress, comment, tariff_id, allowances)
                 emit(Resource.Success<OrderResponse>(response))
             }catch (e: HttpException) {
                 emit(

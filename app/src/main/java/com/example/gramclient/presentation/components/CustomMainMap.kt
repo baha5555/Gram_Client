@@ -25,12 +25,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.NavHostController
-import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
+import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
-import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.map.UserTouchSurface
+import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.map.UserTouchSurface
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -64,7 +63,6 @@ lateinit var getAddressMarker: ImageView
 fun CustomMainMap(
     mainViewModel: MainViewModel,
     navController: NavHostController,
-    preferences: SharedPreferences,
     WHICH_ADDRESS: MutableState<String>?=null
 ) {
 
@@ -115,7 +113,7 @@ fun CustomMainMap(
                     } catch (_: Exception) {
                     }
                 }
-                if(currentRoute==RoutesName.MAIN_SCREEN){
+                if(currentRoute== RoutesName.MAIN_SCREEN){
                     btnLocation.margin(0f, 0f, 0f, 355f)
                     btnLocation.visibility=View.GONE
                     getAddressMarker.visibility=View.GONE
@@ -124,7 +122,7 @@ fun CustomMainMap(
                     addOverlays()
                     showRoadAB(it, fromAddress, toAddress)
                 }
-                else if(currentRoute==RoutesName.SEARCH_DRIVER_SCREEN){
+                else if(currentRoute== RoutesName.SEARCH_DRIVER_SCREEN){
                     btnLocation.visibility = View.GONE
                     getAddressMarker.visibility=View.GONE
 
@@ -132,20 +130,20 @@ fun CustomMainMap(
                     addOverlays()
                     showRoadAB(it, fromAddress, toAddress)
                 }
-                else if(currentRoute==RoutesName.SEARCH_ADDRESS_SCREEN){
+                else if(currentRoute== RoutesName.SEARCH_ADDRESS_SCREEN){
                     map.overlays.clear()
                     addOverlays()
                 }
             }
         },
         update = {
-            if(currentRoute==RoutesName.MAIN_SCREEN){
+            if(currentRoute== RoutesName.MAIN_SCREEN){
                 showRoadAB(it.context, fromAddress, toAddress)
             }
-            else if(currentRoute==RoutesName.SEARCH_DRIVER_SCREEN) {
+            else if(currentRoute== RoutesName.SEARCH_DRIVER_SCREEN) {
                 showRoadAB(it.context, fromAddress, toAddress)
             }
-            else if(currentRoute==RoutesName.SEARCH_ADDRESS_SCREEN){
+            else if(currentRoute== RoutesName.SEARCH_ADDRESS_SCREEN){
                 map.overlays.clear()
 
 //                val matrixA = ColorMatrix()

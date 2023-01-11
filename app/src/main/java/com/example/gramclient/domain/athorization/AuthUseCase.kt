@@ -1,8 +1,7 @@
 package com.example.gramclient.domain.athorization
 
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
-import com.example.gramclient.domain.mainScreen.TariffsResponse
 import retrofit2.HttpException
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow

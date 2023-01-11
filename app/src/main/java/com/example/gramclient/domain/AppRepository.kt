@@ -28,87 +28,53 @@ interface AppRepository {
     suspend fun identification(
         client_register_id: String,
         sms_code: Long,
-        fcm_token:String
+        fcm_token: String
     ): IdentificationResponse
 
     suspend fun getTariffs(): TariffsResponse
-
-    suspend fun getAllowancesByTariffId(
-         tariff_id: Int
-    ): AllowancesResponse
-
-    suspend fun getProfileInfo(token: String): GetProfileInfoResponse
-    suspend fun getOrderHistory(token: String): orderHistoryResponse
-
-
-    suspend fun connectClientWithDriver(
-    token: String,
-    order_id: String
-    ): connectClientWithDriverResponse
+    suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse
+    suspend fun getProfileInfo(): GetProfileInfoResponse
+    suspend fun getOrderHistory(): orderHistoryResponse
+    suspend fun connectClientWithDriver(order_id: String): connectClientWithDriverResponse
     suspend fun sendProfile(
-        token: String,
         first_name: RequestBody,
         last_name: RequestBody,
         email: String,
         avatar: MultipartBody.Part?
     ): ProfileResponse
 
-
-    suspend fun getAddressByPoint(
-        lng: Double,
-        lat: Double
-    ): AddressByPointResponse
-
-
-    suspend fun sendRating(
-         token: String,
-         order_id: Int,
-         add_rating: Int,
-    ): AddRatingResponse
-
-
-    suspend fun searchAddress(
-         addressName: String,
-    ): SearchAddressResponse
-
-
+    suspend fun getAddressByPoint(lng: Double, lat: Double): AddressByPointResponse
+    suspend fun sendRating(order_id: Int, add_rating: Int): AddRatingResponse
+    suspend fun searchAddress(addressName: String): SearchAddressResponse
     suspend fun createOrder(
-        token: String,
         dop_phone: String?,
         from_address: Int?,
         to_addresses: String?,
         comment: String?,
-        tariff_id : Int,
+        tariff_id: Int,
         allowances: String?,
-        ): OrderResponse
+    ): OrderResponse
 
 
     suspend fun getPrice(
-        tariff_id : Int,
+        tariff_id: Int,
         allowances: String?,
         from_address: Int?,
         to_addresses: String?,
     ): CalculateResponse
 
+    suspend fun cancelOrder(order_id: Int): CancelOrderResponse
 
-    suspend fun cancelOrder(
-         token: String,
-         order_id: Int,
-    ): CancelOrderResponse
-
-    suspend fun getActiveOrders(
-        token: String,
-    ): ActiveOrdersResponse
+    suspend fun getActiveOrders(): ActiveOrdersResponse
 
     suspend fun editOrder(
-        token: String,
         order_id: Int,
         dop_phone: String?,
         from_address: Int?,
         meeting_info: String?,
         to_addresses: String?,
         comment: String?,
-        tariff_id : Int,
+        tariff_id: Int,
         allowances: String?,
     ): UpdateOrderResponse
 

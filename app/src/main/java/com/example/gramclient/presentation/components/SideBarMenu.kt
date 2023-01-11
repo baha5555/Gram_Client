@@ -6,9 +6,7 @@ import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,23 +19,23 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.example.gramclient.PreferencesName
+import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
-import com.example.gramclient.presentation.profile.ProfileViewModel
+import com.example.gramclient.app.preference.CustomPreference
+import com.example.gramclient.utils.RoutesName
+import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 
 @Composable
 fun SideBarMenu(
     navController: NavHostController,
-    preferences: SharedPreferences,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val isDialogOpen = remember { mutableStateOf(false) }
     val stateGetProfileInfo by viewModel.stateGetProfileInfo
+    val prefs = CustomPreference(LocalContext.current)
 
     Column(
         modifier = Modifier
@@ -113,9 +111,7 @@ fun SideBarMenu(
             text = "Вы уверены что хотите выйти?",
             okBtnClick = {
                 isDialogOpen.value = false
-                preferences.edit()
-                    .putString(PreferencesName.ACCESS_TOKEN, "")
-                    .apply()
+                prefs.setAccessToken("")
                 navController.navigate(RoutesName.AUTH_SCREEN)
             },
             cancelBtnClick = { isDialogOpen.value = false },

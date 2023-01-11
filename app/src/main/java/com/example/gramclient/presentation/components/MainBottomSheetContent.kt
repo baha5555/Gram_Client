@@ -22,22 +22,20 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.gramclient.Constants
-import com.example.gramclient.PreferencesName
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
-import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.mainScreen.SearchResultContent
-import com.example.gramclient.presentation.mainScreen.SearchTextField
-import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
-import com.example.gramclient.presentation.mainScreen.states.CalculateResponseState
-import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
+import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.main.SearchResultContent
+import com.example.gramclient.presentation.screens.main.SearchTextField
+import com.example.gramclient.presentation.screens.main.states.AllowancesResponseState
+import com.example.gramclient.presentation.screens.main.states.CalculateResponseState
+import com.example.gramclient.presentation.screens.main.states.TariffsResponseState
 import com.example.gramclient.ui.theme.BackgroundColor
 import currentFraction
 import kotlinx.coroutines.CoroutineScope
@@ -52,7 +50,6 @@ fun MainBottomSheetContent(
     mainViewModel: MainViewModel,
     stateCalculate: CalculateResponseState,
     stateTariffs: TariffsResponseState,
-    preferences: SharedPreferences,
     stateAllowances: AllowancesResponseState,
     navController: NavHostController,
     isSearchState: MutableState<Boolean>,
@@ -109,7 +106,6 @@ fun MainBottomSheetContent(
                         stateTariffs =stateTariffs,
                         tariffListIcons =tariffListIcons,
                         mainViewModel =mainViewModel,
-                        preferences =preferences,
                         tariffIcons =tariffIcons
                     )
                 },
@@ -138,7 +134,6 @@ fun MainBottomSheetContent(
                     .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)) {
                 SearchTextField(
                     searchText = searchText,
-                    preferences = preferences,
                     navController = navController,
                     focusRequester = focusRequester,
                     isSearchState = isSearchState,
@@ -320,7 +315,6 @@ fun TariffsContent(
     stateTariffs: TariffsResponseState,
     tariffListIcons: Array<Int>,
     mainViewModel: MainViewModel,
-    preferences: SharedPreferences,
     tariffIcons: Array<Int>
 ){
     Column(modifier = Modifier
