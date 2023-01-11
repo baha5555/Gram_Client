@@ -1,15 +1,13 @@
-package com.example.gramclient.presentation.orderScreen
+package com.example.gramclient.presentation.screens.order
 
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.gramclient.*
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.*
@@ -20,7 +18,9 @@ import com.example.gramclient.domain.realtimeDatabase.profile.Client
 import com.example.gramclient.domain.realtimeDatabase.realtimeClientOrderIdDatabaseResponseState
 import com.example.gramclient.domain.realtimeDatabase.realtimeDatabaseResponseState
 import com.example.gramclient.presentation.components.currentRoute
-import com.example.gramclient.presentation.mainScreen.states.CancelOrderResponseState
+import com.example.gramclient.presentation.screens.main.states.CancelOrderResponseState
+import com.example.gramclient.utils.Resource
+import com.example.gramclient.utils.RoutesName
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -74,13 +74,13 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
 
                                 _stateRealtimeOrdersDatabase.value =
                                     realtimeDatabaseResponseState(response = addressResponse)
-                            Log.e("AddRatingResponse", "SendRatingResponse->\n ${_stateAddRating.value}")
+                            Log.e("readAllOrdersFromRealtimeResponse", "Success->\n ${_stateRealtimeOrdersDatabase.value}")
                         }catch (e: Exception) {
                             Log.d("Exception", "${e.message} Exception")
                         }
                     }
                     is Resource.Error -> {
-                        Log.e("AddRatingResponse", "AddRatingResponseError->\n ${result.message}")
+                        Log.e("readAllOrdersFromRealtimeResponse", "readAllOrdersFromRealtimeResponseError->\n ${result.message}")
                         _stateRealtimeOrdersDatabase.value = realtimeDatabaseResponseState(
                             error = "${result.message}"
                         )
@@ -119,10 +119,10 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
         }.launchIn(viewModelScope)
     }
 
-    fun sendRating2(token:String,
+    fun sendRating2(
       order_id: Int,
       add_rating: Int){
-        sendAddRatingUseCase.invoke(token="Bearer $token",order_id, add_rating).onEach { result: Resource<AddRatingResponse> ->
+        sendAddRatingUseCase.invoke(order_id, add_rating).onEach { result: Resource<AddRatingResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -148,10 +148,9 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
     }
 
     fun connectClientWithDriver(
-        token:String,
         order_id: String
     ){
-        connectClientWithDriverUseCase.invoke(token="Bearer $token",order_id).onEach { result: Resource<connectClientWithDriverResponse> ->
+        connectClientWithDriverUseCase.invoke(order_id).onEach { result: Resource<connectClientWithDriverResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -175,8 +174,8 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
             }
         }.launchIn(viewModelScope)
     }
-    fun getActiveOrders(token:String, navController: NavController){
-        getActiveOrdersUseCase.invoke(token="Bearer $token").onEach { result: Resource<ActiveOrdersResponse> ->
+    fun getActiveOrders( navController: NavController){
+        getActiveOrdersUseCase.invoke().onEach { result: Resource<ActiveOrdersResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -216,8 +215,8 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
             }
         }.launchIn(viewModelScope)
     }
-    fun cancelOrder(preferences: SharedPreferences, order_id: Int, navController: NavController,onSuccess:()->Unit){
-        cancelOrderUseCase.invoke(token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}", order_id).onEach { result: Resource<CancelOrderResponse> ->
+    fun cancelOrder(order_id: Int, navController: NavController,onSuccess:()->Unit){
+        cancelOrderUseCase.invoke(order_id).onEach { result: Resource<CancelOrderResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -225,7 +224,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         _stateCancelOrder.value =
                             CancelOrderResponseState(response = response)
                         onSuccess()
-                        getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
+                        getActiveOrders(navController)
                         Log.e("TariffsResponse", "CancelOrderResponse->\n ${_stateCancelOrder.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
@@ -244,10 +243,9 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
         }.launchIn(viewModelScope)
     }
 
-    fun editOrder(preferences: SharedPreferences, toAddressId: Int) {
+    fun editOrder(toAddressId: Int) {
 
         editOrderUseCase.invoke(
-            token="Bearer ${preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString()}",
             order_id = selectedOrder.value.id,
             dop_phone = null,
             from_address = selectedOrder.value.from_address?.id,

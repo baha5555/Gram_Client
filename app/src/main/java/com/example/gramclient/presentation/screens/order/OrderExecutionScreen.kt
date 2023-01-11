@@ -1,7 +1,6 @@
-package com.example.gramclient.presentation.orderScreen
+package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,14 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.domain.realtimeDatabase.Order.FromAddress
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
-import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
-import com.example.gramclient.presentation.profile.ProfileViewModel
+import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.main.addressComponents.AddressList
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
@@ -55,10 +51,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun OrderExecution(
     navController: NavHostController,
-    preferences: SharedPreferences,
     orderExecutionViewModel: OrderExecutionViewModel,
-    mainViewModel: MainViewModel= hiltViewModel(),
-    profileViewModel: ProfileViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
 ) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -121,7 +115,7 @@ fun OrderExecution(
                 if(!isSearchState.value) {
                     selectRealtimeDatabaseOrder.let { order ->
                             if (order.performer != null) {
-                                    performerSection(performer = order, orderExecutionViewModel,preferences)
+                                    performerSection(performer = order, orderExecutionViewModel)
                             }
                         orderSection(order, scope, sheetState, isSearchState)
                         Spacer(modifier = Modifier.height(10.dp))
@@ -134,7 +128,7 @@ fun OrderExecution(
                 }else{
                     searchSection(
                         searchText, focusRequester, isSearchState, sheetState, scope, orderExecutionViewModel,
-                        navController, isAddressList, focusManager, mainViewModel, preferences
+                        navController, isAddressList, focusManager, mainViewModel
                     )
                 }
             }
@@ -150,7 +144,7 @@ fun OrderExecution(
                         isDialogOpen.value = false
                         sheetState.bottomSheetState.collapse()
                         if(orderId!=-1)
-                        orderExecutionViewModel.cancelOrder(preferences = preferences, orderId, navController) {
+                        orderExecutionViewModel.cancelOrder(orderId, navController) {
                             navController.popBackStack()
                         }
                     }
@@ -198,8 +192,6 @@ fun OrderExecution(
                                             delay(3000)
                                             thumbUpClicked = true
                                             orderExecutionViewModel.sendRating2(
-                                                token = preferences.getString(PreferencesName.ACCESS_TOKEN,
-                                                    "").toString(),
                                                 order_id = 590,
                                                 add_rating = ratingState.value * 10
                                             )
@@ -243,8 +235,7 @@ fun OrderExecution(
 @Composable
 fun performerSection(
     performer: RealtimeDatabaseOrder,
-    orderExecutionViewModel: OrderExecutionViewModel,
-    preferences: SharedPreferences
+    orderExecutionViewModel: OrderExecutionViewModel
     ){
     val connectClientWithDriverIsDialogOpen = remember{ mutableStateOf(false)}
     Column(
@@ -306,7 +297,6 @@ fun performerSection(
         okBtnClick = {
             connectClientWithDriverIsDialogOpen.value = false
             orderExecutionViewModel.connectClientWithDriver(
-                token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
                 order_id = performer.id.toString()
             )
         },
@@ -560,7 +550,6 @@ fun searchSection(
     isAddressList: MutableState<Boolean>,
     focusManager: FocusManager,
     mainViewModel: MainViewModel,
-    preferences: SharedPreferences
 ){
     Box(modifier = Modifier.fillMaxWidth()) {
         TextField(
@@ -658,7 +647,7 @@ fun searchSection(
                 bottomSheetState.bottomSheetState.collapse()
             }
             isSearchState.value=false
-                orderExecutionViewModel.editOrder(preferences, address.id)
+                orderExecutionViewModel.editOrder(address.id)
         }
     }
 }

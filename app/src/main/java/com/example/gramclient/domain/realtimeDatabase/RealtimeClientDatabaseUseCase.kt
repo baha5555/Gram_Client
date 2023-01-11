@@ -1,16 +1,16 @@
 package com.example.gramclient.domain.realtimeDatabase
 
 import androidx.lifecycle.LiveData
-import com.example.gramclient.Resource
 import com.example.gramclient.domain.AppRepository
 import com.example.gramclient.domain.realtimeDatabase.profile.Client
+import com.example.gramclient.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class RealtimeClientDatabaseUseCase  @Inject constructor(private val repository: AppRepository) {
+class RealtimeClientDatabaseUseCase  @Inject constructor() {
     operator fun invoke(client:String): Flow<Resource<LiveData<Client>>> =
         flow {
             try {
