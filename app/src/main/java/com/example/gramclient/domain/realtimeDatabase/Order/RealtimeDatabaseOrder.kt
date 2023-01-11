@@ -30,8 +30,8 @@ data class RealtimeDatabaseOrder(
     @ColumnInfo
     val tariff_id: Int?=null,
     @ColumnInfo
-    val to_addresses: List<ToAddresse>? = null,
+    val to_address: List<ToAddresse>? = null,
     @ColumnInfo
     val performer: RealtimeDatabasePerformer? = null,
 
-)
+    )

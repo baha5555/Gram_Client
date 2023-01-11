@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation.screens.order
+package com.example.gramclient.presentation.orderScreen
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
@@ -34,13 +34,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.gramclient.utils.PreferencesName
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
+import com.example.gramclient.domain.realtimeDatabase.Order.FromAddress
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
-import com.example.gramclient.presentation.screens.main.MainViewModel
-import com.example.gramclient.presentation.screens.main.addressComponents.AddressList
-import com.example.gramclient.presentation.screens.profile.ProfileViewModel
+import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.mainScreen.addressComponents.AddressList
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
@@ -49,21 +50,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@SuppressLint("CoroutineCreationDuringComposition", "UnrememberedMutableState")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OrderExecution(
     navController: NavHostController,
+    preferences: SharedPreferences,
     orderExecutionViewModel: OrderExecutionViewModel,
-    mainViewModel: MainViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel= hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val sheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
     val coroutineScope = rememberCoroutineScope()
-    val stateRealtimeDatabase =
-        orderExecutionViewModel.stateRealtimeDatabase.value.response?.observeAsState()?.value
+    val stateRealtimeDatabase = orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
     val isDialogOpen = remember { mutableStateOf(false) }
     var showGrade by remember {
         mutableStateOf(false)
@@ -72,16 +73,16 @@ fun OrderExecution(
     val ratingState = remember {
         mutableStateOf(0)
     }
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = true){
         orderExecutionViewModel.readAllOrders()
     }
-    var selectRealtimeDatabaseOrder: RealtimeDatabaseOrder by remember {
+    var selectRealtimeDatabaseOrder:RealtimeDatabaseOrder by remember {
         mutableStateOf(RealtimeDatabaseOrder())
     }
     // searchState dependencies ->
-    var WHICH_ADDRESS = remember { mutableStateOf("") }
-    val isAddressList = remember { mutableStateOf(true) }
-    val searchText = remember { mutableStateOf("") }
+    var WHICH_ADDRESS = remember{ mutableStateOf("") }
+    val isAddressList= remember { mutableStateOf(true) }
+    val searchText=remember{ mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val isSearchState = remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
@@ -93,18 +94,18 @@ fun OrderExecution(
     val selectedOrder by orderExecutionViewModel.selectedOrder
     LaunchedEffect(key1 = true) {
         Log.e("ActiveOrdersResponse", selectedOrder.toString())
-        scope.launch {
-            stateRealtimeDatabase.let { orders ->
-                orders?.forEach { order ->
-                    if (order.id == selectedOrder.id) {
-                        Log.e("Select Order", "$selectRealtimeDatabaseOrder")
-                        selectRealtimeDatabaseOrder = order
-                    }
+
+    }
+    scope.launch {
+        stateRealtimeDatabase.let { orders ->
+            orders?.forEach { order ->
+                if (order.id == selectedOrder.id) {
+                    Log.e("Select Order", "$selectRealtimeDatabaseOrder")
+                    selectRealtimeDatabaseOrder = order
                 }
             }
         }
     }
-
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetBackgroundColor = Color(0xFFffffff),
@@ -117,11 +118,11 @@ fun OrderExecution(
                     .wrapContentHeight(unbounded = true)
                     .background(BackgroundColor)
             ) {
-                if (!isSearchState.value) {
+                if(!isSearchState.value) {
                     selectRealtimeDatabaseOrder.let { order ->
-                        if (order.performer != null) {
-                            performerSection(performer = order, orderExecutionViewModel)
-                        }
+                            if (order.performer != null) {
+                                    performerSection(performer = order, orderExecutionViewModel,preferences)
+                            }
                         orderSection(order, scope, sheetState, isSearchState)
                         Spacer(modifier = Modifier.height(10.dp))
                         optionSection()
@@ -130,18 +131,10 @@ fun OrderExecution(
                             orderId = order.id
                         })
                     }
-                } else {
+                }else{
                     searchSection(
-                        searchText,
-                        focusRequester,
-                        isSearchState,
-                        sheetState,
-                        scope,
-                        orderExecutionViewModel,
-                        navController,
-                        isAddressList,
-                        focusManager,
-                        mainViewModel
+                        searchText, focusRequester, isSearchState, sheetState, scope, orderExecutionViewModel,
+                        navController, isAddressList, focusManager, mainViewModel, preferences
                     )
                 }
             }
@@ -156,10 +149,10 @@ fun OrderExecution(
                     coroutineScope.launch {
                         isDialogOpen.value = false
                         sheetState.bottomSheetState.collapse()
-                        if (orderId != -1)
-                            orderExecutionViewModel.cancelOrder(orderId, navController){
-                                navController.popBackStack()
-                            }
+                        if(orderId!=-1)
+                        orderExecutionViewModel.cancelOrder(preferences = preferences, orderId, navController) {
+                            navController.popBackStack()
+                        }
                     }
                 },
                 cancelBtnClick = { isDialogOpen.value = false },
@@ -205,6 +198,8 @@ fun OrderExecution(
                                             delay(3000)
                                             thumbUpClicked = true
                                             orderExecutionViewModel.sendRating2(
+                                                token = preferences.getString(PreferencesName.ACCESS_TOKEN,
+                                                    "").toString(),
                                                 order_id = 590,
                                                 add_rating = ratingState.value * 10
                                             )
@@ -248,9 +243,10 @@ fun OrderExecution(
 @Composable
 fun performerSection(
     performer: RealtimeDatabaseOrder,
-    orderExecutionViewModel: OrderExecutionViewModel
-) {
-    val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
+    orderExecutionViewModel: OrderExecutionViewModel,
+    preferences: SharedPreferences
+    ){
+    val connectClientWithDriverIsDialogOpen = remember{ mutableStateOf(false)}
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -259,36 +255,21 @@ fun performerSection(
                 color = Color.White
             )
             .padding(20.dp)
-    ) {
+    ){
         Text(
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            text = "За рулем ${performer.performer?.first_name ?: "Водитель"}",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
+            modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
+            text = "За рулем ${performer.performer?.first_name?:"Водитель"}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         Spacer(modifier = Modifier.height(10.dp))
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "${performer.performer?.transport?.color ?: "Не указан"} ${performer.performer?.transport?.model ?: "Не указан"}",
-                fontSize = 16.sp,
-                color = Color.Black
-            )
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+        ){
+            Text(text = "${performer.performer?.transport?.color?:"Не указан"} ${performer.performer?.transport?.model?:"Не указан"}", fontSize = 16.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 modifier = Modifier
                     .background(shape = RoundedCornerShape(3.dp), color = Color(0xFFF4B91D))
-                    .padding(3.dp),
-                textAlign = TextAlign.Center,
-                text = performer.performer?.transport?.car_number ?: "номер не указан",
-                fontSize = 16.sp,
-                color = Color.Black
-            )
+                    .padding(3.dp), textAlign = TextAlign.Center,
+                text = performer.performer?.transport?.car_number?:"номер не указан", fontSize = 16.sp, color = Color.Black)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Row(
@@ -325,6 +306,7 @@ fun performerSection(
         okBtnClick = {
             connectClientWithDriverIsDialogOpen.value = false
             orderExecutionViewModel.connectClientWithDriver(
+                token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
                 order_id = performer.id.toString()
             )
         },
@@ -341,12 +323,11 @@ fun orderSection(
     bottomSheetState: BottomSheetScaffoldState,
     isSearchState: MutableState<Boolean>
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(bottom = 10.dp)
-    ) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White)
+        .padding(bottom = 10.dp)
+    ){
         Row(
             modifier = Modifier
                 .clickable {
@@ -361,7 +342,7 @@ fun orderSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row() {
+            Row(){
                 Image(
                     modifier = Modifier
                         .size(20.dp),
@@ -370,12 +351,7 @@ fun orderSection(
                 )
                 Spacer(modifier = Modifier.width(20.dp))
 //                Text(text = "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
-                Text(
-                    text = order.from_address?.name ?: "Откуда?",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.Black
-                )
+                Text(text = order.from_address?.address ?: "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Black)
             }
             Image(
                 modifier = Modifier.size(18.dp),
@@ -383,11 +359,9 @@ fun orderSection(
                 contentDescription = "icon"
             )
         }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 55.dp, end = 15.dp)
-        ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 55.dp, end = 15.dp)) {
             Divider()
         }
         Row(
@@ -404,7 +378,7 @@ fun orderSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row() {
+            Row(){
                 Image(
                     modifier = Modifier
                         .size(20.dp),
@@ -412,12 +386,7 @@ fun orderSection(
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                Text(
-                    text = "Добавить остановку",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.Gray
-                )
+                Text(text = "Добавить остановку", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
             }
             Image(
                 modifier = Modifier.size(18.dp),
@@ -425,15 +394,13 @@ fun orderSection(
                 contentDescription = "icon"
             )
         }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 55.dp, end = 15.dp)
-        ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 55.dp, end = 15.dp)) {
             androidx.compose.material.Divider()
         }
 
-        order.to_addresses?.forEach { address ->
+        order.to_address?.forEach { address ->
             Row(
                 modifier = Modifier
                     .clickable {
@@ -456,7 +423,7 @@ fun orderSection(
                     )
                     Spacer(modifier = Modifier.width(20.dp))
                     Text(
-                        text = address.name,
+                        text = address.address,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = Color.Black
@@ -471,18 +438,16 @@ fun orderSection(
         }
     }
 }
-
 @Composable
-fun optionSection() {
+fun optionSection(){
 
-    val switch = remember { mutableStateOf(false) }
+    val switch=remember{ mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(bottom = 10.dp)
-    ) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White)
+        .padding(bottom = 10.dp)
+    ){
         Row(
             modifier = Modifier
                 .clickable {
@@ -497,7 +462,7 @@ fun optionSection() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically){
                 Image(
                     modifier = Modifier
                         .size(20.dp),
@@ -505,21 +470,9 @@ fun optionSection() {
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                Column() {
-                    Text(
-                        text = "Наличные",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.Black,
-                        fontSize = 18.sp
-                    )
-                    Text(
-                        text = "Изменить способ оплаты",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
+                Column(){
+                    Text(text = "Наличные", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Black, fontSize = 18.sp)
+                    Text(text = "Изменить способ оплаты", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray, fontSize = 14.sp)
                 }
             }
             Image(
@@ -528,11 +481,9 @@ fun optionSection() {
                 contentDescription = "icon"
             )
         }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 55.dp, end = 15.dp)
-        ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 55.dp, end = 15.dp)) {
             androidx.compose.material.Divider()
         }
         Row(
@@ -562,7 +513,7 @@ fun optionSection() {
                     maxLines = 1, overflow = TextOverflow.Ellipsis
                 )
             }
-            Row() {
+            Row(){
                 CustomSwitch(switchON = switch) {
 
                 }
@@ -571,9 +522,8 @@ fun optionSection() {
         }
     }
 }
-
 @Composable
-fun actionSection(cancelOrderOnClick: () -> Unit) {
+fun actionSection(cancelOrderOnClick:()->Unit){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -582,28 +532,21 @@ fun actionSection(cancelOrderOnClick: () -> Unit) {
             .padding(20.dp),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.Center
-    ) {
-        CustomCircleButton(
-            text = "Отменить\nзаказ",
-            icon = Icons.Default.Close, cancelOrderOnClick
-        )
+    ){
+        CustomCircleButton(text = "Отменить\nзаказ",
+            icon = Icons.Default.Close,cancelOrderOnClick)
         Spacer(modifier = Modifier.width(20.dp))
-        CustomCircleButton(
-            text = "Отправить\nмаршрут",
-            icon = R.drawable.share_icon
-        ) {
+        CustomCircleButton(text = "Отправить\nмаршрут",
+            icon = R.drawable.share_icon) {
             //method
         }
         Spacer(modifier = Modifier.width(20.dp))
-        CustomCircleButton(
-            text = "Безопас-\nность",
-            icon = R.drawable.safety_icon
-        ) {
+        CustomCircleButton(text = "Безопас-\nность",
+            icon = R.drawable.safety_icon) {
             //method
         }
     }
 }
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun searchSection(
@@ -617,7 +560,8 @@ fun searchSection(
     isAddressList: MutableState<Boolean>,
     focusManager: FocusManager,
     mainViewModel: MainViewModel,
-) {
+    preferences: SharedPreferences
+){
     Box(modifier = Modifier.fillMaxWidth()) {
         TextField(
             value = searchText.value,
@@ -673,19 +617,18 @@ fun searchSection(
                 disabledIndicatorColor = Color.Transparent
             )
         )
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 20.dp)
-                .clickable {
-                    scope.launch {
-                        bottomSheetState.bottomSheetState.collapse()
-                    }
-                    isSearchState.value = false
-                },
+        Box(modifier = Modifier
+            .align(Alignment.CenterEnd)
+            .padding(end = 20.dp)
+            .clickable {
+                scope.launch {
+                    bottomSheetState.bottomSheetState.collapse()
+                }
+                isSearchState.value = false
+            },
             contentAlignment = Alignment.Center
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically){
                 Spacer(
                     modifier =
                     Modifier
@@ -700,10 +643,9 @@ fun searchSection(
         }
     }
     //Search response content
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 10.dp, end = 10.dp, top = 10.dp)
     )
     {
         AddressList(
@@ -711,12 +653,12 @@ fun searchSection(
             isVisible = isAddressList,
             address = searchText,
             focusManager = focusManager,
-        ) { address ->
+        ){address ->
             scope.launch {
                 bottomSheetState.bottomSheetState.collapse()
             }
-            isSearchState.value = false
-            orderExecutionViewModel.editOrder(address.id)
+            isSearchState.value=false
+                orderExecutionViewModel.editOrder(preferences, address.id)
         }
     }
 }

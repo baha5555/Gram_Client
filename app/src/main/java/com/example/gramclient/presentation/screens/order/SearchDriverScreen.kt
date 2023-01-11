@@ -1,5 +1,6 @@
-package com.example.gramclient.presentation.screens.order
+package com.example.gramclient.presentation
 
+import android.content.SharedPreferences
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -25,14 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.utils.RoutesName
+import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomMainMap
-import com.example.gramclient.presentation.screens.main.MainViewModel
-import com.example.gramclient.presentation.screens.profile.ProfileViewModel
+import com.example.gramclient.presentation.mainScreen.MainViewModel
+import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
+import com.example.gramclient.presentation.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.launch
@@ -42,9 +45,10 @@ import kotlinx.coroutines.launch
 fun SearchDriverScreen(
     navController: NavHostController,
     mainViewModel: MainViewModel = hiltViewModel(),
+    preferences: SharedPreferences,
     orderExecutionViewModel: OrderExecutionViewModel,
 ) {
-    val profileViewModel: ProfileViewModel = hiltViewModel()
+    val profileViewModel:ProfileViewModel = hiltViewModel()
     val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
 
 
@@ -60,13 +64,16 @@ fun SearchDriverScreen(
     }
     LaunchedEffect(key1 = true){
 //        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
-        profileViewModel.getProfileInfo()
+        profileViewModel.getProfileInfo(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
         orderExecutionViewModel.readAllOrders()
+    }
+    LaunchedEffect(key1 = true){
+            orderExecutionViewModel.readAllClient("992555425858")
     }
 
     val stateActiveOrders by orderExecutionViewModel.stateActiveOrders
-    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeDatabase
-
+    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
+    val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
     Scaffold(
         backgroundColor =Color(0xFFEEEEEE) ,
         bottomBar = {
@@ -190,42 +197,52 @@ fun SearchDriverScreen(
                         .wrapContentHeight()
                         .background(Color(0xFFEEEEEE))
                 ) {
-                    if(stateRealtimeDatabaseOrders.isLoading) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = PrimaryColor)
-                        }
-                    }
+//                    if(stateRealtimeDatabaseOrders.isLoading) {
+//                        Box(
+//                            modifier = Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            CircularProgressIndicator(color = PrimaryColor)
+//                        }
+//                    }
                     stateRealtimeDatabaseOrders.response?.let { response ->
                             response.observeAsState().value?.let { orders ->
-                                LazyColumn() {
-                                    items(orders) { order ->
-                                        var isOpen = remember{ mutableStateOf(false)}
-                                        val cancelOrderIsDialogOpen = remember { mutableStateOf(false) }
-                                        if (order.phone == profilePhone) {
-                                            orderCard(
-                                                orderExecutionViewModel,
-                                                order,
-                                                navController,
-                                                sheetPeekHeightUpOnClick = {
-                                                    scope.launch {
-                                                        isOpen.value = !isOpen.value
-                                                        sheetPeekHeight = if (isOpen.value)
-                                                            367
-                                                        else
-                                                            200
+                                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId->
+                                    responseClientOrderId.observeAsState().value?.let { clientOrdersId->
+                                        LazyColumn() {
+                                            items(orders) { order ->
+                                                clientOrdersId.active_orders?.let { active ->
+                                                    active.forEach { clientOrderId ->
+                                                        var isOpen =
+                                                            remember { mutableStateOf(false) }
+                                                        if (order.id == clientOrderId) {
+                                                            orderCard(
+                                                                orderExecutionViewModel,
+                                                                preferences,
+                                                                order,
+                                                                navController,
+                                                                sheetPeekHeightUpOnClick = {
+                                                                    scope.launch {
+                                                                        isOpen.value = !isOpen.value
+                                                                        sheetPeekHeight =
+                                                                            if (isOpen.value)
+                                                                                367
+                                                                            else
+                                                                                200
 
+                                                                    }
+                                                                },
+                                                                isOpen = isOpen,
+                                                            )
+                                                            Spacer(Modifier.height(10.dp))
+                                                        }
                                                     }
-                                                },
-                                                isOpen = isOpen,
-                                            )
-                                            Spacer(Modifier.height(10.dp))
+                                                }
+                                            }
+                                            item {
+                                                Spacer(modifier = Modifier.height(120.dp))
+                                            }
                                         }
-                                    }
-                                    item{
-                                        Spacer(modifier=Modifier.height(120.dp))
                                     }
                                 }
                             }
@@ -237,7 +254,8 @@ fun SearchDriverScreen(
         ) {
             CustomMainMap(
                 mainViewModel = mainViewModel,
-                navController = navController
+                navController = navController,
+                preferences = preferences
             )
         }
     }
@@ -246,6 +264,7 @@ fun SearchDriverScreen(
 @Composable
 fun orderCard(
     orderExecutionViewModel: OrderExecutionViewModel,
+    preferences: SharedPreferences,
     order: RealtimeDatabaseOrder,
     navController: NavHostController,
     sheetPeekHeightUpOnClick:()->Unit,
@@ -328,9 +347,8 @@ fun orderCard(
                         cancelOrderIsDialogOpen.value = true
                     }
                 }else {
-                    CustomCircleButton(
-                        text = "Позвонить",
-                        icon = Icons.Default.Phone
+                    CustomCircleButton(text = "Связаться",
+                        icon = R.drawable.phone
                     ) {
                         connectClientWithDriverIsDialogOpen.value = true
                     }
@@ -347,7 +365,7 @@ fun orderCard(
         text = "Вы уверены что хотите отменить заказ?",
         okBtnClick = {
             cancelOrderIsDialogOpen.value = false
-            orderExecutionViewModel.cancelOrder(order.id, navController,{})
+            orderExecutionViewModel.cancelOrder(preferences = preferences, order.id, navController,{})
         },
         cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
         isDialogOpen = cancelOrderIsDialogOpen.value
@@ -356,7 +374,10 @@ fun orderCard(
         text = "Позвонить водителю?",
         okBtnClick = {
             connectClientWithDriverIsDialogOpen.value = false
-            orderExecutionViewModel.connectClientWithDriver(order_id = order.id.toString())
+            orderExecutionViewModel.connectClientWithDriver(
+                token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
+                order_id = order.id.toString()
+            )
         },
         cancelBtnClick = { connectClientWithDriverIsDialogOpen.value = false },
         isDialogOpen = connectClientWithDriverIsDialogOpen.value

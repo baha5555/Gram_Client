@@ -16,7 +16,7 @@ class RealtimeDatabaseUseCase @Inject constructor(private val repository: AppRep
             try {
                 emit(Resource.Loading<LiveData<List<RealtimeDatabaseOrder>>>())
                 val response: LiveData<List<RealtimeDatabaseOrder>> =
-                    repository.readAll
+                    repository.readAllOrders
                 emit(Resource.Success<LiveData<List<RealtimeDatabaseOrder>>>(response))
             } catch (e: HttpException) {
                 emit(
