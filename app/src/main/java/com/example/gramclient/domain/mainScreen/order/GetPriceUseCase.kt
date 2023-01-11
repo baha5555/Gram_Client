@@ -1,6 +1,6 @@
 package com.example.gramclient.domain.mainScreen.order
 
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow

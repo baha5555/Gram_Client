@@ -15,13 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.gramclient.PreferencesName
+import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
-import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
+import com.example.gramclient.app.preference.CustomPreference
+import com.example.gramclient.utils.RoutesName
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -30,12 +31,10 @@ fun BottomBar(
     navController: NavHostController,
     mainBottomSheetState: BottomSheetScaffoldState,
     bottomSheetState: BottomSheetScaffoldState,
-    createOrder: () -> Unit,
-    preferences: SharedPreferences,
-) {
+    createOrder: () -> Unit) {
     val coroutineScope= rememberCoroutineScope()
     val isDialogOpen=remember{ mutableStateOf(false) }
-
+    val prefs = CustomPreference(LocalContext.current)
     BottomAppBar(
         backgroundColor = Color(0xFFF7F7F7),
         contentColor = Color.White,
@@ -76,7 +75,7 @@ fun BottomBar(
                 textSize = 18,
                 textBold = true,
             onClick = {
-                if (preferences.getString(PreferencesName.ACCESS_TOKEN, "") == "") {
+                if (prefs.getAccessToken() == "") {
                     navController.navigate(RoutesName.AUTH_SCREEN){
                         popUpTo(RoutesName.MAIN_SCREEN) {
                             inclusive = true

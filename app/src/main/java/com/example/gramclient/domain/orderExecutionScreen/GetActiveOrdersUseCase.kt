@@ -1,6 +1,6 @@
 package com.example.gramclient.domain.orderExecutionScreen
 
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,13 +11,12 @@ import javax.inject.Inject
 
 class GetActiveOrdersUseCase @Inject constructor(private val repository: AppRepository) {
     operator fun invoke(
-        token: String
     ): Flow<Resource<ActiveOrdersResponse>> =
         flow {
             try {
                 emit(Resource.Loading<ActiveOrdersResponse>())
                 val response: ActiveOrdersResponse =
-                    repository.getActiveOrders(token)
+                    repository.getActiveOrders()
                 emit(Resource.Success<ActiveOrdersResponse>(response))
             } catch (e: HttpException) {
                 emit(

@@ -12,11 +12,9 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +22,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,13 +43,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.gramclient.*
-import com.example.gramclient.Constants.FCM_TOKEN
+import com.example.gramclient.utils.Constants.FCM_TOKEN
 import com.example.gramclient.R
-import com.example.gramclient.extension.checkInternet.ConnectionState
-import com.example.gramclient.extension.checkInternet.connectivityState
-import com.example.gramclient.presentation.authorization.AuthViewModel
-import com.example.gramclient.presentation.drawer_bar.messageScreen.MessageViewModel
+import com.example.gramclient.app.extension.checkInternet.ConnectionState
+import com.example.gramclient.app.extension.checkInternet.connectivityState
+import com.example.gramclient.presentation.screens.authorization.AuthViewModel
+import com.example.gramclient.presentation.screens.drawer.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
+import com.example.gramclient.utils.MyFirebaseMessagingService
+import com.example.gramclient.utils.PreferencesName
+import com.example.gramclient.utils.SmsBroadcastReceiver
 import com.google.android.gms.auth.api.phone.SmsRetriever
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -62,7 +62,6 @@ import kotlinx.coroutines.CoroutineScope
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private lateinit var preferences: SharedPreferences
     private lateinit var authViewModel: AuthViewModel
     private lateinit var navController: NavHostController
     private lateinit var scope: CoroutineScope
@@ -89,7 +88,6 @@ class MainActivity : ComponentActivity() {
                     Navigation(
                         navController = navController,
                         messageViewModel,
-                        preferences,
                         authViewModel = authViewModel
                     )
                 MyFirebaseMessagingService().onCreate()
@@ -115,7 +113,6 @@ class MainActivity : ComponentActivity() {
         startSmartUserConsent()
 //        checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
 //        statusCheck()
-        preferences=getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
 
     }
 
@@ -139,11 +136,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun getOtpFromMessage(message: String, authViewModel:AuthViewModel) {
+    private fun getOtpFromMessage(message: String, authViewModel: AuthViewModel) {
         var code = message.filter { it.isDigit() }
         Log.e("setEditValue", code)
         FCM_TOKEN?.let {
-            authViewModel.setCodeAutomaticly(code, preferences, navController, scope,it)
+            authViewModel.setCodeAutomaticly(code, navController, scope,it)
         }
     }
 

@@ -1,8 +1,7 @@
 package com.example.gramclient.domain.mainScreen.order
 
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
-import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -10,11 +9,11 @@ import java.io.IOException
 import javax.inject.Inject
 
 class CancelOrderUseCase @Inject constructor(private val repository: AppRepository) {
-    operator fun invoke(token: String, order_id: Int): Flow<Resource<CancelOrderResponse>> =
+    operator fun invoke(order_id: Int): Flow<Resource<CancelOrderResponse>> =
         flow{
             try {
                 emit(Resource.Loading<CancelOrderResponse>())
-                val response: CancelOrderResponse = repository.cancelOrder(token, order_id)
+                val response: CancelOrderResponse = repository.cancelOrder(order_id)
                 emit(Resource.Success<CancelOrderResponse>(response))
             }catch (e: HttpException) {
                 emit(

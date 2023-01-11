@@ -1,7 +1,7 @@
 package com.example.gramclient.domain.realtimeDatabase
 
 import androidx.lifecycle.LiveData
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import kotlinx.coroutines.flow.Flow
