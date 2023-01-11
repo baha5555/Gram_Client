@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation
+package com.example.gramclient.presentation.screens.order
 
 import android.content.SharedPreferences
 import androidx.compose.animation.core.*
@@ -26,18 +26,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomMainMap
-import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.orderScreen.OrderExecutionViewModel
-import com.example.gramclient.presentation.profile.ProfileViewModel
+import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.PreferencesName
+import com.example.gramclient.utils.RoutesName
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -45,10 +44,9 @@ import kotlinx.coroutines.launch
 fun SearchDriverScreen(
     navController: NavHostController,
     mainViewModel: MainViewModel = hiltViewModel(),
-    preferences: SharedPreferences,
     orderExecutionViewModel: OrderExecutionViewModel,
 ) {
-    val profileViewModel:ProfileViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
     val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
 
 
@@ -64,7 +62,7 @@ fun SearchDriverScreen(
     }
     LaunchedEffect(key1 = true){
 //        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
-        profileViewModel.getProfileInfo(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString())
+        profileViewModel.getProfileInfo()
         orderExecutionViewModel.readAllOrders()
     }
     LaunchedEffect(key1 = true){
@@ -218,7 +216,6 @@ fun SearchDriverScreen(
                                                         if (order.id == clientOrderId) {
                                                             orderCard(
                                                                 orderExecutionViewModel,
-                                                                preferences,
                                                                 order,
                                                                 navController,
                                                                 sheetPeekHeightUpOnClick = {
@@ -254,8 +251,7 @@ fun SearchDriverScreen(
         ) {
             CustomMainMap(
                 mainViewModel = mainViewModel,
-                navController = navController,
-                preferences = preferences
+                navController = navController
             )
         }
     }
@@ -264,7 +260,6 @@ fun SearchDriverScreen(
 @Composable
 fun orderCard(
     orderExecutionViewModel: OrderExecutionViewModel,
-    preferences: SharedPreferences,
     order: RealtimeDatabaseOrder,
     navController: NavHostController,
     sheetPeekHeightUpOnClick:()->Unit,
@@ -365,7 +360,7 @@ fun orderCard(
         text = "Вы уверены что хотите отменить заказ?",
         okBtnClick = {
             cancelOrderIsDialogOpen.value = false
-            orderExecutionViewModel.cancelOrder(preferences = preferences, order.id, navController,{})
+            orderExecutionViewModel.cancelOrder(order.id, navController,{})
         },
         cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
         isDialogOpen = cancelOrderIsDialogOpen.value
@@ -375,7 +370,6 @@ fun orderCard(
         okBtnClick = {
             connectClientWithDriverIsDialogOpen.value = false
             orderExecutionViewModel.connectClientWithDriver(
-                token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(),
                 order_id = order.id.toString()
             )
         },
