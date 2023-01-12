@@ -101,7 +101,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         _stateRealtimeClientOrderIdDatabase.value =
                             realtimeClientOrderIdDatabaseResponseState(response = realtimeClientOrderIdDatabaseResponseResponse)
 
-                        Log.e("RealtimeClientOrderIdDatabaseResponse", "Success->\n ${_stateRealtimeClientOrderIdDatabase.value.response!!.value }")
+                        Log.e("RealtimeClientOrderIdDatabaseResponse", "Success->\n ${_stateRealtimeClientOrderIdDatabase.value.response?.value }")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }

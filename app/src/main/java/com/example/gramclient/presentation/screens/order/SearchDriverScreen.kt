@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.screens.order
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -39,6 +40,7 @@ import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.utils.RoutesName
 import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchDriverScreen(
@@ -49,8 +51,6 @@ fun SearchDriverScreen(
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
 
-
-    val profilePhone = profileViewModel.stateGetProfileInfo.value.response?.phone
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Expanded
@@ -60,15 +60,17 @@ fun SearchDriverScreen(
     var sheetPeekHeight by remember {
         mutableStateOf(200)
     }
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
 //        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
         profileViewModel.getProfileInfo()
         orderExecutionViewModel.readAllOrders()
-    }
-    LaunchedEffect(key1 = true){
-            orderExecutionViewModel.readAllClient("992555425858")
-    }
 
+    }
+    scope.launch {
+        profileViewModel.stateGetProfileInfo.value.response?.let { response ->
+            orderExecutionViewModel.readAllClient(response.phone)
+        }
+    }
     val stateActiveOrders by orderExecutionViewModel.stateActiveOrders
     val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
     val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
