@@ -100,6 +100,12 @@ fun OrderExecution(
             }
         }
     }
+    scope.launch {
+        showGrade = when(selectedOrder.status){
+            "Выполнен" -> true
+            else -> { false }
+        }
+    }
     BottomSheetScaffold(
         scaffoldState = sheetState,
         sheetBackgroundColor = Color(0xFFffffff),
@@ -218,6 +224,7 @@ fun OrderExecution(
                             scope.launch {
                                 delay(3000)
                                 showGrade = false
+                                navController.popBackStack()
                             }
                             Text(
                                 text = "Спасибо за ваше участие \nв улучшении качества работы!",

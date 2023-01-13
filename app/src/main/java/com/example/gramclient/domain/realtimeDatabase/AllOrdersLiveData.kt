@@ -18,7 +18,7 @@ class AllOrdersLiveData: LiveData<List<RealtimeDatabaseOrder>>() {
         override fun onDataChange(snapshot: DataSnapshot) {
             val notes = mutableListOf<RealtimeDatabaseOrder>()
             snapshot.children.map { it ->
-                Log.e("auth token", "$it<-")
+                Log.e("token Order", "$it<-")
                 notes.add(it.getValue(RealtimeDatabaseOrder::class.java) ?: RealtimeDatabaseOrder())
             }
             value = notes
