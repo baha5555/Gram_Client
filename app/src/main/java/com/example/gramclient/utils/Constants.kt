@@ -8,6 +8,7 @@ import com.example.gramclient.domain.AppRepository
 lateinit var REPOSITORY: AppRepository
 
 object Constants {
+    val TAG = "TAG"
     var FCM_TOKEN:String? = ""
     const val LOCAL_BASE_URL="http://10.250.1.114:8080/"
     const val BASE_URL="http://testapi.client.gram.tj/"
