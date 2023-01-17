@@ -33,5 +33,6 @@ data class RealtimeDatabaseOrder(
     val to_address: List<ToAddresse>? = null,
     @ColumnInfo
     val performer: RealtimeDatabasePerformer? = null,
-
+    @ColumnInfo
+    val filing_time:String?=null
     )
