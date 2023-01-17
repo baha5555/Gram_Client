@@ -1,5 +1,7 @@
 package com.example.gramclient.utils
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.example.gramclient.data.remote.ApplicationApi
 import com.example.gramclient.domain.AppRepository
 
@@ -12,6 +14,7 @@ object Constants {
     const val PREFIX="992"
     const val FROM_ADDRESS="FROM_ADDRESS"
     const val TO_ADDRESS="TO_ADDRESS"
+    var STATE_RAITING: MutableState<Boolean> = mutableStateOf(false)
 }
 
 object PreferencesName {

@@ -41,6 +41,7 @@ import com.example.gramclient.presentation.screens.main.addressComponents.Addres
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants.STATE_RAITING
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -152,7 +153,7 @@ fun OrderExecution(
                 cancelBtnClick = { isDialogOpen.value = false },
                 isDialogOpen = isDialogOpen.value
             )
-            if (showGrade) {
+            if (STATE_RAITING.value) {
                 var thumbUpClicked by remember {
                     mutableStateOf(false)
                 }
@@ -192,7 +193,7 @@ fun OrderExecution(
                                             delay(3000)
                                             thumbUpClicked = true
                                             orderExecutionViewModel.sendRating2(
-                                                order_id = 590,
+                                                order_id = 1136,
                                                 add_rating = ratingState.value * 10
                                             )
                                             Log.d("balll", "" + ratingState.value * 10)
@@ -217,7 +218,7 @@ fun OrderExecution(
                             ratingState.value = 0
                             scope.launch {
                                 delay(3000)
-                                showGrade = false
+                                STATE_RAITING.value = false
                             }
                             Text(
                                 text = "Спасибо за ваше участие \nв улучшении качества работы!",
