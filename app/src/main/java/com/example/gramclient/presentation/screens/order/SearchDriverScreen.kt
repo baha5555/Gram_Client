@@ -1,9 +1,7 @@
 package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -38,11 +36,10 @@ import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants.TAG
 import com.example.gramclient.utils.RoutesName
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
@@ -273,23 +270,24 @@ fun orderCard(
     sheetPeekHeightUpOnClick:()->Unit,
     isOpen:MutableState<Boolean>,
 ){
-    val format = SimpleDateFormat("yyyy-MM-dd HH:mm")
-    var timeUp: Long by remember{
+    val DateformatParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
+    var fillingTimeDateParse: Long by remember{
         mutableStateOf(0)
     }
     var diff:Long by remember{
         mutableStateOf(0)
     }
 
-    var diffMinutes:Long by remember{
+    var fillingTimeMinutes:Long by remember{
         mutableStateOf(0)
     }
     val scope = rememberCoroutineScope()
     scope.launch {
         order.filing_time?.let {
-            timeUp = format.parse(it).time
-            diff = ( timeUp-System.currentTimeMillis())
-            diffMinutes = diff / (60 * 1000) % 60
+            fillingTimeDateParse = DateformatParse.parse(it).time
+            diff = (System.currentTimeMillis()-fillingTimeDateParse)*-1
+            fillingTimeMinutes = diff / (60 * 1000) % 60
+            Log.e(TAG,"fillingTimeMinutes $fillingTimeMinutes")
         }
     }
     val cancelOrderIsDialogOpen = remember{ mutableStateOf(false)}
@@ -329,7 +327,7 @@ fun orderCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Column(){
-                Text(text =  if(order.performer == null) "Ищем ближайших водителей..." else "Через ${if(diffMinutes>=0)diffMinutes else 0} мин приедет", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(text =  if(order.performer == null) "Ищем ближайших водителей..." else { if(fillingTimeMinutes>=0) "Через $fillingTimeMinutes мин приедет" else "Водитель должен прибыть\n в ближайщее время" }, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Text(text =  if(order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color?:""} ${order.performer.transport?.model?:""}", fontSize = 14.sp, color = Color.Black)
             }
             if(order.performer == null) {
