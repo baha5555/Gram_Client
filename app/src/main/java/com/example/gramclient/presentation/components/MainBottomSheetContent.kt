@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation.components
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -248,11 +247,11 @@ fun AddressesContent(
                 contentDescription = "Logo"
             )
             Spacer(modifier = Modifier.width(20.dp))
-            if(address_from.name == "") {
+            if(address_from.address == "") {
                 Text(text = "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
             }else {
                 Text(
-                    address_from.name,
+                    address_from.address,
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -283,14 +282,14 @@ fun AddressesContent(
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                if(address.name=="") {
+                if(address.address=="") {
                     Text(
                         text = "Куда едем?", color=Color.Gray,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }else {
                     Text(
-                        address.name,
+                        address.address,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -336,7 +335,7 @@ fun TariffsContent(
         ) {
             Text(text = selected_tariff?.value!!.name, fontWeight = FontWeight.Bold, fontSize = 25.sp)
             stateCalculate.response?.let {
-                Text(text = if(address_to[0].name == "") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
+                Text(text = if(address_to[0].address == "") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
             }
             if (stateCalculate.response == null || stateCalculate.error != ""){
                 CustomPulseLoader(isLoading = true)

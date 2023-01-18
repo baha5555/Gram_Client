@@ -6,7 +6,6 @@ import TwoFingerDrag
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.*
 import android.preference.PreferenceManager
 import android.util.Log
@@ -70,7 +69,7 @@ fun CustomMainMap(
     val fromAddress by mainViewModel.fromAddress
 
     val context= LocalContext.current
-    val startPointForMarker=remember{ mutableStateOf(GeoPoint(if(toAddress[0].lat != "") toAddress[0].lat.toDouble() else 40.27803692395751, if(toAddress[0].lng != "") toAddress[0].lng.toDouble() else 69.62923931506361)) }
+    val startPointForMarker=remember{ mutableStateOf(GeoPoint(if(toAddress[0].address_lat != "") toAddress[0].address_lat.toDouble() else 40.27803692395751, if(toAddress[0].address_lng != "") toAddress[0].address_lng.toDouble() else 69.62923931506361)) }
     val zoomLevel=remember{ mutableStateOf(18.0) }
 
     AndroidView(
@@ -122,7 +121,7 @@ fun CustomMainMap(
                     addOverlays()
                     showRoadAB(it, fromAddress, toAddress)
                 }
-                else if(currentRoute== RoutesName.SEARCH_DRIVER_SCREEN){
+                else if(currentRoute== RoutesName.SEARCH_DRIVER_SCREEN || currentRoute == RoutesName.ORDER_EXECUTION_SCREEN){
                     btnLocation.visibility = View.GONE
                     getAddressMarker.visibility=View.GONE
 
@@ -140,7 +139,7 @@ fun CustomMainMap(
             if(currentRoute== RoutesName.MAIN_SCREEN){
                 showRoadAB(it.context, fromAddress, toAddress)
             }
-            else if(currentRoute== RoutesName.SEARCH_DRIVER_SCREEN) {
+            else if(currentRoute== RoutesName.SEARCH_DRIVER_SCREEN || currentRoute == RoutesName.ORDER_EXECUTION_SCREEN) {
                 showRoadAB(it.context, fromAddress, toAddress)
             }
             else if(currentRoute== RoutesName.SEARCH_ADDRESS_SCREEN){
@@ -267,9 +266,9 @@ fun showRoadAB(
 //            val startPoint2 = GeoPoint(41.27803692395751, 70.62923931506361)
             val fromAddressPoint: GeoPoint = GeoPoint(0, 0)
             fromAddressPoint.latitude =
-                fromAddress.lat.toDouble() ?: 0.0
+                fromAddress.address_lat.toDouble() ?: 0.0
             fromAddressPoint.longitude =
-                fromAddress.lng.toDouble() ?: 0.0
+                fromAddress.address_lng.toDouble() ?: 0.0
             waypoints.add(fromAddressPoint)
 
 
@@ -277,9 +276,9 @@ fun showRoadAB(
             val toAddressesNames = ArrayList<String>()
             toAddress.forEach { address ->
                 val toAddressPoint: GeoPoint = GeoPoint(0, 0)
-                toAddressPoint.latitude = address.lat.toDouble()
-                toAddressPoint.longitude = address.lng.toDouble()
-                toAddressesNames.add(address.name)
+                toAddressPoint.latitude = address.address_lat.toDouble()
+                toAddressPoint.longitude = address.address_lng.toDouble()
+                toAddressesNames.add(address.address)
                 toAddressesPoints.add(toAddressPoint)
             }
             if (fromAddressPoint.latitude != 0.0 && toAddressesPoints[0].latitude != 0.0 && fromAddressPoint != toAddressesPoints[0])
@@ -303,7 +302,7 @@ fun showRoadAB(
                         context,
                         map,
                         geoPoint = fromAddressPoint,
-                        title = it.name,
+                        title = it.address,
                         R.drawable.ic_from_address_marker
                     )
                 }

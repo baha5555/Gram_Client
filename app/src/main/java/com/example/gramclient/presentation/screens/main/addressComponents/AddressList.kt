@@ -23,7 +23,6 @@ import androidx.navigation.NavController
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.screens.main.MainViewModel
-import java.util.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -49,7 +48,7 @@ fun AddressList(
                if(items.size != 0) {
                    items.forEach{
                        AddressListItem(
-                           addressText = it.name,
+                           addressText = it.address,
                            onItemClick = { selectedAddress ->
                                address.value = selectedAddress
                                keyboardController?.hide()
