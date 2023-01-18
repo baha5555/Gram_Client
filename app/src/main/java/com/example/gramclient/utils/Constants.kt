@@ -16,6 +16,7 @@ object Constants {
     const val FROM_ADDRESS="FROM_ADDRESS"
     const val TO_ADDRESS="TO_ADDRESS"
     var STATE_RAITING: MutableState<Boolean> = mutableStateOf(false)
+    val KONF_URL="https://policies.google.com/privacy?hl=ru"
 }
 
 object PreferencesName {
