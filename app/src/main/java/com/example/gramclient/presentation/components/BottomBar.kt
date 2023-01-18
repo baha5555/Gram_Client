@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,11 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
+import com.example.gramclient.app.preference.CustomPreference
+import com.example.gramclient.utils.RoutesName
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -27,10 +31,10 @@ fun BottomBar(
     navController: NavHostController,
     mainBottomSheetState: BottomSheetScaffoldState,
     bottomSheetState: BottomSheetScaffoldState,
-) {
+    createOrder: () -> Unit) {
     val coroutineScope= rememberCoroutineScope()
     val isDialogOpen=remember{ mutableStateOf(false) }
-
+    val prefs = CustomPreference(LocalContext.current)
     BottomAppBar(
         backgroundColor = Color(0xFFF7F7F7),
         contentColor = Color.White,
@@ -47,16 +51,16 @@ fun BottomBar(
         ) {
             IconButton(onClick = {
                 coroutineScope.launch {
-                    if(mainBottomSheetState.bottomSheetState.isExpanded){
-                        mainBottomSheetState.bottomSheetState.collapse()
+                    if(bottomSheetState.bottomSheetState.isCollapsed){
+                        bottomSheetState.bottomSheetState.expand()
                     } else{
-                        mainBottomSheetState.bottomSheetState.expand()
+                        bottomSheetState.bottomSheetState.collapse()
                     }
                 }
             }) {
                 Image(
                     modifier = Modifier.size(30.dp),
-                    imageVector = ImageVector.vectorResource(if(mainBottomSheetState.bottomSheetState.isCollapsed) R.drawable.options_icon else R.drawable.arrow_down),
+                    imageVector = ImageVector.vectorResource(R.drawable.cash_icon),
                     contentDescription = "icon"
                 )
             }
@@ -71,20 +75,28 @@ fun BottomBar(
                 textSize = 18,
                 textBold = true,
             onClick = {
-                isDialogOpen.value=true
+                if (prefs.getAccessToken() == "") {
+                    navController.navigate(RoutesName.AUTH_SCREEN){
+                        popUpTo(RoutesName.MAIN_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }else {
+                    isDialogOpen.value = true
+                }
             })
             IconButton(onClick = {
                 coroutineScope.launch {
-                    if(bottomSheetState.bottomSheetState.isCollapsed){
-                       bottomSheetState.bottomSheetState.expand()
+                    if(mainBottomSheetState.bottomSheetState.isExpanded){
+                        mainBottomSheetState.bottomSheetState.collapse()
                     } else{
-                        bottomSheetState.bottomSheetState.collapse()
+                        mainBottomSheetState.bottomSheetState.expand()
                     }
                 }
             }) {
                 Image(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.cash_icon),
+                    modifier = Modifier.size(if(mainBottomSheetState.bottomSheetState.isCollapsed) 30.dp else 20.dp),
+                    imageVector = ImageVector.vectorResource(if(mainBottomSheetState.bottomSheetState.isCollapsed) R.drawable.options_icon else R.drawable.arrow_down),
                     contentDescription = "icon"
                 )
             }
@@ -92,8 +104,10 @@ fun BottomBar(
         CustomDialog(
             text = "Оформить данный заказ?",
             okBtnClick = {
-                navController.navigate(RoutesName.ORDEREXECUTION_SCREEN)
-                isDialogOpen.value=false
+                createOrder().let {
+                    navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN)
+                    isDialogOpen.value = false
+                }
                          },
             cancelBtnClick = { isDialogOpen.value=false },
             isDialogOpen = isDialogOpen.value

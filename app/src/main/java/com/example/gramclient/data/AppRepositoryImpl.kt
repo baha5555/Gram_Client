@@ -1,0 +1,125 @@
+package com.example.gramclient.data
+
+import androidx.lifecycle.LiveData
+import com.example.gramclient.app.preference.CustomPreference
+import com.example.gramclient.data.remote.ApplicationApi
+import com.example.gramclient.domain.AppRepository
+import com.example.gramclient.domain.mainScreen.TariffsResponse
+import com.example.gramclient.domain.athorization.AuthResponse
+import com.example.gramclient.domain.athorization.IdentificationResponse
+import com.example.gramclient.domain.mainScreen.AddressByPointResponse
+import com.example.gramclient.domain.mainScreen.AllowancesResponse
+import com.example.gramclient.domain.mainScreen.SearchAddressResponse
+import com.example.gramclient.domain.mainScreen.order.CalculateResponse
+import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
+import com.example.gramclient.domain.mainScreen.order.OrderResponse
+import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
+import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
+import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
+import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
+import com.example.gramclient.domain.profile.GetProfileInfoResponse
+import com.example.gramclient.domain.profile.ProfileResponse
+import com.example.gramclient.domain.realtimeDatabase.AllOrdersLiveData
+import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
+import com.example.gramclient.utils.Constants
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+
+class AppRepositoryImpl(
+    private val api: ApplicationApi,
+    private val prefs: CustomPreference
+) : AppRepository {
+    override val readAllOrders: LiveData<List<RealtimeDatabaseOrder>> = AllOrdersLiveData()
+
+    override suspend fun authorization(phone_number: Long): AuthResponse =
+        api.authorization("${Constants.PREFIX}$phone_number".toLong())
+
+    override suspend fun identification(
+        client_register_id: String,
+        sms_code: Long,
+        fcm_token: String
+    ): IdentificationResponse = api.identification(client_register_id, sms_code, fcm_token)
+
+    override suspend fun getTariffs(): TariffsResponse = api.getTariffs()
+
+    override suspend fun getProfileInfo(): GetProfileInfoResponse =
+        api.getProfileInfo(prefs.getAccessToken())
+
+    override suspend fun getOrderHistory(): orderHistoryResponse =
+        api.getOrderHistory(prefs.getAccessToken())
+
+    override suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse =
+        api.getAllowancesByTariffId(tariff_id)
+
+    override suspend fun sendProfile(
+        first_name: RequestBody,
+        last_name: RequestBody,
+        email: String,
+        avatar: MultipartBody.Part?
+    ): ProfileResponse =
+        api.sendProfile(prefs.getAccessToken(), first_name, last_name, email, avatar)
+
+    override suspend fun getAddressByPoint(
+        lng: Double,
+        lat: Double
+    ): AddressByPointResponse = api.getAddressByPoint(lng, lat)
+
+    override suspend fun sendRating(order_id: Int, add_rating: Int): AddRatingResponse =
+        api.sendRating(prefs.getAccessToken(), order_id, add_rating)
+
+    override suspend fun searchAddress(addressName: String): SearchAddressResponse = api.searchAddress(addressName)
+
+    override suspend fun createOrder(
+        dop_phone: String?,
+        from_address: Int?,
+        to_addresses: String?,
+        comment: String?,
+        tariff_id: Int,
+        allowances: String?
+    ): OrderResponse = api.createOrder(
+        prefs.getAccessToken(),
+        dop_phone,
+        from_address,
+        to_addresses,
+        comment,
+        tariff_id,
+        allowances
+    )
+
+    override suspend fun getPrice(
+        tariff_id: Int,
+        allowances: String?,
+        from_address: Int?,
+        to_addresses: String?
+    ): CalculateResponse = api.getPrice(tariff_id, allowances, from_address, to_addresses)
+
+    override suspend fun cancelOrder(order_id: Int): CancelOrderResponse =
+        api.cancelOrder(prefs.getAccessToken(), order_id)
+
+    override suspend fun getActiveOrders(): ActiveOrdersResponse =
+        api.getActiveOrders(prefs.getAccessToken())
+
+    override suspend fun connectClientWithDriver(order_id: String): connectClientWithDriverResponse =
+        api.connectClientWithDriver(prefs.getAccessToken(), order_id)
+    override suspend fun editOrder(
+        order_id: Int,
+        dop_phone: String?,
+        from_address: Int?,
+        meeting_info: String?,
+        to_addresses: String?,
+        comment: String?,
+        tariff_id: Int,
+        allowances: String?
+    ): UpdateOrderResponse = api.editOrder(
+        prefs.getAccessToken(),
+        order_id,
+        dop_phone,
+        from_address,
+        meeting_info,
+        to_addresses,
+        comment,
+        tariff_id,
+        allowances
+    )
+}

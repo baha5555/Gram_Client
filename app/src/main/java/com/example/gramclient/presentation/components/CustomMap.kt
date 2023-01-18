@@ -26,7 +26,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-lateinit var map: MapView
+private lateinit var map: MapView
 private var requiredCenter: GeoPoint? = null
 @Composable
 fun CustomMap() {
@@ -73,18 +73,13 @@ fun CustomMap() {
                         }
                     }
                 }catch (_: Exception){
-
                 }
             }
         }
     )
-
-
-
-
 }
 
-fun myLocationShow(context: Context?, mLocationOverlay: MyLocationNewOverlay) {
+private fun myLocationShow(context: Context?, mLocationOverlay: MyLocationNewOverlay) {
     val person: Bitmap = context?.let { getBitmap(it, R.drawable.ic_person) }!!
     val arrow: Bitmap = getBitmap(context, R.drawable.ic_navigation)!!
     mLocationOverlay.setPersonHotspot(person.width / 2f, person.height / 2f)
@@ -94,7 +89,7 @@ fun myLocationShow(context: Context?, mLocationOverlay: MyLocationNewOverlay) {
 
 }
 
-fun getBitmap(context: Context, resID: Int): Bitmap? {
+private fun getBitmap(context: Context, resID: Int): Bitmap? {
     val drawable = ResourcesCompat.getDrawable(context.resources, resID, null)
     val bitmap: Bitmap
     return try {
