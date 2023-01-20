@@ -73,7 +73,7 @@ interface ApplicationApi {
     ): AddRatingResponse
 
     @FormUrlEncoded
-    @POST("/api/orders/search-addresses")
+    @POST("/api/mob-app/orders/search-addresses")
     suspend fun searchAddress(
         @Field("search") addressName: String,
     ): SearchAddressResponse

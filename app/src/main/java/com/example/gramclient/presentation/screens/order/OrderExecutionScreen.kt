@@ -100,6 +100,16 @@ fun OrderExecution(
                 }
             }
         }
+        selectRealtimeDatabaseOrder.from_address?.let {
+            mainViewModel.updateFromAddress(it)
+            Log.e("From_address","$it")
+        }
+        selectRealtimeDatabaseOrder.to_address?.let { to_Addresses->
+            to_Addresses.forEach { address->
+                mainViewModel.updateToAddress(0,address)
+                Log.e("To_address","$address")
+            }
+        }
     }
     scope.launch {
         showGrade = when(selectedOrder.status){
@@ -143,7 +153,10 @@ fun OrderExecution(
         sheetPeekHeight = 210.dp,
     ) {
         Box {
-            CustomMap()
+            CustomMainMap(
+                mainViewModel = mainViewModel,
+                navController = navController
+            )
             CustomDialog(
                 text = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?",
                 okBtnClick = {

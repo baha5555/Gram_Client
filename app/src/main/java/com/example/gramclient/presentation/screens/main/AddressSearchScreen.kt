@@ -1,6 +1,5 @@
 package com.example.gramclient.presentation.screens.main
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -218,14 +217,14 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                     tint = Color.White
                 )
             }
-            if (fromAddress.name == "") {
+            if (fromAddress.address == "") {
                 Text(
                     text = "Откуда?", color = Color.Gray, fontSize = 11.sp,
                     fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
             } else {
                 Text(
-                    text = fromAddress.name ?: "", color = Color.White, fontSize = 11.sp,
+                    text = fromAddress.address ?: "", color = Color.White, fontSize = 11.sp,
                     fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
             }
@@ -422,7 +421,7 @@ fun ToAddressField(
                     tint = Color.White
                 )
             }
-            if (address.name == "") {
+            if (address.address == "") {
                 Text(
                     text = "Куда едем?",
                     textAlign = TextAlign.Start,
@@ -436,7 +435,7 @@ fun ToAddressField(
                 )
             } else {
                 Text(
-                    text = address.name,
+                    text = address.address,
                     textAlign = TextAlign.Start,
                     color = Color.White,
                     fontSize = 16.sp,

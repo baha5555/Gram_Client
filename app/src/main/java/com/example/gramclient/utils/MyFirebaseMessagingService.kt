@@ -29,6 +29,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             Handler(Looper.getMainLooper()).post {
                 STATE_RAITING.value = remoteMessage.notification!!.title!=""
             }
+            Log.e("CloudMessage","${remoteMessage.data}")
             generateNotification(remoteMessage.notification!!.title?:"", remoteMessage.notification!!.body?:"")
             Log.v("CloudMessage", "Notification ${remoteMessage.notification!!}")
             Log.v("CloudMessage", "Notification Title ${remoteMessage.notification!!.title}")

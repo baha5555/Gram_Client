@@ -3,6 +3,7 @@ package com.example.gramclient.domain.realtimeDatabase.Order
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.orderHistoryScreen.Performer
 
 @Entity(tableName = "orders_table")
@@ -14,7 +15,7 @@ data class RealtimeDatabaseOrder(
     @ColumnInfo
     val created_at: String?=null,
     @ColumnInfo
-    val from_address: FromAddress?=null,
+    val from_address: Address?=null,
     @ColumnInfo
     val id: Int=0,
     @ColumnInfo
@@ -30,7 +31,7 @@ data class RealtimeDatabaseOrder(
     @ColumnInfo
     val tariff_id: Int?=null,
     @ColumnInfo
-    val to_address: List<ToAddresse>? = null,
+    val to_address: List<Address>? = null,
     @ColumnInfo
     val performer: RealtimeDatabasePerformer? = null,
     @ColumnInfo
