@@ -16,6 +16,9 @@ object Constants {
     const val FROM_ADDRESS="FROM_ADDRESS"
     const val TO_ADDRESS="TO_ADDRESS"
     var STATE_RAITING: MutableState<Boolean> = mutableStateOf(false)
+    var STATE_RAITING_ORDER_ID: MutableState<Int> = mutableStateOf(0)
+    var STATE_ASSIGNED_ORDER:MutableState<Boolean> = mutableStateOf(false)
+    var STATE_ASSIGNED_ORDER_ID:MutableState<Int> = mutableStateOf(-1)
 }
 
 object PreferencesName {

@@ -16,7 +16,10 @@ import androidx.core.app.NotificationCompat
 import com.example.gramclient.R
 import com.example.gramclient.utils.Constants.FCM_TOKEN
 import com.example.gramclient.presentation.MainActivity
+import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER
+import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER_ID
 import com.example.gramclient.utils.Constants.STATE_RAITING
+import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -27,13 +30,21 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.notification != null) {
             Handler(Looper.getMainLooper()).post {
-                STATE_RAITING.value = remoteMessage.notification!!.title!=""
+                when(remoteMessage.data["type"]) {
+                    "0" ->{
+                        STATE_ASSIGNED_ORDER.value = true
+                        STATE_ASSIGNED_ORDER_ID.value = remoteMessage.data["order_id"]?.toInt()?:-1
+                    }
+                    "2" -> {
+                        STATE_RAITING.value = remoteMessage.notification!!.title != ""
+                        STATE_RAITING_ORDER_ID.value = remoteMessage.data["order_id"]?.toInt() ?: -1
+                    }
+                }
             }
-            Log.e("CloudMessage","${remoteMessage.data}")
+            Log.e("CloudMessage","${remoteMessage.data} ---- ")
             generateNotification(remoteMessage.notification!!.title?:"", remoteMessage.notification!!.body?:"")
-            Log.v("CloudMessage", "Notification ${remoteMessage.notification!!}")
-            Log.v("CloudMessage", "Notification Title ${remoteMessage.notification!!.title}")
-            Log.v("CloudMessage", "Notification Body ${remoteMessage.notification!!.body}")
+            Log.e("CloudMessage", "Notification Title ${remoteMessage.notification!!.title}")
+            Log.e("CloudMessage", "Notification Body ${remoteMessage.notification!!.body}")
         }
     }
     fun getRemoteView(title: String, body:String): RemoteViews {
