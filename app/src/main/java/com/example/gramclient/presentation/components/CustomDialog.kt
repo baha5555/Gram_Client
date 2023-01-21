@@ -70,3 +70,47 @@ fun CustomDialog(
         }
     }
 }
+@Composable
+fun CustomCancelDialog(
+    text: String,
+    okBtnClick: () -> Unit,
+    cancelBtnClick: () -> Unit,
+    isDialogOpen:Boolean,
+){
+    if(isDialogOpen){
+        Dialog(onDismissRequest = { /*TODO*/ }) {
+
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(10.dp)
+            ) {
+                Text(
+                    text = text,
+                    fontSize = 18.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    Button(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor, contentColor = Color.White),
+                        onClick = { okBtnClick() }
+                    ) {
+                        Text(text = "OK", fontSize = 18.sp, color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}

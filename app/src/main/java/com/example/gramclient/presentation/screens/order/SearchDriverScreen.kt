@@ -2,6 +2,7 @@ package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -20,12 +21,14 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
@@ -274,6 +277,8 @@ fun orderCard(
     sheetPeekHeightUpOnClick:()->Unit,
     isOpen:MutableState<Boolean>,
 ){
+    val context = LocalContext.current
+
     val DateformatParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
     var fillingTimeDateParse: Long by remember{
         mutableStateOf(0)
@@ -417,7 +422,10 @@ fun orderCard(
             connectClientWithDriverIsDialogOpen.value = false
             orderExecutionViewModel.connectClientWithDriver(
                 order_id = order.id.toString()
-            )
+            ) {
+                Toast.makeText(context, "Ваш запрос принят.Ждите звонка.", Toast.LENGTH_SHORT)
+                    .show()
+            }
         },
         cancelBtnClick = { connectClientWithDriverIsDialogOpen.value = false },
         isDialogOpen = connectClientWithDriverIsDialogOpen.value

@@ -2,6 +2,7 @@ package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -164,21 +166,39 @@ fun OrderExecution(
                 mainViewModel = mainViewModel,
                 navController = navController
             )
-            CustomDialog(
-                text =stateCancelOrderText,
-                okBtnClick = {
-                    coroutineScope.launch {
-                        isDialogOpen.value = false
-                        sheetState.bottomSheetState.collapse()
-                        if(orderId!=-1)
-                        orderExecutionViewModel.cancelOrder(orderId, navController) {
-                            navController.popBackStack()
+            if(stateCancelOrderText=="Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?") {
+                CustomDialog(
+                    text = stateCancelOrderText,
+                    okBtnClick = {
+                        coroutineScope.launch {
+                            isDialogOpen.value = false
+                            sheetState.bottomSheetState.collapse()
+                            if (orderId != -1)
+                                orderExecutionViewModel.cancelOrder(orderId, navController) {
+                                    navController.popBackStack()
+                                }
                         }
-                    }
-                },
-                cancelBtnClick = { isDialogOpen.value = false },
-                isDialogOpen = isDialogOpen.value
-            )
+                    },
+                    cancelBtnClick = { isDialogOpen.value = false },
+                    isDialogOpen = isDialogOpen.value
+                )
+            }
+            else {
+                CustomCancelDialog(
+                    text = stateCancelOrderText,
+                    okBtnClick = {
+                        coroutineScope.launch {
+                            isDialogOpen.value = false
+                        }
+                    },
+                    cancelBtnClick = {
+                        coroutineScope.launch {
+                            isDialogOpen.value = false
+                        }
+                    },
+                    isDialogOpen = isDialogOpen.value
+                )
+            }
             if (STATE_RAITING.value) {
                 var thumbUpClicked by remember {
                     mutableStateOf(false)
@@ -266,6 +286,7 @@ fun performerSection(
     performer: RealtimeDatabaseOrder,
     orderExecutionViewModel: OrderExecutionViewModel
     ){
+    val context = LocalContext.current
     val connectClientWithDriverIsDialogOpen = remember{ mutableStateOf(false)}
     val DateformatParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
     var fillingTimeDateParse: Long by remember{
@@ -355,7 +376,9 @@ fun performerSection(
             connectClientWithDriverIsDialogOpen.value = false
             orderExecutionViewModel.connectClientWithDriver(
                 order_id = performer.id.toString()
-            )
+            ) {
+                Toast.makeText(context, "Ваш запрос принят.Ждите звонка.",Toast.LENGTH_SHORT).show()
+            }
         },
         cancelBtnClick = { connectClientWithDriverIsDialogOpen.value = false },
         isDialogOpen = connectClientWithDriverIsDialogOpen.value
