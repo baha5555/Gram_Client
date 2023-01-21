@@ -148,7 +148,8 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
     }
 
     fun connectClientWithDriver(
-        order_id: String
+        order_id: String,
+        onSuccess: () -> Unit
     ){
         connectClientWithDriverUseCase.invoke(order_id).onEach { result: Resource<connectClientWithDriverResponse> ->
             when (result){
@@ -157,6 +158,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         val connectClientWithDriverResponse: connectClientWithDriverResponse? = result.data
                         _stateConnectClientWithDriver.value =
                             ConnectClientWithDriverResponseState(response = connectClientWithDriverResponse)
+                        onSuccess()
                         Log.e("ConnectClientWithDriverResponseSuccess", "ConnectClientWithDriverResponse->\n ${_stateConnectClientWithDriver.value.response}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")

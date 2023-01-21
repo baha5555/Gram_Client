@@ -2,9 +2,8 @@ package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.widget.Toast
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +21,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -41,10 +41,13 @@ import com.example.gramclient.presentation.screens.main.addressComponents.Addres
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Constants.STATE_RAITING
+import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 
 
 @SuppressLint("CoroutineCreationDuringComposition", "UnrememberedMutableState")
@@ -90,6 +93,9 @@ fun OrderExecution(
     LaunchedEffect(key1 = true) {
         Log.e("ActiveOrdersResponse", selectedOrder.toString())
 
+    }
+    var stateCancelOrderText by remember {
+        mutableStateOf("Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?")
     }
     scope.launch {
         stateRealtimeDatabase.let { orders ->
@@ -140,6 +146,9 @@ fun OrderExecution(
                         actionSection(cancelOrderOnClick = {
                             isDialogOpen.value = true
                             orderId = order.id
+                            if(order.status == "Исполняется"){
+                                stateCancelOrderText = "Вы не можете отменить активный заказ.\nЭто может сделать только оператор"
+                            }
                         })
                     }
                 }else{
@@ -157,21 +166,39 @@ fun OrderExecution(
                 mainViewModel = mainViewModel,
                 navController = navController
             )
-            CustomDialog(
-                text = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?",
-                okBtnClick = {
-                    coroutineScope.launch {
-                        isDialogOpen.value = false
-                        sheetState.bottomSheetState.collapse()
-                        if(orderId!=-1)
-                        orderExecutionViewModel.cancelOrder(orderId, navController) {
-                            navController.popBackStack()
+            if(stateCancelOrderText=="Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?") {
+                CustomDialog(
+                    text = stateCancelOrderText,
+                    okBtnClick = {
+                        coroutineScope.launch {
+                            isDialogOpen.value = false
+                            sheetState.bottomSheetState.collapse()
+                            if (orderId != -1)
+                                orderExecutionViewModel.cancelOrder(orderId, navController) {
+                                    navController.popBackStack()
+                                }
                         }
-                    }
-                },
-                cancelBtnClick = { isDialogOpen.value = false },
-                isDialogOpen = isDialogOpen.value
-            )
+                    },
+                    cancelBtnClick = { isDialogOpen.value = false },
+                    isDialogOpen = isDialogOpen.value
+                )
+            }
+            else {
+                CustomCancelDialog(
+                    text = stateCancelOrderText,
+                    okBtnClick = {
+                        coroutineScope.launch {
+                            isDialogOpen.value = false
+                        }
+                    },
+                    cancelBtnClick = {
+                        coroutineScope.launch {
+                            isDialogOpen.value = false
+                        }
+                    },
+                    isDialogOpen = isDialogOpen.value
+                )
+            }
             if (STATE_RAITING.value) {
                 var thumbUpClicked by remember {
                     mutableStateOf(false)
@@ -212,7 +239,7 @@ fun OrderExecution(
                                             delay(3000)
                                             thumbUpClicked = true
                                             orderExecutionViewModel.sendRating2(
-                                                order_id = 1136,
+                                                order_id = STATE_RAITING_ORDER_ID.value,
                                                 add_rating = ratingState.value * 10
                                             )
                                             Log.d("balll", "" + ratingState.value * 10)
@@ -238,7 +265,6 @@ fun OrderExecution(
                             scope.launch {
                                 delay(3000)
                                 STATE_RAITING.value = false
-                                showGrade = false
                                 navController.popBackStack()
                             }
                             Text(
@@ -254,12 +280,34 @@ fun OrderExecution(
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun performerSection(
     performer: RealtimeDatabaseOrder,
     orderExecutionViewModel: OrderExecutionViewModel
     ){
+    val context = LocalContext.current
     val connectClientWithDriverIsDialogOpen = remember{ mutableStateOf(false)}
+    val DateformatParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
+    var fillingTimeDateParse: Long by remember{
+        mutableStateOf(0)
+    }
+    var diff:Long by remember{
+        mutableStateOf(0)
+    }
+
+    var fillingTimeMinutes:Long by remember{
+        mutableStateOf(0)
+    }
+    val scope = rememberCoroutineScope()
+    scope.launch {
+        performer.filing_time?.let {
+            fillingTimeDateParse = DateformatParse.parse(it).time
+            diff = (System.currentTimeMillis()-fillingTimeDateParse)*-1
+            fillingTimeMinutes = diff / (60 * 1000) % 60
+            Log.e(Constants.TAG,"fillingTimeMinutes $fillingTimeMinutes")
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -271,7 +319,15 @@ fun performerSection(
     ){
         Text(
             modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
-            text = "За рулем ${performer.performer?.first_name?:"Водитель"}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            text = when(performer.status){
+                "Водитель на месте"->"Водитель на месте,\n можете выходить"
+                "Исполняется"->"За рулем ${performer.performer?.first_name?:"Водитель"}"
+                "Водитель назначен"->{
+                    if(fillingTimeMinutes>0)"Через $fillingTimeMinutes мин приедет ${performer.performer?.first_name}"
+                    else "Скоро приедет ${performer.performer?.first_name}"
+                }
+                else -> {""}
+            }, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
@@ -320,7 +376,9 @@ fun performerSection(
             connectClientWithDriverIsDialogOpen.value = false
             orderExecutionViewModel.connectClientWithDriver(
                 order_id = performer.id.toString()
-            )
+            ) {
+                Toast.makeText(context, "Ваш запрос принят.Ждите звонка.",Toast.LENGTH_SHORT).show()
+            }
         },
         cancelBtnClick = { connectClientWithDriverIsDialogOpen.value = false },
         isDialogOpen = connectClientWithDriverIsDialogOpen.value
@@ -670,6 +728,7 @@ fun searchSection(
             }
             isSearchState.value=false
                 orderExecutionViewModel.editOrder(address.id)
+            searchText.value = ""
         }
     }
 }

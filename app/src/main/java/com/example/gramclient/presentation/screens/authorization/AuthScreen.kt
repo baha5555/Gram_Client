@@ -17,10 +17,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +26,6 @@ import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.ui.theme.BackgroundColor
-import com.example.gramclient.utils.Constants.KONF_URL
 
 @Composable
 fun AuthorizationScreen(
@@ -38,16 +35,6 @@ fun AuthorizationScreen(
     val phone = remember { mutableStateOf("") }
     val nextBtnEnabled = remember {
         mutableStateOf(false)
-    }
-    val mUriHandler = LocalUriHandler.current
-
-    val mAnnotatedLinkString = buildAnnotatedString {
-        addStringAnnotation(
-            tag = "URL",
-            annotation = KONF_URL,
-            start = 0,
-            end = 0
-        )
     }
 
     Column(
@@ -180,11 +167,7 @@ fun AuthorizationScreen(
             Text(text = " правилами работы сервиса и политикой\n" +
                     "    обработки персональных данных.",
                 color = Color.Blue,
-                modifier = Modifier.clickable { mAnnotatedLinkString
-                    .getStringAnnotations("URL", 0, 0)
-                    .firstOrNull()?.let { stringAnnotation ->
-                        mUriHandler.openUri(stringAnnotation.item)
-                    } })
+                modifier = Modifier.clickable { })
         }
     }
 }

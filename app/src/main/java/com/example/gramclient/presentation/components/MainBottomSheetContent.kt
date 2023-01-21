@@ -359,7 +359,12 @@ fun TariffsContent(
                 ) {
                     items(items = tariffs, itemContent = { tariff ->
                         TariffItem(
-                            icon = if (tariff.id == 1) tariffListIcons[0] else if (tariff.id == 2) tariffListIcons[1] else if (tariff.id == 4) tariffListIcons[2] else if (tariff.id == 5) tariffListIcons[3] else tariffListIcons[4],
+                            icon = when(tariff.id){
+                                1->tariffListIcons[0]
+                                2-> tariffListIcons[1]
+                                4-> tariffListIcons[2]
+                                5-> tariffListIcons[3]
+                                else -> tariffListIcons[4] },
                             name = tariff.name,
                             price = tariff.min_price,
                             isSelected = selected_tariff?.value == tariff,

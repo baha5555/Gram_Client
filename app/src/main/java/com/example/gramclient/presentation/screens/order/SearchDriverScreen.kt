@@ -2,6 +2,7 @@ package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -20,12 +21,14 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
@@ -36,6 +39,10 @@ import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER
+import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER_ID
+import com.example.gramclient.utils.Constants.STATE_RAITING
+import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.example.gramclient.utils.Constants.TAG
 import com.example.gramclient.utils.RoutesName
 import kotlinx.coroutines.launch
@@ -270,6 +277,8 @@ fun orderCard(
     sheetPeekHeightUpOnClick:()->Unit,
     isOpen:MutableState<Boolean>,
 ){
+    val context = LocalContext.current
+
     val DateformatParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
     var fillingTimeDateParse: Long by remember{
         mutableStateOf(0)
@@ -283,6 +292,9 @@ fun orderCard(
     }
     val scope = rememberCoroutineScope()
     scope.launch {
+        if(STATE_RAITING_ORDER_ID.value != order.id){
+            STATE_RAITING.value = false
+        }
         order.filing_time?.let {
             fillingTimeDateParse = DateformatParse.parse(it).time
             diff = (System.currentTimeMillis()-fillingTimeDateParse)*-1
@@ -327,7 +339,21 @@ fun orderCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Column(){
-                Text(text =  if(order.performer == null) "Ищем ближайших водителей..." else { if(fillingTimeMinutes>=0) "Через $fillingTimeMinutes мин приедет" else "Водитель должен прибыть\n в ближайщее время" }, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(text =
+                if(order.performer == null)
+                    "Ищем ближайших водителей..."
+                else {
+                        when(order.status){
+                            "Водитель на месте"->"Водитель на месте,\n можете выходить"
+                            "Исполняется"->"Приятной поездки"
+                            "Водитель назначен"->{
+                                if(fillingTimeMinutes>0)"Через $fillingTimeMinutes мин приедет"
+                                else "В ближайшее время \n приедет ${order.performer.first_name}"
+                            }
+                            else -> {""}
+                        }
+                },
+                    fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Text(text =  if(order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color?:""} ${order.performer.transport?.model?:""}", fontSize = 14.sp, color = Color.Black)
             }
             if(order.performer == null) {
@@ -396,7 +422,10 @@ fun orderCard(
             connectClientWithDriverIsDialogOpen.value = false
             orderExecutionViewModel.connectClientWithDriver(
                 order_id = order.id.toString()
-            )
+            ) {
+                Toast.makeText(context, "Ваш запрос принят.Ждите звонка.", Toast.LENGTH_SHORT)
+                    .show()
+            }
         },
         cancelBtnClick = { connectClientWithDriverIsDialogOpen.value = false },
         isDialogOpen = connectClientWithDriverIsDialogOpen.value
