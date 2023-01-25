@@ -236,57 +236,48 @@ fun ProfileScreen(
                                     textBold = true,
                                     onClick = {
                                         scope.launch {
-                                            lateinit var photos: MutableState<File?>
-                                            selectImage?.let {
-                                                try {
-                                                    val photo by  mutableStateOf(
+                                            try {
+                                                var photos:MutableState<File?> = mutableStateOf(null)
+                                                selectImage?.let {
+                                                    val photo = mutableStateOf(
                                                         File(
                                                             getRealPathFromURI(
                                                                 context,
-                                                                selectImage!!
+                                                                it
                                                             )
                                                         )
                                                     )
-                                                    photos = photo as MutableState<File?>
-
-                                                    viewModel.sendProfile(
-                                                        (profileFirstName.value
-                                                            ?: getProfileFirstName
-                                                            ?: "").toRequestBody(),
-                                                        (profileLastName.value ?: getProfileLastName
-                                                        ?: "").toRequestBody(),
-                                                        profileEmail.value ?: getProfileEmail ?: "",
-                                                        photos,
-                                                        context
-                                                    )
-                                                } catch (e: HttpException) {
-                                                    Log.e(
-                                                        "HELO",
-                                                        e.localizedMessage
-                                                            ?: "Произошла непредвиденная ошибка"
-                                                    )
-                                                } catch (e: IOException) {
-                                                    Log.e(
-                                                        "HELO",
-                                                        "NOT Network"
-                                                    )
-                                                }catch (e:Exception) {
-//                                    navController.popBackStack()
-                                                    if (selectImage == null)
-                                                        Toast.makeText(
-                                                            context,
-                                                            "Выберите аватар",
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
-                                                    else {
-                                                        Log.e("HELLO","$e")
-                                                        Toast.makeText(
-                                                            context,
-                                                            "Произошла ошибка! Повторите еще раз $e ",
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
-                                                    }
+                                                    photos.value = photo.value
                                                 }
+                                                viewModel.sendProfile(
+                                                    (profileFirstName.value
+                                                        ?: getProfileFirstName
+                                                        ?: "").toRequestBody(),
+                                                    (profileLastName.value ?: getProfileLastName
+                                                    ?: "").toRequestBody(),
+                                                    profileEmail.value ?: getProfileEmail ?: "",
+                                                    photos,
+                                                    context
+                                                )
+                                            } catch (e: HttpException) {
+                                                Log.e(
+                                                    "HELO",
+                                                    e.localizedMessage
+                                                        ?: "Произошла непредвиденная ошибка"
+                                                )
+                                            } catch (e: IOException) {
+                                                Log.e(
+                                                    "HELO",
+                                                    "NOT Network"
+                                                )
+                                            } catch (e: Exception) {
+//                                    navController.popBackStack()
+                                                Log.e("HELLO", "$e")
+                                                Toast.makeText(
+                                                    context,
+                                                    "Произошла ошибка! Повторите еще раз $e ",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
                                             }
 
                                         }

@@ -69,7 +69,7 @@ class ProfileViewModel @Inject constructor(
         first_name: RequestBody,
         last_name: RequestBody,
         email: String,
-        images: MutableState<File?>?,
+        images: MutableState<File?>,
         context:Context
                     ){
         sendProfileUseCase.invoke(first_name,last_name, email, avatar = images).onEach { result: Resource<ProfileResponse> ->
@@ -80,11 +80,6 @@ class ProfileViewModel @Inject constructor(
                         _stateprofile.value =
                             ProfileResponseState(response = allowancesResponse?.result)
                         getProfileInfo()
-                        Toast.makeText(
-                            context,
-                            "Фото успешно отправлено!",
-                            Toast.LENGTH_LONG
-                        ).show()
                         Log.e("ProfileResponse", "SendProfileSuccess->\n ${_stateprofile.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")

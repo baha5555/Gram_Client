@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.screens.main
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -38,6 +39,7 @@ import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.addressComponents.AddressList
+import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import kotlinx.coroutines.CoroutineScope
@@ -60,6 +62,7 @@ fun AddressSearchScreen(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
 
+    val profileViewModel:ProfileViewModel = hiltViewModel()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     val coroutineScope = rememberCoroutineScope()
@@ -77,6 +80,7 @@ fun AddressSearchScreen(
         }
     }
     LaunchedEffect(bottomSheetState.bottomSheetState.currentValue) {
+        profileViewModel.getProfileInfo()
         if (bottomSheetState.bottomSheetState.isCollapsed) {
             isSearchState.value = false
             Log.e("singleTapConfirmedHelper", "isCollapsed")
@@ -232,6 +236,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AddressSearchBottomSheet(
@@ -258,6 +263,10 @@ fun AddressSearchBottomSheet(
             .padding(15.dp)
     ) {
         if (!isSearchState.value) {
+            coroutineScope.launch {
+                if(searchText.value !="")
+                    searchText.value = ""
+            }
             ToAddressField(
                 navController,
                 WHICH_ADDRESS = WHICH_ADDRESS,
@@ -277,7 +286,6 @@ fun AddressSearchBottomSheet(
             }
             SearchTextField(
                 searchText = searchText,
-                navController = navController,
                 focusRequester = focusRequester,
                 isSearchState = isSearchState,
                 scope = coroutineScope,
@@ -471,7 +479,6 @@ fun SearchResultContent(
     )
     {
         AddressList(
-            navController = navController,
             isVisible = isAddressList,
             address = searchText,
             focusManager = focusManager,
@@ -500,7 +507,6 @@ fun SearchResultContent(
 fun SearchTextField(
     searchText: MutableState<String>,
     mainViewModel: MainViewModel = hiltViewModel(),
-    navController: NavHostController,
     focusRequester: FocusRequester,
     isSearchState: MutableState<Boolean>,
     bottomSheetState: BottomSheetScaffoldState,
@@ -510,8 +516,10 @@ fun SearchTextField(
         TextField(
             value = searchText.value,
             onValueChange = { value ->
-                searchText.value = value
-                mainViewModel.searchAddress(value)
+                scope.launch {
+                    searchText.value = value
+                    mainViewModel.searchAddress(value)
+                }
             },
             modifier = Modifier
                 .focusRequester(focusRequester)
@@ -533,8 +541,7 @@ fun SearchTextField(
                     IconButton(
                         modifier = Modifier.offset(x = (-40).dp),
                         onClick = {
-                            searchText.value =
-                                ""
+                            scope.launch { searchText.value = ""}
                         }
                     ) {
                         Icon(
@@ -568,8 +575,8 @@ fun SearchTextField(
                 .clickable {
                     scope.launch {
                         bottomSheetState.bottomSheetState.collapse()
+                        isSearchState.value = false
                     }
-                    isSearchState.value = false
                 },
             contentAlignment = Alignment.Center
         ) {

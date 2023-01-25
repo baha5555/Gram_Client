@@ -136,6 +136,10 @@ fun OrderExecution(
                     .background(BackgroundColor)
             ) {
                 if(!isSearchState.value) {
+                    scope.launch{
+                        if(searchText.value != "")
+                            searchText.value = ""
+                    }
                     selectRealtimeDatabaseOrder.let { order ->
                             if (order.performer != null) {
                                     performerSection(performer = order, orderExecutionViewModel)
@@ -718,7 +722,6 @@ fun searchSection(
     )
     {
         AddressList(
-            navController = navController,
             isVisible = isAddressList,
             address = searchText,
             focusManager = focusManager,

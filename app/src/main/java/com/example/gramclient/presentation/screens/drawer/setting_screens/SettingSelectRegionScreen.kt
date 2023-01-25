@@ -27,12 +27,12 @@ fun SettingSelectRegionScreen(navController: NavHostController) {
             val search = remember {
                 mutableStateOf("")
             }
-            CustomSearch(search)
-            var textRegion = arrayOf<String>("Таджикистан", "Узбекистан", "Россия")
+//            CustomSearch(search)
+            var textRegion = arrayOf<String>("Таджикистан"/*, "Узбекистан", "Россия"*/)
             var iconRegion = arrayOf<ImageVector>(
                 ImageVector.vectorResource(id = R.drawable.flag_tj),
-                ImageVector.vectorResource(id = R.drawable.flag_uz),
-                ImageVector.vectorResource(id = R.drawable.flag_ru)
+                /*ImageVector.vectorResource(id = R.drawable.flag_uz),
+                ImageVector.vectorResource(id = R.drawable.flag_ru)*/
             )
             for (i in textRegion.indices) {
                 ListRegions(text = textRegion[i], img = iconRegion[i])

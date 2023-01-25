@@ -21,20 +21,21 @@ private val repository: AppRepository
                         first_name: RequestBody,
                         last_name: RequestBody,
                         email: String,
-                        avatar: MutableState<File?>?
+                        avatar: MutableState<File?>
     ): Flow<Resource<ProfileResponse>> =
         flow{
             try {
                 emit(Resource.Loading<ProfileResponse>())
                 val response: ProfileResponse = repository.sendProfile(first_name,last_name,email,
-                    avatar?.value?.let {
+                    if(avatar.value!=null)
                         MultipartBody.Part
-                            .createFormData(
-                                name = "avatar",
-                                filename = it.name,
-                                body = it.asRequestBody()
-                            )
-                    })
+                        .createFormData(
+                            name = "avatar",
+                            filename = avatar.value!!.name,
+                            body = avatar.value!!.asRequestBody()
+                        )
+                else null
+                )
                 emit(Resource.Success<ProfileResponse>(response))
             }catch (e: HttpException) {
                 emit(

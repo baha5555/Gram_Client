@@ -122,7 +122,11 @@ fun MainScreen(
                     paymentMethods.forEachIndexed { idx, item ->
                         Row(modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { paymentState.value = item }
+                            .clickable {
+                                coroutineScope.launch {
+                                    paymentState.value = item
+                                }
+                            }
                             .padding(vertical = 15.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween) {
@@ -188,7 +192,9 @@ fun MainScreen(
                                         .size(50.dp),
                                     backgroundColor = Color.White,
                                     onClick = {
-                                        navController.popBackStack()
+                                        coroutineScope.launch {
+                                            navController.popBackStack()
+                                        }
                                     }
                                 ) {
                                     Icon(
