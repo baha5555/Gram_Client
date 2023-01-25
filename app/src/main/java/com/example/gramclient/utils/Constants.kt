@@ -19,6 +19,7 @@ object Constants {
     var STATE_RAITING_ORDER_ID: MutableState<Int> = mutableStateOf(0)
     var STATE_ASSIGNED_ORDER:MutableState<Boolean> = mutableStateOf(false)
     var STATE_ASSIGNED_ORDER_ID:MutableState<Int> = mutableStateOf(-1)
+    var KONFIG_URL = "https://sales-generator.ru/blog/politika-konfidentsialnosti-dlya-sayta/?ysclid=ld8t95ulfy169128439"
 }
 
 object PreferencesName {
