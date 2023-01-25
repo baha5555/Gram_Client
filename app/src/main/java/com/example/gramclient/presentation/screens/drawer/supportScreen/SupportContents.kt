@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.screens.drawer.supportScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,7 @@ import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
 fun SupportContent(stateContent: MutableState<String>) {
+    val context = LocalContext.current
     Column(
         Modifier
             .fillMaxSize()
@@ -43,15 +46,18 @@ fun SupportContent(stateContent: MutableState<String>) {
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             CustomCircleButton(text = "Экстренная\nситуация", icon = Icons.Default.Headphones) {
-                stateContent.value = "EmergencySituation"
+//                stateContent.value = "EmergencySituation"
+                Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_LONG).show()
+
             }
             CustomCircleButton(text = "Доверенные\nконтакты", icon = R.drawable.ic_contact) {
-                stateContent.value = "Contact"
+//                stateContent.value = "Contact"
+                Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_LONG).show()
             }
             CustomCircleButton(text = "Скорая \nи полиция", icon = R.drawable.ic_alarm_light) {
-                stateContent.value = "AmbulancePolice"
+//                stateContent.value = "AmbulancePolice"
+                Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_LONG).show()
             }
-
         }
     }
 }
@@ -106,6 +112,7 @@ fun ShowContent(title: String, text: String, textBtn: String, color: Color, icon
 
 @Composable
 fun EmergencySituation(navController: NavHostController) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -146,7 +153,9 @@ fun EmergencySituation(navController: NavHostController) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { navController.navigate(RoutesName.MESSAGE_SCREEN)}
+                    .clickable {
+                        Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_LONG).show()
+                    /*navController.navigate(RoutesName.MESSAGE_SCREEN)*/}
                     .padding(vertical = 15.dp, horizontal = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically

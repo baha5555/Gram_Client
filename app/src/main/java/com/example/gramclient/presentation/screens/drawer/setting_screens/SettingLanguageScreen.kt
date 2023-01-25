@@ -34,10 +34,10 @@ fun SettingLanguageScreen(navController: NavHostController) {
 
 @Composable
 private fun CheckBoxGroupGroup(
-    items: List<String> = arrayListOf("Русский", "English", "Francais", "Украiнська"),
-    items_2: List<String> = arrayListOf("", "Английский", "Французский", "Украинский")
+    items: List<String> = arrayListOf("Русский",/* "English", "Francais", "Украiнська"*/),
+    items_2: List<String> = arrayListOf("",/* "Английский", "Французский", "Украинский"*/)
 ) {
-    val state = remember { mutableStateOf("") }
+    val state = remember { mutableStateOf("Русский") }
     Column {
         items.forEach { item ->
             Row(

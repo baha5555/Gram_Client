@@ -23,10 +23,10 @@ fun SettingRegionScreen(navController: NavHostController) {
             val search = remember {
                 mutableStateOf("")
             }
-            CustomSearch(search)
+//            CustomSearch(search)
             ListRegion("Худжанд", "Согдийская область")
-            ListRegion("Душанбе", "Город республиканского значения")
-            ListRegion("Худжанд", "Хатлонская область")
+//            ListRegion("Душанбе", "Город республиканского значения")
+//            ListRegion("Худжанд", "Хатлонская область")
         }
     }
 

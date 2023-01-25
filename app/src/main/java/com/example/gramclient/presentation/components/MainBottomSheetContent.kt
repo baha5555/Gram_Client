@@ -41,6 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainBottomSheetContent(
@@ -72,8 +73,6 @@ fun MainBottomSheetContent(
     val stateSearchAddress by mainViewModel.stateSearchAddress
 
     val coroutineScope= rememberCoroutineScope()
-
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -81,6 +80,10 @@ fun MainBottomSheetContent(
             .fillMaxHeight(fraction = heightFraction)
     ) {
         if(!isSearchState.value){
+            coroutineScope.launch {
+                if(searchText.value!="")
+                    searchText.value = ""
+            }
             SheetContent (
                 currentFraction=scaffoldState.currentFraction,
                 addressContent = {
@@ -133,7 +136,6 @@ fun MainBottomSheetContent(
                     .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)) {
                 SearchTextField(
                     searchText = searchText,
-                    navController = navController,
                     focusRequester = focusRequester,
                     isSearchState = isSearchState,
                     bottomSheetState = scaffoldState,
@@ -148,7 +150,7 @@ fun MainBottomSheetContent(
                     isSearchState = isSearchState,
                     scope = coroutineScope,
                     mainViewModel = mainViewModel,
-                    WHICH_ADDRESS = WHICH_ADDRESS
+                    WHICH_ADDRESS = WHICH_ADDRESS,
                 )
             }
         }

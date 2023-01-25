@@ -27,7 +27,6 @@ import com.example.gramclient.presentation.screens.main.MainViewModel
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddressList(
-    navController: NavController,
     isVisible: MutableState<Boolean>,
     address: MutableState<String>,
     focusManager: FocusManager,
@@ -45,7 +44,7 @@ fun AddressList(
                Loader(isLoading = stateSearchAddress.isLoading)
            }
            stateSearchAddress.response?.let { items ->
-               if(items.size != 0) {
+               if(items.isNotEmpty()) {
                    items.forEach{
                        AddressListItem(
                            addressText = it.address,
