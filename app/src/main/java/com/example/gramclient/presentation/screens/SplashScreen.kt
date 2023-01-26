@@ -23,7 +23,6 @@ import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.gramclient.utils.PreferencesName
 import kotlinx.coroutines.delay
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference

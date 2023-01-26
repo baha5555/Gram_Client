@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.gramclient.domain.mainScreen.Address
-import com.example.gramclient.domain.orderHistoryScreen.Performer
 
 @Entity(tableName = "orders_table")
 data class RealtimeDatabaseOrder(

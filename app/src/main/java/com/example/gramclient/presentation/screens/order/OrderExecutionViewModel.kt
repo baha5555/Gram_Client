@@ -1,6 +1,5 @@
 package com.example.gramclient.presentation.screens.order
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +56,6 @@ class OrderExecutionViewModel  @Inject constructor(
     private val _stateEditOrder = mutableStateOf(EditOrderResponseState())
     val stateEditOrder: State<EditOrderResponseState> = _stateEditOrder
 
-//    private val _selectedOrder = mutableStateOf(Order(listOf(), "", "", "", null, 1, "", null, "", 1, "", "", "", 1, null))
 private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
     val selectedOrder: State<RealtimeDatabaseOrder> = _selectedOrder
 
@@ -74,9 +72,9 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
 
                                 _stateRealtimeOrdersDatabase.value =
                                     realtimeDatabaseResponseState(response = addressResponse)
-                            Log.e("readAllOrdersFromRealtimeResponse", "Success->\n ${_stateRealtimeOrdersDatabase.value}")
+                            Log.e("readAllOrdersFromRealtimeResponse", "Success->\n ${_stateRealtimeOrdersDatabase.value.response?.value}")
                         }catch (e: Exception) {
-                            Log.d("Exception", "${e.message} Exception")
+                            Log.d("readAllOrdersFromRealtimeResponse", "${e.message} Exception")
                         }
                     }
                     is Resource.Error -> {
@@ -129,9 +127,9 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         val addressResponse: AddRatingResponse? = result.data
                         _stateAddRating.value =
                             AddRatingResponseState(response = addressResponse?.result)
-                        Log.e("AddRatingResponse", "SendRatingResponse->\n ${_stateAddRating.value}")
+                        Log.e("AddRatingResponse", "AddRatingResponseSuccess->\n ${_stateAddRating.value}")
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("AddRatingResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
@@ -159,7 +157,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         _stateConnectClientWithDriver.value =
                             ConnectClientWithDriverResponseState(response = connectClientWithDriverResponse)
                         onSuccess()
-                        Log.e("ConnectClientWithDriverResponseSuccess", "ConnectClientWithDriverResponse->\n ${_stateConnectClientWithDriver.value.response}")
+                        Log.e("ConnectClientWithDriverResponseSuccess", "ConnectClientWithDriverResponseSuccess->\n ${_stateConnectClientWithDriver.value.response}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
@@ -184,7 +182,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         val response: ActiveOrdersResponse? = result.data
                         _stateActiveOrders.value =
                             ActiveOrdersResponseState(response = response?.result)
-                        Log.e("ActiveOrdersResponse", "ActiveOrdersResponse->\n ${_stateActiveOrders.value}")
+                        Log.e("ActiveOrdersResponse", "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}")
                         currentRoute = navController.currentBackStackEntry?.destination?.route
                         if(navController.currentBackStackEntry?.destination?.route == RoutesName.SPLASH_SCREEN) {
                             if (_stateActiveOrders.value.response!!.isEmpty()) {
@@ -202,7 +200,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                             }
                         }
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("ActiveOrdersResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
@@ -227,13 +225,13 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                             CancelOrderResponseState(response = response)
                         onSuccess()
                         getActiveOrders(navController)
-                        Log.e("TariffsResponse", "CancelOrderResponse->\n ${_stateCancelOrder.value}")
+                        Log.e("CancelOrderResponse", "CancelOrderResponseSuccess->\n ${_stateCancelOrder.value}")
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("CancelOrderResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("TariffsResponse", "CancelOrderResponseError->\n ${result.message}")
+                    Log.e("CancelOrderResponse", "CancelOrderResponseError->\n ${result.message}")
                     _stateCancelOrder.value = CancelOrderResponseState(
                         error = "${result.message}"
                     )
@@ -264,9 +262,9 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         _stateEditOrder.value =
                             EditOrderResponseState(response = response)
                         readAllOrders()
-                        Log.e("EditOrderResponse", "EditOrderResponse->\n ${_stateEditOrder.value}")
+                        Log.e("EditOrderResponse", "EditOrderResponseSuccess->\n ${_stateEditOrder.value}")
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("EditOrderResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {

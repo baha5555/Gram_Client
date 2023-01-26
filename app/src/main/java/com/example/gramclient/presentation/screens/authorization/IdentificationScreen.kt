@@ -58,7 +58,8 @@ fun IdentificationScreen(
     }
     if(stateLogin.isLoading) {
         LoadingIndicator(isLoading = true)
-    }else{
+    }
+    else{
         stateAuth.response?.let{
             if (!initialApiCalled) {
                 LaunchedEffect(code.value) {
@@ -80,7 +81,7 @@ fun IdentificationScreen(
                 .fillMaxSize()
                 .padding(16.dp)
             ) {
-                val (logo, text, codeField, text2, btn, error) = createRefs()
+                val (logo, text, codeField, text2, error) = createRefs()
                 Image(
                     modifier= Modifier
                         .constrainAs(logo) {
@@ -150,7 +151,8 @@ fun IdentificationScreen(
                             }
                             .padding(top = 60.dp, bottom = 20.dp),
                         textAlign = TextAlign.Center, color = Color.Gray)
-                }else{
+                }
+                else{
                     Text(text = "Отправить код еще раз",
                         modifier= Modifier
                             .fillMaxWidth()
@@ -168,10 +170,12 @@ fun IdentificationScreen(
                                         time -= 1
                                     }
                                 }
-                                viewModel.authorization(
-                                    phone.value!!.toInt(),
-                                    navController
-                                )
+                                phone.value?.let { it1 ->
+                                    viewModel.authorization(
+                                        it1.toInt(),
+                                        navController
+                                    )
+                                }
                             },
                         textAlign = TextAlign.Center, color = Color.Blue)
                 }
@@ -195,7 +199,7 @@ fun ErrorMessage(
     }
 }
 @Composable
-fun LoadingIndicator(isLoading: Boolean, backgroundColor: Color = Color(0x00E5E5E5)) {
+fun LoadingIndicator(isLoading: Boolean) {
     if (isLoading) {
         Box(
             modifier = Modifier

@@ -1,6 +1,5 @@
 package com.example.gramclient.presentation.screens.authorization
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.gramclient.app.preference.CustomPreference
-import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.domain.athorization.AuthResponse
@@ -111,7 +109,7 @@ class AuthViewModel @Inject constructor(
                     val response = result.data
                     _stateLogin.value =
                         IdentificationResponseState(response = response?.result)
-                    Log.e("authresponse", "authresponse->\n ${_stateLogin.value}\n")
+                    Log.e("authresponse", "authresponseSuccess->\n ${_stateLogin.value}\n")
                     prefs.setAccessToken("Bearer ${response?.result?.access_token}")
                     navController.navigate(RoutesName.MAIN_SCREEN) {
                         popUpTo(RoutesName.IDENTIFICATION_SCREEN) {

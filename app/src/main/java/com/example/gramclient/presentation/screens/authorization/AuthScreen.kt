@@ -36,9 +36,11 @@ fun AuthorizationScreen(
     viewModel: AuthViewModel
 ) {
     val phone = remember { mutableStateOf("") }
+
     val nextBtnEnabled = remember {
         mutableStateOf(false)
     }
+
     val mAnnotatedLinkString = buildAnnotatedString {
         addStringAnnotation(
             tag = "URL",
@@ -47,6 +49,7 @@ fun AuthorizationScreen(
             end = 0
         )
     }
+
     val mUriHandler = LocalUriHandler.current
 
     Column(
@@ -94,7 +97,6 @@ fun AuthorizationScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    var numberText by remember { mutableStateOf("") }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         OutlinedTextField(
                             value = "",
