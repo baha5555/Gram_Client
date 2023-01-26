@@ -2,7 +2,6 @@ package com.example.gramclient.presentation.screens.main
 
 import android.app.Activity
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -14,7 +13,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.gramclient.utils.Constants
-import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.mainScreen.*
 import com.example.gramclient.domain.mainScreen.order.*
@@ -75,7 +73,7 @@ class MainViewModel @Inject constructor(
         _fromAddress.value = address
     }
 
-    fun updateToAddress(index: Int, address:Address?) {
+    fun updateToAddress(address:Address?) {
         if(address != null){
             _toAddress.value = listOf(address)
         }
@@ -93,17 +91,17 @@ class MainViewModel @Inject constructor(
 
     fun includeAllowance(toDesiredAllowance: ToDesiredAllowance){
         if(toDesiredAllowance.isSelected.value){
-            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            Log.e("IncludeAllowance", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
             _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value=_selectedAllowances
             getPrice()
-            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            Log.e("IncludeAllowance", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
         }else{
-            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            Log.e("IncludeAllowance", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
             _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value=_selectedAllowances
             getPrice()
-            Log.e("TariffsResponse", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            Log.e("IncludeAllowance", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
         }
     }
 
@@ -115,7 +113,7 @@ class MainViewModel @Inject constructor(
                         val tariffsResponse: TariffsResponse? = result.data
                         _stateTariffs.value =
                             TariffsResponseState(response = tariffsResponse?.result)
-                        Log.e("TariffsResponse", "TariffsResponse->\n ${_stateTariffs.value}")
+                        Log.e("TariffsResponse", "TariffsResponseSuccess->\n ${_stateTariffs.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
@@ -141,13 +139,13 @@ class MainViewModel @Inject constructor(
                         val allowancesResponse: AllowancesResponse? = result.data
                         _stateAllowances.value =
                             AllowancesResponseState(response = allowancesResponse?.result?.map { it.toDesiredAllowance() })
-                        Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAllowances.value}")
+                        Log.e("AllowancesResponse", "AllowancesResponseSuccess->\n ${_stateAllowances.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("AllowancesResponse", "AllowancesResponse->\n ${result.message}")
+                    Log.e("AllowancesResponse", "AllowancesResponseError->\n ${result.message}")
                     _stateAllowances.value = AllowancesResponseState(
                         error = "${result.message}"
                     )
@@ -167,7 +165,7 @@ class MainViewModel @Inject constructor(
                         val addressResponse: AddressByPointResponse? = result.data
                         _stateAddressPoint.value =
                             AddressByPointResponseState(response = addressResponse?.result)
-                        Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAddressPoint.value}")
+                        Log.e("AddressByPointResponse", "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}")
                         updateFromAddress(
                             Address(_stateAddressPoint.value.response!!.name,
                             _stateAddressPoint.value.response!!.id,
@@ -175,11 +173,11 @@ class MainViewModel @Inject constructor(
                             _stateAddressPoint.value.response!!.lng)
                         )
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("AddressByPointResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("AllowancesResponse", "AllowancesResponse->\n ${result.message}")
+                    Log.e("AddressByPointResponse", "AddressByPointResponseError->\n ${result.message}")
                     _stateAddressPoint.value = AddressByPointResponseState(
                         error = "${result.message}"
                     )
@@ -208,10 +206,10 @@ class MainViewModel @Inject constructor(
         task.addOnSuccessListener {
             if (it != null){
                 getAddressByPoint(it.longitude, it.latitude)
-                Log.e("TariffsResponse","Location - > ${it.longitude}  + ${it.latitude}")
+                Log.e("ActualLocation","Location - > ${it.longitude}  + ${it.latitude}")
             }
             else{
-                Log.e("NULL", "NULL")
+                Log.e("ActualLocation", "NULL")
             }
         }
 
@@ -224,13 +222,13 @@ class MainViewModel @Inject constructor(
                         val addressResponse: SearchAddressResponse? = result.data
                         _stateSearchAddress.value =
                             SearchAddressResponseState(response = addressResponse?.result)
-                        Log.e("TariffsResponse", "SearchAddressResponse->\n ${_stateSearchAddress.value}")
+                        Log.e("SearchAddressResponse", "SearchAddressResponseSuccess->\n ${_stateSearchAddress.value}")
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("SearchAddressResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("TariffsResponse", "TariffsResponseError->\n ${result.message}")
+                    Log.e("SearchAddressResponse", "TariffsResponseError->\n ${result.message}")
                     _stateSearchAddress.value = SearchAddressResponseState(
                         error = "${result.message}"
                     )
@@ -257,14 +255,14 @@ class MainViewModel @Inject constructor(
                         val response: OrderResponse? = result.data
                         _stateCreateOrder.value =
                             OrderResponseState(response = response)
-                        Log.e("TariffsResponse", "OrderResponse->\n ${_stateCreateOrder.value}")
+                        Log.e("OrderResponse", "OrderResponseSuccess->\n ${_stateCreateOrder.value}")
                         orderExecutionViewModel.getActiveOrders(navController)
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("OrderResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("TariffsResponse", "OrderResponseError->\n ${result.message}")
+                    Log.e("OrderResponse", "OrderResponseError->\n ${result.message}")
                     _stateCreateOrder.value = OrderResponseState(
                         error = "${result.message}"
                     )
@@ -289,13 +287,13 @@ class MainViewModel @Inject constructor(
                         val response: CalculateResponse? = result.data
                         _stateCalculate.value =
                             CalculateResponseState(response = response)
-                        Log.e("TariffsResponse", "CalculateResponse->\n ${_stateCalculate.value}")
+                        Log.e("CalculateResponse", "CalculateResponseSuccess->\n ${_stateCalculate.value}")
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("CalculateResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("TariffsResponse", "CalculateResponseError->\n ${result.message}")
+                    Log.e("CalculateResponse", "CalculateResponseError->\n ${result.message}")
                     _stateCalculate.value = CalculateResponseState(
                         error = "${result.message}"
                     )
@@ -319,7 +317,7 @@ class MainViewModel @Inject constructor(
                         val addressResponse: AddressByPointResponse? = result.data
                         _stateAddressPoint.value =
                             AddressByPointResponseState(response = addressResponse?.result)
-                        Log.e("TariffsResponse", "AllowancesResponseError->\n ${_stateAddressPoint.value}")
+                        Log.e("AddressByPointResponse", "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}")
                         when(WHICH_ADDRESS.value){
                             Constants.FROM_ADDRESS -> {
                                 updateFromAddress(
@@ -331,7 +329,6 @@ class MainViewModel @Inject constructor(
                             }
                             Constants.TO_ADDRESS -> {
                                 updateToAddress(
-                                    0,
                                     Address(_stateAddressPoint.value.response!!.name,
                                         _stateAddressPoint.value.response!!.id,
                                         _stateAddressPoint.value.response!!.lat,
@@ -339,14 +336,14 @@ class MainViewModel @Inject constructor(
                                 )
                             }
                         }
-                        Log.e("singleTapConfirmedHelper", "${toAddress}")
+                        Log.e("singleTapConfirmedHelper", "$toAddress")
 
                     }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        Log.d("AddressByPointResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("AllowancesResponse", "AllowancesResponse->\n ${result.message}")
+                    Log.e("AddressByPointResponse", "AddressByPointResponseError->\n ${result.message}")
                     _stateAddressPoint.value = AddressByPointResponseState(
                         error = "${result.message}"
                     )

@@ -23,9 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -91,7 +89,12 @@ class MainActivity : ComponentActivity() {
                         authViewModel = authViewModel
                     )
                 MyFirebaseMessagingService().onCreate()
-
+                val isDialog = remember {
+                    mutableStateOf(false)
+                }
+                if(connection == ConnectionState.Available){
+                    isDialog.value = true
+                }
                 if(connection == ConnectionState.Unavailable) {
                         SimpleAlertDialog(
                             title = "Внимание",
@@ -106,7 +109,8 @@ class MainActivity : ComponentActivity() {
                                     }
                                 this.startActivity(callIntent)
                             },
-                        onDismiss = {this@MainActivity.finish()})
+                        onDismiss = {this@MainActivity.finish()},
+                        isDialog = isDialog )
                     }
             }
         }
@@ -329,56 +333,61 @@ fun SimpleAlertDialog(
     confirmText: String,
     dismissText:String,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isDialog: MutableState<Boolean>
 ){
-    Dialog(
-        onDismissRequest = { /*TODO*/ },
-    ) {
-        Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(15.dp))
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(15.dp)
+    if(!isDialog.value) {
+        Dialog(
+            onDismissRequest = { /*TODO*/ },
         ) {
-            Text(
-                text = title,
-                fontSize = 22.sp,
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = text,
-                fontSize = 16.sp,
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(15.dp))
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(15.dp)
             ) {
-                Button(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .weight(1f),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black, contentColor = Color.Black),
-                    onClick = { onDismiss() }
-                ) {
-                    Text(text = dismissText, fontSize = 16.sp, color = Color.White)
-                }
-                Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    modifier=Modifier
-                        .clickable { onConfirm() }
-                        .padding(2.dp)
-                        .clip(shape = RoundedCornerShape(5.dp))
-                    ,
-                    text = confirmText, fontSize = 18.sp, color = Color(0xFF1E88E5)
+                    text = title,
+                    fontSize = 22.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = text,
+                    fontSize = 16.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(30.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.Black,
+                            contentColor = Color.Black
+                        ),
+                        onClick = { onDismiss() }
+                    ) {
+                        Text(text = dismissText, fontSize = 16.sp, color = Color.White)
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        modifier = Modifier
+                            .clickable { onConfirm() }
+                            .padding(2.dp)
+                            .clip(shape = RoundedCornerShape(5.dp)),
+                        text = confirmText, fontSize = 18.sp, color = Color(0xFF1E88E5)
+                    )
+                }
             }
         }
     }

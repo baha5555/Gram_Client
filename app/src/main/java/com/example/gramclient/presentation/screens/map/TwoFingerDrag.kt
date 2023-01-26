@@ -17,19 +17,16 @@ class TwoFingerDrag(context: Context, private val listener: Listener) {
         DISTANCE_TOLERANCE_PX = context.resources.displayMetrics.density * DISTANCE_TOLERANCE_DP
         handlerConfirmDrawByTime = Handler(Looper.getMainLooper())
         confirmDrawByTime = Runnable {
-            Log.d("MyApp3", "TwoFingerDrag   confirming draw by time")
+            Log.d("TwoFingerDrag", "TwoFingerDrag   confirming draw by time")
             oneFingerOperationStatus = IN_PROGRESS
             listener.onOneFinger(oneFingerStartEvent)
         }
     }
 
     fun onTouchEvent(event: MotionEvent): Boolean {
-//        if (event.getToolType(0) == MotionEvent.TOOL_TYPE_FINGER) {
         if (event.pointerCount == 1) {
-//                Log.d("MyApp3", "TwoFingerDrag onTouchEvent one " + MotionEvent.actionToString(event.getAction()));
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    //                        timeDrawStarted = System.currentTimeMillis();
                     oneFingerOperationStatus = NOT_STARTED
                     panStarted = false
                     oneFingerStartEvent = MotionEvent.obtain(event)
@@ -47,14 +44,14 @@ class TwoFingerDrag(context: Context, private val listener: Listener) {
                                     )
                                 }else null
                             Log.d(
-                                "MyApp3",
-                                "   distance " + distance + " vs " + DISTANCE_TOLERANCE_PX
+                                "TwoFingerDrag",
+                                "   distance $distance vs $DISTANCE_TOLERANCE_PX"
                             )
                             if(distance != null){
                                 if (distance < DISTANCE_TOLERANCE_PX) {
-                                    Log.d("MyApp3", "   cancelling draw by distance")
+                                    Log.d("TwoFingerDrag", "   cancelling draw by distance")
                                 } else {
-                                    Log.d("MyApp3", "   confirming draw by distance")
+                                    Log.d("TwoFingerDrag", "   confirming draw by distance")
                                     handlerConfirmDrawByTime.removeCallbacks(confirmDrawByTime)
                                     oneFingerOperationStatus = IN_PROGRESS
                                     listener.onOneFinger(oneFingerStartEvent)
@@ -94,15 +91,12 @@ class TwoFingerDrag(context: Context, private val listener: Listener) {
             }
         } else {
             Log.d(
-                "MyApp3",
+                "TwoFingerDrag",
                 "TwoFingerDrag onTouchEvent more " + event.pointerCount + " " + MotionEvent.actionToString(
                     event.action
                 )
             )
         }
-        //        } else {
-//            Log.d("MyApp3", "TwoFingerDrag onTouchEvent not finger " + event.getToolType(0) + " " + event.getPointerCount() + " " + MotionEvent.actionToString(event.getAction()));
-//        }
         return false
     }
 

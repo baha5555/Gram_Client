@@ -6,7 +6,6 @@ import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
@@ -65,22 +64,34 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val scope = rememberCoroutineScope()
+
     val context = LocalContext.current
-    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+
     val stateGetProfileInfo by viewModel.stateGetProfileInfo
+
     val profileInfo = stateGetProfileInfo.response
+
     val getProfileFirstName = stateGetProfileInfo.response?.first_name
+
     val getProfileLastName = stateGetProfileInfo.response?.last_name
+
     val getProfileEmail = stateGetProfileInfo.response?.email
+
     val profileFirstName = remember { mutableStateOf(getProfileFirstName) }
+
     val profileEmail = remember { mutableStateOf(getProfileEmail) }
+
     val profileLastName = remember { mutableStateOf(getProfileLastName) }
+
     val profileImage = viewModel.stateGetProfileInfo.value.response?.avatar_url
+
     var selectImage by mutableStateOf<Uri?>(null)
+
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
             selectImage = it
         }
+
     val state = rememberSwipeRefreshState(stateGetProfileInfo.isLoading)
 
     LaunchedEffect(key1 = true) {
@@ -124,7 +135,6 @@ fun ProfileScreen(
                                     .clickable {
                                         launcher.launch("image/*")
                                     },
-//                    imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
                                 contentDescription = "",
                             )
                         } else {
@@ -139,7 +149,6 @@ fun ProfileScreen(
                                     .clickable {
                                         launcher.launch("image/*")
                                     },
-//                    imageVector = ImageVector.vectorResource(id = R.drawable.camera_plus),
                                 contentDescription = "",
                             )
                         }
@@ -237,17 +246,13 @@ fun ProfileScreen(
                                     onClick = {
                                         scope.launch {
                                             try {
-                                                var photos:MutableState<File?> = mutableStateOf(null)
+                                                var photo:MutableState<File?> = mutableStateOf(null)
                                                 selectImage?.let {
-                                                    val photo = mutableStateOf(
-                                                        File(
-                                                            getRealPathFromURI(
-                                                                context,
-                                                                it
-                                                            )
+                                                    Log.e("selectImage","$it")
+                                                    photo.value = File(
+                                                        getRealPathFromURI(context,it)
                                                         )
-                                                    )
-                                                    photos.value = photo.value
+                                                    Log.e("selectImage","${photo.value}")
                                                 }
                                                 viewModel.sendProfile(
                                                     (profileFirstName.value
@@ -256,8 +261,7 @@ fun ProfileScreen(
                                                     (profileLastName.value ?: getProfileLastName
                                                     ?: "").toRequestBody(),
                                                     profileEmail.value ?: getProfileEmail ?: "",
-                                                    photos,
-                                                    context
+                                                    photo,
                                                 )
                                             } catch (e: HttpException) {
                                                 Log.e(
@@ -271,7 +275,6 @@ fun ProfileScreen(
                                                     "NOT Network"
                                                 )
                                             } catch (e: Exception) {
-//                                    navController.popBackStack()
                                                 Log.e("HELLO", "$e")
                                                 Toast.makeText(
                                                     context,
@@ -346,7 +349,7 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
                         val file = File(id)
                         if (file.exists()) return id
                     }
-                    val contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id))
+                    val contentUri = ContentUris.withAppendedId(Uri.parse("content://"), java.lang.Long.valueOf(id))
                     return getDataColumn(context, contentUri, null, null)
                 }
                 isMediaDocument(uri) -> {

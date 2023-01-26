@@ -70,7 +70,6 @@ class ProfileViewModel @Inject constructor(
         last_name: RequestBody,
         email: String,
         images: MutableState<File?>,
-        context:Context
                     ){
         sendProfileUseCase.invoke(first_name,last_name, email, avatar = images).onEach { result: Resource<ProfileResponse> ->
             when (result){

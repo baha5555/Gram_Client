@@ -30,8 +30,7 @@ import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.presentation.screens.main.MainViewModel
-import com.example.gramclient.presentation.screens.main.SearchResultContent
-import com.example.gramclient.presentation.screens.main.SearchTextField
+import com.example.gramclient.presentation.screens.main.components.*
 import com.example.gramclient.presentation.screens.main.states.AllowancesResponseState
 import com.example.gramclient.presentation.screens.main.states.CalculateResponseState
 import com.example.gramclient.presentation.screens.main.states.TariffsResponseState
@@ -56,6 +55,7 @@ fun MainBottomSheetContent(
     focusRequester: FocusRequester,
 ){
     val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
+
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
 
 
@@ -69,8 +69,6 @@ fun MainBottomSheetContent(
     val searchText=remember{ mutableStateOf("") }
 
     val focusManager = LocalFocusManager.current
-
-    val stateSearchAddress by mainViewModel.stateSearchAddress
 
     val coroutineScope= rememberCoroutineScope()
     Box(
@@ -89,7 +87,6 @@ fun MainBottomSheetContent(
                 addressContent = {
                     AddressesContent(
                         currentFraction = scaffoldState.currentFraction,
-                        navController =navController,
                         address_from =fromAddress,
                         address_to =toAddress,
                         bottomSheetState =scaffoldState,
@@ -100,7 +97,6 @@ fun MainBottomSheetContent(
                 },
                 tariffsContent = {
                     TariffsContent(
-                        scaffoldState = scaffoldState,
                         currentFraction = scaffoldState.currentFraction,
                         selected_tariff =selected_tariff,
                         stateCalculate =stateCalculate,
@@ -200,7 +196,6 @@ fun SheetContent(
 @Composable
 fun AddressesContent(
     currentFraction: Float,
-    navController: NavHostController,
     address_from: Address,
     address_to: List<Address>,
     bottomSheetState: BottomSheetScaffoldState,
@@ -309,7 +304,6 @@ fun AddressesContent(
 @Composable
 fun TariffsContent(
     currentFraction: Float,
-    scaffoldState: BottomSheetScaffoldState,
     selected_tariff: State<TariffsResult?>?,
     stateCalculate: CalculateResponseState,
     address_to: List<Address>,

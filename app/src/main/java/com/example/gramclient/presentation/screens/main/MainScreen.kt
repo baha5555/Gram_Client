@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation.screens.main
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -26,8 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
+import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
@@ -52,27 +51,23 @@ fun MainScreen(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
 
-    val drawerState = rememberDrawerState(
-        initialValue = DrawerValue.Closed
-    )
-
     val scaffoldState = rememberScaffoldState()
 
     val paymentMethods = listOf("Наличные", "Картой", "С бонусного счета")
     val paymentState = remember { mutableStateOf("") }
 
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     var initialApiCalled by rememberSaveable { mutableStateOf(false) }
-    var isSearchState = remember{ mutableStateOf(false) }
+    var isSearchState = remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
-
-
+    val prefs = CustomPreference(LocalContext.current)
     if (!initialApiCalled) {
         LaunchedEffect(Unit) {
-            profileViewModel.getProfileInfo()
+            if (prefs.getAccessToken() != "") {
+                profileViewModel.getProfileInfo()
+            }
             mainViewModel.getTariffs()
             mainViewModel.getAllowancesByTariffId(1)
             mainViewModel.getPrice()
@@ -81,21 +76,19 @@ fun MainScreen(
     }
 
     LaunchedEffect(mainBottomSheetState.bottomSheetState.currentValue) {
-        if(mainBottomSheetState.bottomSheetState.isCollapsed) {
-            isSearchState.value=false
+        if (mainBottomSheetState.bottomSheetState.isCollapsed) {
+            isSearchState.value = false
             Log.e("singleTapConfirmedHelper", "isCollapsed")
-        }else{
+        } else {
             Log.e("singleTapConfirmedHelper", "isExpanded")
         }
     }
 
     val stateTariffs by mainViewModel.stateTariffs
+
     val stateAllowances by mainViewModel.stateAllowances
-    val stateAddressByPoint by mainViewModel.stateAddressPoint
+
     val stateCalculate by mainViewModel.stateCalculate
-
-
-
 
     BottomSheetScaffold(
         sheetBackgroundColor = Color.White,
@@ -133,7 +126,13 @@ fun MainScreen(
                             Row {
                                 Image(
                                     modifier = Modifier.size(20.dp),
-                                    imageVector = ImageVector.vectorResource(if (idx == 0) R.drawable.wallet_icon else if (idx == 1) R.drawable.payment_card_icon else R.drawable.bonus_icon),
+                                    imageVector = ImageVector.vectorResource(
+                                        when (idx) {
+                                            0 -> R.drawable.wallet_icon
+                                            1 -> R.drawable.payment_card_icon
+                                            else -> R.drawable.bonus_icon
+                                        }
+                                    ),
                                     contentDescription = "Logo"
                                 )
                                 Spacer(modifier = Modifier.width(19.dp))
@@ -141,7 +140,7 @@ fun MainScreen(
                             }
                             CustomCheckBox(size = 25.dp,
                                 isChecked = paymentState.value == item,
-                                onChecked = { paymentState.value = item })
+                                onChecked = { coroutineScope.launch { paymentState.value = item } })
                         }
                         Divider()
                     }
@@ -169,7 +168,7 @@ fun MainScreen(
                 contentAlignment = Alignment.CenterStart
             ) {
                 Scaffold(scaffoldState = scaffoldState, bottomBar = {
-                    if(!isSearchState.value) {
+                    if (!isSearchState.value) {
                         BottomBar(
                             navController, mainBottomSheetState, bottomSheetState,
                             createOrder = {
@@ -186,7 +185,7 @@ fun MainScreen(
                                 modifier = Modifier.fillMaxWidth().padding(start = 30.dp)
                                     .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
                                 horizontalAlignment = Alignment.Start
-                            ){
+                            ) {
                                 FloatingActionButton(
                                     modifier = Modifier
                                         .size(50.dp),
@@ -214,8 +213,8 @@ fun MainScreen(
                                 stateTariffs = stateTariffs,
                                 stateAllowances = stateAllowances,
                                 navController = navController,
-                                isSearchState=isSearchState,
-                                focusRequester=focusRequester
+                                isSearchState = isSearchState,
+                                focusRequester = focusRequester
                             )
                         },
                         sheetPeekHeight = 325.dp,

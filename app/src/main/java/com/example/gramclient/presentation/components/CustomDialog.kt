@@ -74,7 +74,6 @@ fun CustomDialog(
 fun CustomCancelDialog(
     text: String,
     okBtnClick: () -> Unit,
-    cancelBtnClick: () -> Unit,
     isDialogOpen:Boolean,
 ){
     if(isDialogOpen){

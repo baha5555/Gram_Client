@@ -1,6 +1,5 @@
 package com.example.gramclient.presentation.components
 
-import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.utils.RoutesName
@@ -31,7 +29,8 @@ fun BottomBar(
     navController: NavHostController,
     mainBottomSheetState: BottomSheetScaffoldState,
     bottomSheetState: BottomSheetScaffoldState,
-    createOrder: () -> Unit) {
+    createOrder: () -> Unit
+) {
     val coroutineScope= rememberCoroutineScope()
     val isDialogOpen=remember{ mutableStateOf(false) }
     val prefs = CustomPreference(LocalContext.current)
@@ -75,14 +74,16 @@ fun BottomBar(
                 textSize = 18,
                 textBold = true,
             onClick = {
-                if (prefs.getAccessToken() == "") {
-                    navController.navigate(RoutesName.AUTH_SCREEN){
-                        popUpTo(RoutesName.MAIN_SCREEN) {
-                            inclusive = true
+                coroutineScope.launch {
+                    if (prefs.getAccessToken() == "") {
+                        navController.navigate(RoutesName.AUTH_SCREEN) {
+                            popUpTo(RoutesName.MAIN_SCREEN) {
+                                inclusive = true
+                            }
                         }
+                    } else {
+                        isDialogOpen.value = true
                     }
-                }else {
-                    isDialogOpen.value = true
                 }
             })
             IconButton(onClick = {
@@ -104,12 +105,14 @@ fun BottomBar(
         CustomDialog(
             text = "Оформить данный заказ?",
             okBtnClick = {
-                createOrder().let {
-                    navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN)
-                    isDialogOpen.value = false
+                coroutineScope.launch {
+                    createOrder().let {
+                        navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN)
+                        isDialogOpen.value = false
+                    }
                 }
                          },
-            cancelBtnClick = { isDialogOpen.value=false },
+            cancelBtnClick = { coroutineScope.launch { isDialogOpen.value=false } },
             isDialogOpen = isDialogOpen.value
         )
     }
