@@ -22,9 +22,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,7 +37,9 @@ import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrde
 import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomMainMap
+import com.example.gramclient.presentation.components.SideBarMenu
 import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
@@ -64,6 +68,9 @@ fun SearchDriverScreen(
             initialValue = BottomSheetValue.Expanded
         )
     )
+    val bottomSheetState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
+    )
     val scope = rememberCoroutineScope()
     var sheetPeekHeight by remember {
         mutableStateOf(200)
@@ -74,138 +81,171 @@ fun SearchDriverScreen(
         orderExecutionViewModel.readAllOrders()
 
     }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
     scope.launch {
         profileViewModel.stateGetProfileInfo.value.response?.let { response ->
-            Log.e("phone response","Success")
+            Log.e("phone response", "Success")
             orderExecutionViewModel.readAllClient(response.phone)
         }
     }
     val stateActiveOrders by orderExecutionViewModel.stateActiveOrders
     val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
     val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
-    Scaffold(
-        backgroundColor =Color(0xFFEEEEEE) ,
-        bottomBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .clip(shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
-                    .background(Color.White)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(15.dp)
-                        .height(50.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(PrimaryColor)
-                        .clickable {
-                            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
-                                    inclusive = true
-                                }
-                            }
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
-                            contentDescription = "car_eco",
-                        )
-                        Text(
-                            text = "Заказать ещё одну машину",
-                            textAlign = TextAlign.Center,
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.padding(end = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        ModalDrawer(
+            drawerState = drawerState,
+            gesturesEnabled = !drawerState.isClosed,
+            drawerContent = {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    Column(
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Divider(
-                            color = Color.White,
-                            modifier = Modifier
-                                .width(1.dp)
-                                .fillMaxHeight(0.5f)
-                                .offset((-10).dp, 0.dp)
-                        )
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = "car_eco",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.White
-                        )
-                    }
-
-                }
-
-                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                    repeat(5) {
-                        Box(
-                            modifier = Modifier
-                                .size(150.dp, 30.dp)
-                                .padding(start = 15.dp)
-                                .border(
-                                    width = 1.dp,
-                                    color = PrimaryColor,
-                                    shape = RoundedCornerShape(35.dp)
-                                )
-                                .clip(RoundedCornerShape(35.dp))
-                        ) {
-                            Image(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
-                                contentDescription = "ic_box"
-                            )
-                            Text(
-                                text = "Доставка", fontSize = 12.sp, modifier = Modifier.align(
-                                    Alignment.Center
-                                )
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(150.dp, 30.dp)
-                                .padding(start = 15.dp)
-                                .border(
-                                    width = 1.dp,
-                                    color = PrimaryColor,
-                                    shape = RoundedCornerShape(35.dp)
-                                )
-                                .clip(RoundedCornerShape(35.dp))
-                        ) {
-                            Image(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
-                                contentDescription = "ic_box"
-                            )
-                            Text(
-                                text = "Аренда авто",
-                                fontSize = 12.sp,
-                                modifier = Modifier.align(
-                                    Alignment.Center
-                                )
-                            )
-                        }
+                        SideBarMenu(navController)
                     }
                 }
-                Spacer(Modifier.requiredHeight(20.dp))
-            }
-        }
-    ) {
+            },
+            content = {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 
-        BottomSheetScaffold(sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
-            scaffoldState = bottomSheetScaffoldState,
-            sheetContent = {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .background(Color(0xFFEEEEEE))
-                ) {
+                    Scaffold(
+                        backgroundColor = Color(0xFFEEEEEE),
+                        bottomBar = {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .clip(
+                                        shape = RoundedCornerShape(
+                                            topStart = 25.dp,
+                                            topEnd = 25.dp
+                                        )
+                                    )
+                                    .background(Color.White)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(15.dp)
+                                        .height(50.dp)
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(PrimaryColor)
+                                        .clickable {
+                                            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                                popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
+                                                    inclusive = true
+                                                }
+                                            }
+                                        },
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Image(
+                                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                                            contentDescription = "car_eco",
+                                        )
+                                        Text(
+                                            text = "Заказать ещё одну машину",
+                                            textAlign = TextAlign.Center,
+                                            color = Color.White,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier.padding(end = 10.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Divider(
+                                            color = Color.White,
+                                            modifier = Modifier
+                                                .width(1.dp)
+                                                .fillMaxHeight(0.5f)
+                                                .offset((-10).dp, 0.dp)
+                                        )
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowForward,
+                                            contentDescription = "car_eco",
+                                            modifier = Modifier.size(24.dp),
+                                            tint = Color.White
+                                        )
+                                    }
+
+                                }
+
+                                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                                    repeat(5) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(150.dp, 30.dp)
+                                                .padding(start = 15.dp)
+                                                .border(
+                                                    width = 1.dp,
+                                                    color = PrimaryColor,
+                                                    shape = RoundedCornerShape(35.dp)
+                                                )
+                                                .clip(RoundedCornerShape(35.dp))
+                                        ) {
+                                            Image(
+                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
+                                                contentDescription = "ic_box"
+                                            )
+                                            Text(
+                                                text = "Доставка",
+                                                fontSize = 12.sp,
+                                                modifier = Modifier.align(
+                                                    Alignment.Center
+                                                )
+                                            )
+                                        }
+                                        Box(
+                                            modifier = Modifier
+                                                .size(150.dp, 30.dp)
+                                                .padding(start = 15.dp)
+                                                .border(
+                                                    width = 1.dp,
+                                                    color = PrimaryColor,
+                                                    shape = RoundedCornerShape(35.dp)
+                                                )
+                                                .clip(RoundedCornerShape(35.dp))
+                                        ) {
+                                            Image(
+                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
+                                                contentDescription = "ic_box"
+                                            )
+                                            Text(
+                                                text = "Аренда авто",
+                                                fontSize = 12.sp,
+                                                modifier = Modifier.align(
+                                                    Alignment.Center
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                                Spacer(Modifier.requiredHeight(20.dp))
+                            }
+                        }
+                    ) {
+
+                        BottomSheetScaffold(
+                            sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
+                            scaffoldState = bottomSheetScaffoldState,
+                            floatingActionButton = {
+                                FloatingButton(
+                                    scope = scope,
+                                    drawerState = drawerState,
+                                    bottomSheetState = bottomSheetState
+                                )
+                            },
+                            sheetContent = {
+                                Column(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
+                                        .background(Color(0xFFEEEEEE))
+                                ) {
 //                    if(stateRealtimeDatabaseOrders.isLoading) {
 //                        Box(
 //                            modifier = Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)),
@@ -214,60 +254,66 @@ fun SearchDriverScreen(
 //                            CircularProgressIndicator(color = PrimaryColor)
 //                        }
 //                    }
-                    stateRealtimeDatabaseOrders.response?.let { response ->
-                            response.observeAsState().value?.let { orders ->
-                                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId->
-                                    responseClientOrderId.observeAsState().value?.let { clientOrdersId->
-                                        LazyColumn() {
-                                            items(orders) { order ->
-                                                clientOrdersId.active_orders?.let { active ->
-                                                    active.forEach { clientOrderId ->
-                                                        var isOpen =
-                                                            remember { mutableStateOf(false) }
-                                                        if (order.id == clientOrderId) {
-                                                            orderCard(
-                                                                orderExecutionViewModel,
-                                                                order,
-                                                                navController,
-                                                                sheetPeekHeightUpOnClick = {
-                                                                    scope.launch {
-                                                                        isOpen.value = !isOpen.value
-                                                                        sheetPeekHeight =
-                                                                            if (isOpen.value)
-                                                                                367
-                                                                            else
-                                                                                200
+                                    stateRealtimeDatabaseOrders.response?.let { response ->
+                                        response.observeAsState().value?.let { orders ->
+                                            stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
+                                                responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
+                                                    LazyColumn() {
+                                                        items(orders) { order ->
+                                                            clientOrdersId.active_orders?.let { active ->
+                                                                active.forEach { clientOrderId ->
+                                                                    var isOpen =
+                                                                        remember {
+                                                                            mutableStateOf(
+                                                                                false
+                                                                            )
+                                                                        }
+                                                                    if (order.id == clientOrderId) {
+                                                                        orderCard(
+                                                                            orderExecutionViewModel,
+                                                                            order,
+                                                                            navController,
+                                                                            sheetPeekHeightUpOnClick = {
+                                                                                scope.launch {
+                                                                                    isOpen.value =
+                                                                                        !isOpen.value
+                                                                                    sheetPeekHeight =
+                                                                                        if (isOpen.value)
+                                                                                            367
+                                                                                        else
+                                                                                            200
 
+                                                                                }
+                                                                            },
+                                                                            isOpen = isOpen,
+                                                                        )
+                                                                        Spacer(Modifier.height(10.dp))
                                                                     }
-                                                                },
-                                                                isOpen = isOpen,
-                                                            )
-                                                            Spacer(Modifier.height(10.dp))
+                                                                }
+                                                            }
+                                                        }
+                                                        item {
+                                                            Spacer(modifier = Modifier.height(120.dp))
                                                         }
                                                     }
                                                 }
                                             }
-                                            item {
-                                                Spacer(modifier = Modifier.height(120.dp))
-                                            }
                                         }
                                     }
                                 }
-                            }
+                            }, sheetPeekHeight = sheetPeekHeight.dp
+                        ) {
+                            CustomMainMap(
+                                mainViewModel = mainViewModel,
+                                navController = navController
+                            )
                         }
-
-
+                    }
                 }
-            }, sheetPeekHeight = sheetPeekHeight.dp
-        ) {
-            CustomMainMap(
-                mainViewModel = mainViewModel,
-                navController = navController
-            )
-        }
+            }
+        )
     }
 }
-
 @SuppressLint("SimpleDateFormat", "CoroutineCreationDuringComposition")
 @Composable
 fun orderCard(

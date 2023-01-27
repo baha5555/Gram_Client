@@ -11,7 +11,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class AllOrdersLiveData: LiveData<List<RealtimeDatabaseOrder>>() {
-    private val mAuth = FirebaseAuth.getInstance()
     private val  database = Firebase.database.reference
         .child("orders")
     private val listener = object : ValueEventListener {

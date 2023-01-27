@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
                 scope= rememberCoroutineScope()
 
                 val connection by connectivityState()
-
+                Permissions()
                     Navigation(
                         navController = navController,
                         messageViewModel,
@@ -206,64 +206,6 @@ class MainActivity : ComponentActivity() {
         val alert = builder.create()
         alert.show()
     }
-
-    private fun checkForPermissions(permission: String, name:String, requestCode:Int){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            when{
-                ContextCompat.checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED ->{
-                    Log.d("locationPermission", "Разрешение на геолокацию получено")
-                }
-                shouldShowRequestPermissionRationale(permission) -> showDialog(permission, name, requestCode)
-                else -> ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        fun innerCheck(name: String){
-            if(grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                showDialog(Manifest.permission.ACCESS_FINE_LOCATION, name, requestCode)
-            }else{
-                Log.d("locationPermission", "Разрешение на геолокацию не получено")
-            }
-        }
-        when(requestCode){
-            FINE_LOCATION_RQ -> innerCheck("локации")
-            CAMERA_RQ -> innerCheck("camera")
-        }
-    }
-
-    private fun showDialog(permission: String, name: String, requestCode: Int){
-        val builder=AlertDialog.Builder(this)
-
-        builder.apply {
-            setMessage("Для использования этого приложения требуется разрешение на доступ к $name")
-            setTitle("Требуется разрешение")
-            setPositiveButton("OK"){ dialog, which ->
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = Uri.fromParts("package", packageName, null)
-                intent.data = uri
-                startActivity(intent)
-                this@MainActivity.finish()
-            }
-            setNegativeButton("Отмена"){dialog, which ->
-                this@MainActivity.finish()
-                //delete all caches
-//                (context.getSystemService(ACTIVITY_SERVICE) as ActivityManager).clearApplicationUserData()
-            }
-            setOnDismissListener {
-                checkForPermissions(Manifest.permission.ACCESS_FINE_LOCATION, "геоданным", FINE_LOCATION_RQ)
-            }
-        }
-        val dialog = builder.create()
-        dialog.show()
-    }
-
 }
 
 @Composable
