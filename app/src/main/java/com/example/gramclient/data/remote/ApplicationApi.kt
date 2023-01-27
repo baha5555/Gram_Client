@@ -29,7 +29,7 @@ interface ApplicationApi {
     @POST("/api/auth/client-registers/2")
     suspend fun identification(
         @Field("client_register_id") client_register_id: String,
-        @Field("sms_code") sms_code: Long,
+        @Field("sms_code") sms_code: String,
         @Field("fcm_token")fcm_token:String
     ): IdentificationResponse
 

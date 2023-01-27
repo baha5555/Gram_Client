@@ -102,7 +102,7 @@ class AuthViewModel @Inject constructor(
         navController: NavHostController,
         fcm_token:String
     ){
-        var code=sms_code.toInt()
+        var code=sms_code
         identificationUseCase.invoke(client_regiter_id, code,fcm_token).onEach { result: Resource<IdentificationResponse> ->
             when (result) {
                 is Resource.Success -> {

@@ -20,7 +20,8 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun CustomTopBar(
     title: String,
     navController: NavHostController,
-    actionNum: Int = 0
+    actionNum: Int = 0,
+    quitOnClick:()->Unit = {}
 ) {
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
@@ -58,7 +59,7 @@ fun CustomTopBar(
                     }
                 }
                 3 -> {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick =  quitOnClick ){
                         Image(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_logout_blue),
                             contentDescription = ""

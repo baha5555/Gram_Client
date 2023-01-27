@@ -37,7 +37,7 @@ class AppRepositoryImpl(
 
     override suspend fun identification(
         client_register_id: String,
-        sms_code: Long,
+        sms_code: String,
         fcm_token: String
     ): IdentificationResponse = api.identification(client_register_id, sms_code, fcm_token)
 

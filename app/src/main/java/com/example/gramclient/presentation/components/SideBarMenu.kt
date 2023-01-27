@@ -26,8 +26,11 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
+import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun SideBarMenu(
@@ -38,7 +41,8 @@ fun SideBarMenu(
     val stateGetProfileInfo by viewModel.stateGetProfileInfo
     val prefs = CustomPreference(LocalContext.current)
 
-    val currentScreen = navController.currentBackStackEntryAsState().value?.destination?.route?:""
+    val coroutineScope = rememberCoroutineScope()
+    val currentScreen = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,7 +57,9 @@ fun SideBarMenu(
         ) {
             Box {
                 Image(
-                    painter = rememberAsyncImagePainter(model = stateGetProfileInfo.response?.avatar_url?:R.drawable.avatar),
+                    painter = rememberAsyncImagePainter(
+                        model = stateGetProfileInfo.response?.avatar_url ?: R.drawable.avatar
+                    ),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(50.dp)
@@ -61,20 +67,28 @@ fun SideBarMenu(
                     contentDescription = "",
                 )
             }
-            Column(Modifier.padding(start=15.dp)){
+            Column(Modifier.padding(start = 15.dp)) {
                 Text(
                     modifier = Modifier.clickable {
-                        if (prefs.getAccessToken() == "") {
-                            if(currentScreen == RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                navController.navigate(RoutesName.AUTH_SCREEN) {
-                                    popUpTo(RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                        inclusive = true
+                        coroutineScope.launch {
+                            if (prefs.getAccessToken() == "") {
+                                if (currentScreen == RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                    navController.navigate(RoutesName.AUTH_SCREEN) {
+                                        popUpTo(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                            inclusive = true
+                                        }
                                     }
                                 }
+                                if (currentScreen == RoutesName.SEARCH_DRIVER_SCREEN) {
+                                    navController.navigate(RoutesName.AUTH_SCREEN) {
+                                        popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            } else {
+                                navController.navigate(RoutesName.PROFILE_SCREEN)
                             }
-                        }
-                        else {
-                            navController.navigate(RoutesName.PROFILE_SCREEN)
                         }
                     },
                     text = if (stateGetProfileInfo.response?.first_name != null && stateGetProfileInfo.response?.last_name != null) stateGetProfileInfo.response?.first_name + ' ' + stateGetProfileInfo.response?.last_name else "Выбрать Имя...",
@@ -120,17 +134,26 @@ fun SideBarMenu(
                 ShowItems(iconList[i], textList[i], navController, isDialogOpen)
             }
         }
+        val activity = (LocalContext.current as MainActivity)
         CustomDialog(
-            text = "Вы уверены что хотите выйти?",
+            text = "Действительно выйти?",
             okBtnClick = {
-                isDialogOpen.value = false
-                prefs.setAccessToken("")
-                navController.navigate(RoutesName.AUTH_SCREEN)
+                activity.finish()
             },
             cancelBtnClick = { isDialogOpen.value = false },
             isDialogOpen = isDialogOpen.value
         )
     }
+//        CustomDialog(
+//            text = "Вы уверены что хотите выйти?",
+//            okBtnClick = {
+//                isDialogOpen.value = false
+//                prefs.setAccessToken("")
+//                navController.navigate(RoutesName.AUTH_SCREEN)
+//            },
+//            cancelBtnClick = { isDialogOpen.value = false },
+//            isDialogOpen = isDialogOpen.value
+//        )
 }
 
 @Composable

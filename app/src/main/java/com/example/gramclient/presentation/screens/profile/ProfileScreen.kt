@@ -40,12 +40,15 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.R
+import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.CustomButton
+import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomSwitch
 import com.example.gramclient.presentation.components.CustomTopBar
 import com.example.gramclient.presentation.screens.authorization.LoadingIndicator
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
+import com.example.gramclient.utils.RoutesName
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -85,6 +88,8 @@ fun ProfileScreen(
 
     val profileImage = viewModel.stateGetProfileInfo.value.response?.avatar_url
 
+    val isDialogOpen = remember { mutableStateOf(false) }
+
     var selectImage by mutableStateOf<Uri?>(null)
 
     val launcher =
@@ -97,10 +102,23 @@ fun ProfileScreen(
     LaunchedEffect(key1 = true) {
         viewModel.getProfileInfo()
     }
+    val prefs = CustomPreference(LocalContext.current)
 
     Scaffold(
-        topBar = { CustomTopBar(title = "Профиль", navController = navController, actionNum = 3) }
+        topBar = { CustomTopBar(title = "Профиль", navController = navController, actionNum = 3){
+            isDialogOpen.value = true
+        } }
     ) {
+        CustomDialog(
+            text = "Вы уверены что хотите выйти?",
+            okBtnClick = {
+                isDialogOpen.value = false
+                prefs.setAccessToken("")
+                navController.navigate(RoutesName.AUTH_SCREEN)
+            },
+            cancelBtnClick = { isDialogOpen.value = false },
+            isDialogOpen = isDialogOpen.value
+        )
         when {
             stateGetProfileInfo.isLoading -> {
                 LoadingIndicator(isLoading = true)

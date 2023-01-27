@@ -78,7 +78,6 @@ fun SearchDriverScreen(
     LaunchedEffect(key1 = true) {
 //        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
         profileViewModel.getProfileInfo()
-        orderExecutionViewModel.readAllOrders()
 
     }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -86,6 +85,7 @@ fun SearchDriverScreen(
     scope.launch {
         profileViewModel.stateGetProfileInfo.value.response?.let { response ->
             Log.e("phone response", "Success")
+            orderExecutionViewModel.readAllOrders()
             orderExecutionViewModel.readAllClient(response.phone)
         }
     }

@@ -27,7 +27,7 @@ interface AppRepository {
 
     suspend fun identification(
         client_register_id: String,
-        sms_code: Long,
+        sms_code: String,
         fcm_token: String
     ): IdentificationResponse
 
