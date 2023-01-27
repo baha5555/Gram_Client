@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
@@ -37,6 +38,7 @@ fun SideBarMenu(
     val stateGetProfileInfo by viewModel.stateGetProfileInfo
     val prefs = CustomPreference(LocalContext.current)
 
+    val currentScreen = navController.currentBackStackEntryAsState().value?.destination?.route?:""
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +64,18 @@ fun SideBarMenu(
             Column(Modifier.padding(start=15.dp)){
                 Text(
                     modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                        if (prefs.getAccessToken() == "") {
+                            if(currentScreen == RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                navController.navigate(RoutesName.AUTH_SCREEN) {
+                                    popUpTo(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            navController.navigate(RoutesName.PROFILE_SCREEN)
+                        }
                     },
                     text = if (stateGetProfileInfo.response?.first_name != null && stateGetProfileInfo.response?.last_name != null) stateGetProfileInfo.response?.first_name + ' ' + stateGetProfileInfo.response?.last_name else "Выбрать Имя...",
                     fontSize = 22.sp,
