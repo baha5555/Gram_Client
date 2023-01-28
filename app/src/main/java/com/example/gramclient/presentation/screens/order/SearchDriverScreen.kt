@@ -60,9 +60,10 @@ fun SearchDriverScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     orderExecutionViewModel: OrderExecutionViewModel,
 ) {
+    val isGet = remember {
+        mutableStateOf(true)
+    }
     val profileViewModel: ProfileViewModel = hiltViewModel()
-    val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
-
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Expanded
@@ -81,15 +82,14 @@ fun SearchDriverScreen(
 
     }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-
-    scope.launch {
+    if(isGet.value){
         profileViewModel.stateGetProfileInfo.value.response?.let { response ->
             Log.e("phone response", "Success")
             orderExecutionViewModel.readAllOrders()
             orderExecutionViewModel.readAllClient(response.phone)
+            isGet.value=false
         }
     }
-    val stateActiveOrders by orderExecutionViewModel.stateActiveOrders
     val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
     val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
