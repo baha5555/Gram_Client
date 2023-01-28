@@ -128,14 +128,16 @@ fun CustomMainMap(
                 }
                 btnLocation.setOnClickListener {
                     map.controller.animateTo(mLocationOverlay.myLocation)
-                    scope.launch {
-                        if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
-                            if(WHICH_ADDRESS != null)
-                            mainViewModel.getAddressFromMap(
-                                mLocationOverlay.myLocation.longitude,
-                                mLocationOverlay.myLocation.latitude,
-                                WHICH_ADDRESS
-                            )
+                    if(mLocationOverlay.myLocation!=null){
+                        scope.launch {
+                            if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                if(WHICH_ADDRESS != null)
+                                    mainViewModel.getAddressFromMap(
+                                        mLocationOverlay.myLocation.longitude,
+                                        mLocationOverlay.myLocation.latitude,
+                                        WHICH_ADDRESS
+                                    )
+                            }
                         }
                     }
                 }
