@@ -24,6 +24,7 @@ import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.map.UserTouchSurface
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.RoutesName
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -49,34 +50,43 @@ lateinit var mLocationOverlay: MyLocationNewOverlay
 
 @SuppressLint("StaticFieldLeak")
 lateinit var btnLocation: ImageButton
+
 @SuppressLint("StaticFieldLeak")
 lateinit var getAddressMarker: ImageView
- var currentRoute: String?=null
+var currentRoute: String? = null
 
 @Composable
 fun CustomMainMap(
     mainViewModel: MainViewModel,
     navController: NavHostController,
-    WHICH_ADDRESS: MutableState<String>?=null
+    WHICH_ADDRESS: MutableState<String>? = null
 ) {
 
     val toAddress by mainViewModel.toAddress
     val fromAddress by mainViewModel.fromAddress
-
-    val context= LocalContext.current
-    val startPointForMarker=remember{ mutableStateOf(GeoPoint(if(toAddress[0].address_lat != "") toAddress[0].address_lat.toDouble() else 40.27803692395751, if(toAddress[0].address_lng != "") toAddress[0].address_lng.toDouble() else 69.62923931506361)) }
-    val zoomLevel=remember{ mutableStateOf(18.0) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val startPointForMarker = remember {
+        mutableStateOf(
+            GeoPoint(
+                if (toAddress[0].address_lat != "") toAddress[0].address_lat.toDouble() else 40.27803692395751,
+                if (toAddress[0].address_lng != "") toAddress[0].address_lng.toDouble() else 69.62923931506361
+            )
+        )
+    }
+    val zoomLevel = remember { mutableStateOf(18.0) }
 
     AndroidView(
         factory = {
             View.inflate(it, R.layout.map, null).apply {
                 map = this.findViewById(R.id.map)
-                userTouchSurface=this.findViewById(R.id.userTouchSurface)
+                userTouchSurface = this.findViewById(R.id.userTouchSurface)
                 btnLocation = this.findViewById(R.id.btnLocation)
                 getAddressMarker = this.findViewById(R.id.getAddressMarker)
                 currentRoute = navController.currentBackStackEntry?.destination?.route
 
-                Configuration.getInstance().load(it, PreferenceManager.getDefaultSharedPreferences(it))
+                Configuration.getInstance()
+                    .load(it, PreferenceManager.getDefaultSharedPreferences(it))
                 map.setTileSource(TileSourceFactory.MAPNIK)
                 val startPoint = startPointForMarker.value
                 val mapController = map.controller
@@ -95,21 +105,18 @@ fun CustomMainMap(
                 val myLocationProvider = GpsMyLocationProvider(it)
                 mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
                 myLocationShow(it, mLocationOverlay)
-                btnLocation.setOnClickListener {
-                    map.controller.animateTo(mLocationOverlay.myLocation)
-                }
                 when (currentRoute) {
                     RoutesName.MAIN_SCREEN -> {
                         btnLocation.margin(0f, 0f, 0f, 355f)
-                        btnLocation.visibility=View.GONE
-                        getAddressMarker.visibility=View.GONE
+                        btnLocation.visibility = View.GONE
+                        getAddressMarker.visibility = View.GONE
                         map.overlays.clear()
                         addOverlays()
                         showRoadAB(it, fromAddress, toAddress)
                     }
                     RoutesName.SEARCH_DRIVER_SCREEN, RoutesName.ORDER_EXECUTION_SCREEN -> {
                         btnLocation.visibility = View.GONE
-                        getAddressMarker.visibility=View.GONE
+                        getAddressMarker.visibility = View.GONE
                         map.overlays.clear()
                         addOverlays()
                         showRoadAB(it, fromAddress, toAddress)
@@ -117,6 +124,19 @@ fun CustomMainMap(
                     RoutesName.SEARCH_ADDRESS_SCREEN -> {
                         map.overlays.clear()
                         addOverlays()
+                    }
+                }
+                btnLocation.setOnClickListener {
+                    map.controller.animateTo(mLocationOverlay.myLocation)
+                    scope.launch {
+                        if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
+                            if(WHICH_ADDRESS != null)
+                            mainViewModel.getAddressFromMap(
+                                mLocationOverlay.myLocation.longitude,
+                                mLocationOverlay.myLocation.latitude,
+                                WHICH_ADDRESS
+                            )
+                        }
                     }
                 }
             }
@@ -131,95 +151,126 @@ fun CustomMainMap(
                 }
                 RoutesName.SEARCH_ADDRESS_SCREEN -> {
                     map.overlays.clear()
-                    userTouchSurface.setCallback(TwoFingerDrag(context, object : TwoFingerDrag.Listener {
-                        override fun onOneFinger(event: MotionEvent?) {
-                            map.dispatchTouchEvent(event)
-                            if (event != null) {
-                                when (event.action) {
-                                    MotionEvent.ACTION_MOVE-> {
-                                        Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
-                                    }
-                                    MotionEvent.ACTION_DOWN -> {
-                                        Log.e("singleTapConfirmedHelper", "Action was DOWN")
+                    userTouchSurface.setCallback(
+                        TwoFingerDrag(
+                            context,
+                            object : TwoFingerDrag.Listener {
+                                override fun onOneFinger(event: MotionEvent?) {
+                                    map.dispatchTouchEvent(event)
+                                    if (event != null) {
+                                        when (event.action) {
+                                            MotionEvent.ACTION_MOVE -> {
+                                                Log.e(
+                                                    "singleTapConfirmedHelper",
+                                                    "${map.mapCenter.latitude}-${map.mapCenter.longitude}"
+                                                )
+                                            }
+                                            MotionEvent.ACTION_DOWN -> {
+                                                Log.e("singleTapConfirmedHelper", "Action was DOWN")
 
-                                    }
-                                    MotionEvent.ACTION_UP -> {
-                                        Log.e("singleTapConfirmedHelper", "Action was UP")
-                                        if(WHICH_ADDRESS != null) {
-                                            mainViewModel.getAddressFromMap(
-                                                map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
-                                            )
+                                            }
+                                            MotionEvent.ACTION_UP -> {
+                                                Log.e("singleTapConfirmedHelper", "Action was UP")
+                                                if (WHICH_ADDRESS != null) {
+                                                    mainViewModel.getAddressFromMap(
+                                                        map.mapCenter.longitude,
+                                                        map.mapCenter.latitude,
+                                                        WHICH_ADDRESS
+                                                    )
+                                                }
+                                                Log.e("singleTapConfirmedHelper", "$toAddress")
+                                                map.postInvalidate()
+                                                startPointForMarker.value = GeoPoint(
+                                                    map.mapCenter.latitude,
+                                                    map.mapCenter.longitude
+                                                )
+                                                zoomLevel.value = map.zoomLevelDouble
+                                            }
+                                            MotionEvent.ACTION_CANCEL -> {
+                                                Log.e(
+                                                    "singleTapConfirmedHelper",
+                                                    "Action was CANCEL"
+                                                )
+
+                                            }
+                                            MotionEvent.ACTION_OUTSIDE -> {
+                                                Log.e(
+                                                    "singleTapConfirmedHelper",
+                                                    "Movement occurred outside bounds of current screen element"
+                                                )
+
+                                            }
+                                            else -> {
+                                                Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
+                                            }
                                         }
-                                        Log.e("singleTapConfirmedHelper", "$toAddress")
-                                        map.postInvalidate()
-                                        startPointForMarker.value=GeoPoint(map.mapCenter.latitude, map.mapCenter.longitude)
-                                        zoomLevel.value=map.zoomLevelDouble
-                                    }
-                                    MotionEvent.ACTION_CANCEL -> {
-                                        Log.e("singleTapConfirmedHelper", "Action was CANCEL")
-
-                                    }
-                                    MotionEvent.ACTION_OUTSIDE -> {
-                                        Log.e("singleTapConfirmedHelper", "Movement occurred outside bounds of current screen element")
-
-                                    }
-                                    else-> {
-                                        Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
                                     }
                                 }
-                            }
-                        }
 
-                        override fun onTwoFingers(event: MotionEvent?) {
-                            map.dispatchTouchEvent(event)
-                            if (event != null) {
-                                when (event.action) {
-                                    MotionEvent.ACTION_MOVE-> {
-        //                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
-                                    }
-                                    MotionEvent.ACTION_POINTER_2_DOWN -> {
-                                        Log.e("singleTapConfirmedHelper", "Action was ACTION_POINTER_2_DOWN")
-                                    }
-                                    MotionEvent.TOOL_TYPE_FINGER -> {
-                                        Log.e("singleTapConfirmedHelper", "Action was TOOL_TYPE_FINGER")
-                                    }
-                                    MotionEvent.ACTION_POINTER_2_UP -> {
-                                        Log.e("singleTapConfirmedHelper", "Action was UP")
-                                        if(WHICH_ADDRESS != null) {
-                                            mainViewModel.getAddressFromMap(
-                                                map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
-                                            )
+                                override fun onTwoFingers(event: MotionEvent?) {
+                                    map.dispatchTouchEvent(event)
+                                    if (event != null) {
+                                        when (event.action) {
+                                            MotionEvent.ACTION_MOVE -> {
+                                                //                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
+                                            }
+                                            MotionEvent.ACTION_POINTER_2_DOWN -> {
+                                                Log.e(
+                                                    "singleTapConfirmedHelper",
+                                                    "Action was ACTION_POINTER_2_DOWN"
+                                                )
+                                            }
+                                            MotionEvent.TOOL_TYPE_FINGER -> {
+                                                Log.e(
+                                                    "singleTapConfirmedHelper",
+                                                    "Action was TOOL_TYPE_FINGER"
+                                                )
+                                            }
+                                            MotionEvent.ACTION_POINTER_2_UP -> {
+                                                Log.e("singleTapConfirmedHelper", "Action was UP")
+                                                if (WHICH_ADDRESS != null) {
+                                                    mainViewModel.getAddressFromMap(
+                                                        map.mapCenter.longitude,
+                                                        map.mapCenter.latitude,
+                                                        WHICH_ADDRESS
+                                                    )
+                                                }
+                                                Log.e("singleTapConfirmedHelper", "$toAddress")
+                                                map.postInvalidate()
+                                                startPointForMarker.value = GeoPoint(
+                                                    map.mapCenter.latitude,
+                                                    map.mapCenter.longitude
+                                                )
+                                                zoomLevel.value = map.zoomLevelDouble
+                                            }
+                                            else -> {
+                                                Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
+                                            }
                                         }
-                                        Log.e("singleTapConfirmedHelper", "$toAddress")
-                                        map.postInvalidate()
-                                        startPointForMarker.value=GeoPoint(map.mapCenter.latitude, map.mapCenter.longitude)
-                                        zoomLevel.value=map.zoomLevelDouble
-                                    }
-                                    else-> {
-                                        Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
                                     }
                                 }
+                            })
+                    )
+                    map.overlays.add(
+                        MapEventsOverlay(object : MapEventsReceiver {
+                            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                                map.postInvalidate()
+                                startPointForMarker.value = GeoPoint(p.latitude, p.longitude)
+                                if (WHICH_ADDRESS != null) {
+                                    mainViewModel.getAddressFromMap(
+                                        map.mapCenter.longitude,
+                                        map.mapCenter.latitude,
+                                        WHICH_ADDRESS
+                                    )
+                                }
+                                zoomLevel.value = map.zoomLevelDouble
+                                return true
                             }
-                        }
-                    }))
-                    map.overlays.add(MapEventsOverlay(object : MapEventsReceiver {
-                        override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-        //                        Toast.makeText(context, "${p.longitude}-${p.latitude}", Toast.LENGTH_SHORT).show()
-                            map.postInvalidate()
-                            startPointForMarker.value=GeoPoint(p.latitude, p.longitude)
-                            if(WHICH_ADDRESS != null) {
-                                mainViewModel.getAddressFromMap(
-                                    map.mapCenter.longitude, map.mapCenter.latitude, WHICH_ADDRESS
-                                )
-                            }
-                            zoomLevel.value=map.zoomLevelDouble
-                            return true
-                        }
 
-                        override fun longPressHelper(p: GeoPoint): Boolean {
-                            return false
-                        }
-                    })
+                            override fun longPressHelper(p: GeoPoint): Boolean {
+                                return false
+                            }
+                        })
                     )
                     addOverlays()
                 }
@@ -337,7 +388,12 @@ fun addMarker(context: Context, map: MapView, geoPoint: GeoPoint, title: String,
     map.overlays.add(firstMarker)
 }
 
-fun View.margin(left: Float? = null, top: Float? = null, right: Float? = null, bottom: Float? = null) {
+fun View.margin(
+    left: Float? = null,
+    top: Float? = null,
+    right: Float? = null,
+    bottom: Float? = null
+) {
     layoutParams<ViewGroup.MarginLayoutParams> {
         left?.run { leftMargin = dpToPx(this) }
         top?.run { topMargin = dpToPx(this) }
@@ -351,4 +407,5 @@ inline fun <reified T : ViewGroup.LayoutParams> View.layoutParams(block: T.() ->
 }
 
 fun View.dpToPx(dp: Float): Int = context.dpToPx(dp)
-fun Context.dpToPx(dp: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
+fun Context.dpToPx(dp: Float): Int =
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
