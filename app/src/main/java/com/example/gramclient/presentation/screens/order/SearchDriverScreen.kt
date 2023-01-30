@@ -76,7 +76,6 @@ fun SearchDriverScreen(
         mutableStateOf(200)
     }
     LaunchedEffect(key1 = true) {
-//        orderExecutionViewModel.getActiveOrders(token = preferences.getString(PreferencesName.ACCESS_TOKEN, "").toString(), navController)
         profileViewModel.getProfileInfo()
 
     }
@@ -345,7 +344,7 @@ fun orderCard(
             fillingTimeDateParse = DateformatParse.parse(it).time
             diff = (System.currentTimeMillis()-fillingTimeDateParse)*-1
             fillingTimeMinutes = diff / (60 * 1000) % 60
-            Log.e(TAG,"fillingTimeMinutes $fillingTimeMinutes")
+//            Log.e(TAG,"fillingTimeMinutes $fillingTimeMinutes")
         }
     }
     val cancelOrderIsDialogOpen = remember{ mutableStateOf(false)}
@@ -391,7 +390,7 @@ fun orderCard(
                 else {
                         when(order.status){
                             "Водитель на месте"->"Водитель на месте,\n можете выходить"
-                            "Исполняется"->"Приятной поездки"
+                            "Исполняется"->"За рулем ${order.performer?.first_name?:"Водитель"}"
                             "Водитель назначен"->{
                                 if(fillingTimeMinutes>0)"Через $fillingTimeMinutes мин приедет"
                                 else "В ближайшее время \n приедет ${order.performer.first_name}"
@@ -405,7 +404,7 @@ fun orderCard(
             if(order.performer == null) {
                 Text(text = "00:00", fontSize = 14.sp, color = Color.Black)
             }else{
-                Box {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = order.performer.transport?.car_number?:"",
                         fontWeight = FontWeight.SemiBold,

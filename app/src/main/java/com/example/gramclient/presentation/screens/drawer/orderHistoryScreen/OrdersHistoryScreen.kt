@@ -59,13 +59,15 @@ fun OrdersHistoryScreen(
             ) {
                 LazyColumn {
                     items(taxiOrdersNonNull) { item: OrderHistoryResult ->
-                        if (item.status == "Выполнен" || item.status == "Отменен") {
-                            ListHistoryItem(
-                                status = item.status,
-                                createdAt = item.created_at,
-                                fromAddress = item.from_address.name,
-                                toAddresse = item.to_addresses
-                            )
+                        item.to_addresses?.let { toAddress ->
+                            item.from_address?.name?.let { fromAddress ->
+                                ListHistoryItem(
+                                    status = item.status,
+                                    createdAt = item.created_at,
+                                    fromAddress = fromAddress,
+                                    toAddresse = toAddress
+                                )
+                            }
                         }
                     }
                 }
@@ -80,8 +82,6 @@ fun ListHistoryItem(
     createdAt:String,
     fromAddress: String,
     toAddresse: List<ToAddresse>,
-
-
 ) {
     val expanded = remember { mutableStateOf(false) }
     Card(
@@ -160,7 +160,7 @@ fun ListHistoryItem(
                 }
             }
             IconButton(
-                onClick = { expanded.value = true },
+                onClick = {/* expanded.value = true */},
                 modifier = Modifier
                     .fillMaxWidth(0.1f)
                     .padding(end = 5.dp)

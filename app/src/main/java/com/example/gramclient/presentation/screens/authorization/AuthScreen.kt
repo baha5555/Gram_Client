@@ -22,6 +22,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -178,8 +179,8 @@ fun AuthorizationScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "Подтверждая номер телефона, я соглашаюсь с ", color = Color.Gray)
-            Text(text = " правилами работы сервиса и политикой\n" +
-                    "    обработки персональных данных.",
+            Text(text = " правилами работы сервиса и политикой обработки персональных данных.",
+                textAlign = TextAlign.Center,
                 color = Color.Blue,
                 modifier = Modifier.clickable {
                     mAnnotatedLinkString

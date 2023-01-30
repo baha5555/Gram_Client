@@ -45,16 +45,16 @@ fun SearchResultContent(
         ) { address ->
             scope.launch {
                 bottomSheetState.bottomSheetState.collapse()
-                isSearchState.value = false
-                when (WHICH_ADDRESS.value) {
-                    Constants.FROM_ADDRESS -> {
-                        mainViewModel.updateFromAddress(address)
-                    }
-                    Constants.TO_ADDRESS -> {
-                        mainViewModel.updateToAddress(address)
-                        if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
-                            navController.navigate(RoutesName.MAIN_SCREEN)
-                        }
+            }
+            isSearchState.value = false
+            when (WHICH_ADDRESS.value) {
+                Constants.FROM_ADDRESS -> {
+                    mainViewModel.updateFromAddress(address)
+                }
+                Constants.TO_ADDRESS -> {
+                    mainViewModel.updateToAddress(address)
+                    if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
+                        navController.navigate(RoutesName.MAIN_SCREEN)
                     }
                 }
             }

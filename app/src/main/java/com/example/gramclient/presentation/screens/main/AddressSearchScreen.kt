@@ -40,7 +40,7 @@ fun AddressSearchScreen(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
 
-    val profileViewModel:ProfileViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     val coroutineScope = rememberCoroutineScope()
@@ -126,9 +126,9 @@ fun AddressSearchScreen(
                             FromAddressField(fromAddress) {
                                 coroutineScope.launch {
                                     bottomSheetState.bottomSheetState.expand()
-                                    isSearchState.value = true
-                                    WHICH_ADDRESS.value = Constants.FROM_ADDRESS
                                 }
+                                isSearchState.value = true
+                                WHICH_ADDRESS.value = Constants.FROM_ADDRESS
                             }
                         }
                     }

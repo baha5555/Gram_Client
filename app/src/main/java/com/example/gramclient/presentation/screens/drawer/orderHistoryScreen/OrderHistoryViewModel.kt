@@ -28,13 +28,13 @@ class OrderHistoryViewModel @Inject constructor(
                         val tariffsResponse: orderHistoryResponse? = result.data
                         _stateGetOrderHistory.value =
                             OrderHistoryResponseState(response = tariffsResponse?.result)
-                        Log.e("GetProfileResponse", "GetProfileResponseSuccess->\n ${_stateGetOrderHistory.value}")
+                        Log.e("OrderHistoryResponse", "OrderHistoryResponseSuccess->\n ${_stateGetOrderHistory.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("GetProfileResponse", "GetProfileResponseError->\n ${result.message}")
+                    Log.e("OrderHistoryResponse", "OrderHistoryResponseError->\n ${result.message}")
                     _stateGetOrderHistory.value = OrderHistoryResponseState(
                         error = "${result.message}"
                     )

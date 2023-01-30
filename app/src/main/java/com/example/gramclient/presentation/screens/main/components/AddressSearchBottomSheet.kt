@@ -47,10 +47,8 @@ fun AddressSearchBottomSheet(
             .padding(15.dp)
     ) {
         if (!isSearchState.value) {
-            coroutineScope.launch {
                 if(searchText.value !="")
                     searchText.value = ""
-            }
             ToAddressField(
                 navController,
                 WHICH_ADDRESS = WHICH_ADDRESS,

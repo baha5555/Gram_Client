@@ -98,8 +98,8 @@ fun SearchTextField(
                 .clickable {
                     scope.launch {
                         bottomSheetState.bottomSheetState.collapse()
-                        isSearchState.value = false
                     }
+                    isSearchState.value = false
                 },
             contentAlignment = Alignment.Center
         ) {
