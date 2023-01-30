@@ -41,11 +41,11 @@ fun SplashScreen(
     val prefs = CustomPreference(LocalContext.current)
     LaunchedEffect(key1 = true) {
         if(prefs.getAccessToken() == "") navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
-        else orderExecutionViewModel.getActiveOrders(navController)
+        else orderExecutionViewModel.getActiveOrders()
     }
     if(activeOrders.success){
         currentRoute = navController.currentBackStackEntry?.destination?.route
-        if(navController.currentBackStackEntry?.destination?.route == RoutesName.SPLASH_SCREEN) {
+        if(currentRoute == RoutesName.SPLASH_SCREEN) {
             Log.i("asdasda", ""+activeOrders.response)
             if (activeOrders.response!!.isEmpty()) {
                 navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {

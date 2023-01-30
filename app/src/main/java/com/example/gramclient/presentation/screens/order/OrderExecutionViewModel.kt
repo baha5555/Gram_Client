@@ -174,7 +174,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
             }
         }.launchIn(viewModelScope)
     }
-    fun getActiveOrders( navController: NavController){
+    fun getActiveOrders(){
         getActiveOrdersUseCase.invoke().onEach { result: Resource<ActiveOrdersResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -183,23 +183,6 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         _stateActiveOrders.value =
                             ActiveOrdersResponseState(response = response?.result, success = true)
                         Log.e("ActiveOrdersResponse", "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}")
-                        currentRoute = navController.currentBackStackEntry?.destination?.route
-                        return@onEach
-                        if(navController.currentBackStackEntry?.destination?.route == RoutesName.SPLASH_SCREEN) {
-                            if (_stateActiveOrders.value.response!!.isEmpty()) {
-                                navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                    popUpTo(RoutesName.SPLASH_SCREEN) {
-                                        inclusive = true
-                                    }
-                                }
-                            } else {
-                                navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN) {
-                                    popUpTo(RoutesName.SPLASH_SCREEN) {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-                        }
                     }catch (e: Exception) {
                         Log.d("ActiveOrdersResponse", "${e.message} Exception")
                     }
@@ -225,7 +208,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                         _stateCancelOrder.value =
                             CancelOrderResponseState(response = response)
                         onSuccess()
-                        getActiveOrders(navController)
+                        getActiveOrders()
                         Log.e("CancelOrderResponse", "CancelOrderResponseSuccess->\n ${_stateCancelOrder.value}")
                     }catch (e: Exception) {
                         Log.d("CancelOrderResponse", "${e.message} Exception")

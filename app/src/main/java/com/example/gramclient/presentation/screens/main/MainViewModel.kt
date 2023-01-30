@@ -256,7 +256,7 @@ class MainViewModel @Inject constructor(
                         _stateCreateOrder.value =
                             OrderResponseState(response = response)
                         Log.e("OrderResponse", "OrderResponseSuccess->\n ${_stateCreateOrder.value}")
-                        orderExecutionViewModel.getActiveOrders(navController)
+                        orderExecutionViewModel.getActiveOrders()
                     }catch (e: Exception) {
                         Log.d("OrderResponse", "${e.message} Exception")
                     }
