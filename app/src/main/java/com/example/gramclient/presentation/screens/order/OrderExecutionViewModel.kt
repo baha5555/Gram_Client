@@ -181,9 +181,10 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                     try {
                         val response: ActiveOrdersResponse? = result.data
                         _stateActiveOrders.value =
-                            ActiveOrdersResponseState(response = response?.result)
+                            ActiveOrdersResponseState(response = response?.result, success = true)
                         Log.e("ActiveOrdersResponse", "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}")
                         currentRoute = navController.currentBackStackEntry?.destination?.route
+                        return@onEach
                         if(navController.currentBackStackEntry?.destination?.route == RoutesName.SPLASH_SCREEN) {
                             if (_stateActiveOrders.value.response!!.isEmpty()) {
                                 navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
