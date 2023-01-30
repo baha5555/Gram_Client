@@ -24,9 +24,9 @@ import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import kotlinx.coroutines.delay
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
+import com.example.gramclient.presentation.components.CustomRequestError
 import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
@@ -36,17 +36,17 @@ import com.example.gramclient.ui.theme.BackgroundColor
 fun SplashScreen(
     navController: NavController,
     orderExecutionViewModel: OrderExecutionViewModel,
-){
+) {
     val activeOrders = orderExecutionViewModel.stateActiveOrders.value
     val prefs = CustomPreference(LocalContext.current)
     LaunchedEffect(key1 = true) {
-        if(prefs.getAccessToken() == "") navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
+        if (prefs.getAccessToken() == "") navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
         else orderExecutionViewModel.getActiveOrders()
     }
-    if(activeOrders.success){
+    if (activeOrders.success) {
         currentRoute = navController.currentBackStackEntry?.destination?.route
-        if(currentRoute == RoutesName.SPLASH_SCREEN) {
-            Log.i("asdasda", ""+activeOrders.response)
+        if (currentRoute == RoutesName.SPLASH_SCREEN) {
+            Log.i("asdasda", "" + activeOrders.response)
             if (activeOrders.response!!.isEmpty()) {
                 navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
                     popUpTo(RoutesName.SPLASH_SCREEN) {
@@ -63,11 +63,11 @@ fun SplashScreen(
         }
     }
     Splash()
-
+    if(activeOrders.error!="") CustomRequestError{ orderExecutionViewModel.getActiveOrders() }
 }
 
 @Composable
-fun Splash(){
+fun Splash() {
     Column(
         modifier = Modifier
             .fillMaxSize()
