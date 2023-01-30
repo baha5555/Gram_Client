@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -141,7 +142,7 @@ fun ProfileScreen(
                         .background(BackgroundColor)
                         .fillMaxSize()
                 ) {
-                    item() {
+                    item {
                         Spacer(modifier = Modifier.height(75.dp))
                         if (selectImage != null) {
                             Image(
@@ -155,10 +156,11 @@ fun ProfileScreen(
                                     },
                                 contentDescription = "",
                             )
-                        } else {
+                        }
+                        else {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = profileImage ?: R.drawable.avatar
+                                    model = if(profileImage!="") profileImage ?: R.drawable.camera_plus else R.drawable.camera_plus
                                 ),
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
@@ -170,6 +172,12 @@ fun ProfileScreen(
                                 contentDescription = "",
                             )
                         }
+                        Text(
+                            modifier = Modifier.clickable { launcher.launch("image/*") },
+                            text = "Изменить фото",
+                            textDecoration = TextDecoration.Underline,
+                            fontSize = 18.sp
+                        )
                         Spacer(modifier = Modifier.height(75.dp))
 
                         Column(
@@ -227,23 +235,20 @@ fun ProfileScreen(
                                 )
 
                             Spacer(modifier = Modifier.height(35.dp))
-                            TextField(
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                value = viewModel.stateGetProfileInfo.value.response?.phone.toString(),
-                                onValueChange = { },
-                                label = { Text(text = "Телефон") },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = BackgroundColor,
-                                    unfocusedLabelColor = FontSilver,
-                                    focusedLabelColor = FontSilver,
-                                    unfocusedIndicatorColor = FontSilver,
-                                    focusedIndicatorColor = FontSilver,
-                                    cursorColor = FontSilver,
-                                ),
-                                textStyle = TextStyle(color = Color.Gray)
-                            )
+                            Column {
+                                Text(text = "Телефон",
+                                    modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 15.dp, bottom = 5.dp), fontSize = 12.sp, color = Color.Gray)
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp, bottom = 10.dp),
+                                    text = viewModel.stateGetProfileInfo.value.response?.phone.toString(),
+                                    color = Color.Gray
+                                )
+                                Divider()
+                            }
 
                             Spacer(modifier = Modifier.height(49.dp))
 

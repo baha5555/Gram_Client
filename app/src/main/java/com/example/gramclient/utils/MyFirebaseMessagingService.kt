@@ -18,6 +18,8 @@ import com.example.gramclient.utils.Constants.FCM_TOKEN
 import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER
 import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER_ID
+import com.example.gramclient.utils.Constants.STATE_DRIVER_IN_SITE
+import com.example.gramclient.utils.Constants.STATE_DRIVER_IN_SITE_ORDER_ID
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.google.firebase.messaging.FirebaseMessaging
@@ -34,6 +36,10 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
                     "0" ->{
                         STATE_ASSIGNED_ORDER.value = true
                         STATE_ASSIGNED_ORDER_ID.value = remoteMessage.data["order_id"]?.toInt()?:-1
+                    }
+                    "1"->{
+                        STATE_DRIVER_IN_SITE.value = true
+                        STATE_DRIVER_IN_SITE_ORDER_ID.value = remoteMessage.data["order_id"]?.toInt()?:-1
                     }
                     "2" -> {
                         STATE_RAITING.value = remoteMessage.notification!!.title != ""

@@ -85,7 +85,7 @@ fun OrderExecution(
     }
 
     var stateCancelOrderText by remember {
-        mutableStateOf("Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?")
+        mutableStateOf("Вы уверены, что хотите отменить данный заказ?")
     }
 
     scope.launch {
@@ -130,6 +130,7 @@ fun OrderExecution(
                     selectRealtimeDatabaseOrder.let { order ->
                             if (order.performer != null) {
                                     performerSection(performer = order, orderExecutionViewModel)
+                                stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
                             }
                         orderSection(order, scope, sheetState, isSearchState)
                         Spacer(modifier = Modifier.height(10.dp))
@@ -157,7 +158,7 @@ fun OrderExecution(
                 mainViewModel = mainViewModel,
                 navController = navController
             )
-            if(stateCancelOrderText=="Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?") {
+            if(stateCancelOrderText!="Вы не можете отменить активный заказ.\nЭто может сделать только оператор") {
                 CustomDialog(
                     text = stateCancelOrderText,
                     okBtnClick = {

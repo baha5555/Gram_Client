@@ -78,10 +78,8 @@ fun MainBottomSheetContent(
             .fillMaxHeight(fraction = heightFraction)
     ) {
         if(!isSearchState.value){
-            coroutineScope.launch {
                 if(searchText.value!="")
                     searchText.value = ""
-            }
             SheetContent (
                 currentFraction=scaffoldState.currentFraction,
                 addressContent = {

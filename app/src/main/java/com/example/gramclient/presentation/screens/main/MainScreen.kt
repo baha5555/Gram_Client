@@ -116,9 +116,7 @@ fun MainScreen(
                         Row(modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                coroutineScope.launch {
                                     paymentState.value = item
-                                }
                             }
                             .padding(vertical = 15.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -140,7 +138,7 @@ fun MainScreen(
                             }
                             CustomCheckBox(size = 25.dp,
                                 isChecked = paymentState.value == item,
-                                onChecked = { coroutineScope.launch { paymentState.value = item } })
+                                onChecked = { paymentState.value = item })
                         }
                         Divider()
                     }
