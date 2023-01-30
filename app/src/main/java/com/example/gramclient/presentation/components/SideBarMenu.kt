@@ -3,6 +3,7 @@ package com.example.gramclient.presentation.components
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -58,7 +59,7 @@ fun SideBarMenu(
             Box {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = stateGetProfileInfo.response?.avatar_url ?: R.drawable.avatar
+                        model = if(stateGetProfileInfo.response?.avatar_url!="")stateGetProfileInfo.response?.avatar_url ?: R.drawable.camera_plus_light else R.drawable.camera_plus_light
                     ),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -169,9 +170,9 @@ fun ShowItems(
             .fillMaxWidth()
             .clickable {
                 when (text) {
-                    "Параметры" -> navController.navigate(RoutesName.SETTING_SCREEN)
-                    "Мои адреса" -> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
-                    "Поддержка" -> navController.navigate(RoutesName.SUPPORT_SCREEN)
+                    "Параметры" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.SETTING_SCREEN)*/
+                    "Мои адреса" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
+                    "Поддержка" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
                     "О приложении" -> navController.navigate(RoutesName.ABOUT_SCREEN)
                     "Выход" -> {
                         isDialogOpen.value = true
@@ -180,7 +181,8 @@ fun ShowItems(
                         navController.navigate(RoutesName.ORDERS_HISTORY_SCREEN)
                     }
                     "Промокоды" -> {
-                        navController.navigate(RoutesName.PROMO_CODE_SCREEN)
+                        Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show()
+//                        navController.navigate(RoutesName.PROMO_CODE_SCREEN)
                     }
                     "Позвонить оператору" -> {
                         val callIntent: Intent = Uri

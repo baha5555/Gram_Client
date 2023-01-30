@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,6 +33,9 @@ import com.example.gramclient.presentation.screens.order.OrderExecution
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import com.example.gramclient.presentation.screens.profile.ProfileScreen
+import com.example.gramclient.utils.Constants
+import com.example.gramclient.utils.Constants.STATE_DRIVER_IN_SITE
+import com.example.gramclient.utils.Constants.STATE_DRIVER_IN_SITE_ORDER_ID
 
 
 @Composable
@@ -47,7 +51,19 @@ fun Navigation(
     val activity = (LocalContext.current as? MainActivity)
     val context= LocalContext.current
 
-
+    if(Constants.STATE_DRIVER_IN_SITE.value)
+    {
+        orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.let { response ->
+            response.observeAsState().value?.let {
+                for (i in it)
+                {
+                    if(i.id == STATE_DRIVER_IN_SITE_ORDER_ID.value)
+                    DriverInSiteScreen(i, isDialog = STATE_DRIVER_IN_SITE)
+                }
+            }
+        }
+    }
+    else
     NavHost(
         navController = navController,
         startDestination = RoutesName.SPLASH_SCREEN

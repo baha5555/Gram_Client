@@ -5,7 +5,7 @@ data class OrderHistoryResult(
     val comment: Any,
     val created_at: String,
     val dop_phone: Any,
-    val from_address: FromAddress,
+    val from_address: FromAddress?,
     val id: Int,
     val performer: Performer,
     val phone: String,
@@ -14,5 +14,5 @@ data class OrderHistoryResult(
     val status: String,
     val tariff: String,
     val tariff_id: Int,
-    val to_addresses: List<ToAddresse>
+    val to_addresses: List<ToAddresse>?
 )

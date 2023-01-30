@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +33,7 @@ fun AboutScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundColor)
+            .background(Color.White)
     ) {
         CustomTopBar(title = "О приложении", navController = navController)
         Column(
@@ -49,7 +50,7 @@ fun AboutScreen(navController: NavHostController) {
             Text(text = "версия 1.00.00 от 1 декабря 2022", fontSize = 20.sp)
             Spacer(modifier = Modifier.height(30.dp))
             Text(
-                text = "Приложение предназначено для создания заказа автотранспорта, услуг  и информирования заказчика о его исполнении.",
+                text = "Приложение предназначено для создания заказа автотранспорта, услуг и информирования заказчика о его исполнении.",
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.height(30.dp))

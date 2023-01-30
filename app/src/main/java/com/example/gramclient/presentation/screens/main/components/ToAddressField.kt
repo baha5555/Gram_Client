@@ -50,9 +50,9 @@ fun ToAddressField(
                 .clickable {
                     scope.launch {
                         bottomSheetState.bottomSheetState.expand()
-                        isSearchState.value = true
-                        WHICH_ADDRESS.value = Constants.TO_ADDRESS
                     }
+                    isSearchState.value = true
+                    WHICH_ADDRESS.value = Constants.TO_ADDRESS
                 }
                 .background(PrimaryColor)
                 .padding(horizontal = 5.dp)
