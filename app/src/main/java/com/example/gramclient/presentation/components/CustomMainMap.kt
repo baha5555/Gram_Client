@@ -4,9 +4,14 @@ package com.example.gramclient.presentation.components
 
 import TwoFingerDrag
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.graphics.*
+import android.location.LocationManager
+import android.net.Uri
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
@@ -14,16 +19,38 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
+import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.map.UserTouchSurface
+import com.example.gramclient.ui.theme.BackgroundColor
+import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.RoutesName
 import kotlinx.coroutines.GlobalScope
@@ -61,224 +88,333 @@ fun CustomMainMap(
     navController: NavHostController,
     WHICH_ADDRESS: MutableState<String>? = null
 ) {
-
-    val toAddress by mainViewModel.toAddress
-    val fromAddress by mainViewModel.fromAddress
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val startPointForMarker = remember {
-        mutableStateOf(
-            GeoPoint(
-                if (toAddress[0].address_lat != "") toAddress[0].address_lat.toDouble() else 40.27803692395751,
-                if (toAddress[0].address_lng != "") toAddress[0].address_lng.toDouble() else 69.62923931506361
-            )
-        )
+    val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+    val stateStatusGPS = remember {
+        mutableStateOf(manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
     }
-    val zoomLevel = remember { mutableStateOf(18.0) }
-
-    AndroidView(
-        factory = {
-            View.inflate(it, R.layout.map, null).apply {
-                map = this.findViewById(R.id.map)
-                userTouchSurface = this.findViewById(R.id.userTouchSurface)
-                btnLocation = this.findViewById(R.id.btnLocation)
-                getAddressMarker = this.findViewById(R.id.getAddressMarker)
-                currentRoute = navController.currentBackStackEntry?.destination?.route
-
-                Configuration.getInstance()
-                    .load(it, PreferenceManager.getDefaultSharedPreferences(it))
-                map.setTileSource(TileSourceFactory.MAPNIK)
-                val startPoint = startPointForMarker.value
-                val mapController = map.controller
-                mapController.setZoom(zoomLevel.value)
-                map.controller.setCenter(startPoint)
-
-                mRotationGestureOverlay = RotationGestureOverlay(it, map)
-                mRotationGestureOverlay.isEnabled = false
-
-                map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-                map.setMultiTouchControls(true)
-
-                map.minZoomLevel = 10.0
-                map.maxZoomLevel = 24.0
-
-                val myLocationProvider = GpsMyLocationProvider(it)
-                mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
-                myLocationShow(it, mLocationOverlay)
-                when (currentRoute) {
-                    RoutesName.MAIN_SCREEN -> {
-                        btnLocation.margin(0f, 0f, 0f, 355f)
-                        btnLocation.visibility = View.GONE
-                        getAddressMarker.visibility = View.GONE
-                        map.overlays.clear()
-                        addOverlays()
-                        showRoadAB(it, fromAddress, toAddress)
-                    }
-                    RoutesName.SEARCH_DRIVER_SCREEN, RoutesName.ORDER_EXECUTION_SCREEN -> {
-                        btnLocation.visibility = View.GONE
-                        getAddressMarker.visibility = View.GONE
-                        map.overlays.clear()
-                        addOverlays()
-                        showRoadAB(it, fromAddress, toAddress)
-                    }
-                    RoutesName.SEARCH_ADDRESS_SCREEN -> {
-                        map.overlays.clear()
-                        addOverlays()
-                    }
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            when (event) {
+                Lifecycle.Event.ON_CREATE -> {
+                    Log.d("mapLive", "ON_CREATE")
                 }
-                btnLocation.setOnClickListener {
-                    map.controller.animateTo(mLocationOverlay.myLocation)
-                    if(mLocationOverlay.myLocation!=null){
-                        scope.launch {
-                            if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                if(WHICH_ADDRESS != null)
-                                    mainViewModel.getAddressFromMap(
-                                        mLocationOverlay.myLocation.longitude,
-                                        mLocationOverlay.myLocation.latitude,
-                                        WHICH_ADDRESS
-                                    )
+                Lifecycle.Event.ON_START -> {
+                    Log.d("mapLive", "ON_START")
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    Log.d("mapLive", "ON_RESUME")
+                    stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                }
+                Lifecycle.Event.ON_PAUSE -> {
+                    Log.d("mapLive", "ON_PAUSE")
+                }
+                Lifecycle.Event.ON_STOP -> {
+                    Log.d("mapLive", "ON_STOP")
+                }
+                Lifecycle.Event.ON_DESTROY -> {
+                    Log.d("mapLive", "ON_DESTROY")
+                }
+                else -> return@LifecycleEventObserver
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+    if (stateStatusGPS.value) {
+        val toAddress by mainViewModel.toAddress
+        val fromAddress by mainViewModel.fromAddress
+        val scope = rememberCoroutineScope()
+        val startPointForMarker = remember {
+            mutableStateOf(
+                GeoPoint(
+                    if (toAddress[0].address_lat != "") toAddress[0].address_lat.toDouble() else 40.27803692395751,
+                    if (toAddress[0].address_lng != "") toAddress[0].address_lng.toDouble() else 69.62923931506361
+                )
+            )
+        }
+        val zoomLevel = remember { mutableStateOf(18.0) }
+
+        AndroidView(
+            factory = {
+                View.inflate(it, R.layout.map, null).apply {
+                    map = this.findViewById(R.id.map)
+                    userTouchSurface = this.findViewById(R.id.userTouchSurface)
+                    btnLocation = this.findViewById(R.id.btnLocation)
+                    getAddressMarker = this.findViewById(R.id.getAddressMarker)
+                    currentRoute = navController.currentBackStackEntry?.destination?.route
+
+                    Configuration.getInstance()
+                        .load(it, PreferenceManager.getDefaultSharedPreferences(it))
+                    map.setTileSource(TileSourceFactory.MAPNIK)
+                    val startPoint = startPointForMarker.value
+                    val mapController = map.controller
+                    mapController.setZoom(zoomLevel.value)
+                    map.controller.setCenter(startPoint)
+
+                    mRotationGestureOverlay = RotationGestureOverlay(it, map)
+                    mRotationGestureOverlay.isEnabled = false
+
+                    map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                    map.setMultiTouchControls(true)
+
+                    map.minZoomLevel = 10.0
+                    map.maxZoomLevel = 24.0
+
+                    val myLocationProvider = GpsMyLocationProvider(it)
+                    mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
+                    myLocationShow(it, mLocationOverlay)
+                    when (currentRoute) {
+                        RoutesName.MAIN_SCREEN -> {
+                            btnLocation.margin(0f, 0f, 0f, 355f)
+                            btnLocation.visibility = View.GONE
+                            getAddressMarker.visibility = View.GONE
+                            map.overlays.clear()
+                            addOverlays()
+                            showRoadAB(it, fromAddress, toAddress)
+                        }
+                        RoutesName.SEARCH_DRIVER_SCREEN, RoutesName.ORDER_EXECUTION_SCREEN -> {
+                            btnLocation.visibility = View.GONE
+                            getAddressMarker.visibility = View.GONE
+                            map.overlays.clear()
+                            addOverlays()
+                            showRoadAB(it, fromAddress, toAddress)
+                        }
+                        RoutesName.SEARCH_ADDRESS_SCREEN -> {
+                            map.overlays.clear()
+                            addOverlays()
+                        }
+                    }
+                    btnLocation.setOnClickListener {
+                        map.controller.animateTo(mLocationOverlay.myLocation)
+                        if(mLocationOverlay.myLocation!=null){
+                            scope.launch {
+                                if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                    if(WHICH_ADDRESS != null)
+                                        mainViewModel.getAddressFromMap(
+                                            mLocationOverlay.myLocation.longitude,
+                                            mLocationOverlay.myLocation.latitude,
+                                            WHICH_ADDRESS
+                                        )
+                                }
                             }
                         }
                     }
                 }
-            }
-        },
-        update = {
-            when (currentRoute) {
-                RoutesName.MAIN_SCREEN -> {
-                    showRoadAB(it.context, fromAddress, toAddress)
-                }
-                RoutesName.SEARCH_DRIVER_SCREEN, RoutesName.ORDER_EXECUTION_SCREEN -> {
-                    showRoadAB(it.context, fromAddress, toAddress)
-                }
-                RoutesName.SEARCH_ADDRESS_SCREEN -> {
-                    map.overlays.clear()
-                    userTouchSurface.setCallback(
-                        TwoFingerDrag(
-                            context,
-                            object : TwoFingerDrag.Listener {
-                                override fun onOneFinger(event: MotionEvent?) {
-                                    map.dispatchTouchEvent(event)
-                                    if (event != null) {
-                                        when (event.action) {
-                                            MotionEvent.ACTION_MOVE -> {
-                                                Log.e(
-                                                    "singleTapConfirmedHelper",
-                                                    "${map.mapCenter.latitude}-${map.mapCenter.longitude}"
-                                                )
-                                            }
-                                            MotionEvent.ACTION_DOWN -> {
-                                                Log.e("singleTapConfirmedHelper", "Action was DOWN")
-
-                                            }
-                                            MotionEvent.ACTION_UP -> {
-                                                Log.e("singleTapConfirmedHelper", "Action was UP")
-                                                if (WHICH_ADDRESS != null) {
-                                                    mainViewModel.getAddressFromMap(
-                                                        map.mapCenter.longitude,
-                                                        map.mapCenter.latitude,
-                                                        WHICH_ADDRESS
+            },
+            update = {
+                when (currentRoute) {
+                    RoutesName.MAIN_SCREEN -> {
+                        showRoadAB(it.context, fromAddress, toAddress)
+                    }
+                    RoutesName.SEARCH_DRIVER_SCREEN, RoutesName.ORDER_EXECUTION_SCREEN -> {
+                        showRoadAB(it.context, fromAddress, toAddress)
+                    }
+                    RoutesName.SEARCH_ADDRESS_SCREEN -> {
+                        map.overlays.clear()
+                        userTouchSurface.setCallback(
+                            TwoFingerDrag(
+                                context,
+                                object : TwoFingerDrag.Listener {
+                                    override fun onOneFinger(event: MotionEvent?) {
+                                        map.dispatchTouchEvent(event)
+                                        if (event != null) {
+                                            when (event.action) {
+                                                MotionEvent.ACTION_MOVE -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "${map.mapCenter.latitude}-${map.mapCenter.longitude}"
                                                     )
                                                 }
-                                                Log.e("singleTapConfirmedHelper", "$toAddress")
-                                                map.postInvalidate()
-                                                startPointForMarker.value = GeoPoint(
-                                                    map.mapCenter.latitude,
-                                                    map.mapCenter.longitude
-                                                )
-                                                zoomLevel.value = map.zoomLevelDouble
-                                            }
-                                            MotionEvent.ACTION_CANCEL -> {
-                                                Log.e(
-                                                    "singleTapConfirmedHelper",
-                                                    "Action was CANCEL"
-                                                )
+                                                MotionEvent.ACTION_DOWN -> {
+                                                    Log.e("singleTapConfirmedHelper", "Action was DOWN")
 
-                                            }
-                                            MotionEvent.ACTION_OUTSIDE -> {
-                                                Log.e(
-                                                    "singleTapConfirmedHelper",
-                                                    "Movement occurred outside bounds of current screen element"
-                                                )
+                                                }
+                                                MotionEvent.ACTION_UP -> {
+                                                    Log.e("singleTapConfirmedHelper", "Action was UP")
+                                                    if (WHICH_ADDRESS != null) {
+                                                        mainViewModel.getAddressFromMap(
+                                                            map.mapCenter.longitude,
+                                                            map.mapCenter.latitude,
+                                                            WHICH_ADDRESS
+                                                        )
+                                                    }
+                                                    Log.e("singleTapConfirmedHelper", "$toAddress")
+                                                    map.postInvalidate()
+                                                    startPointForMarker.value = GeoPoint(
+                                                        map.mapCenter.latitude,
+                                                        map.mapCenter.longitude
+                                                    )
+                                                    zoomLevel.value = map.zoomLevelDouble
+                                                }
+                                                MotionEvent.ACTION_CANCEL -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was CANCEL"
+                                                    )
 
-                                            }
-                                            else -> {
-                                                Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
+                                                }
+                                                MotionEvent.ACTION_OUTSIDE -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Movement occurred outside bounds of current screen element"
+                                                    )
+
+                                                }
+                                                else -> {
+                                                    Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
+                                                }
                                             }
                                         }
                                     }
+
+                                    override fun onTwoFingers(event: MotionEvent?) {
+                                        map.dispatchTouchEvent(event)
+                                        if (event != null) {
+                                            when (event.action) {
+                                                MotionEvent.ACTION_MOVE -> {
+                                                    //                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
+                                                }
+                                                MotionEvent.ACTION_POINTER_2_DOWN -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was ACTION_POINTER_2_DOWN"
+                                                    )
+                                                }
+                                                MotionEvent.TOOL_TYPE_FINGER -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was TOOL_TYPE_FINGER"
+                                                    )
+                                                }
+                                                MotionEvent.ACTION_POINTER_2_UP -> {
+                                                    Log.e("singleTapConfirmedHelper", "Action was UP")
+                                                    if (WHICH_ADDRESS != null) {
+                                                        mainViewModel.getAddressFromMap(
+                                                            map.mapCenter.longitude,
+                                                            map.mapCenter.latitude,
+                                                            WHICH_ADDRESS
+                                                        )
+                                                    }
+                                                    Log.e("singleTapConfirmedHelper", "$toAddress")
+                                                    map.postInvalidate()
+                                                    startPointForMarker.value = GeoPoint(
+                                                        map.mapCenter.latitude,
+                                                        map.mapCenter.longitude
+                                                    )
+                                                    zoomLevel.value = map.zoomLevelDouble
+                                                }
+                                                else -> {
+                                                    Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
+                                                }
+                                            }
+                                        }
+                                    }
+                                })
+                        )
+                        map.overlays.add(
+                            MapEventsOverlay(object : MapEventsReceiver {
+                                override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                                    map.postInvalidate()
+                                    startPointForMarker.value = GeoPoint(p.latitude, p.longitude)
+                                    if (WHICH_ADDRESS != null) {
+                                        mainViewModel.getAddressFromMap(
+                                            map.mapCenter.longitude,
+                                            map.mapCenter.latitude,
+                                            WHICH_ADDRESS
+                                        )
+                                    }
+                                    zoomLevel.value = map.zoomLevelDouble
+                                    return true
                                 }
 
-                                override fun onTwoFingers(event: MotionEvent?) {
-                                    map.dispatchTouchEvent(event)
-                                    if (event != null) {
-                                        when (event.action) {
-                                            MotionEvent.ACTION_MOVE -> {
-                                                //                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
-                                            }
-                                            MotionEvent.ACTION_POINTER_2_DOWN -> {
-                                                Log.e(
-                                                    "singleTapConfirmedHelper",
-                                                    "Action was ACTION_POINTER_2_DOWN"
-                                                )
-                                            }
-                                            MotionEvent.TOOL_TYPE_FINGER -> {
-                                                Log.e(
-                                                    "singleTapConfirmedHelper",
-                                                    "Action was TOOL_TYPE_FINGER"
-                                                )
-                                            }
-                                            MotionEvent.ACTION_POINTER_2_UP -> {
-                                                Log.e("singleTapConfirmedHelper", "Action was UP")
-                                                if (WHICH_ADDRESS != null) {
-                                                    mainViewModel.getAddressFromMap(
-                                                        map.mapCenter.longitude,
-                                                        map.mapCenter.latitude,
-                                                        WHICH_ADDRESS
-                                                    )
-                                                }
-                                                Log.e("singleTapConfirmedHelper", "$toAddress")
-                                                map.postInvalidate()
-                                                startPointForMarker.value = GeoPoint(
-                                                    map.mapCenter.latitude,
-                                                    map.mapCenter.longitude
-                                                )
-                                                zoomLevel.value = map.zoomLevelDouble
-                                            }
-                                            else -> {
-                                                Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
-                                            }
-                                        }
-                                    }
+                                override fun longPressHelper(p: GeoPoint): Boolean {
+                                    return false
                                 }
                             })
-                    )
-                    map.overlays.add(
-                        MapEventsOverlay(object : MapEventsReceiver {
-                            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-                                map.postInvalidate()
-                                startPointForMarker.value = GeoPoint(p.latitude, p.longitude)
-                                if (WHICH_ADDRESS != null) {
-                                    mainViewModel.getAddressFromMap(
-                                        map.mapCenter.longitude,
-                                        map.mapCenter.latitude,
-                                        WHICH_ADDRESS
+                        )
+                        addOverlays()
+                    }
+                }
+            }
+        )
+    } else {
+        val context = LocalContext.current
+        val activity = (context as MainActivity)
+        Dialog(onDismissRequest = { /*TODO*/ }) {
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .fillMaxWidth()
+                    .background(White)
+                    .padding(20.dp)
+            ) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Для продолжения работы необходимо включить GPS-приемник",
+                    fontSize = 18.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Black
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = BackgroundColor, contentColor = Black),
+                        onClick = {
+                            activity.finish()
+                        }
+                    ) {
+                        Text(text = "Выход", fontSize = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Button(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor, contentColor = White),
+                        onClick = { Intent(
+                            Settings.ACTION_LOCATION_SOURCE_SETTINGS,
+                            Uri.fromParts(
+                                "package",
+                                context.packageName,
+                                null
+                            )
+                        ).also { intent ->
+                            try {
+                                context.startActivity(
+                                    intent
+                                )
+                            } catch (e: ActivityNotFoundException) {
+                                Intent(
+                                    Settings.ACTION_LOCATION_SOURCE_SETTINGS
+                                ).also { intentCatch ->
+                                    context.startActivity(
+                                        intentCatch
                                     )
                                 }
-                                zoomLevel.value = map.zoomLevelDouble
-                                return true
                             }
 
-                            override fun longPressHelper(p: GeoPoint): Boolean {
-                                return false
-                            }
-                        })
-                    )
-                    addOverlays()
+                        } }
+                    ) {
+                        Text(text = "Настройки", fontSize = 18.sp, color = White)
+                    }
                 }
             }
         }
-    )
+    }
 }
 
 fun addOverlays() {
