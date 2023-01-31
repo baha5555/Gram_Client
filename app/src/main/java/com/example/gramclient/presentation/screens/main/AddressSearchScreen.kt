@@ -58,7 +58,6 @@ fun AddressSearchScreen(
         }
     }
     LaunchedEffect(bottomSheetState.bottomSheetState.currentValue) {
-        profileViewModel.getProfileInfo()
         if (bottomSheetState.bottomSheetState.isCollapsed) {
             isSearchState.value = false
             Log.e("singleTapConfirmedHelper", "isCollapsed")

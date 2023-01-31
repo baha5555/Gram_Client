@@ -49,6 +49,7 @@ import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.example.gramclient.utils.Constants.TAG
 import com.example.gramclient.utils.RoutesName
+import com.example.gramclient.utils.Values
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
@@ -63,7 +64,6 @@ fun SearchDriverScreen(
     val isGet = remember {
         mutableStateOf(true)
     }
-    val profileViewModel: ProfileViewModel = hiltViewModel()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(
             initialValue = BottomSheetValue.Expanded
@@ -76,18 +76,11 @@ fun SearchDriverScreen(
     var sheetPeekHeight by remember {
         mutableStateOf(200)
     }
-    LaunchedEffect(key1 = true) {
-        profileViewModel.getProfileInfo()
-
-    }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    if(isGet.value){
-        profileViewModel.stateGetProfileInfo.value.response?.let { response ->
-            Log.e("phone response", "Success")
-            orderExecutionViewModel.readAllOrders()
-            orderExecutionViewModel.readAllClient(response.phone)
-            isGet.value=false
-        }
+    if(isGet.value && Values.PhoneNumber.value!=""){
+        orderExecutionViewModel.readAllOrders()
+        orderExecutionViewModel.readAllClient(Values.PhoneNumber.value)
+        isGet.value=false
     }
     val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
     val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase

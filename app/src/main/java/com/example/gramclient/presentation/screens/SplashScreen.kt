@@ -20,6 +20,7 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -30,18 +31,23 @@ import com.example.gramclient.presentation.components.CustomRequestError
 import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 
 @Composable
 fun SplashScreen(
     navController: NavController,
     orderExecutionViewModel: OrderExecutionViewModel,
+    profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val activeOrders = orderExecutionViewModel.stateActiveOrders.value
     val prefs = CustomPreference(LocalContext.current)
     LaunchedEffect(key1 = true) {
         if (prefs.getAccessToken() == "") navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
-        else orderExecutionViewModel.getActiveOrders()
+        else {
+            orderExecutionViewModel.getActiveOrders()
+            profileViewModel.getProfileInfo()
+        }
     }
     if (activeOrders.success) {
         currentRoute = navController.currentBackStackEntry?.destination?.route
