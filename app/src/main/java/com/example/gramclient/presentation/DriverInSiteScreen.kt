@@ -62,19 +62,20 @@ fun DriverInSiteScreen(
                 )
             }
         }
-        Box(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 25.dp), contentAlignment = Alignment.BottomCenter) {
-            CustomButton(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .height(61.dp)
-                    .padding(horizontal = 20.dp, vertical = 25.dp),
-                text = "OK",
-                textSize = 18,
-                textBold = true,
-            ) {
-                isDialog.value = false
-            }
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 25.dp), contentAlignment = Alignment.BottomCenter) {
+                CustomButton(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .fillMaxWidth()
+                        .height(61.dp),
+                    text = "OK",
+                    textSize = 18,
+                    textBold = true,
+                ) {
+                    isDialog.value = false
+                }
         }
     }
 }

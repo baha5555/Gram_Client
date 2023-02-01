@@ -244,59 +244,62 @@ fun ProfileScreen(
 
                         Spacer(modifier = Modifier.height(49.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CustomButton(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Color.Black)
-                                    .width(363.dp)
-                                    .height(55.dp)
-                                    .padding(top = 0.dp),
-                                text = "Cохранить",
-                                textSize = 18,
-                                textBold = true,
-                                onClick = {
-                                    scope.launch {
-                                        try {
-                                            var photo:MutableState<File?> = mutableStateOf(null)
-                                            selectImage?.let {
-                                                Log.e("selectImage","$it")
-                                                photo.value = File(
-                                                    getRealPathFromURI(context,it)
-                                                )
-                                                Log.e("selectImage","${photo.value}")
-                                            }
-                                            viewModel.sendProfile(
-                                                (profileFirstName.value
-                                                    ?: getProfileFirstName
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                CustomButton(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color.Black)
+                                        .width(363.dp)
+                                        .height(55.dp)
+                                        .padding(top = 0.dp),
+                                    text = "Cохранить",
+                                    textSize = 18,
+                                    textBold = true,
+                                    onClick = {
+                                        scope.launch {
+                                            try {
+                                                var photo:MutableState<File?> = mutableStateOf(null)
+                                                selectImage?.let {
+                                                    Log.e("selectImage","$it")
+                                                    photo.value = File(
+                                                        getRealPathFromURI(context,it)
+                                                        )
+                                                    Log.e("selectImage","${photo.value}")
+                                                }
+                                                viewModel.sendProfile(
+                                                    (profileFirstName.value
+                                                        ?: getProfileFirstName
+                                                        ?: "").toRequestBody(),
+                                                    (profileLastName.value ?: getProfileLastName
                                                     ?: "").toRequestBody(),
-                                                (profileLastName.value ?: getProfileLastName
-                                                ?: "").toRequestBody(),
-                                                profileEmail.value ?: getProfileEmail ?: "",
-                                                photo,
-                                            )
-                                        } catch (e: HttpException) {
-                                            Log.e(
-                                                "HELO",
-                                                e.localizedMessage
-                                                    ?: "Произошла непредвиденная ошибка"
-                                            )
-                                        } catch (e: IOException) {
-                                            Log.e(
-                                                "HELO",
-                                                "NOT Network"
-                                            )
-                                        } catch (e: Exception) {
-                                            Log.e("HELLO", "$e")
-                                            Toast.makeText(
-                                                context,
-                                                "Произошла ошибка! Повторите еще раз $e ",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
+                                                    if(profileEmail.value !="")profileEmail.value else null,
+                                                    photo,
+                                                )
+                                                {
+                                                    Toast.makeText(context,"Ваши данные успешно сохранились.",Toast.LENGTH_LONG).show()
+                                                }
+                                            } catch (e: HttpException) {
+                                                Log.e(
+                                                    "HELO",
+                                                    e.localizedMessage
+                                                        ?: "Произошла непредвиденная ошибка"
+                                                )
+                                            } catch (e: IOException) {
+                                                Log.e(
+                                                    "HELO",
+                                                    "NOT Network"
+                                                )
+                                            } catch (e: Exception) {
+                                                Log.e("HELLO", "$e")
+                                                Toast.makeText(
+                                                    context,
+                                                    "Произошла ошибка! Повторите еще раз $e ",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
 
                                     }
                                 }
@@ -332,7 +335,6 @@ fun ProfileScreen(
     if(stateGetProfileInfo.error!="") CustomRequestError {
         viewModel.getProfileInfo()
     }
-
 }
 fun getRealPathFromURI(context: Context, uri: Uri): String? {
     when {

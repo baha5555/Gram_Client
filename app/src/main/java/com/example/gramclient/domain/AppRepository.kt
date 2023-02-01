@@ -39,7 +39,7 @@ interface AppRepository {
     suspend fun sendProfile(
         first_name: RequestBody,
         last_name: RequestBody,
-        email: String,
+        email: String?,
         avatar: MultipartBody.Part?
     ): ProfileResponse
 

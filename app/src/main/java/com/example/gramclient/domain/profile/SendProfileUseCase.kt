@@ -20,7 +20,7 @@ private val repository: AppRepository
     operator fun invoke(
                         first_name: RequestBody,
                         last_name: RequestBody,
-                        email: String,
+                        email: String?,
                         avatar: MutableState<File?>
     ): Flow<Resource<ProfileResponse>> =
         flow{

@@ -22,7 +22,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val sendProfileUseCase: SendProfileUseCase,
     private val getProfileInfoUseCase: GetProfileInfoUseCase
-) : ViewModel() {
+):ViewModel() {
     private val _stateprofile = mutableStateOf(ProfileResponseState())
     val stateAllowances: State<ProfileResponseState> = _stateprofile
 
@@ -81,8 +81,9 @@ class ProfileViewModel @Inject constructor(
     fun sendProfile(
         first_name: RequestBody,
         last_name: RequestBody,
-        email: String,
+        email: String?,
         images: MutableState<File?>,
+        onSuccess:()->Unit = {},
     ) {
         sendProfileUseCase.invoke(first_name, last_name, email, avatar = images)
             .onEach { result: Resource<ProfileResponse> ->
@@ -93,6 +94,7 @@ class ProfileViewModel @Inject constructor(
                             _stateprofile.value =
                                 ProfileResponseState(response = allowancesResponse?.result)
                             getProfileInfo()
+                            onSuccess()
                             Log.e(
                                 "ProfileResponse",
                                 "SendProfileSuccess->\n ${_stateprofile.value}"

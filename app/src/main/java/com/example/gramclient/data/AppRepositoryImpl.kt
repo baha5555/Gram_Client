@@ -55,7 +55,7 @@ class AppRepositoryImpl(
     override suspend fun sendProfile(
         first_name: RequestBody,
         last_name: RequestBody,
-        email: String,
+        email: String?,
         avatar: MultipartBody.Part?
     ): ProfileResponse =
         api.sendProfile(prefs.getAccessToken(), first_name, last_name, email, avatar)
