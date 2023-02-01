@@ -1,6 +1,8 @@
 package com.example.gramclient.presentation.screens.main
 
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -16,6 +18,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
@@ -31,6 +34,25 @@ fun AddressSearchScreen(
     navController: NavHostController,
     mainViewModel: MainViewModel
 ) {
+
+
+    var pressedTime: Long = 0
+    val activity = (LocalContext.current as? MainActivity)
+    val context1= LocalContext.current
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+    BackHandler(enabled = drawerState.isClosed) {
+        if (pressedTime + 2000 > System.currentTimeMillis()) {
+            activity?.finish()
+        } else {
+            Toast.makeText(context1, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+        }
+        pressedTime = System.currentTimeMillis();
+    }
+
+
+
+
     var isSearchState = remember { mutableStateOf(false) }
     var sheetPeekHeight = remember { mutableStateOf(280) }
 
@@ -41,7 +63,8 @@ fun AddressSearchScreen(
     )
 
     val profileViewModel: ProfileViewModel = hiltViewModel()
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -71,6 +94,10 @@ fun AddressSearchScreen(
 
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+
+        BackHandler(enabled = drawerState.isOpen) {
+            scope.launch { drawerState.close() }
+        }
         ModalDrawer(
             drawerState = drawerState,
             gesturesEnabled = !drawerState.isClosed,
@@ -82,8 +109,11 @@ fun AddressSearchScreen(
                         SideBarMenu(navController)
                     }
                 }
+
             },
             content = {
+
+
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     BottomSheetScaffold(
                         modifier = Modifier.fillMaxSize(),

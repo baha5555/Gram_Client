@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +39,7 @@ import com.example.gramclient.utils.Constants.STATE_DRIVER_IN_SITE
 import com.example.gramclient.utils.Constants.STATE_DRIVER_IN_SITE_ORDER_ID
 
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun Navigation(
     navController: NavHostController,
@@ -129,25 +131,11 @@ fun Navigation(
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
             SearchDriverScreen(navController, orderExecutionViewModel=orderExecutionViewModel)
-            BackHandler(enabled = true) {
-                if (pressedTime + 2000 > System.currentTimeMillis()) {
-                    activity?.finish()
-                } else {
-                    Toast.makeText(context, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
-                }
-                pressedTime = System.currentTimeMillis();
-            }
+
         }
         composable(RoutesName.SEARCH_ADDRESS_SCREEN) {
             AddressSearchScreen(navController, mainViewModel)
-            BackHandler(enabled = true) {
-                if (pressedTime + 2000 > System.currentTimeMillis()) {
-                    activity?.finish()
-                } else {
-                    Toast.makeText(context, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
-                }
-                pressedTime = System.currentTimeMillis();
-            }
+
         }
     }
 }

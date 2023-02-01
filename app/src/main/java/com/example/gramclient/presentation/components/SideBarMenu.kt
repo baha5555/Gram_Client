@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -37,6 +39,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SideBarMenu(
     navController: NavHostController) {
+
     val isDialogOpen = remember { mutableStateOf(false) }
     val prefs = CustomPreference(LocalContext.current)
 
@@ -47,6 +50,7 @@ fun SideBarMenu(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .background(color = colorResource(id = R.color.primary_color))
+
     ) {
         Spacer(modifier = Modifier.height(40.dp))
         Row(
@@ -90,7 +94,7 @@ fun SideBarMenu(
                             }
                         }
                     },
-                    text =if(Values.FirstName.value!="" && Values.LastName.value!="") Values.FirstName.value+" "+Values.LastName.value else "Выбрать Имя...",
+                    text =if(Values.FirstName.value!="" && Values.LastName.value!="" && Values.LastName.value!=null && Values.FirstName.value!=null) Values.FirstName.value+" "+Values.LastName.value else "Выбрать Имя...",
                     fontSize = 22.sp,
                     color = Color.White
                 )
@@ -98,7 +102,7 @@ fun SideBarMenu(
                     modifier = Modifier.clickable {
                         navController.navigate(RoutesName.PROFILE_SCREEN)
                     },
-                    text = if (Values.Email.value!="") Values.Email.value else "Выбрать Почту...",
+                    text = if (Values.Email.value!="" && Values.Email.value!=null) "${Values.Email.value}" else "Выбрать Почту...",
                     fontSize = 18.sp,
                     color = Color.White
                 )
@@ -168,9 +172,15 @@ fun ShowItems(
             .fillMaxWidth()
             .clickable {
                 when (text) {
-                    "Параметры" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.SETTING_SCREEN)*/
-                    "Мои адреса" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
-                    "Поддержка" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
+                    "Параметры" -> Toast
+                        .makeText(context, "Эта страница на стадии разработки", Toast.LENGTH_LONG)
+                        .show() /*navController.navigate(RoutesName.SETTING_SCREEN)*/
+                    "Мои адреса" -> Toast
+                        .makeText(context, "Эта страница на стадии разработки", Toast.LENGTH_LONG)
+                        .show() /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
+                    "Поддержка" -> Toast
+                        .makeText(context, "Эта страница на стадии разработки", Toast.LENGTH_LONG)
+                        .show() /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
                     "О приложении" -> navController.navigate(RoutesName.ABOUT_SCREEN)
                     "Выход" -> {
                         isDialogOpen.value = true
@@ -179,7 +189,13 @@ fun ShowItems(
                         navController.navigate(RoutesName.ORDERS_HISTORY_SCREEN)
                     }
                     "Промокоды" -> {
-                        Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show()
+                        Toast
+                            .makeText(
+                                context,
+                                "Эта страница на стадии разработки",
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
 //                        navController.navigate(RoutesName.PROMO_CODE_SCREEN)
                     }
                     "Позвонить оператору" -> {
