@@ -275,7 +275,7 @@ fun ProfileScreen(
                                                         ?: "").toRequestBody(),
                                                     (profileLastName.value ?: getProfileLastName
                                                     ?: "").toRequestBody(),
-                                                    profileEmail.value ?: getProfileEmail ?: "",
+                                                    if(profileEmail.value !="")profileEmail.value else null,
                                                     photo,
                                                 )
                                                 {

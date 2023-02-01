@@ -47,8 +47,20 @@ class ProfileViewModel @Inject constructor(
                         val tariffsResponse: GetProfileInfoResponse? = result.data
                         _stateGetProfileInfo.value =
                             GetProfileInfoResponseState(response = tariffsResponse?.result)
-                        Log.e("GetProfileResponse", "GetProfileResponseSuccess->\n ${_stateGetProfileInfo.value}")
-                    }catch (e: Exception) {
+                        stateGetProfileInfo.value.response.let {
+                            if (it != null) {
+                                Values.FirstName.value = it.first_name
+                                Values.LastName.value = it.last_name
+                                Values.Email.value = it.email
+                                Values.ImageUrl.value = it.avatar_url
+                                Values.PhoneNumber.value = it.phone
+                            }
+                        }
+                        Log.e(
+                            "GetProfileResponse",
+                            "GetProfileResponseSuccess->\n ${_stateGetProfileInfo.value}"
+                        )
+                    } catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
@@ -69,7 +81,7 @@ class ProfileViewModel @Inject constructor(
     fun sendProfile(
         first_name: RequestBody,
         last_name: RequestBody,
-        email: String,
+        email: String?,
         images: MutableState<File?>,
         onSuccess:()->Unit = {},
     ) {
