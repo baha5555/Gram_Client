@@ -1,9 +1,7 @@
 package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -31,348 +29,319 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
-import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomMainMap
 import com.example.gramclient.presentation.components.SideBarMenu
+import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
-import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
-import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER
-import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER_ID
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
-import com.example.gramclient.utils.Constants.TAG
-import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.utils.Values
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+val orderCount = mutableStateOf(-1)
 
-@SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun SearchDriverScreen(
-    navController: NavHostController,
-    mainViewModel: MainViewModel = hiltViewModel(),
-    orderExecutionViewModel: OrderExecutionViewModel,
-) {
-
-    var pressedTime: Long = 0
-    val activity = (LocalContext.current as? MainActivity)
-    val context1= LocalContext.current
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-
-
-    BackHandler(enabled = drawerState.isClosed) {
-        if (pressedTime + 2000 > System.currentTimeMillis()) {
-            activity?.finish()
-        } else {
-            Toast.makeText(context1, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+class SearchDriverScreen : Screen {
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val mainViewModel: MainViewModel = hiltViewModel()
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+        val isGet = remember {
+            mutableStateOf(true)
         }
-        pressedTime = System.currentTimeMillis();
-    }
-
-
-    val isGet = remember {
-        mutableStateOf(true)
-    }
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberBottomSheetState(
-            initialValue = BottomSheetValue.Expanded
+        val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+            bottomSheetState = rememberBottomSheetState(
+                initialValue = BottomSheetValue.Expanded
+            )
         )
-    )
-    val bottomSheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
-    )
-    val scope = rememberCoroutineScope()
-    var sheetPeekHeight by remember {
-        mutableStateOf(200)
-    }
-    if(isGet.value && Values.PhoneNumber.value!=""){
-        orderExecutionViewModel.readAllOrders()
-        orderExecutionViewModel.readAllClient(Values.PhoneNumber.value)
-        isGet.value=false
-    }
-    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
-    val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        BackHandler(enabled = drawerState.isOpen) {
-
-            scope.launch { drawerState.close() }
+        val bottomSheetState = rememberBottomSheetScaffoldState(
+            bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
+        )
+        val scope = rememberCoroutineScope()
+        var sheetPeekHeight by remember {
+            mutableStateOf(200)
         }
-        ModalDrawer(
-            drawerState = drawerState,
-            gesturesEnabled = !drawerState.isClosed,
-            drawerContent = {
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        SideBarMenu(navController)
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+        if (isGet.value && Values.PhoneNumber.value != "") {
+            orderExecutionViewModel.readAllOrders()
+            orderExecutionViewModel.readAllClient(Values.PhoneNumber.value)
+            isGet.value = false
+        }
+        val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
+        val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            ModalDrawer(
+                drawerState = drawerState,
+                gesturesEnabled = !drawerState.isClosed,
+                drawerContent = {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            SideBarMenu()
+                        }
                     }
-                }
-            },
-            content = {
+                },
+                content = {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-
-                    Scaffold(
-                        backgroundColor = Color(0xFFEEEEEE),
-                        bottomBar = {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .clip(
-                                        shape = RoundedCornerShape(
-                                            topStart = 25.dp,
-                                            topEnd = 25.dp
-                                        )
-                                    )
-                                    .background(Color.White)
-                            ) {
-                                Row(
+                        Scaffold(
+                            backgroundColor = Color(0xFFEEEEEE),
+                            bottomBar = {
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(15.dp)
-                                        .height(50.dp)
-                                        .clip(RoundedCornerShape(20.dp))
-                                        .background(PrimaryColor)
-                                        .clickable {
-                                            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                                popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
-                                                    inclusive = true
-                                                }
-                                            }
-                                        },
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .wrapContentHeight()
+                                        .clip(
+                                            shape = RoundedCornerShape(
+                                                topStart = 25.dp,
+                                                topEnd = 25.dp
+                                            )
+                                        )
+                                        .background(Color.White)
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Image(
-                                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
-                                            contentDescription = "car_eco",
-                                        )
-                                        Text(
-                                            text = "Заказать ещё одну машину",
-                                            textAlign = TextAlign.Center,
-                                            color = Color.White,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                        )
-                                    }
                                     Row(
-                                        modifier = Modifier.padding(end = 10.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(15.dp)
+                                            .height(50.dp)
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .background(PrimaryColor)
+                                            .clickable { navigator.replace(SearchAddressScreen()) },
+                                        horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Divider(
-                                            color = Color.White,
-                                            modifier = Modifier
-                                                .width(1.dp)
-                                                .fillMaxHeight(0.5f)
-                                                .offset((-10).dp, 0.dp)
-                                        )
-                                        Icon(
-                                            imageVector = Icons.Default.ArrowForward,
-                                            contentDescription = "car_eco",
-                                            modifier = Modifier.size(24.dp),
-                                            tint = Color.White
-                                        )
-                                    }
-
-                                }
-
-                                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                                    repeat(5) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(150.dp, 30.dp)
-                                                .padding(start = 15.dp)
-                                                .border(
-                                                    width = 1.dp,
-                                                    color = PrimaryColor,
-                                                    shape = RoundedCornerShape(35.dp)
-                                                )
-                                                .clip(RoundedCornerShape(35.dp))
-                                        ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
                                             Image(
-                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
-                                                contentDescription = "ic_box"
+                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                                                contentDescription = "car_eco",
                                             )
                                             Text(
-                                                text = "Доставка",
-                                                fontSize = 12.sp,
-                                                modifier = Modifier.align(
-                                                    Alignment.Center
-                                                )
+                                                text = "Заказать ещё одну машину",
+                                                textAlign = TextAlign.Center,
+                                                color = Color.White,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.SemiBold,
                                             )
                                         }
-                                        Box(
-                                            modifier = Modifier
-                                                .size(150.dp, 30.dp)
-                                                .padding(start = 15.dp)
-                                                .border(
-                                                    width = 1.dp,
-                                                    color = PrimaryColor,
-                                                    shape = RoundedCornerShape(35.dp)
-                                                )
-                                                .clip(RoundedCornerShape(35.dp))
+                                        Row(
+                                            modifier = Modifier.padding(end = 10.dp),
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Image(
-                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
-                                                contentDescription = "ic_box"
+                                            Divider(
+                                                color = Color.White,
+                                                modifier = Modifier
+                                                    .width(1.dp)
+                                                    .fillMaxHeight(0.5f)
+                                                    .offset((-10).dp, 0.dp)
                                             )
-                                            Text(
-                                                text = "Аренда авто",
-                                                fontSize = 12.sp,
-                                                modifier = Modifier.align(
-                                                    Alignment.Center
+                                            Icon(
+                                                imageVector = Icons.Default.ArrowForward,
+                                                contentDescription = "car_eco",
+                                                modifier = Modifier.size(24.dp),
+                                                tint = Color.White
+                                            )
+                                        }
+
+                                    }
+
+                                    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                                        repeat(5) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(150.dp, 30.dp)
+                                                    .padding(start = 15.dp)
+                                                    .border(
+                                                        width = 1.dp,
+                                                        color = PrimaryColor,
+                                                        shape = RoundedCornerShape(35.dp)
+                                                    )
+                                                    .clip(RoundedCornerShape(35.dp))
+                                            ) {
+                                                Image(
+                                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
+                                                    contentDescription = "ic_box"
                                                 )
-                                            )
+                                                Text(
+                                                    text = "Доставка",
+                                                    fontSize = 12.sp,
+                                                    modifier = Modifier.align(
+                                                        Alignment.Center
+                                                    )
+                                                )
+                                            }
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(150.dp, 30.dp)
+                                                    .padding(start = 15.dp)
+                                                    .border(
+                                                        width = 1.dp,
+                                                        color = PrimaryColor,
+                                                        shape = RoundedCornerShape(35.dp)
+                                                    )
+                                                    .clip(RoundedCornerShape(35.dp))
+                                            ) {
+                                                Image(
+                                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
+                                                    contentDescription = "ic_box"
+                                                )
+                                                Text(
+                                                    text = "Аренда авто",
+                                                    fontSize = 12.sp,
+                                                    modifier = Modifier.align(
+                                                        Alignment.Center
+                                                    )
+                                                )
+                                            }
                                         }
                                     }
+                                    Spacer(Modifier.requiredHeight(20.dp))
                                 }
-                                Spacer(Modifier.requiredHeight(20.dp))
                             }
-                        }
-                    ) {
+                        ) {
 
-                        BottomSheetScaffold(
-                            sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
-                            scaffoldState = bottomSheetScaffoldState,
-                            floatingActionButton = {
-                                FloatingButton(
-                                    scope = scope,
-                                    drawerState = drawerState,
-                                    bottomSheetState = bottomSheetState
-                                )
-                            },
-                            sheetContent = {
-                                Column(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentHeight()
-                                        .background(Color(0xFFEEEEEE))
-                                ) {
-//                    if(stateRealtimeDatabaseOrders.isLoading) {
-//                        Box(
-//                            modifier = Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)),
-//                            contentAlignment = Alignment.Center
-//                        ) {
-//                            CircularProgressIndicator(color = PrimaryColor)
-//                        }
-//                    }
-                                    stateRealtimeDatabaseOrders.response?.let { response ->
-                                        response.observeAsState().value?.let { orders ->
-                                            stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
-                                                responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
-                                                    LazyColumn() {
-                                                        items(orders) { order ->
-                                                            clientOrdersId.active_orders?.let { active ->
-                                                                active.forEach { clientOrderId ->
-                                                                    var isOpen =
-                                                                        remember {
-                                                                            mutableStateOf(
-                                                                                false
+                            BottomSheetScaffold(
+                                sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
+                                scaffoldState = bottomSheetScaffoldState,
+                                floatingActionButton = {
+                                    FloatingButton(
+                                        scope = scope,
+                                        drawerState = drawerState,
+                                        bottomSheetState = bottomSheetState
+                                    )
+                                },
+                                sheetContent = {
+                                    Column(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .wrapContentHeight()
+                                            .background(Color(0xFFEEEEEE))
+                                    ) {
+                                        stateRealtimeDatabaseOrders.response?.let { response ->
+                                            response.observeAsState().value?.let { orders ->
+                                                orderCount.value = orders.size
+                                                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
+                                                    responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
+                                                        LazyColumn() {
+                                                            items(orders) { order ->
+                                                                clientOrdersId.active_orders?.let { active ->
+                                                                    active.forEach { clientOrderId ->
+                                                                        var isOpen =
+                                                                            remember {
+                                                                                mutableStateOf(
+                                                                                    false
+                                                                                )
+                                                                            }
+                                                                        if (order.id == clientOrderId) {
+                                                                            orderCard(
+                                                                                orderExecutionViewModel,
+                                                                                order,
+                                                                                sheetPeekHeightUpOnClick = {
+                                                                                    scope.launch {
+                                                                                        isOpen.value =
+                                                                                            !isOpen.value
+                                                                                        sheetPeekHeight =
+                                                                                            if (isOpen.value)
+                                                                                                367
+                                                                                            else
+                                                                                                200
+
+                                                                                    }
+                                                                                },
+                                                                                isOpen = isOpen,
+                                                                            )
+                                                                            Spacer(
+                                                                                Modifier.height(
+                                                                                    10.dp
+                                                                                )
                                                                             )
                                                                         }
-                                                                    if (order.id == clientOrderId) {
-                                                                        orderCard(
-                                                                            orderExecutionViewModel,
-                                                                            order,
-                                                                            navController,
-                                                                            sheetPeekHeightUpOnClick = {
-                                                                                scope.launch {
-                                                                                    isOpen.value =
-                                                                                        !isOpen.value
-                                                                                    sheetPeekHeight =
-                                                                                        if (isOpen.value)
-                                                                                            367
-                                                                                        else
-                                                                                            200
-
-                                                                                }
-                                                                            },
-                                                                            isOpen = isOpen,
-                                                                        )
-                                                                        Spacer(Modifier.height(10.dp))
                                                                     }
                                                                 }
                                                             }
-                                                        }
-                                                        item {
-                                                            Spacer(modifier = Modifier.height(120.dp))
+                                                            item {
+                                                                Spacer(
+                                                                    modifier = Modifier.height(
+                                                                        120.dp
+                                                                    )
+                                                                )
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                            }, sheetPeekHeight = sheetPeekHeight.dp
-                        ) {
-                            CustomMainMap(
-                                mainViewModel = mainViewModel,
-                                navController = navController
-                            )
+                                }, sheetPeekHeight = sheetPeekHeight.dp
+                            ) {
+                                CustomMainMap(
+                                    mainViewModel = mainViewModel
+                                )
+                            }
                         }
                     }
                 }
-            }
-        )
+            )
+        }
     }
+
 }
+
 @SuppressLint("SimpleDateFormat", "CoroutineCreationDuringComposition")
 @Composable
 fun orderCard(
     orderExecutionViewModel: OrderExecutionViewModel,
     order: RealtimeDatabaseOrder,
-    navController: NavHostController,
-    sheetPeekHeightUpOnClick:()->Unit,
-    isOpen:MutableState<Boolean>,
-){
+    sheetPeekHeightUpOnClick: () -> Unit,
+    isOpen: MutableState<Boolean>,
+) {
+    val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
 
     val DateformatParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
-    var fillingTimeDateParse: Long by remember{
+    var fillingTimeDateParse: Long by remember {
         mutableStateOf(0)
     }
-    var diff:Long by remember{
+    var diff: Long by remember {
         mutableStateOf(0)
     }
 
-    var fillingTimeMinutes:Long by remember{
+    var fillingTimeMinutes: Long by remember {
         mutableStateOf(0)
     }
     val scope = rememberCoroutineScope()
     scope.launch {
-        if(STATE_RAITING_ORDER_ID.value != order.id){
+        if (STATE_RAITING_ORDER_ID.value != order.id) {
             STATE_RAITING.value = false
         }
         order.filing_time?.let {
             fillingTimeDateParse = DateformatParse.parse(it).time
-            diff = (System.currentTimeMillis()-fillingTimeDateParse)*-1
+            diff = (System.currentTimeMillis() - fillingTimeDateParse) * -1
             fillingTimeMinutes = diff / (60 * 1000) % 60
 //            Log.e(TAG,"fillingTimeMinutes $fillingTimeMinutes")
         }
     }
-    val cancelOrderIsDialogOpen = remember{ mutableStateOf(false)}
-    val connectClientWithDriverIsDialogOpen = remember{ mutableStateOf(false)}
+    val cancelOrderIsDialogOpen = remember { mutableStateOf(false) }
+    val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .clickable { sheetPeekHeightUpOnClick() }
             .fillMaxWidth()
             .background(color = Color.White, shape = RoundedCornerShape(20.dp))
-    ){
-        if(order.performer == null){
+    ) {
+        if (order.performer == null) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -381,10 +350,12 @@ fun orderCard(
                         start = 20.dp,
                         end = 20.dp
                     )
-            ){
-                LinearProgressIndicator(color = Color(0xFF4285F4), modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(percent = 50)))
+            ) {
+                LinearProgressIndicator(
+                    color = PrimaryColor, modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(shape = RoundedCornerShape(percent = 50))
+                )
             }
         }
         Row(
@@ -398,31 +369,39 @@ fun orderCard(
                 ),
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Column(){
-                Text(text =
-                if(order.performer == null)
-                    "Ищем ближайших водителей..."
-                else {
-                        when(order.status){
-                            "Водитель на месте"->"Водитель на месте,\n можете выходить"
-                            "Исполняется"->"За рулем ${order.performer?.first_name?:"Водитель"}"
-                            "Водитель назначен"->{
-                                if(fillingTimeMinutes>0)"Через $fillingTimeMinutes мин приедет"
+        ) {
+            Column() {
+                Text(
+                    text =
+                    if (order.performer == null)
+                        "Ищем ближайших водителей..."
+                    else {
+                        when (order.status) {
+                            "Водитель на месте" -> "Водитель на месте,\n можете выходить"
+                            "Исполняется" -> "За рулем ${order.performer?.first_name ?: "Водитель"}"
+                            "Водитель назначен" -> {
+                                if (fillingTimeMinutes > 0) "Через $fillingTimeMinutes мин приедет"
                                 else "В ближайшее время \n приедет ${order.performer.first_name}"
                             }
-                            else -> {""}
+                            else -> {
+                                ""
+                            }
                         }
-                },
-                    fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text(text =  if(order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color?:""} ${order.performer.transport?.model?:""}", fontSize = 14.sp, color = Color.Black)
+                    },
+                    fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black
+                )
+                Text(
+                    text = if (order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color ?: ""} ${order.performer.transport?.model ?: ""}",
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
             }
-            if(order.performer == null) {
+            if (order.performer == null) {
                 Text(text = "00:00", fontSize = 14.sp, color = Color.Black)
-            }else{
+            } else {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = order.performer.transport?.car_number?:"",
+                        text = order.performer.transport?.car_number ?: "",
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp,
                         modifier = Modifier
@@ -437,7 +416,7 @@ fun orderCard(
                 }
             }
         }
-        if(isOpen.value){
+        if (isOpen.value) {
             Divider()
             Row(
                 modifier = Modifier
@@ -445,16 +424,17 @@ fun orderCard(
                     .padding(20.dp),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.Center
-            ){
-                if(order.performer == null) {
+            ) {
+                if (order.performer == null) {
                     CustomCircleButton(
                         text = "Отменить\nзаказ",
                         icon = Icons.Default.Close
                     ) {
                         cancelOrderIsDialogOpen.value = true
                     }
-                }else {
-                    CustomCircleButton(text = "Связаться",
+                } else {
+                    CustomCircleButton(
+                        text = "Связаться",
                         icon = R.drawable.phone
                     ) {
                         connectClientWithDriverIsDialogOpen.value = true
@@ -463,7 +443,7 @@ fun orderCard(
                 Spacer(modifier = Modifier.width(50.dp))
                 CustomCircleButton(text = "Детали", icon = Icons.Default.Menu) {
                     orderExecutionViewModel.updateSelectedOrder(order)
-                    navController.navigate(RoutesName.ORDER_EXECUTION_SCREEN)
+                    navigator.push(OrderExecutionScreen())
                 }
             }
         }
@@ -472,7 +452,7 @@ fun orderCard(
         text = "Вы уверены что хотите отменить заказ?",
         okBtnClick = {
             cancelOrderIsDialogOpen.value = false
-            orderExecutionViewModel.cancelOrder(order.id, navController,{})
+            orderExecutionViewModel.cancelOrder(order.id, {})
         },
         cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
         isDialogOpen = cancelOrderIsDialogOpen.value
@@ -495,12 +475,12 @@ fun orderCard(
 
 @Composable
 fun PulseLoading(
-    durationMillis:Int = 1000,
-    maxPulseSize:Float = 300f,
-    minPulseSize:Float = 50f,
-    pulseColor:Color = Color(234,240,246),
-    centreColor:Color =  Color(66,133,244)
-){
+    durationMillis: Int = 1000,
+    maxPulseSize: Float = 300f,
+    minPulseSize: Float = 50f,
+    pulseColor: Color = Color(234, 240, 246),
+    centreColor: Color = Color(66, 133, 244)
+) {
     val infiniteTransition = rememberInfiniteTransition()
     val size by infiniteTransition.animateFloat(
         initialValue = minPulseSize,
@@ -518,7 +498,7 @@ fun PulseLoading(
             repeatMode = RepeatMode.Restart
         )
     )
-    Box(contentAlignment = Alignment.Center,modifier = Modifier.fillMaxSize()) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Card(
             shape = CircleShape,
             modifier = Modifier
@@ -528,10 +508,12 @@ fun PulseLoading(
             backgroundColor = pulseColor,
             elevation = 0.dp
         ) {}
-        Card(modifier = Modifier
-            .size(minPulseSize.dp)
-            .align(Alignment.Center),
+        Card(
+            modifier = Modifier
+                .size(minPulseSize.dp)
+                .align(Alignment.Center),
             shape = CircleShape,
-            backgroundColor = centreColor){}
+            backgroundColor = centreColor
+        ) {}
     }
 }

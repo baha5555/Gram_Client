@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 fun SearchResultContent(
     searchText: MutableState<String>,
     focusManager: FocusManager,
-    navController: NavHostController,
     isAddressList: MutableState<Boolean>,
     bottomSheetState: BottomSheetScaffoldState,
     isSearchState: MutableState<Boolean>,
@@ -31,7 +30,7 @@ fun SearchResultContent(
     mainViewModel: MainViewModel,
     WHICH_ADDRESS: MutableState<String>
 ) {
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
+    //val currentRoute = navController.currentBackStackEntry?.destination?.route
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,9 +52,9 @@ fun SearchResultContent(
                 }
                 Constants.TO_ADDRESS -> {
                     mainViewModel.updateToAddress(address)
-                    if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
+                    /*if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
                         navController.navigate(RoutesName.MAIN_SCREEN)
-                    }
+                    }*/
                 }
             }
         }

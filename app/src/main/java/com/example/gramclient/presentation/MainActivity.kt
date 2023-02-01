@@ -7,15 +7,14 @@ import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import cafe.adriel.voyager.navigator.Navigator
 import com.example.gramclient.*
+import com.example.gramclient.presentation.screens.SplashScreen
 import com.example.gramclient.presentation.screens.authorization.AuthViewModel
-import com.example.gramclient.presentation.screens.drawer.messageScreen.MessageViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
 import com.example.gramclient.utils.Constants.FCM_TOKEN
 import com.example.gramclient.utils.MyFirebaseMessagingService
@@ -42,16 +41,10 @@ class MainActivity : ComponentActivity() {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
             GramClientTheme {
-                val messageViewModel = viewModels<MessageViewModel>()
-                authViewModel = hiltViewModel()
                 navController = rememberNavController()
                 scope = rememberCoroutineScope()
                 Permissions()
-                Navigation(
-                    navController = navController,
-                    messageViewModel,
-                    authViewModel = authViewModel
-                )
+                Navigator(screen = SplashScreen())
                 MyFirebaseMessagingService().onCreate()
             }
         }
@@ -91,7 +84,9 @@ class MainActivity : ComponentActivity() {
         smsBroadcastReceiver!!.smsBroadcastReceiverListener =
             object : SmsBroadcastReceiver.SmsBroadcastReceiverListener {
                 override fun onSuccess(intent: Intent?) {
-                    startActivityForResult(intent, REQ_USER_CONSENT)
+                    if (intent != null) {
+                        startActivityForResult(intent, REQ_USER_CONSENT)
+                    }
                 }
 
                 override fun onFailure() {}

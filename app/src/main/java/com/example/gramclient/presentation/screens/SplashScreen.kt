@@ -1,6 +1,5 @@
 package com.example.gramclient.presentation.screens
 
-import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.tween
@@ -21,59 +20,50 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.CustomRequestError
-import com.example.gramclient.presentation.components.currentRoute
-import com.example.gramclient.utils.RoutesName
+import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 
-@Composable
-fun SplashScreen(
-    navController: NavController,
-    orderExecutionViewModel: OrderExecutionViewModel,
-    profileViewModel: ProfileViewModel = hiltViewModel()
-) {
-    val activeOrders = orderExecutionViewModel.stateActiveOrders.value
-    val profileInfo = profileViewModel.stateGetProfileInfo.value
+class SplashScreen : Screen {
+    @Composable
+    override fun Content() {
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+        val profileViewModel: ProfileViewModel = hiltViewModel()
+        val navigator = LocalNavigator.currentOrThrow
+        val currentKey = navigator.lastItem.key
+        val activeOrders = orderExecutionViewModel.stateActiveOrders.value
+        val profileInfo = profileViewModel.stateGetProfileInfo.value
 
-    val prefs = CustomPreference(LocalContext.current)
-    LaunchedEffect(key1 = true) {
-        if (prefs.getAccessToken() == "") navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
-        else {
+        val prefs = CustomPreference(LocalContext.current)
+        LaunchedEffect(key1 = true) {
+            if (prefs.getAccessToken() == "") navigator.replace(SearchAddressScreen())
+            else {
+                orderExecutionViewModel.getActiveOrders()
+                profileViewModel.getProfileInfo()
+            }
+        }
+        if (activeOrders.success) {
+        if (currentKey == SplashScreen().key) {
+            if (activeOrders.response!!.isEmpty()) { navigator.replace(SearchAddressScreen()) }
+            else { navigator.replace(SearchDriverScreen()) }
+        }
+        }
+        Splash()
+        if(activeOrders.error!="" && profileInfo.error!="") CustomRequestError{
             orderExecutionViewModel.getActiveOrders()
             profileViewModel.getProfileInfo()
         }
-    }
-    if (activeOrders.success) {
-        currentRoute = navController.currentBackStackEntry?.destination?.route
-        if (currentRoute == RoutesName.SPLASH_SCREEN) {
-            Log.i("asdasda", "" + activeOrders.response)
-            if (activeOrders.response!!.isEmpty()) {
-                navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
-                    popUpTo(RoutesName.SPLASH_SCREEN) {
-                        inclusive = true
-                    }
-                }
-            } else {
-                navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN) {
-                    popUpTo(RoutesName.SPLASH_SCREEN) {
-                        inclusive = true
-                    }
-                }
-            }
-        }
-    }
-    Splash()
-    if(activeOrders.error!="" && profileInfo.error!="") CustomRequestError{
-        orderExecutionViewModel.getActiveOrders()
-        profileViewModel.getProfileInfo()
     }
 }
 

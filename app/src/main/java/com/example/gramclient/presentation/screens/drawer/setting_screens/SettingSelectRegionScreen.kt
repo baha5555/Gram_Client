@@ -22,7 +22,7 @@ import com.example.gramclient.presentation.components.CustomTopBar
 
 @Composable
 fun SettingSelectRegionScreen(navController: NavHostController) {
-    Scaffold(topBar = { CustomTopBar(title = "Выбор страны", navController) }) {
+    Scaffold(topBar = { CustomTopBar(title = "Выбор страны") }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             val search = remember {
                 mutableStateOf("")

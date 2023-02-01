@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation
+package com.example.gramclient.presentation.screens.drawer
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,7 +25,7 @@ import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
 fun PromoCodeScreen(navController: NavHostController) {
-    Scaffold(topBar = { CustomTopBar(title = "Промокоды", navController = navController) }) {
+    Scaffold(topBar = { CustomTopBar(title = "Промокоды") }) {
         Column{
             Column(
                 modifier = Modifier
