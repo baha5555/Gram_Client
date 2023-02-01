@@ -47,7 +47,7 @@ fun AboutScreen(navController: NavHostController) {
                 fontWeight = FontWeight.Bold,
                 lineHeight = 24.sp
             )
-            Text(text = "версия 1.00.00 от 1 декабря 2022", fontSize = 20.sp)
+            Text(text = "версия 1.1", fontSize = 20.sp)
             Spacer(modifier = Modifier.height(30.dp))
             Text(
                 text = "Приложение предназначено для создания заказа автотранспорта, услуг и информирования заказчика о его исполнении.",

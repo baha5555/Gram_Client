@@ -42,14 +42,12 @@ import coil.compose.rememberImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
-import com.example.gramclient.presentation.components.CustomButton
-import com.example.gramclient.presentation.components.CustomDialog
-import com.example.gramclient.presentation.components.CustomSwitch
-import com.example.gramclient.presentation.components.CustomTopBar
+import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.authorization.LoadingIndicator
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
 import com.example.gramclient.utils.RoutesName
+import com.example.gramclient.utils.Values
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -73,13 +71,11 @@ fun ProfileScreen(
 
     val stateGetProfileInfo by viewModel.stateGetProfileInfo
 
-    val profileInfo = stateGetProfileInfo.response
+    val getProfileFirstName = Values.FirstName.value
 
-    val getProfileFirstName = stateGetProfileInfo.response?.first_name
+    val getProfileLastName = Values.LastName.value
 
-    val getProfileLastName = stateGetProfileInfo.response?.last_name
-
-    val getProfileEmail = stateGetProfileInfo.response?.email
+    val getProfileEmail = Values.Email.value
 
     val profileFirstName = remember { mutableStateOf(getProfileFirstName) }
 
@@ -87,7 +83,7 @@ fun ProfileScreen(
 
     val profileLastName = remember { mutableStateOf(getProfileLastName) }
 
-    val profileImage = viewModel.stateGetProfileInfo.value.response?.avatar_url
+    val profileImage = Values.ImageUrl.value
 
     val isDialogOpen = remember { mutableStateOf(false) }
 
@@ -100,7 +96,8 @@ fun ProfileScreen(
 
     val state = rememberSwipeRefreshState(stateGetProfileInfo.isLoading)
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = true)
+    {
         viewModel.getProfileInfo()
     }
     val prefs = CustomPreference(LocalContext.current)
@@ -120,137 +117,132 @@ fun ProfileScreen(
             cancelBtnClick = { isDialogOpen.value = false },
             isDialogOpen = isDialogOpen.value
         )
-        when {
-            stateGetProfileInfo.isLoading -> {
-                LoadingIndicator(isLoading = true)
+        SwipeRefresh(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            onRefresh = {
+                viewModel.getProfileInfo()
+                profileFirstName.value = getProfileFirstName
+                profileLastName.value = getProfileLastName
+                profileEmail.value = getProfileEmail
             }
-        }
-        profileInfo?.let { taxiOrdersNonNull ->
-            SwipeRefresh(
-                modifier = Modifier.fillMaxSize(),
-                state = state,
-                onRefresh = {
-                    viewModel.getProfileInfo()
-                    profileFirstName.value = getProfileFirstName
-                    profileLastName.value = getProfileLastName
-                    profileEmail.value = getProfileEmail
-                }
+        ) {
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(BackgroundColor)
+                    .fillMaxSize()
             ) {
-                LazyColumn(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .background(BackgroundColor)
-                        .fillMaxSize()
-                ) {
-                    item {
-                        Spacer(modifier = Modifier.height(75.dp))
-                        if (selectImage != null) {
-                            Image(
-                                painter = rememberImagePainter(selectImage),
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(150.dp)
-                                    .clip(CircleShape)
-                                    .clickable {
-                                        launcher.launch("image/*")
-                                    },
-                                contentDescription = "",
-                            )
-                        }
-                        else {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = if(profileImage!="") profileImage ?: R.drawable.camera_plus else R.drawable.camera_plus
-                                ),
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(150.dp)
-                                    .clip(CircleShape)
-                                    .clickable {
-                                        launcher.launch("image/*")
-                                    },
-                                contentDescription = "",
-                            )
-                        }
-                        Text(
-                            modifier = Modifier.clickable { launcher.launch("image/*") },
-                            text = "Изменить фото",
-                            textDecoration = TextDecoration.Underline,
-                            fontSize = 18.sp
-                        )
-                        Spacer(modifier = Modifier.height(75.dp))
-
-                        Column(
+                item {
+                    Spacer(modifier = Modifier.height(75.dp))
+                    if (selectImage != null) {
+                        Image(
+                            painter = rememberImagePainter(selectImage),
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 27.dp, end = 21.dp)
-                        ) {
+                                .size(150.dp)
+                                .clip(CircleShape)
+                                .clickable {
+                                    launcher.launch("image/*")
+                                },
+                            contentDescription = "",
+                        )
+                    }
+                    else {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = if(profileImage!="") profileImage ?: R.drawable.camera_plus else R.drawable.camera_plus
+                            ),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(150.dp)
+                                .clip(CircleShape)
+                                .padding(20.dp)
+                                .clickable {
+                                    launcher.launch("image/*")
+                                },
+                            contentDescription = "",
+                        )
+                    }
+                    Text(
+                        modifier = Modifier.clickable { launcher.launch("image/*") },
+                        text = "Изменить фото",
+                        textDecoration = TextDecoration.Underline,
+                        fontSize = 18.sp
+                    )
+                    Spacer(modifier = Modifier.height(75.dp))
 
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                value = (profileFirstName.value?:getProfileFirstName?:""),
-                                onValueChange = { profileFirstName.value = it },
-                                label = { Text(text = "Имя*") },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = BackgroundColor,
-                                    unfocusedLabelColor = FontSilver,
-                                    focusedLabelColor = FontSilver,
-                                    unfocusedIndicatorColor = FontSilver,
-                                    focusedIndicatorColor = FontSilver,
-                                    cursorColor = FontSilver,
-                                )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 27.dp, end = 21.dp)
+                    ) {
+
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            value = (profileFirstName.value?:getProfileFirstName?:""),
+                            onValueChange = { profileFirstName.value = it },
+                            label = { Text(text = "Имя*") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = BackgroundColor,
+                                unfocusedLabelColor = FontSilver,
+                                focusedLabelColor = FontSilver,
+                                unfocusedIndicatorColor = FontSilver,
+                                focusedIndicatorColor = FontSilver,
+                                cursorColor = FontSilver,
                             )
-                            Spacer(modifier = Modifier.height(35.dp))
-                                TextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    value = (profileLastName.value ?: getProfileLastName ?: ""),
-                                    onValueChange = { profileLastName.value = it },
-                                    label = { Text(text = "Фамилия*") },
-                                    colors = TextFieldDefaults.textFieldColors(
-                                        backgroundColor = BackgroundColor,
-                                        unfocusedLabelColor = FontSilver,
-                                        focusedLabelColor = FontSilver,
-                                        unfocusedIndicatorColor = FontSilver,
-                                        focusedIndicatorColor = FontSilver,
-                                        cursorColor = FontSilver,
-                                    )
-                                )
-                            Spacer(modifier = Modifier.height(35.dp))
-                                TextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    value = (profileEmail.value ?: getProfileEmail ?: ""),
-                                    onValueChange = { profileEmail.value = it },
-                                    label = { Text(text = "Email*") },
-                                    colors = TextFieldDefaults.textFieldColors(
-                                        backgroundColor = BackgroundColor,
-                                        unfocusedLabelColor = FontSilver,
-                                        focusedLabelColor = FontSilver,
-                                        unfocusedIndicatorColor = FontSilver,
-                                        focusedIndicatorColor = FontSilver,
-                                        cursorColor = FontSilver,
-                                    )
-                                )
+                        )
+                        Spacer(modifier = Modifier.height(35.dp))
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            value = (profileLastName.value ?: getProfileLastName ?: ""),
+                            onValueChange = { profileLastName.value = it },
+                            label = { Text(text = "Фамилия*") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = BackgroundColor,
+                                unfocusedLabelColor = FontSilver,
+                                focusedLabelColor = FontSilver,
+                                unfocusedIndicatorColor = FontSilver,
+                                focusedIndicatorColor = FontSilver,
+                                cursorColor = FontSilver,
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(35.dp))
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            value = (profileEmail.value ?: getProfileEmail ?: ""),
+                            onValueChange = { profileEmail.value = it },
+                            label = { Text(text = "Email*") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = BackgroundColor,
+                                unfocusedLabelColor = FontSilver,
+                                focusedLabelColor = FontSilver,
+                                unfocusedIndicatorColor = FontSilver,
+                                focusedIndicatorColor = FontSilver,
+                                cursorColor = FontSilver,
+                            )
+                        )
 
-                            Spacer(modifier = Modifier.height(35.dp))
-                            Column {
-                                Text(text = "Телефон",
-                                    modifier = Modifier
+                        Spacer(modifier = Modifier.height(35.dp))
+                        Column {
+                            Text(text = "Телефон",
+                                modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 15.dp, bottom = 5.dp), fontSize = 12.sp, color = Color.Gray)
-                                Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 15.dp, bottom = 10.dp),
-                                    text = viewModel.stateGetProfileInfo.value.response?.phone.toString(),
-                                    color = Color.Gray
-                                )
-                                Divider()
-                            }
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 15.dp, bottom = 10.dp),
+                                text = Values.PhoneNumber.value,
+                                color = Color.Gray
+                            )
+                            Divider()
+                        }
 
-                            Spacer(modifier = Modifier.height(49.dp))
+                        Spacer(modifier = Modifier.height(49.dp))
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -309,37 +301,39 @@ fun ProfileScreen(
                                                 ).show()
                                             }
 
-                                        }
                                     }
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(49.dp))
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-
-                            ) {
-                                Text(
-                                    text = "Получение рассылки",
-                                    color = Color.Black,
-                                    fontSize = 15.sp
-                                )
-                                Box(modifier = Modifier.padding(end = 5.dp)) {
-                                    val switchON = remember {
-                                        mutableStateOf(false) // Initially the switch is ON
-                                    }
-                                    CustomSwitch(switchON) {}
                                 }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(49.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
 
+                        ) {
+                            Text(
+                                text = "Получение рассылки",
+                                color = Color.Black,
+                                fontSize = 15.sp
+                            )
+                            Box(modifier = Modifier.padding(end = 5.dp)) {
+                                val switchON = remember {
+                                    mutableStateOf(false) // Initially the switch is ON
+                                }
+                                CustomSwitch(switchON) {}
                             }
-                            Spacer(modifier = Modifier.height(49.dp))
 
                         }
+                        Spacer(modifier = Modifier.height(49.dp))
+
                     }
                 }
             }
         }
+    }
+    if(stateGetProfileInfo.error!="") CustomRequestError {
+        viewModel.getProfileInfo()
     }
 }
 fun getRealPathFromURI(context: Context, uri: Uri): String? {

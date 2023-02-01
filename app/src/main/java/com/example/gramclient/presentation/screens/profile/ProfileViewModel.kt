@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.profile.*
+import com.example.gramclient.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -38,9 +39,9 @@ class ProfileViewModel @Inject constructor(
     private val _stateGetProfileInfo = mutableStateOf(GetProfileInfoResponseState())
     val stateGetProfileInfo: State<GetProfileInfoResponseState> = _stateGetProfileInfo
 
-    fun getProfileInfo(){
+    fun getProfileInfo() {
         getProfileInfoUseCase.invoke().onEach { result: Resource<GetProfileInfoResponse> ->
-            when (result){
+            when (result) {
                 is Resource.Success -> {
                     try {
                         val tariffsResponse: GetProfileInfoResponse? = result.data
@@ -71,31 +72,35 @@ class ProfileViewModel @Inject constructor(
         email: String,
         images: MutableState<File?>,
         onSuccess:()->Unit = {},
-                    ){
-        sendProfileUseCase.invoke(first_name,last_name, email, avatar = images).onEach { result: Resource<ProfileResponse> ->
-            when (result){
-                is Resource.Success -> {
-                    try {
-                        val allowancesResponse: ProfileResponse? = result.data
-                        _stateprofile.value =
-                            ProfileResponseState(response = allowancesResponse?.result)
-                        getProfileInfo()
-                        onSuccess()
-                        Log.e("ProfileResponse", "SendProfileSuccess->\n ${_stateprofile.value}")
-                    }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+    ) {
+        sendProfileUseCase.invoke(first_name, last_name, email, avatar = images)
+            .onEach { result: Resource<ProfileResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val allowancesResponse: ProfileResponse? = result.data
+                            _stateprofile.value =
+                                ProfileResponseState(response = allowancesResponse?.result)
+                            getProfileInfo()
+                            onSuccess()
+                            Log.e(
+                                "ProfileResponse",
+                                "SendProfileSuccess->\n ${_stateprofile.value}"
+                            )
+                        } catch (e: Exception) {
+                            Log.d("Exception", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
+                        Log.e("ProfileResponse", "SendProfileErorr->\n ${result.message}")
+                        _stateprofile.value = ProfileResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateprofile.value = ProfileResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("ProfileResponse", "SendProfileErorr->\n ${result.message}")
-                    _stateprofile.value = ProfileResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateprofile.value = ProfileResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 }

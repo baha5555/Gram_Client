@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.screens
 
+import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.tween
@@ -19,37 +20,60 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import kotlinx.coroutines.delay
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
+import com.example.gramclient.presentation.components.CustomRequestError
+import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 
 @Composable
 fun SplashScreen(
     navController: NavController,
     orderExecutionViewModel: OrderExecutionViewModel,
-){
+    profileViewModel: ProfileViewModel = hiltViewModel()
+) {
+    val activeOrders = orderExecutionViewModel.stateActiveOrders.value
     val prefs = CustomPreference(LocalContext.current)
     LaunchedEffect(key1 = true) {
-        delay(2200L)
-        if (prefs.getAccessToken() != "") {
-            orderExecutionViewModel.getActiveOrders(navController)
-        }else{
-            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
+        if (prefs.getAccessToken() == "") navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
+        else {
+            orderExecutionViewModel.getActiveOrders()
+            profileViewModel.getProfileInfo()
+        }
+    }
+    if (activeOrders.success) {
+        currentRoute = navController.currentBackStackEntry?.destination?.route
+        if (currentRoute == RoutesName.SPLASH_SCREEN) {
+            Log.i("asdasda", "" + activeOrders.response)
+            if (activeOrders.response!!.isEmpty()) {
+                navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                    popUpTo(RoutesName.SPLASH_SCREEN) {
+                        inclusive = true
+                    }
+                }
+            } else {
+                navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN) {
+                    popUpTo(RoutesName.SPLASH_SCREEN) {
+                        inclusive = true
+                    }
+                }
+            }
         }
     }
     Splash()
-
+    if(activeOrders.error!="") CustomRequestError{ orderExecutionViewModel.getActiveOrders() }
 }
 
 @Composable
-fun Splash(){
+fun Splash() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +105,7 @@ fun Splash(){
         )
         var visible by remember { mutableStateOf(false) }
 
-        val animationTime = 1500
+        val animationTime = 15000
         val animationDelayTime = 5
 
         val arrowStartLocation = Offset(0F, 100F)

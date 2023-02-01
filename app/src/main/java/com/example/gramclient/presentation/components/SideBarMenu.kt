@@ -30,16 +30,14 @@ import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
+import com.example.gramclient.utils.Values
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun SideBarMenu(
-    navController: NavHostController,
-    viewModel: ProfileViewModel = hiltViewModel()
-) {
+    navController: NavHostController) {
     val isDialogOpen = remember { mutableStateOf(false) }
-    val stateGetProfileInfo by viewModel.stateGetProfileInfo
     val prefs = CustomPreference(LocalContext.current)
 
     val coroutineScope = rememberCoroutineScope()
@@ -59,7 +57,7 @@ fun SideBarMenu(
             Box {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = if(stateGetProfileInfo.response?.avatar_url!="")stateGetProfileInfo.response?.avatar_url ?: R.drawable.camera_plus_light else R.drawable.camera_plus_light
+                        model = if(Values.ImageUrl.value!="")Values.ImageUrl.value ?: R.drawable.camera_plus_light else R.drawable.camera_plus_light
                     ),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -92,7 +90,7 @@ fun SideBarMenu(
                             }
                         }
                     },
-                    text = if (stateGetProfileInfo.response?.first_name != null && stateGetProfileInfo.response?.last_name != null) stateGetProfileInfo.response?.first_name + ' ' + stateGetProfileInfo.response?.last_name else "Выбрать Имя...",
+                    text =if(Values.FirstName.value!="" && Values.LastName.value!="") Values.FirstName.value+" "+Values.LastName.value else "Выбрать Имя...",
                     fontSize = 22.sp,
                     color = Color.White
                 )
@@ -100,7 +98,7 @@ fun SideBarMenu(
                     modifier = Modifier.clickable {
                         navController.navigate(RoutesName.PROFILE_SCREEN)
                     },
-                    text = if (stateGetProfileInfo.response?.email != null) stateGetProfileInfo.response!!.email else "Выбрать Почту...",
+                    text = if (Values.Email.value!="") Values.Email.value else "Выбрать Почту...",
                     fontSize = 18.sp,
                     color = Color.White
                 )
