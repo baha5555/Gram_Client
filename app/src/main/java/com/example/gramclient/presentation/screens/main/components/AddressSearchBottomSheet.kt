@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -46,6 +47,9 @@ fun AddressSearchBottomSheet(
             .background(Color.White)
             .padding(15.dp)
     ) {
+        Row(modifier = Modifier.size(width = 100.dp, height = 20.dp).background(Color.Green)) {
+            Text(text = "123")
+        }
         if (!isSearchState.value) {
                 if(searchText.value !="")
                     searchText.value = ""
