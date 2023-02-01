@@ -18,6 +18,7 @@ import com.example.gramclient.domain.mainScreen.*
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.screens.main.states.*
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.utils.Values
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,11 +72,13 @@ class MainViewModel @Inject constructor(
 
     fun updateFromAddress(address:Address) {
         _fromAddress.value = address
+        Values.FromAddress.value = address
     }
 
     fun updateToAddress(address:Address?) {
         if(address != null){
             _toAddress.value = listOf(address)
+            Values.ToAddress.value = listOf(address)
         }
     }
 

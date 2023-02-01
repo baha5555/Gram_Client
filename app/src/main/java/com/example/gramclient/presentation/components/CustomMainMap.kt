@@ -38,21 +38,25 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavHostController
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.MainActivity
+import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.map.UserTouchSurface
+import com.example.gramclient.presentation.screens.order.OrderExecutionScreen
+import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
-import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.RoutesName
+import com.example.gramclient.utils.Values
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
@@ -69,6 +73,8 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
+lateinit var fromAddres2: Address
+lateinit var toAddress2: List<Address>
 private lateinit var map: MapView
 
 private lateinit var userTouchSurface: UserTouchSurface
@@ -88,6 +94,9 @@ fun CustomMainMap(
     WHICH_ADDRESS: MutableState<String>? = null
 ) {
     val context = LocalContext.current
+    val navigator = LocalNavigator.currentOrThrow
+    currentRoute = navigator.lastItem.key
+
     val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     val stateStatusGPS = remember {
@@ -127,8 +136,10 @@ fun CustomMainMap(
         }
     }
     if (stateStatusGPS.value) {
-        val toAddress by mainViewModel.toAddress
-        val fromAddress by mainViewModel.fromAddress
+        val toAddress by Values.ToAddress
+        val fromAddress by Values.FromAddress
+        toAddress2 = toAddress
+        fromAddres2 = fromAddress
         val scope = rememberCoroutineScope()
         val startPointForMarker = remember {
             mutableStateOf(
@@ -147,8 +158,6 @@ fun CustomMainMap(
                     userTouchSurface = this.findViewById(R.id.userTouchSurface)
                     btnLocation = this.findViewById(R.id.btnLocation)
                     getAddressMarker = this.findViewById(R.id.getAddressMarker)
-                    //currentRoute = navController.currentBackStackEntry?.destination?.route
-
                     Configuration.getInstance()
                         .load(it, PreferenceManager.getDefaultSharedPreferences(it))
                     map.setTileSource(TileSourceFactory.MAPNIK)
@@ -170,7 +179,7 @@ fun CustomMainMap(
                     mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
                     myLocationShow(it, mLocationOverlay)
                     when (currentRoute) {
-                        RoutesName.MAIN_SCREEN -> {
+                        MainScreen().key -> {
                             btnLocation.margin(0f, 0f, 0f, 355f)
                             btnLocation.visibility = View.GONE
                             getAddressMarker.visibility = View.GONE
@@ -178,14 +187,14 @@ fun CustomMainMap(
                             addOverlays()
                             showRoadAB(it, fromAddress, toAddress)
                         }
-                        RoutesName.SEARCH_DRIVER_SCREEN, RoutesName.ORDER_EXECUTION_SCREEN -> {
+                        SearchDriverScreen().key, OrderExecutionScreen().key -> {
                             btnLocation.visibility = View.GONE
                             getAddressMarker.visibility = View.GONE
                             map.overlays.clear()
                             addOverlays()
                             showRoadAB(it, fromAddress, toAddress)
                         }
-                        RoutesName.SEARCH_ADDRESS_SCREEN -> {
+                        SearchAddressScreen().key -> {
                             map.overlays.clear()
                             addOverlays()
                         }
@@ -209,13 +218,13 @@ fun CustomMainMap(
             },
             update = {
                 when (currentRoute) {
-                    RoutesName.MAIN_SCREEN -> {
-                        showRoadAB(it.context, fromAddress, toAddress)
+                    MainScreen().key -> {
+                        if(fromAddress!= fromAddres2 || toAddress!= toAddress2) showRoadAB(it.context, fromAddress, toAddress)
                     }
-                    RoutesName.SEARCH_DRIVER_SCREEN, RoutesName.ORDER_EXECUTION_SCREEN -> {
-                        showRoadAB(it.context, fromAddress, toAddress)
+                    SearchDriverScreen().key, OrderExecutionScreen().key -> {
+                        //showRoadAB(it.context, fromAddress, toAddress)
                     }
-                    RoutesName.SEARCH_ADDRESS_SCREEN -> {
+                    SearchAddressScreen().key -> {
                         map.overlays.clear()
                         userTouchSurface.setCallback(
                             TwoFingerDrag(
