@@ -25,171 +25,183 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
+import com.example.gramclient.presentation.components.CustomBackHandle
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.utils.Constants
 
-@Composable
-fun AuthorizationScreen(
-    navController: NavHostController,
-    viewModel: AuthViewModel
-) {
-    val phone = remember { mutableStateOf("") }
+class AuthScreen : Screen {
+    @Composable
+    override fun Content() {
+        CustomBackHandle()
+        val navigator = LocalNavigator.currentOrThrow
+        val viewModel: AuthViewModel = hiltViewModel()
+        val phone = remember { mutableStateOf("") }
 
-    val nextBtnEnabled = remember {
-        mutableStateOf(false)
-    }
+        val nextBtnEnabled = remember {
+            mutableStateOf(false)
+        }
 
-    val mAnnotatedLinkString = buildAnnotatedString {
-        addStringAnnotation(
-            tag = "URL",
-            annotation = Constants.KONFIG_URL,
-            start = 0,
-            end = 0
-        )
-    }
+        val mAnnotatedLinkString = buildAnnotatedString {
+            addStringAnnotation(
+                tag = "URL",
+                annotation = Constants.KONFIG_URL,
+                start = 0,
+                end = 0
+            )
+        }
 
-    val mUriHandler = LocalUriHandler.current
+        val mUriHandler = LocalUriHandler.current
 
-    Column(
-        Modifier
-            .fillMaxHeight()
-            .background(color = BackgroundColor),
-        Arrangement.SpaceBetween
-    ) {
         Column(
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-
+            Modifier
+                .fillMaxHeight()
+                .background(color = BackgroundColor),
+            Arrangement.SpaceBetween
         ) {
-            var visible by remember { mutableStateOf(false) }
+            Column(
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
 
-            val animationTime = 1500
-            val animationDelayTime = 5
+            ) {
+                var visible by remember { mutableStateOf(false) }
 
-            val arrowStartLocation = Offset(0F, 100F)
-            val arrowEndLocation = Offset(0F, 0F)
+                val animationTime = 1500
+                val animationDelayTime = 5
 
-            LaunchedEffect(Unit) {
-                visible = true
-            }
-            val arrowLocation by animateOffsetAsState(
-                targetValue = if (visible) arrowEndLocation else arrowStartLocation,
-                animationSpec = tween(
-                    animationTime,
-                    animationDelayTime,
-                    easing = LinearOutSlowInEasing
+                val arrowStartLocation = Offset(0F, 100F)
+                val arrowEndLocation = Offset(0F, 0F)
+
+                LaunchedEffect(Unit) {
+                    visible = true
+                }
+                val arrowLocation by animateOffsetAsState(
+                    targetValue = if (visible) arrowEndLocation else arrowStartLocation,
+                    animationSpec = tween(
+                        animationTime,
+                        animationDelayTime,
+                        easing = LinearOutSlowInEasing
+                    )
                 )
-            )
-            Image(
-                imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
-                "",
-                modifier = Modifier.offset(arrowLocation.x.dp, arrowLocation.y.dp)
-            )
+                Image(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
+                    "",
+                    modifier = Modifier.offset(arrowLocation.x.dp, arrowLocation.y.dp)
+                )
 
-            Column(modifier = Modifier.padding(start = 40.dp, end = 40.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        OutlinedTextField(
-                            value = "",
-                            onValueChange = {
-                                ""
-                            },
-                            placeholder = {
-                                Text(text = "+992", fontSize = 18.sp)
-                            },
-                            modifier = Modifier
-                                .padding(bottom = 40.dp)
-                                .background(Color.White, shape = RoundedCornerShape(5.dp))
-                                .fillMaxWidth(0.35f),
-                            shape = RoundedCornerShape(5.dp),
-                            enabled = false,
-                            singleLine = true,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = Color.Black,
-                                unfocusedBorderColor = Color.Transparent,
-                                cursorColor = Color.Black,
-                                textColor = Color.Black,
-                                disabledTextColor = Color.Black,
-                                placeholderColor = Color.Black
-                            ),
-                            leadingIcon = {
-                                Image(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.tj_flat),
-                                    contentDescription = "Проверено"
-                                )
-                            }
-                        )
-                        OutlinedTextField(
-                            value = phone.value,
-                            onValueChange = {
-                                if (it.length < 10) {
-                                    phone.value = it
-                                    nextBtnEnabled.value = false
+                Column(modifier = Modifier.padding(start = 40.dp, end = 40.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            OutlinedTextField(
+                                value = "",
+                                onValueChange = {
+                                    ""
+                                },
+                                placeholder = {
+                                    Text(text = "+992", fontSize = 18.sp)
+                                },
+                                modifier = Modifier
+                                    .padding(bottom = 40.dp)
+                                    .background(Color.White, shape = RoundedCornerShape(5.dp))
+                                    .fillMaxWidth(0.35f),
+                                shape = RoundedCornerShape(5.dp),
+                                enabled = false,
+                                singleLine = true,
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = Color.Black,
+                                    unfocusedBorderColor = Color.Transparent,
+                                    cursorColor = Color.Black,
+                                    textColor = Color.Black,
+                                    disabledTextColor = Color.Black,
+                                    placeholderColor = Color.Black
+                                ),
+                                leadingIcon = {
+                                    Image(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.tj_flat),
+                                        contentDescription = "Проверено"
+                                    )
                                 }
-                                if (it.length == 9) nextBtnEnabled.value = true
-                            },
-                            placeholder = {
-                                Text(text = "Телефон", fontSize = 18.sp)
-                            },
-                            textStyle = TextStyle.Default.copy(fontSize = 18.sp),
-                            modifier = Modifier
-                                .background(Color.White, shape = RoundedCornerShape(5.dp))
-                                .fillMaxWidth(0.95f),
-                            shape = RoundedCornerShape(5.dp),
-                            singleLine = true,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = Color(0xFF2264D1),
-                                unfocusedBorderColor = Color.Transparent,
-                                cursorColor = Color(0xFF2264D1),
-                                textColor = Color.Black,
-                            ),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                        )
+                            )
+                            OutlinedTextField(
+                                value = phone.value,
+                                onValueChange = {
+                                    if (it.length < 10) {
+                                        phone.value = it
+                                        nextBtnEnabled.value = false
+                                    }
+                                    if (it.length == 9) nextBtnEnabled.value = true
+                                },
+                                placeholder = {
+                                    Text(text = "Телефон", fontSize = 18.sp)
+                                },
+                                textStyle = TextStyle.Default.copy(fontSize = 18.sp),
+                                modifier = Modifier
+                                    .background(Color.White, shape = RoundedCornerShape(5.dp))
+                                    .fillMaxWidth(0.95f),
+                                shape = RoundedCornerShape(5.dp),
+                                singleLine = true,
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = Color(0xFF2264D1),
+                                    unfocusedBorderColor = Color.Transparent,
+                                    cursorColor = Color(0xFF2264D1),
+                                    textColor = Color.Black,
+                                ),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                            )
+                        }
+                    }
+
+                    CustomButton(
+                        enabled = nextBtnEnabled.value,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .fillMaxWidth()
+                            .height(61.dp),
+                        text = "Продолжить",
+                        textSize = 18,
+                        textBold = true,
+                    ) {
+                        viewModel.authorization(phone.value.toInt()) {
+                            navigator.replace(IdentificationScreen(viewModel))
+                        }
                     }
                 }
-
-                CustomButton(
-                    enabled = nextBtnEnabled.value,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .fillMaxWidth()
-                        .height(61.dp),
-                    text = "Продолжить",
-                    textSize = 18,
-                    textBold = true,
-                ) {
-                    viewModel.authorization(phone.value.toInt(), navController)
-                }
+            }
+            Column(
+                modifier = Modifier
+                    .padding(10.dp),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Подтверждая номер телефона, я соглашаюсь с ", color = Color.Gray)
+                Text(text = " правилами работы сервиса и политикой обработки персональных данных.",
+                    textAlign = TextAlign.Center,
+                    color = Color.Blue,
+                    modifier = Modifier.clickable {
+                        mAnnotatedLinkString
+                            .getStringAnnotations("URL", 0, 0)
+                            .firstOrNull()
+                            ?.let { stringAnnotation ->
+                                mUriHandler.openUri(stringAnnotation.item)
+                            }
+                    })
             }
         }
-        Column(
-            modifier = Modifier
-                .padding(10.dp),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Подтверждая номер телефона, я соглашаюсь с ", color = Color.Gray)
-            Text(text = " правилами работы сервиса и политикой обработки персональных данных.",
-                textAlign = TextAlign.Center,
-                color = Color.Blue,
-                modifier = Modifier.clickable {
-                    mAnnotatedLinkString
-                        .getStringAnnotations("URL", 0, 0)
-                        .firstOrNull()
-                        ?.let { stringAnnotation ->
-                            mUriHandler.openUri(stringAnnotation.item)
-                        }
-                })
-        }
     }
+
 }

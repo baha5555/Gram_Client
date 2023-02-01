@@ -22,8 +22,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
+import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.RoutesName
@@ -34,13 +37,13 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ToAddressField(
-    navController: NavHostController,
     WHICH_ADDRESS: MutableState<String>,
     isSearchState: MutableState<Boolean>,
     bottomSheetState: BottomSheetScaffoldState,
     scope: CoroutineScope,
     toAddress: List<Address>
 ) {
+    val navigator = LocalNavigator.currentOrThrow
     toAddress.forEach { address ->
         Box(
             modifier = Modifier
@@ -79,7 +82,7 @@ fun ToAddressField(
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            navController.navigate(RoutesName.MAIN_SCREEN)
+                            navigator.push(MainScreen())
                         },
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = "car_eco",

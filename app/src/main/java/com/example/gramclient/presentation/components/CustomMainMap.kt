@@ -85,7 +85,6 @@ var currentRoute: String? = null
 @Composable
 fun CustomMainMap(
     mainViewModel: MainViewModel,
-    navController: NavHostController,
     WHICH_ADDRESS: MutableState<String>? = null
 ) {
     val context = LocalContext.current
@@ -148,7 +147,7 @@ fun CustomMainMap(
                     userTouchSurface = this.findViewById(R.id.userTouchSurface)
                     btnLocation = this.findViewById(R.id.btnLocation)
                     getAddressMarker = this.findViewById(R.id.getAddressMarker)
-                    currentRoute = navController.currentBackStackEntry?.destination?.route
+                    //currentRoute = navController.currentBackStackEntry?.destination?.route
 
                     Configuration.getInstance()
                         .load(it, PreferenceManager.getDefaultSharedPreferences(it))

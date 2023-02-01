@@ -21,6 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
@@ -34,235 +37,233 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("CoroutineCreationDuringComposition", "UnrememberedMutableState")
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun OrderExecution(
-    navController: NavHostController,
-    orderExecutionViewModel: OrderExecutionViewModel,
-    mainViewModel: MainViewModel = hiltViewModel(),
-) {
-    val sheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
-    )
+class OrderExecutionScreen : Screen{
+    @SuppressLint("CoroutineCreationDuringComposition")
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    override fun Content() {
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+        val mainViewModel: MainViewModel = hiltViewModel()
+        val navigator = LocalNavigator.currentOrThrow
+        val sheetState = rememberBottomSheetScaffoldState(
+            bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
+        )
 
-    val coroutineScope = rememberCoroutineScope()
+        val coroutineScope = rememberCoroutineScope()
 
-    val stateRealtimeDatabaseOrders = orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
+        val stateRealtimeDatabaseOrders = orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
 
-    val isDialogOpen = remember { mutableStateOf(false) }
+        val isDialogOpen = remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
+        val scope = rememberCoroutineScope()
 
-    val ratingState = remember {
-        mutableStateOf(0)
-    }
-
-    LaunchedEffect(key1 = true){
-        orderExecutionViewModel.readAllOrders()
-    }
-
-    var selectRealtimeDatabaseOrder:RealtimeDatabaseOrder by remember {
-        mutableStateOf(RealtimeDatabaseOrder())
-    }
-    // searchState dependencies ->
-    var WHICH_ADDRESS = remember{ mutableStateOf("") }
-    val isAddressList= remember { mutableStateOf(true) }
-    val searchText=remember{ mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
-    val isSearchState = remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
-    var orderId by remember {
-        mutableStateOf(-1)
-    }
-    //searchState dependencies <-
-
-    val selectedOrder by orderExecutionViewModel.selectedOrder
-
-    LaunchedEffect(key1 = true) {
-        Log.e("ActiveOrdersResponse", selectedOrder.toString())
-
-    }
-
-    var stateCancelOrderText by remember {
-        mutableStateOf("Вы уверены, что хотите отменить данный заказ?")
-    }
-
-    scope.launch {
-        stateRealtimeDatabaseOrders.let { orders ->
-            orders?.forEach { order ->
-                if (order.id == selectedOrder.id) {
-                    Log.e("Select Order", "$selectRealtimeDatabaseOrder")
-                    selectRealtimeDatabaseOrder = order
-                }
-            }
+        val ratingState = remember {
+            mutableStateOf(0)
         }
 
-        selectRealtimeDatabaseOrder.from_address?.let {
-            mainViewModel.updateFromAddress(it)
-            Log.e("From_address","$it")
+        LaunchedEffect(key1 = true){
+            orderExecutionViewModel.readAllOrders()
         }
 
-        selectRealtimeDatabaseOrder.to_address?.let { to_Addresses->
-            to_Addresses.forEach { address->
-                mainViewModel.updateToAddress(address)
-                Log.e("To_address","$address")
-            }
+        var selectRealtimeDatabaseOrder:RealtimeDatabaseOrder by remember {
+            mutableStateOf(RealtimeDatabaseOrder())
         }
-    }
-    BottomSheetScaffold(
-        scaffoldState = sheetState,
-        sheetBackgroundColor = Color(0xFFffffff),
-        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        sheetContent = {
+        // searchState dependencies ->
+        var WHICH_ADDRESS = remember{ mutableStateOf("") }
+        val isAddressList= remember { mutableStateOf(true) }
+        val searchText=remember{ mutableStateOf("") }
+        val focusManager = LocalFocusManager.current
+        val isSearchState = remember { mutableStateOf(false) }
+        val focusRequester = remember { FocusRequester() }
+        var orderId by remember {
+            mutableStateOf(-1)
+        }
+        //searchState dependencies <-
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(unbounded = true)
-                    .background(BackgroundColor)
-            ) {
-                if(!isSearchState.value) {
-                    scope.launch{
-                        if(searchText.value != "")
-                            searchText.value = ""
+        val selectedOrder by orderExecutionViewModel.selectedOrder
+
+        LaunchedEffect(key1 = true) {
+            Log.e("ActiveOrdersResponse", selectedOrder.toString())
+
+        }
+
+        var stateCancelOrderText by remember {
+            mutableStateOf("Вы уверены, что хотите отменить данный заказ?")
+        }
+
+        scope.launch {
+            stateRealtimeDatabaseOrders.let { orders ->
+                orders?.forEach { order ->
+                    if (order.id == selectedOrder.id) {
+                        Log.e("Select Order", "$selectRealtimeDatabaseOrder")
+                        selectRealtimeDatabaseOrder = order
                     }
-                    selectRealtimeDatabaseOrder.let { order ->
-                            if (order.performer != null) {
-                                    performerSection(performer = order, orderExecutionViewModel)
-                                stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
-                            }
-                        orderSection(order, scope, sheetState, isSearchState)
-                        Spacer(modifier = Modifier.height(10.dp))
-                        optionSection()
-                        actionSection(cancelOrderOnClick = {
-                            isDialogOpen.value = true
-                            orderId = order.id
-                            if(order.status == "Исполняется"){
-                                stateCancelOrderText = "Вы не можете отменить активный заказ.\nЭто может сделать только оператор"
-                            }
-                        })
-                    }
-                }else{
-                    searchSection(
-                        searchText, focusRequester, isSearchState, sheetState, scope, orderExecutionViewModel,
-                        navController, isAddressList, focusManager, mainViewModel
-                    )
                 }
             }
-        },
-        sheetPeekHeight = 210.dp,
-    ) {
-        Box {
-            CustomMainMap(
-                mainViewModel = mainViewModel,
-                navController = navController
-            )
-            if(stateCancelOrderText!="Вы не можете отменить активный заказ.\nЭто может сделать только оператор") {
-                CustomDialog(
-                    text = stateCancelOrderText,
-                    okBtnClick = {
-                        coroutineScope.launch {
-                            isDialogOpen.value = false
-                            sheetState.bottomSheetState.collapse()
-                            if (orderId != -1)
-                                orderExecutionViewModel.cancelOrder(orderId, navController) {
-                                    navController.popBackStack()
-                                }
-                        }
-                    },
-                    cancelBtnClick = { isDialogOpen.value = false },
-                    isDialogOpen = isDialogOpen.value
-                )
+
+            selectRealtimeDatabaseOrder.from_address?.let {
+                mainViewModel.updateFromAddress(it)
+                Log.e("From_address","$it")
             }
-            else {
-                CustomCancelDialog(
-                    text = stateCancelOrderText,
-                    okBtnClick = {
-                        coroutineScope.launch {
-                            isDialogOpen.value = false
-                        }
-                    },
-                    isDialogOpen = isDialogOpen.value
-                )
-            }
-            if (STATE_RAITING.value) {
-                var thumbUpClicked by remember {
-                    mutableStateOf(false)
+
+            selectRealtimeDatabaseOrder.to_address?.let { to_Addresses->
+                to_Addresses.forEach { address->
+                    mainViewModel.updateToAddress(address)
+                    Log.e("To_address","$address")
                 }
-                Box(
+            }
+        }
+        BottomSheetScaffold(
+            scaffoldState = sheetState,
+            sheetBackgroundColor = Color(0xFFffffff),
+            sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+            sheetContent = {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                        .offset(0.dp, 100.dp)
-                        .padding(horizontal = 50.dp)
-                        .clip(
-                            RoundedCornerShape(30.dp)
-                        )
-                        .background(PrimaryColor),
-                    contentAlignment = Alignment.Center
+                        .wrapContentHeight(unbounded = true)
+                        .background(BackgroundColor)
                 ) {
-                    Column(
+                    if(!isSearchState.value) {
+                        scope.launch{
+                            if(searchText.value != "")
+                                searchText.value = ""
+                        }
+                        selectRealtimeDatabaseOrder.let { order ->
+                            if (order.performer != null) {
+                                performerSection(performer = order, orderExecutionViewModel)
+                                stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
+                            }
+                            orderSection(order, scope, sheetState, isSearchState)
+                            Spacer(modifier = Modifier.height(10.dp))
+                            optionSection()
+                            actionSection(cancelOrderOnClick = {
+                                isDialogOpen.value = true
+                                orderId = order.id
+                                if(order.status == "Исполняется"){
+                                    stateCancelOrderText = "Вы не можете отменить активный заказ.\nЭто может сделать только оператор"
+                                }
+                            })
+                        }
+                    }else{
+                        searchSection(
+                            searchText, focusRequester, isSearchState, sheetState, scope, orderExecutionViewModel, isAddressList, focusManager, mainViewModel
+                        )
+                    }
+                }
+            },
+            sheetPeekHeight = 210.dp,
+        ) {
+            Box {
+                CustomMainMap(
+                    mainViewModel = mainViewModel)
+                if(stateCancelOrderText!="Вы не можете отменить активный заказ.\nЭто может сделать только оператор") {
+                    CustomDialog(
+                        text = stateCancelOrderText,
+                        okBtnClick = {
+                            coroutineScope.launch {
+                                isDialogOpen.value = false
+                                sheetState.bottomSheetState.collapse()
+                                if (orderId != -1)
+                                    orderExecutionViewModel.cancelOrder(orderId) {
+                                        navigator.pop()
+                                    }
+                            }
+                        },
+                        cancelBtnClick = { isDialogOpen.value = false },
+                        isDialogOpen = isDialogOpen.value
+                    )
+                }
+                else {
+                    CustomCancelDialog(
+                        text = stateCancelOrderText,
+                        okBtnClick = {
+                            coroutineScope.launch {
+                                isDialogOpen.value = false
+                            }
+                        },
+                        isDialogOpen = isDialogOpen.value
+                    )
+                }
+                if (STATE_RAITING.value) {
+                    var thumbUpClicked by remember {
+                        mutableStateOf(false)
+                    }
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(18.dp),
-                    ) {
-                        if (!thumbUpClicked) {
-                            Text(
-                                text = "Оцените поездку",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                modifier = Modifier.offset(10.dp, (-8).dp)
+                            .height(100.dp)
+                            .offset(0.dp, 100.dp)
+                            .padding(horizontal = 50.dp)
+                            .clip(
+                                RoundedCornerShape(30.dp)
                             )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                repeat(5) {
-                                    Box(modifier = Modifier.clickable(indication = null,
-                                        interactionSource = remember { MutableInteractionSource() }) {
-                                        ratingState.value = it + 1
-                                        scope.launch {
-                                            delay(3000)
-                                            thumbUpClicked = true
-                                            orderExecutionViewModel.sendRating2(
-                                                order_id = STATE_RAITING_ORDER_ID.value,
-                                                add_rating = ratingState.value * 10
+                            .background(PrimaryColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(18.dp),
+                        ) {
+                            if (!thumbUpClicked) {
+                                Text(
+                                    text = "Оцените поездку",
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.offset(10.dp, (-8).dp)
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    repeat(5) {
+                                        Box(modifier = Modifier.clickable(indication = null,
+                                            interactionSource = remember { MutableInteractionSource() }) {
+                                            ratingState.value = it + 1
+                                            scope.launch {
+                                                delay(3000)
+                                                thumbUpClicked = true
+                                                orderExecutionViewModel.sendRating2(
+                                                    order_id = STATE_RAITING_ORDER_ID.value,
+                                                    add_rating = ratingState.value * 10
+                                                )
+                                                Log.d("balll", "" + ratingState.value * 10)
+                                            }
+
+                                        }) {
+                                            if (it < ratingState.value) Image(
+                                                imageVector = ImageVector.vectorResource(
+                                                    id = R.drawable.ic_default_star
+                                                ),
+                                                contentDescription = null,
                                             )
-                                            Log.d("balll", "" + ratingState.value * 10)
+                                            else Image(
+                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_outlined_star),
+                                                contentDescription = null,
+                                            )
                                         }
 
-                                    }) {
-                                        if (it < ratingState.value) Image(
-                                            imageVector = ImageVector.vectorResource(
-                                                id = R.drawable.ic_default_star
-                                            ),
-                                            contentDescription = null,
-                                        )
-                                        else Image(
-                                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_outlined_star),
-                                            contentDescription = null,
-                                        )
                                     }
-
                                 }
+                            } else {
+                                ratingState.value = 0
+                                scope.launch {
+                                    delay(3000)
+                                    STATE_RAITING.value = false
+                                    navigator.pop()
+                                }
+                                Text(
+                                    text = "Спасибо за ваше участие \nв улучшении качества работы!",
+                                    color = Color.White,
+                                    fontSize = 18.sp
+                                )
                             }
-                        } else {
-                            ratingState.value = 0
-                            scope.launch {
-                                delay(3000)
-                                STATE_RAITING.value = false
-                                navController.popBackStack()
-                            }
-                            Text(
-                                text = "Спасибо за ваше участие \nв улучшении качества работы!",
-                                color = Color.White,
-                                fontSize = 18.sp
-                            )
                         }
                     }
                 }
             }
         }
     }
+
 }

@@ -25,7 +25,7 @@ import com.example.gramclient.ui.theme.BackgroundColor
 
 @Composable
 fun SettingScreen(navController: NavHostController) {
-    Scaffold(topBar = { CustomTopBar("Параметры", navController) }) {
+    Scaffold(topBar = { CustomTopBar("Параметры") }) {
         Column(
             Modifier
                 .fillMaxSize()

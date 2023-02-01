@@ -24,10 +24,7 @@ import com.example.gramclient.presentation.components.CustomTopBar
 @Composable
 fun AddAddressScreen(navController: NavHostController) {
     Scaffold(topBar = {
-        CustomTopBar(
-            title = "Добавление адреса",
-            navController = navController
-        )
+        CustomTopBar(title = "Добавление адреса")
     }) {
         val search = remember {
             mutableStateOf("")

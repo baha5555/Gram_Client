@@ -17,20 +17,22 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
-import com.example.gramclient.utils.RoutesName
+import com.example.gramclient.presentation.screens.authorization.AuthScreen
+import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomBar(
-    navController: NavHostController,
     mainBottomSheetState: BottomSheetScaffoldState,
     bottomSheetState: BottomSheetScaffoldState,
     createOrder: () -> Unit
 ) {
+    val navigator = LocalNavigator.currentOrThrow
     val coroutineScope= rememberCoroutineScope()
     val isDialogOpen=remember{ mutableStateOf(false) }
     val prefs = CustomPreference(LocalContext.current)
@@ -76,11 +78,7 @@ fun BottomBar(
             onClick = {
                 coroutineScope.launch {
                     if (prefs.getAccessToken() == "") {
-                        navController.navigate(RoutesName.AUTH_SCREEN) {
-                            popUpTo(RoutesName.MAIN_SCREEN) {
-                                inclusive = true
-                            }
-                        }
+                        navigator.replaceAll(AuthScreen())
                     } else {
                         isDialogOpen.value = true
                     }
@@ -107,7 +105,7 @@ fun BottomBar(
             okBtnClick = {
                 coroutineScope.launch {
                     createOrder().let {
-                        navController.navigate(RoutesName.SEARCH_DRIVER_SCREEN)
+                        navigator.push(SearchDriverScreen())
                         isDialogOpen.value = false
                     }
                 }

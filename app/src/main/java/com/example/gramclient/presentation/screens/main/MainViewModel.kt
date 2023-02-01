@@ -240,7 +240,7 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun createOrder(orderExecutionViewModel: OrderExecutionViewModel, navController:NavController) {
+    fun createOrder(orderExecutionViewModel: OrderExecutionViewModel) {
         createOrderUseCase.invoke(
             dop_phone = null,
             from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,

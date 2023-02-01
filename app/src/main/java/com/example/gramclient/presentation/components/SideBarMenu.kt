@@ -23,11 +23,17 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.MainActivity
+import com.example.gramclient.presentation.screens.authorization.AuthScreen
+import com.example.gramclient.presentation.screens.drawer.AboutScreen
+import com.example.gramclient.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
+import com.example.gramclient.presentation.screens.profile.ProfileScreen
 import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.utils.Values
@@ -35,13 +41,13 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun SideBarMenu(
-    navController: NavHostController) {
+fun SideBarMenu() {
     val isDialogOpen = remember { mutableStateOf(false) }
     val prefs = CustomPreference(LocalContext.current)
+    val navigator = LocalNavigator.currentOrThrow
 
     val coroutineScope = rememberCoroutineScope()
-    val currentScreen = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
+    //val currentScreen = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +63,8 @@ fun SideBarMenu(
             Box {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = if(Values.ImageUrl.value!="")Values.ImageUrl.value ?: R.drawable.camera_plus_light else R.drawable.camera_plus_light
+                        model = if (Values.ImageUrl.value != "") Values.ImageUrl.value
+                            ?: R.drawable.camera_plus_light else R.drawable.camera_plus_light
                     ),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -70,35 +77,19 @@ fun SideBarMenu(
                 Text(
                     modifier = Modifier.clickable {
                         coroutineScope.launch {
-                            if (prefs.getAccessToken() == "") {
-                                if (currentScreen == RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                    navController.navigate(RoutesName.AUTH_SCREEN) {
-                                        popUpTo(RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                            inclusive = true
-                                        }
-                                    }
-                                }
-                                if (currentScreen == RoutesName.SEARCH_DRIVER_SCREEN) {
-                                    navController.navigate(RoutesName.AUTH_SCREEN) {
-                                        popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
-                                            inclusive = true
-                                        }
-                                    }
-                                }
-                            } else {
-                                navController.navigate(RoutesName.PROFILE_SCREEN)
-                            }
+                            if (prefs.getAccessToken() == "") navigator.push(AuthScreen())
+                            else navigator.push(ProfileScreen())
                         }
                     },
-                    text =if(Values.FirstName.value!="" && Values.LastName.value!="") Values.FirstName.value+" "+Values.LastName.value else "Выбрать Имя...",
+                    text = if (Values.FirstName.value != "" && Values.LastName.value != "") Values.FirstName.value + " " + Values.LastName.value else "Выбрать Имя...",
                     fontSize = 22.sp,
                     color = Color.White
                 )
                 Text(
                     modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                        navigator.push(ProfileScreen())
                     },
-                    text = if (Values.Email.value!="") Values.Email.value else "Выбрать Почту...",
+                    text = if (Values.Email.value != "") Values.Email.value else "Выбрать Почту...",
                     fontSize = 18.sp,
                     color = Color.White
                 )
@@ -130,7 +121,7 @@ fun SideBarMenu(
                 "Выход",
             )
             for (i in iconList.indices) {
-                ShowItems(iconList[i], textList[i], navController, isDialogOpen)
+                ShowItems(iconList[i], textList[i], isDialogOpen)
             }
         }
         val activity = (LocalContext.current as MainActivity)
@@ -143,43 +134,57 @@ fun SideBarMenu(
             isDialogOpen = isDialogOpen.value
         )
     }
-//        CustomDialog(
-//            text = "Вы уверены что хотите выйти?",
-//            okBtnClick = {
-//                isDialogOpen.value = false
-//                prefs.setAccessToken("")
-//                navController.navigate(RoutesName.AUTH_SCREEN)
-//            },
-//            cancelBtnClick = { isDialogOpen.value = false },
-//            isDialogOpen = isDialogOpen.value
-//        )
 }
 
 @Composable
 fun ShowItems(
     icon: ImageVector,
     text: String,
-    navController: NavHostController,
     isDialogOpen: MutableState<Boolean>
 ) {
     val context = LocalContext.current
+    val navigator = LocalNavigator.currentOrThrow
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 when (text) {
-                    "Параметры" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.SETTING_SCREEN)*/
-                    "Мои адреса" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
-                    "Поддержка" -> Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show() /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
-                    "О приложении" -> navController.navigate(RoutesName.ABOUT_SCREEN)
+                    "Параметры" -> Toast
+                        .makeText(
+                            context,
+                            "Эта страница на стадии разработки",
+                            Toast.LENGTH_LONG
+                        )
+                        .show() /*navController.navigate(RoutesName.SETTING_SCREEN)*/
+                    "Мои адреса" -> Toast
+                        .makeText(
+                            context,
+                            "Эта страница на стадии разработки",
+                            Toast.LENGTH_LONG
+                        )
+                        .show() /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
+                    "Поддержка" -> Toast
+                        .makeText(
+                            context,
+                            "Эта страница на стадии разработки",
+                            Toast.LENGTH_LONG
+                        )
+                        .show() /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
+                    "О приложении" -> navigator.push(AboutScreen())
                     "Выход" -> {
                         isDialogOpen.value = true
                     }
                     "История заказов" -> {
-                        navController.navigate(RoutesName.ORDERS_HISTORY_SCREEN)
+                        navigator.push(OrdersHistoryScreen())
                     }
                     "Промокоды" -> {
-                        Toast.makeText(context,"Эта страница на стадии разработки",Toast.LENGTH_LONG).show()
+                        Toast
+                            .makeText(
+                                context,
+                                "Эта страница на стадии разработки",
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
 //                        navController.navigate(RoutesName.PROMO_CODE_SCREEN)
                     }
                     "Позвонить оператору" -> {

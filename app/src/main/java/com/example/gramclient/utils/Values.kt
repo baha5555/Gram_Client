@@ -9,4 +9,5 @@ object Values {
     val Email = mutableStateOf("")
     val PhoneNumber = mutableStateOf("")
     val ImageUrl: MutableState<String?> = mutableStateOf("")
+    val ClientOrdersSize = mutableStateOf(0)
 }

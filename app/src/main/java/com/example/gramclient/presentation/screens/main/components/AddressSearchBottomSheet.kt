@@ -25,7 +25,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddressSearchBottomSheet(
     heightFraction: Float = 0.98f,
-    navController: NavHostController,
     isSearchState: MutableState<Boolean>,
     mainViewModel: MainViewModel,
     bottomSheetState: BottomSheetScaffoldState,
@@ -50,7 +49,6 @@ fun AddressSearchBottomSheet(
                 if(searchText.value !="")
                     searchText.value = ""
             ToAddressField(
-                navController,
                 WHICH_ADDRESS = WHICH_ADDRESS,
                 toAddress = toAddress,
                 isSearchState = isSearchState,
@@ -76,7 +74,6 @@ fun AddressSearchBottomSheet(
             SearchResultContent(
                 searchText = searchText,
                 focusManager = focusManager,
-                navController = navController,
                 isAddressList = isAddressList,
                 bottomSheetState = bottomSheetState,
                 isSearchState = isSearchState,
