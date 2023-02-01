@@ -70,6 +70,7 @@ class ProfileViewModel @Inject constructor(
         last_name: RequestBody,
         email: String,
         images: MutableState<File?>,
+        onSuccess:()->Unit = {},
                     ){
         sendProfileUseCase.invoke(first_name,last_name, email, avatar = images).onEach { result: Resource<ProfileResponse> ->
             when (result){
@@ -79,6 +80,7 @@ class ProfileViewModel @Inject constructor(
                         _stateprofile.value =
                             ProfileResponseState(response = allowancesResponse?.result)
                         getProfileInfo()
+                        onSuccess()
                         Log.e("ProfileResponse", "SendProfileSuccess->\n ${_stateprofile.value}")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")

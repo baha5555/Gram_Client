@@ -286,6 +286,9 @@ fun ProfileScreen(
                                                     profileEmail.value ?: getProfileEmail ?: "",
                                                     photo,
                                                 )
+                                                {
+                                                    Toast.makeText(context,"Ваши данные успешно сохранились.",Toast.LENGTH_LONG).show()
+                                                }
                                             } catch (e: HttpException) {
                                                 Log.e(
                                                     "HELO",
