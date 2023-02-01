@@ -41,6 +41,8 @@ fun SplashScreen(
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val activeOrders = orderExecutionViewModel.stateActiveOrders.value
+    val profileInfo = profileViewModel.stateGetProfileInfo.value
+
     val prefs = CustomPreference(LocalContext.current)
     LaunchedEffect(key1 = true) {
         if (prefs.getAccessToken() == "") navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
@@ -69,7 +71,10 @@ fun SplashScreen(
         }
     }
     Splash()
-    if(activeOrders.error!="") CustomRequestError{ orderExecutionViewModel.getActiveOrders() }
+    if(activeOrders.error!="" && profileInfo.error!="") CustomRequestError{
+        orderExecutionViewModel.getActiveOrders()
+        profileViewModel.getProfileInfo()
+    }
 }
 
 @Composable

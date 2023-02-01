@@ -53,7 +53,7 @@ interface ApplicationApi {
         @Header("Authorization") token: String,
         @Part("first_name") first_name: RequestBody,
         @Part("last_name") last_name: RequestBody,
-        @Query("email") email: String,
+        @Query("email") email: String?,
         @Part avatar: MultipartBody.Part?
     ): ProfileResponse
 

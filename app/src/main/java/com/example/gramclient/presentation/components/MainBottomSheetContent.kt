@@ -338,13 +338,30 @@ fun TariffsContent(
         Column(horizontalAlignment = Alignment.Start) {
             Image(
                 modifier = Modifier
+                    .padding(end =
+                    when(selected_tariff?.value!!.id) {
+                        1 -> 110.dp
+                        2-> 145.dp
+                        4 -> 130.dp
+                        5 -> 130.dp
+                        else -> 310.dp
+                    }, bottom = 30.dp)
                     .fillMaxWidth(0f + currentFraction)
                     .graphicsLayer(alpha = 0f + currentFraction)
                     .height(0.dp + (currentFraction * 80).dp),
-                painter = painterResource(if(selected_tariff?.value!!.id==1) tariffIcons[0] else if(selected_tariff.value!!.id==2) tariffIcons[1] else if(selected_tariff.value!!.id==4) tariffIcons[2] else if(selected_tariff.value!!.id==5) tariffIcons[3] else tariffIcons[4]),
+                painter = painterResource(
+                    when(selected_tariff.value!!.id) {
+                        1 -> tariffIcons[0]
+                        2 -> tariffIcons[1]
+                        3 -> tariffIcons[2]
+                        4 -> tariffIcons[2]
+                        5 -> tariffIcons[3]
+                        else -> tariffIcons[4]
+                    }),
                 contentDescription = "icon"
             )
         }
+
         stateTariffs.response?.let { tariffs ->
             if (tariffs.size != 0) {
                 LazyRow(
