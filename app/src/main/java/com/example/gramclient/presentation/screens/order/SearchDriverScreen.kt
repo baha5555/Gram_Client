@@ -3,6 +3,7 @@ package com.example.gramclient.presentation.screens.order
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
+import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.components.CustomMainMap
@@ -61,6 +63,23 @@ fun SearchDriverScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     orderExecutionViewModel: OrderExecutionViewModel,
 ) {
+
+    var pressedTime: Long = 0
+    val activity = (LocalContext.current as? MainActivity)
+    val context1= LocalContext.current
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+
+    BackHandler(enabled = drawerState.isClosed) {
+        if (pressedTime + 2000 > System.currentTimeMillis()) {
+            activity?.finish()
+        } else {
+            Toast.makeText(context1, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+        }
+        pressedTime = System.currentTimeMillis();
+    }
+
+
     val isGet = remember {
         mutableStateOf(true)
     }
@@ -76,7 +95,6 @@ fun SearchDriverScreen(
     var sheetPeekHeight by remember {
         mutableStateOf(200)
     }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
     if(isGet.value && Values.PhoneNumber.value!=""){
         orderExecutionViewModel.readAllOrders()
         orderExecutionViewModel.readAllClient(Values.PhoneNumber.value)
@@ -85,6 +103,10 @@ fun SearchDriverScreen(
     val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
     val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        BackHandler(enabled = drawerState.isOpen) {
+
+            scope.launch { drawerState.close() }
+        }
         ModalDrawer(
             drawerState = drawerState,
             gesturesEnabled = !drawerState.isClosed,
@@ -98,6 +120,7 @@ fun SearchDriverScreen(
                 }
             },
             content = {
+
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 
                     Scaffold(

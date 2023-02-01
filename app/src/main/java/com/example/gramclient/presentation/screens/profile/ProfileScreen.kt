@@ -77,11 +77,11 @@ fun ProfileScreen(
 
     val getProfileEmail = Values.Email.value
 
-    val profileFirstName = remember { mutableStateOf(getProfileFirstName) }
+    val profileFirstName = remember { mutableStateOf(getProfileFirstName ?: "") }
 
-    val profileEmail = remember { mutableStateOf(getProfileEmail) }
+    val profileEmail = remember { mutableStateOf(getProfileEmail?:"") }
 
-    val profileLastName = remember { mutableStateOf(getProfileLastName) }
+    val profileLastName = remember { mutableStateOf(getProfileLastName?:"") }
 
     val profileImage = Values.ImageUrl.value
 

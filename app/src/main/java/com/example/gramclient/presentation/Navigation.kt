@@ -129,25 +129,11 @@ fun Navigation(
         }
         composable(RoutesName.SEARCH_DRIVER_SCREEN) {
             SearchDriverScreen(navController, orderExecutionViewModel=orderExecutionViewModel)
-            BackHandler(enabled = true) {
-                if (pressedTime + 2000 > System.currentTimeMillis()) {
-                    activity?.finish()
-                } else {
-                    Toast.makeText(context, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
-                }
-                pressedTime = System.currentTimeMillis();
-            }
+
         }
         composable(RoutesName.SEARCH_ADDRESS_SCREEN) {
             AddressSearchScreen(navController, mainViewModel)
-            BackHandler(enabled = true) {
-                if (pressedTime + 2000 > System.currentTimeMillis()) {
-                    activity?.finish()
-                } else {
-                    Toast.makeText(context, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
-                }
-                pressedTime = System.currentTimeMillis();
-            }
+
         }
     }
 }
