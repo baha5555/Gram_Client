@@ -55,7 +55,7 @@ fun DriverInSiteScreen(
                 Spacer(modifier = Modifier.height(45.dp))
                 Log.e("DRIVER","INSITE")
                 Text(
-                    text = "Приехал ${selectRealtimeDatabaseOrder.performer?.first_name} на ${selectRealtimeDatabaseOrder.performer?.transport?.model?:"Model"}\n цвет ${selectRealtimeDatabaseOrder.performer?.transport?.color?:"Color"},госномер ${selectRealtimeDatabaseOrder.performer?.transport?.car_number}\n Платное ожидание начнется в 20:10 \n Пожалуйста выходите",
+                    text = "Приехал ${selectRealtimeDatabaseOrder.performer?.first_name} на ${selectRealtimeDatabaseOrder.performer?.transport?.model?:"Model"}\n цвет ${selectRealtimeDatabaseOrder.performer?.transport?.color?:"Color"}, госномер ${selectRealtimeDatabaseOrder.performer?.transport?.car_number}\n Платное ожидание начнется в 20:10 \n Пожалуйста выходите",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
