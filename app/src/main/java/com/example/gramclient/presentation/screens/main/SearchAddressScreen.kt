@@ -1,6 +1,8 @@
 package com.example.gramclient.presentation.screens.main
 
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -16,6 +18,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
+import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
@@ -29,7 +32,23 @@ class SearchAddressScreen : Screen{
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        CustomBackHandle()
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+        var pressedTime: Long = 0
+        val activity = (LocalContext.current as? MainActivity)
+        val context1= LocalContext.current
+
+
+        BackHandler(enabled = drawerState.isClosed) {
+            if (pressedTime + 2000 > System.currentTimeMillis()) {
+                activity?.finish()
+            } else {
+                Toast.makeText(context1, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+            }
+            pressedTime = System.currentTimeMillis();
+        }
+
+
         val mainViewModel: MainViewModel = hiltViewModel()
         var isSearchState = remember { mutableStateOf(false) }
         var sheetPeekHeight = remember { mutableStateOf(280) }
@@ -41,7 +60,7 @@ class SearchAddressScreen : Screen{
         )
 
         val profileViewModel: ProfileViewModel = hiltViewModel()
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
+
 
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
@@ -65,10 +84,13 @@ class SearchAddressScreen : Screen{
                 Log.e("singleTapConfirmedHelper", "isExpanded")
             }
         }
-
         val toAddress by mainViewModel.toAddress
         val fromAddress by mainViewModel.fromAddress
+        val scope = rememberCoroutineScope()
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            BackHandler(enabled = drawerState.isOpen) {
+                scope.launch { drawerState.close() }
+            }
             ModalDrawer(
                 drawerState = drawerState,
                 gesturesEnabled = !drawerState.isClosed,
