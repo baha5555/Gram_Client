@@ -30,6 +30,7 @@ import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.presentation.screens.profile.ProfileScreen
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import kotlinx.coroutines.launch
 
@@ -223,7 +224,6 @@ class MainScreen : Screen{
             }
         }
     }
-
 }
 
 

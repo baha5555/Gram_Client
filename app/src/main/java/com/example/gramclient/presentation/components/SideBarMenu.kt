@@ -69,7 +69,8 @@ fun SideBarMenu() {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(50.dp)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                        .padding(if(Values.ImageUrl.value == "")5.dp else 0.dp),
                     contentDescription = "",
                 )
             }
@@ -87,7 +88,8 @@ fun SideBarMenu() {
                 )
                 Text(
                     modifier = Modifier.clickable {
-                        navigator.push(ProfileScreen())
+                        if (prefs.getAccessToken() == "") navigator.push(AuthScreen())
+                        else navigator.push(ProfileScreen())
                     },
                     text = if (Values.Email.value != "") Values.Email.value else "Выбрать Почту...",
                     fontSize = 18.sp,

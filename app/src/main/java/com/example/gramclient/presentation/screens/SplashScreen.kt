@@ -65,61 +65,61 @@ class SplashScreen : Screen {
             profileViewModel.getProfileInfo()
         }
     }
-}
 
-@Composable
-fun Splash() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = BackgroundColor),
-        verticalArrangement = Arrangement.Bottom,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(verticalAlignment = Alignment.Bottom) {
-            Image(
-                imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
-                ""
-            )
-
-            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.day_and_night))
-            //val progress by animateLottieCompositionAsState(composition)
-            LottieAnimation(
-                composition = composition,
-                modifier = Modifier.fillMaxSize(0.4f),
-                alignment = Alignment.BottomCenter
-                //progress = { progress },
-            )
-
-        }
-
-        Text(
-            text = "БЫСТРО, ДЕШЕВО, БЕЗОПАСНО",
-            fontSize = 18.sp,
-            modifier = Modifier.padding(top = 30.dp)
-        )
-        var visible by remember { mutableStateOf(false) }
-
-        val animationTime = 15000
-        val animationDelayTime = 5
-
-        val arrowStartLocation = Offset(0F, 100F)
-        val arrowEndLocation = Offset(0F, 0F)
-
-        LaunchedEffect(Unit) {
-            visible = true
-        }
-        val arrowLocation by animateOffsetAsState(
-            targetValue = if (visible) arrowEndLocation else arrowStartLocation,
-            animationSpec = tween(animationTime, animationDelayTime, easing = LinearOutSlowInEasing)
-        )
-        Image(
-            painter = BitmapPainter(ImageBitmap.imageResource(R.drawable.city)),
-            contentDescription = "Зимний лес",
+    @Composable
+    fun Splash() {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .offset(arrowLocation.x.dp, arrowLocation.y.dp),
-            alignment = Alignment.BottomCenter
-        )
+                .background(color = BackgroundColor),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Image(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
+                    ""
+                )
+
+                val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.day_and_night))
+                //val progress by animateLottieCompositionAsState(composition)
+                LottieAnimation(
+                    composition = composition,
+                    modifier = Modifier.fillMaxSize(0.4f),
+                    alignment = Alignment.BottomCenter
+                    //progress = { progress },
+                )
+
+            }
+
+            Text(
+                text = "БЫСТРО, ДЕШЕВО, БЕЗОПАСНО",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 30.dp)
+            )
+            var visible by remember { mutableStateOf(false) }
+
+            val animationTime = 15000
+            val animationDelayTime = 5
+
+            val arrowStartLocation = Offset(0F, 100F)
+            val arrowEndLocation = Offset(0F, 0F)
+
+            LaunchedEffect(Unit) {
+                visible = true
+            }
+            val arrowLocation by animateOffsetAsState(
+                targetValue = if (visible) arrowEndLocation else arrowStartLocation,
+                animationSpec = tween(animationTime, animationDelayTime, easing = LinearOutSlowInEasing)
+            )
+            Image(
+                painter = BitmapPainter(ImageBitmap.imageResource(R.drawable.city)),
+                contentDescription = "Зимний лес",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset(arrowLocation.x.dp, arrowLocation.y.dp),
+                alignment = Alignment.BottomCenter
+            )
+        }
     }
 }
