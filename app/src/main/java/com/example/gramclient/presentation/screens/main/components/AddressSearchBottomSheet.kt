@@ -46,6 +46,7 @@ fun AddressSearchBottomSheet(
             .background(Color.White)
             .padding(15.dp)
     ) {
+
         if (!isSearchState.value) {
                 if(searchText.value !="")
                     searchText.value = ""
