@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -88,11 +90,47 @@ fun AddressSearchScreen(
                     BottomSheetScaffold(
                         modifier = Modifier.fillMaxSize(),
                         floatingActionButton = {
-                            FloatingButton(
-                                scope = coroutineScope,
-                                drawerState = drawerState,
-                                bottomSheetState = bottomSheetState
-                            )
+                            if (Constants.STATE_ARROW_BACK_IN_ADDRESS_SEARCH_SCREEN.value) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(start = 25.dp)
+                                            .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-95).dp else (-65).dp),
+                                        horizontalAlignment = Alignment.Start
+                                    ) {
+                                        FloatingActionButton(
+                                            modifier = Modifier
+                                                .size(50.dp),
+                                            backgroundColor = Color.White,
+                                            onClick = {
+                                                navController.popBackStack()
+                                            }
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.ArrowBack,
+                                                contentDescription = "Menu", tint = Color.Black,
+                                                modifier = Modifier.size(25.dp)
+                                            )
+                                        }
+                                    }
+                                    FloatingButton(
+                                        scope = coroutineScope,
+                                        drawerState = drawerState,
+                                        bottomSheetState = bottomSheetState
+                                    )
+                                }
+                            }
+                            else {
+                                FloatingButton(
+                                    scope = coroutineScope,
+                                    drawerState = drawerState,
+                                    bottomSheetState = bottomSheetState
+                                )
+                            }
                         },
                         drawerGesturesEnabled = false,
                         sheetBackgroundColor = Color.White,

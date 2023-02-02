@@ -43,6 +43,7 @@ import com.example.gramclient.presentation.screens.main.components.FloatingButto
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER
 import com.example.gramclient.utils.Constants.STATE_ASSIGNED_ORDER_ID
 import com.example.gramclient.utils.Constants.STATE_RAITING
@@ -79,9 +80,18 @@ fun SearchDriverScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     if(isGet.value && Values.PhoneNumber.value!=""){
         orderExecutionViewModel.readAllOrders()
-        orderExecutionViewModel.readAllClient(Values.PhoneNumber.value)
+        orderExecutionViewModel.readAllClient(Values.PhoneNumber.value) {
+            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
+                popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
+                    inclusive = true
+                }
+            }
+            sheetPeekHeight = 200
+            Constants.STATE_ARROW_BACK_IN_ADDRESS_SEARCH_SCREEN.value = false
+        }
         isGet.value=false
     }
+    val stateOfActiveOrdersIsNull = remember{ mutableStateOf(false)}
     val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
     val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -123,11 +133,8 @@ fun SearchDriverScreen(
                                         .clip(RoundedCornerShape(20.dp))
                                         .background(PrimaryColor)
                                         .clickable {
-                                            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN) {
-                                                popUpTo(RoutesName.SEARCH_DRIVER_SCREEN) {
-                                                    inclusive = true
-                                                }
-                                            }
+                                            navController.navigate(RoutesName.SEARCH_ADDRESS_SCREEN)
+                                            Constants.STATE_ARROW_BACK_IN_ADDRESS_SEARCH_SCREEN.value = true
                                         },
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically

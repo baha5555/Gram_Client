@@ -24,7 +24,7 @@ class ProfileViewModel @Inject constructor(
     private val getProfileInfoUseCase: GetProfileInfoUseCase
 ):ViewModel() {
     private val _stateprofile = mutableStateOf(ProfileResponseState())
-    val stateAllowances: State<ProfileResponseState> = _stateprofile
+    val stateprofile: State<ProfileResponseState> = _stateprofile
 
     private val _stateListOfGenders = mutableStateOf(listOf("Мужской", "Женский"))
     val stateListOfGenders: State<List<String>> = _stateListOfGenders
@@ -92,7 +92,7 @@ class ProfileViewModel @Inject constructor(
                         try {
                             val allowancesResponse: ProfileResponse? = result.data
                             _stateprofile.value =
-                                ProfileResponseState(response = allowancesResponse?.result)
+                                ProfileResponseState(response = allowancesResponse?.result?.get(0))
                             getProfileInfo()
                             onSuccess()
                             Log.e(
@@ -104,9 +104,9 @@ class ProfileViewModel @Inject constructor(
                         }
                     }
                     is Resource.Error -> {
-                        Log.e("ProfileResponse", "SendProfileErorr->\n ${result.message}")
+                        Log.e("ProfileResponse", "SendProfileErorr->\n${result.message}\n ${result.data}")
                         _stateprofile.value = ProfileResponseState(
-                            error = "${result.message}"
+                            error = result.data?.error
                         )
                     }
                     is Resource.Loading -> {
