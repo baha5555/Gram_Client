@@ -21,10 +21,8 @@ import com.example.gramclient.domain.realtimeDatabase.RealtimeDatabaseUseCase
 import com.example.gramclient.domain.realtimeDatabase.profile.Client
 import com.example.gramclient.domain.realtimeDatabase.realtimeClientOrderIdDatabaseResponseState
 import com.example.gramclient.domain.realtimeDatabase.realtimeDatabaseResponseState
-import com.example.gramclient.presentation.components.currentRoute
 import com.example.gramclient.presentation.screens.main.states.CancelOrderResponseState
 import com.example.gramclient.utils.Resource
-import com.example.gramclient.utils.RoutesName
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -98,8 +96,8 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                 }
             }.launchIn(viewModelScope)
     }
-    fun readAllClient(client:String) {
-        realtimeClientDatabaseUseCase.invoke(client).onEach { result: Resource<LiveData<Client>> ->
+    fun readAllClient(client:String, goToSearchAddressScreen:()->Unit) {
+        realtimeClientDatabaseUseCase.invoke(client,goToSearchAddressScreen).onEach { result: Resource<LiveData<Client>> ->
             when (result){
                 is Resource.Success -> {
                     try {

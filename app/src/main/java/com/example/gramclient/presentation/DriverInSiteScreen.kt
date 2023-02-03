@@ -2,15 +2,15 @@ package com.example.gramclient.presentation
 
 import android.annotation.SuppressLint
 import android.media.MediaPlayer
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,16 +20,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.R
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.CustomButton
-import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
-import com.example.gramclient.presentation.screens.profile.ProfileViewModel
-import com.example.gramclient.utils.Constants.isDialogState
-import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.time.Clock
+import java.time.LocalDateTime
+import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun DriverInSiteScreen(
@@ -38,6 +38,11 @@ fun DriverInSiteScreen(
 ) {
     val context = LocalContext.current
     if(isDialog.value) {
+        val mp3:MediaPlayer  = MediaPlayer.create(context,R.raw.uvedoplegne)
+        mp3.start()
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MINUTE, 5)
+        val formattedTime = String.format("%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE))
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 15.dp), contentAlignment = Alignment.Center) {
@@ -55,7 +60,7 @@ fun DriverInSiteScreen(
                 Spacer(modifier = Modifier.height(45.dp))
                 Log.e("DRIVER","INSITE")
                 Text(
-                    text = "Приехал ${selectRealtimeDatabaseOrder.performer?.first_name} на ${selectRealtimeDatabaseOrder.performer?.transport?.model?:"Model"}\n цвет ${selectRealtimeDatabaseOrder.performer?.transport?.color?:"Color"}, госномер ${selectRealtimeDatabaseOrder.performer?.transport?.car_number}\n Платное ожидание начнется в 20:10 \n Пожалуйста выходите",
+                    text = "Приехал ${selectRealtimeDatabaseOrder.performer?.first_name} на ${selectRealtimeDatabaseOrder.performer?.transport?.model?:"Model"}\n цвет ${selectRealtimeDatabaseOrder.performer?.transport?.color?:"Color"}, госномер ${selectRealtimeDatabaseOrder.performer?.transport?.car_number}\n Платное ожидание начнется в $formattedTime \n Пожалуйста выходите",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold

@@ -82,8 +82,8 @@ fun SideBarMenu() {
                             else navigator.push(ProfileScreen())
                         }
                     },
-                    text = if (Values.FirstName.value != "" && Values.LastName.value != "") Values.FirstName.value + " " + Values.LastName.value else "Выбрать Имя...",
-                    fontSize = 22.sp,
+                    text =if(Values.FirstName.value!="" && Values.LastName.value!="" && Values.FirstName.value!=null && Values.LastName.value!=null) Values.FirstName.value+" "+Values.LastName.value else "Выбрать Имя...",
+                fontSize = 22.sp,
                     color = Color.White
                 )
                 Text(
@@ -91,7 +91,7 @@ fun SideBarMenu() {
                         if (prefs.getAccessToken() == "") navigator.push(AuthScreen())
                         else navigator.push(ProfileScreen())
                     },
-                    text = if (Values.Email.value != "") Values.Email.value else "Выбрать Почту...",
+                    text = if (Values.Email.value!="" && Values.Email.value!=null) Values.Email.value else "Выбрать Почту...",
                     fontSize = 18.sp,
                     color = Color.White
                 )
