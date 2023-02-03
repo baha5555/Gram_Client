@@ -22,7 +22,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val sendProfileUseCase: SendProfileUseCase,
     private val getProfileInfoUseCase: GetProfileInfoUseCase
-):ViewModel() {
+) : ViewModel() {
     private val _stateprofile = mutableStateOf(ProfileResponseState())
     val stateAllowances: State<ProfileResponseState> = _stateprofile
 
@@ -46,15 +46,16 @@ class ProfileViewModel @Inject constructor(
                     try {
                         val tariffsResponse: GetProfileInfoResponse? = result.data
                         _stateGetProfileInfo.value =
-                            GetProfileInfoResponseState(response = tariffsResponse?.result, success = true)
+                            GetProfileInfoResponseState(
+                                response = tariffsResponse?.result,
+                                success = true
+                            )
                         stateGetProfileInfo.value.response.let {
-                            if (it != null) {
-                                Values.FirstName.value = it.first_name
-                                Values.LastName.value = it.last_name
-                                Values.Email.value = it.email
-                                Values.ImageUrl.value = it.avatar_url
-                                Values.PhoneNumber.value = it.phone
-                            }
+                            Values.FirstName.value = it?.first_name ?: ""
+                            Values.LastName.value = it?.last_name ?: ""
+                            Values.Email.value = it?.email ?: ""
+                            Values.ImageUrl.value = it?.avatar_url ?: ""
+                            Values.PhoneNumber.value = it?.phone ?: ""
                         }
                         Log.e(
                             "GetProfileResponse",
@@ -83,7 +84,7 @@ class ProfileViewModel @Inject constructor(
         last_name: RequestBody,
         email: String?,
         images: MutableState<File?>,
-        onSuccess:()->Unit = {},
+        onSuccess: () -> Unit = {},
     ) {
         sendProfileUseCase.invoke(first_name, last_name, email, avatar = images)
             .onEach { result: Resource<ProfileResponse> ->
