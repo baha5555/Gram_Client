@@ -55,7 +55,6 @@ class MainActivity : ComponentActivity() {
                 scope = rememberCoroutineScope()
                 Permissions()
                 Navigator(screen = SplashScreen())
-                Log.i("asda", ""+STATE_DRIVER_IN_SITE.value)
                 if (STATE_DRIVER_IN_SITE.value) {
                     orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.let { response ->
                         response.observeAsState().value?.let {
