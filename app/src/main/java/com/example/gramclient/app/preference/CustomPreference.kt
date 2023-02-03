@@ -29,6 +29,6 @@ class CustomPreference @Inject constructor(@ApplicationContext context : Context
         return prefs.getString(PreferencesName.PHONE_NUMBER, "")!!
     }
     fun setPhoneNumber(query: String) {
-        prefs.edit().putString(PreferencesName.PHONE_NUMBER, query).apply()
+        prefs.edit().putString(PreferencesName.PHONE_NUMBER, "992$query").apply()
     }
 }

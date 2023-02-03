@@ -33,42 +33,19 @@ class SearchAddressScreen : Screen{
     @Composable
     override fun Content() {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
-
-        var pressedTime: Long = 0
-        val activity = (LocalContext.current as? MainActivity)
-        val context1= LocalContext.current
-
-
-        BackHandler(enabled = drawerState.isClosed) {
-            if (pressedTime + 2000 > System.currentTimeMillis()) {
-                activity?.finish()
-            } else {
-                Toast.makeText(context1, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
-            }
-            pressedTime = System.currentTimeMillis();
-        }
-
-
         val mainViewModel: MainViewModel = hiltViewModel()
         var isSearchState = remember { mutableStateOf(false) }
         var sheetPeekHeight = remember { mutableStateOf(280) }
-
         var WHICH_ADDRESS = remember { mutableStateOf(Constants.TO_ADDRESS) }
-
         val bottomSheetState = rememberBottomSheetScaffoldState(
             bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
         )
-
-        val profileViewModel: ProfileViewModel = hiltViewModel()
-
-
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
-
         var initialApiCalled by rememberSaveable { mutableStateOf(false) }
-
         val focusRequester = remember { FocusRequester() }
 
+        CustomBackHandle(drawerState.isClosed)
 
         if (!initialApiCalled) {
             LaunchedEffect(Unit) {
