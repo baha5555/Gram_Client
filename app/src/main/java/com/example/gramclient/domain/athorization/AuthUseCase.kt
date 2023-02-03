@@ -10,11 +10,11 @@ import javax.inject.Inject
 
 class AuthUseCase @Inject constructor(private val repository: AppRepository) {
 
-    operator fun invoke(phone:Int): Flow<Resource<AuthResponse>> =
+    operator fun invoke(phone: String): Flow<Resource<AuthResponse>> =
         flow{
             try {
                 emit(Resource.Loading<AuthResponse>())
-                val response: AuthResponse = repository.authorization(phone.toLong())
+                val response: AuthResponse = repository.authorization(phone)
                 emit(Resource.Success<AuthResponse>(response))
             }catch (e: HttpException) {
                 emit(

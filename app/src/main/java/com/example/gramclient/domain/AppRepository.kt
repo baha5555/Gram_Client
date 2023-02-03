@@ -22,7 +22,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 interface AppRepository {
-    suspend fun authorization(phone_number: Long): AuthResponse
+    suspend fun authorization(phone_number: String): AuthResponse
     val readAllOrders: LiveData<List<RealtimeDatabaseOrder>>
 
     suspend fun identification(

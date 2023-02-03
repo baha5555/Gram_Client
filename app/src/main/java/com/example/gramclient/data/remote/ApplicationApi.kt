@@ -23,7 +23,7 @@ import retrofit2.http.*
 interface ApplicationApi {
     @FormUrlEncoded
     @POST("/api/auth/client-registers")
-    suspend fun authorization(@Field("phone_number") phone_number: Long): AuthResponse
+    suspend fun authorization(@Field("phone_number") phone_number: String): AuthResponse
 
     @FormUrlEncoded
     @POST("/api/auth/client-registers/2")

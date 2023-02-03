@@ -68,7 +68,7 @@ class AuthViewModel @Inject constructor(
         smsCode.value=code
     }
 
-    fun authorization(phone: Int, onSuccess: () -> Unit){
+    fun authorization(phone: String, onSuccess: () -> Unit){
         phoneNumber.value=phone.toString()
         authUseCase.invoke(phone).onEach { result: Resource<AuthResponse> ->
             when (result){

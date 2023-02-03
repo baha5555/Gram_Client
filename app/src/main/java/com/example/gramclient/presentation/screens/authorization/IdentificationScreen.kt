@@ -181,7 +181,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                     }
                                     phone.value?.let { it1 ->
                                         viewModel.authorization(
-                                            it1.toInt()
+                                            it1
                                         ) {
                                             navigator.replace(IdentificationScreen(viewModel))
                                         }

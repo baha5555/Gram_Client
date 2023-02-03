@@ -32,8 +32,8 @@ class AppRepositoryImpl(
 ) : AppRepository {
     override val readAllOrders: LiveData<List<RealtimeDatabaseOrder>> = AllOrdersLiveData()
 
-    override suspend fun authorization(phone_number: Long): AuthResponse =
-        api.authorization("${Constants.PREFIX}$phone_number".toLong())
+    override suspend fun authorization(phone_number: String): AuthResponse =
+        api.authorization("${Constants.PREFIX}$phone_number")
 
     override suspend fun identification(
         client_register_id: String,
