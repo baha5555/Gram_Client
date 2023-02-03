@@ -11,6 +11,7 @@ object Constants {
     const val PREFIX="992"
     const val FROM_ADDRESS="FROM_ADDRESS"
     const val TO_ADDRESS="TO_ADDRESS"
+    val STATE_ARROW_BACK_IN_ADDRESS_SEARCH_SCREEN = mutableStateOf(false)
     var STATE_RAITING: MutableState<Boolean> = mutableStateOf(false)
     var STATE_RAITING_ORDER_ID: MutableState<Int> = mutableStateOf(-1)
     var STATE_ASSIGNED_ORDER:MutableState<Boolean> = mutableStateOf(false)

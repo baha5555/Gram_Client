@@ -79,6 +79,9 @@ class SearchDriverScreen : Screen {
         LaunchedEffect(key1 = true ){
             orderExecutionViewModel.readAllOrders()
             orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
+            {
+
+            }
         }
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {

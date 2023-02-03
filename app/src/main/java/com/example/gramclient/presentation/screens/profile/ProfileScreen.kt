@@ -54,7 +54,8 @@ import retrofit2.HttpException
 import java.io.File
 import java.io.IOException
 
-class ProfileScreen : Screen {
+
+class ProfileScreen : Screen{
     @SuppressLint("UnrememberedMutableState")
     @Composable
     override fun Content() {
@@ -70,6 +71,7 @@ class ProfileScreen : Screen {
         val profileEmail = remember { mutableStateOf(getProfileEmail ?: "") }
         val profileLastName = remember { mutableStateOf(getProfileLastName ?: "") }
         val profileImage = Values.ImageUrl.value
+        val stateProfile = viewModel.stateprofile
         val isDialogOpen = remember { mutableStateOf(false) }
         var selectImage by mutableStateOf<Uri?>(null)
 
@@ -147,7 +149,6 @@ class ProfileScreen : Screen {
                                 modifier = Modifier
                                     .size(150.dp)
                                     .clip(CircleShape)
-                                    .padding(20.dp)
                                     .clickable {
                                         launcher.launch("image/*")
                                     },
@@ -334,86 +335,101 @@ class ProfileScreen : Screen {
         if (stateGetProfileInfo.error != "") CustomRequestError {
             viewModel.getProfileInfo()
         }
-    }
-
-    fun getRealPathFromURI(context: Context, uri: Uri): String? {
-        when {
-            // DocumentProvider
-            DocumentsContract.isDocumentUri(context, uri) -> {
-                when {
-                    // ExternalStorageProvider
-                    isExternalStorageDocument(uri) -> {
-                        val docId = DocumentsContract.getDocumentId(uri)
-                        val split = docId.split(":").toTypedArray()
-                        val type = split[0]
-                        // This is for checking Main Memory
-                        return if ("primary".equals(type, ignoreCase = true)) {
-                            if (split.size > 1) {
-                                Environment.getExternalStorageDirectory()
-                                    .toString() + "/" + split[1]
-                            } else {
-                                Environment.getExternalStorageDirectory().toString() + "/"
-                            }
-                            // This is for checking SD Card
-                        } else {
-                            "storage" + "/" + docId.replace(":", "/")
-                        }
-                    }
-                    isDownloadsDocument(uri) -> {
-                        val fileName = getFilePath(context, uri)
-                        if (fileName != null) {
-                            return Environment.getExternalStorageDirectory()
-                                .toString() + "/Download/" + fileName
-                        }
-                        var id = DocumentsContract.getDocumentId(uri)
-                        if (id.startsWith("raw:")) {
-                            id = id.replaceFirst("raw:".toRegex(), "")
-                            val file = File(id)
-                            if (file.exists()) return id
-                        }
-                        val contentUri = ContentUris.withAppendedId(
-                            Uri.parse("content://"),
-                            java.lang.Long.valueOf(id)
-                        )
-                        return getDataColumn(context, contentUri, null, null)
-                    }
-                    isMediaDocument(uri) -> {
-                        val docId = DocumentsContract.getDocumentId(uri)
-                        val split = docId.split(":").toTypedArray()
-                        val type = split[0]
-                        var contentUri: Uri? = null
-                        when (type) {
-                            "image" -> {
-                                contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                            }
-                            "video" -> {
-                                contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                            }
-                            "audio" -> {
-                                contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                            }
-                        }
-                        val selection = "_id=?"
-                        val selectionArgs = arrayOf(split[1])
-                        return getDataColumn(context, contentUri, selection, selectionArgs)
-                    }
-                }
-            }
-            "content".equals(uri.scheme, ignoreCase = true) -> {
-                // Return the remote address
-                return if (isGooglePhotosUri(uri)) uri.lastPathSegment else getDataColumn(
+        if (stateProfile.value.error != null) {
+            if (stateProfile.value.error!![0].first_name != null && stateProfile.value.error!![0].last_name != null) {
+                Toast.makeText(
                     context,
-                    uri,
-                    null,
-                    null
+                    "Поля Имя и Фамилия обьязательны для заполнения",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else if (stateProfile.value.error!![0].first_name != null) {
+                Toast.makeText(context, "Поле Имя обьязательна для заполнения", Toast.LENGTH_LONG)
+                    .show()
+            } else if (stateProfile.value.error!![0].last_name != null) {
+                Toast.makeText(
+                    context,
+                    "Поле Фамилия обьязательна для заполнения",
+                    Toast.LENGTH_LONG
                 )
-            }
-            "file".equals(uri.scheme, ignoreCase = true) -> {
-                return uri.path
+                    .show()
+            } else if (stateProfile.value.error!![0].email != null) {
+                Toast.makeText(context, "Неправильный формат почты", Toast.LENGTH_LONG).show()
             }
         }
-        return null
+        if (stateGetProfileInfo.error != "") CustomRequestError {
+            viewModel.getProfileInfo()
+        }
     }
+}
+
+fun getRealPathFromURI(context: Context, uri: Uri): String? {
+    when {
+        // DocumentProvider
+        DocumentsContract.isDocumentUri(context, uri) -> {
+            when {
+                // ExternalStorageProvider
+                isExternalStorageDocument(uri) -> {
+                    val docId = DocumentsContract.getDocumentId(uri)
+                    val split = docId.split(":").toTypedArray()
+                    val type = split[0]
+                    // This is for checking Main Memory
+                    return if ("primary".equals(type, ignoreCase = true)) {
+                        if (split.size > 1) {
+                            Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+                        } else {
+                            Environment.getExternalStorageDirectory().toString() + "/"
+                        }
+                        // This is for checking SD Card
+                    } else {
+                        "storage" + "/" + docId.replace(":", "/")
+                    }
+                }
+                isDownloadsDocument(uri) -> {
+                    val fileName = getFilePath(context, uri)
+                    if (fileName != null) {
+                        return Environment.getExternalStorageDirectory().toString() + "/Download/" + fileName
+                    }
+                    var id = DocumentsContract.getDocumentId(uri)
+                    if (id.startsWith("raw:")) {
+                        id = id.replaceFirst("raw:".toRegex(), "")
+                        val file = File(id)
+                        if (file.exists()) return id
+                    }
+                    val contentUri = ContentUris.withAppendedId(Uri.parse("content://"), java.lang.Long.valueOf(id))
+                    return getDataColumn(context, contentUri, null, null)
+                }
+                isMediaDocument(uri) -> {
+                    val docId = DocumentsContract.getDocumentId(uri)
+                    val split = docId.split(":").toTypedArray()
+                    val type = split[0]
+                    var contentUri: Uri? = null
+                    when (type) {
+                        "image" -> {
+                            contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                        }
+                        "video" -> {
+                            contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                        }
+                        "audio" -> {
+                            contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                        }
+                    }
+                    val selection = "_id=?"
+                    val selectionArgs = arrayOf(split[1])
+                    return getDataColumn(context, contentUri, selection, selectionArgs)
+                }
+            }
+        }
+        "content".equals(uri.scheme, ignoreCase = true) -> {
+            // Return the remote address
+            return if (isGooglePhotosUri(uri)) uri.lastPathSegment else getDataColumn(context, uri, null, null)
+        }
+        "file".equals(uri.scheme, ignoreCase = true) -> {
+            return uri.path
+        }
+    }
+    return null
+}
 
     fun getDataColumn(
         context: Context,
@@ -494,4 +510,3 @@ class ProfileScreen : Screen {
     fun isGooglePhotosUri(uri: Uri): Boolean {
         return "com.google.android.apps.photos.content" == uri.authority
     }
-}
