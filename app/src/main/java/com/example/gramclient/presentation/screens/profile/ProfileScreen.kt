@@ -97,10 +97,11 @@ class ProfileScreen : Screen {
                 text = "Вы уверены что хотите выйти?",
                 okBtnClick = {
                     isDialogOpen.value = false
-                    prefs.setAccessToken("")
+                    prefs.clearPreference()
                     Values.ImageUrl.value=""
                     Values.FirstName.value=""
                     Values.LastName.value=""
+                    Values.Email.value=""
                     navigator.replaceAll(AuthScreen())
                 },
                 cancelBtnClick = { isDialogOpen.value = false },
