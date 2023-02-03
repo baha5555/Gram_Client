@@ -176,7 +176,7 @@ class AuthScreen : Screen {
                         textSize = 18,
                         textBold = true,
                     ) {
-                        viewModel.authorization(phone.value.toInt()) {
+                        viewModel.authorization(phone.value) {
                             navigator.replace(IdentificationScreen(viewModel))
                         }
                     }

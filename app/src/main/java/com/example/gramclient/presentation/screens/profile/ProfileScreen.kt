@@ -54,6 +54,7 @@ import retrofit2.HttpException
 import java.io.File
 import java.io.IOException
 
+
 class ProfileScreen : Screen{
     @SuppressLint("UnrememberedMutableState")
     @Composable
@@ -98,7 +99,11 @@ class ProfileScreen : Screen{
                 text = "Вы уверены что хотите выйти?",
                 okBtnClick = {
                     isDialogOpen.value = false
-                    prefs.setAccessToken("")
+                    prefs.clearPreference()
+                    Values.ImageUrl.value=""
+                    Values.FirstName.value=""
+                    Values.LastName.value=""
+                    Values.Email.value=""
                     navigator.replaceAll(AuthScreen())
                 },
                 cancelBtnClick = { isDialogOpen.value = false },
@@ -163,6 +168,7 @@ class ProfileScreen : Screen{
                                 .fillMaxWidth()
                                 .padding(start = 27.dp, end = 21.dp)
                         ) {
+
                             TextField(
                                 modifier = Modifier
                                     .fillMaxWidth(),
@@ -425,75 +431,82 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
     return null
 }
 
-fun getDataColumn(context: Context, uri: Uri?, selection: String?,
-                  selectionArgs: Array<String>?): String? {
-    var cursor: Cursor? = null
-    val column = "_data"
-    val projection = arrayOf(
-        column
-    )
-    try {
-        if (uri == null) return null
-        cursor = context.contentResolver.query(uri, projection, selection, selectionArgs,
-            null)
-        if (cursor != null && cursor.moveToFirst()) {
-            val index = cursor.getColumnIndexOrThrow(column)
-            return cursor.getString(index)
+    fun getDataColumn(
+        context: Context,
+        uri: Uri?,
+        selection: String?,
+        selectionArgs: Array<String>?
+    ): String? {
+        var cursor: Cursor? = null
+        val column = "_data"
+        val projection = arrayOf(
+            column
+        )
+        try {
+            if (uri == null) return null
+            cursor = context.contentResolver.query(
+                uri, projection, selection, selectionArgs,
+                null
+            )
+            if (cursor != null && cursor.moveToFirst()) {
+                val index = cursor.getColumnIndexOrThrow(column)
+                return cursor.getString(index)
+            }
+        } finally {
+            cursor?.close()
         }
-    } finally {
-        cursor?.close()
+        return null
     }
-    return null
-}
 
-
-fun getFilePath(context: Context, uri: Uri?): String? {
-    var cursor: Cursor? = null
-    val projection = arrayOf(
-        MediaStore.MediaColumns.DISPLAY_NAME
-    )
-    try {
-        if (uri == null) return null
-        cursor = context.contentResolver.query(uri, projection, null, null,
-            null)
-        if (cursor != null && cursor.moveToFirst()) {
-            val index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
-            return cursor.getString(index)
+    fun getFilePath(context: Context, uri: Uri?): String? {
+        var cursor: Cursor? = null
+        val projection = arrayOf(
+            MediaStore.MediaColumns.DISPLAY_NAME
+        )
+        try {
+            if (uri == null) return null
+            cursor = context.contentResolver.query(
+                uri, projection, null, null,
+                null
+            )
+            if (cursor != null && cursor.moveToFirst()) {
+                val index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                return cursor.getString(index)
+            }
+        } finally {
+            cursor?.close()
         }
-    } finally {
-        cursor?.close()
+        return null
     }
-    return null
-}
 
-/**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is ExternalStorageProvider.
- */
-fun isExternalStorageDocument(uri: Uri): Boolean {
-    return "com.android.externalstorage.documents" == uri.authority
-}
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    fun isExternalStorageDocument(uri: Uri): Boolean {
+        return "com.android.externalstorage.documents" == uri.authority
+    }
 
-/**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is DownloadsProvider.
- */
-fun isDownloadsDocument(uri: Uri): Boolean {
-    return "com.android.providers.downloads.documents" == uri.authority
-}
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    fun isDownloadsDocument(uri: Uri): Boolean {
+        return "com.android.providers.downloads.documents" == uri.authority
+    }
 
-/**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is MediaProvider.
- */
-fun isMediaDocument(uri: Uri): Boolean {
-    return "com.android.providers.media.documents" == uri.authority
-}
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    fun isMediaDocument(uri: Uri): Boolean {
+        return "com.android.providers.media.documents" == uri.authority
+    }
 
-/**
- * @param uri The Uri to check.
- * @return Whether the Uri authority is Google Photos.
- */
-fun isGooglePhotosUri(uri: Uri): Boolean {
-    return "com.google.android.apps.photos.content" == uri.authority
-}
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is Google Photos.
+     */
+    fun isGooglePhotosUri(uri: Uri): Boolean {
+        return "com.google.android.apps.photos.content" == uri.authority
+    }

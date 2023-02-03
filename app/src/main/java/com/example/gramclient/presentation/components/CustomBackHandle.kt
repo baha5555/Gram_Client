@@ -7,11 +7,11 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.gramclient.presentation.MainActivity
 
 @Composable
-fun CustomBackHandle(){
+fun CustomBackHandle(enabled: Boolean = true){
     var pressedTime: Long = 0
     val activity = (LocalContext.current as? MainActivity)
     val context= LocalContext.current
-    BackHandler(enabled = true) {
+    BackHandler(enabled = enabled) {
         if (pressedTime + 2000 > System.currentTimeMillis()) {
             activity?.finish()
         } else {

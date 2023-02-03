@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,6 +22,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
+import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.ui.theme.PrimaryColor
@@ -34,29 +36,30 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val context = LocalContext.current
+        val prefs = CustomPreference(context)
         val modifier: Modifier = Modifier
-        var time: Int by remember{ mutableStateOf(25)}
-        val code=viewModel.smsCode.observeAsState()
-        val phone=viewModel.phoneNumber.observeAsState()
+        var time: Int by remember { mutableStateOf(25) }
+        val code = viewModel.smsCode.observeAsState()
+        val phone = viewModel.phoneNumber.observeAsState()
 
-        val coroutineScope= rememberCoroutineScope()
+        val coroutineScope = rememberCoroutineScope()
         val stateLogin by viewModel.stateLogin
         val stateAuth by viewModel.stateAuth
 
         var initialApiCalled by rememberSaveable { mutableStateOf(false) }
         val isAutoInsert by viewModel.isAutoInsert
 
-        LaunchedEffect(key1 = true ){
-            while (time>0) {
+        LaunchedEffect(key1 = true) {
+            while (time > 0) {
                 delay(1000L)
                 time -= 1
             }
         }
-        if(stateLogin.isLoading) {
+        if (stateLogin.isLoading) {
             LoadingIndicator(isLoading = true)
-        }
-        else{
-            stateAuth.response?.let{
+        } else {
+            stateAuth.response?.let {
                 if (!initialApiCalled) {
                     LaunchedEffect(code.value) {
                         if (code.value!!.length == 4 && !isAutoInsert) {
@@ -65,8 +68,9 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                     code.value!!,
                                     it.result.client_register_id,
                                     fcm_token
-                                ){
+                                ) {
                                     navigator.replaceAll(MainScreen())
+                                    if(phone.value!=null) prefs.setPhoneNumber(phone.value!!)
                                 }
                             }
                             initialApiCalled = true
@@ -80,7 +84,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                 ) {
                     val (logo, text, codeField, text2, error) = createRefs()
                     Image(
-                        modifier= Modifier
+                        modifier = Modifier
                             .constrainAs(logo) {
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)
@@ -102,9 +106,18 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                 end.linkTo(parent.end)
                             }
                             .padding(top = 47.dp)
-                    ){
-                        Text(text = "Сообщение с кодом отправлено на", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-                        Text(text = "+992${phone.value}", modifier=Modifier.fillMaxWidth(), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+                    ) {
+                        Text(
+                            text = "Сообщение с кодом отправлено на",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "+992${phone.value}",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     Row(modifier = modifier
@@ -121,7 +134,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                             initialCode = code.value!!
                         ) {
                             viewModel.updateCode(it)
-                            if(it.length ==4){
+                            if (it.length == 4) {
                                 initialApiCalled = false
                             }
                         }
@@ -137,7 +150,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                             .padding(top = 20.dp),
                         message = stateLogin.error
                     )
-                    if(time>0) {
+                    if (time > 0) {
                         Text(text = "Повторный запрос кода: 00:$time",
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -148,10 +161,9 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                 }
                                 .padding(top = 60.dp, bottom = 20.dp),
                             textAlign = TextAlign.Center, color = Color.Gray)
-                    }
-                    else{
+                    } else {
                         Text(text = "Отправить код еще раз",
-                            modifier= Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .constrainAs(text2) {
                                     top.linkTo(codeField.bottom)
@@ -169,45 +181,32 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                     }
                                     phone.value?.let { it1 ->
                                         viewModel.authorization(
-                                            it1.toInt()
-                                        ){
+                                            it1
+                                        ) {
                                             navigator.replace(IdentificationScreen(viewModel))
                                         }
                                     }
                                 },
-                            textAlign = TextAlign.Center, color = Color.Blue)
+                            textAlign = TextAlign.Center, color = Color.Blue
+                        )
                     }
                 }
             }
         }
     }
 
-}
-
-@Composable
-fun ErrorMessage(
-    modifier: Modifier,
-    message: String
-) {
-    if (message != "") {
-        Text(
-            modifier=modifier,
-            text = message,
-            textAlign = TextAlign.Center,
-            color = Color(0xFFF44336)
-        )
-    }
-}
-@Composable
-fun LoadingIndicator(isLoading: Boolean) {
-    if (isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = PrimaryColor)
+    @Composable
+    fun ErrorMessage(
+        modifier: Modifier,
+        message: String
+    ) {
+        if (message != "") {
+            Text(
+                modifier = modifier,
+                text = message,
+                textAlign = TextAlign.Center,
+                color = Color(0xFFF44336)
+            )
         }
     }
 }

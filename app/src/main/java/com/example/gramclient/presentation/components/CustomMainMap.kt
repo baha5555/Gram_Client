@@ -7,6 +7,7 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.*
 import android.location.LocationManager
 import android.net.Uri
@@ -55,6 +56,8 @@ import com.example.gramclient.presentation.screens.order.OrderExecutionScreen
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants
+import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.utils.Values
 import kotlinx.coroutines.GlobalScope
@@ -94,6 +97,7 @@ fun CustomMainMap(
     WHICH_ADDRESS: MutableState<String>? = null
 ) {
     val context = LocalContext.current
+    val prefs: SharedPreferences = context.getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
     val navigator = LocalNavigator.currentOrThrow
     currentRoute = navigator.lastItem.key
 
@@ -129,9 +133,11 @@ fun CustomMainMap(
                 else -> return@LifecycleEventObserver
             }
         }
-
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
+            prefs.edit().putLong("mapPosX", map.mapCenter.latitude.toBits())
+                .putLong("mapPosY", map.mapCenter.longitude.toBits())
+                .putLong("mapPosZ", map.zoomLevelDouble.toBits()).apply()
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
@@ -149,7 +155,6 @@ fun CustomMainMap(
                 )
             )
         }
-        val zoomLevel = remember { mutableStateOf(18.0) }
 
         AndroidView(
             factory = {
@@ -161,11 +166,13 @@ fun CustomMainMap(
                     Configuration.getInstance()
                         .load(it, PreferenceManager.getDefaultSharedPreferences(it))
                     map.setTileSource(TileSourceFactory.MAPNIK)
-                    val startPoint = startPointForMarker.value
                     val mapController = map.controller
-                    mapController.setZoom(zoomLevel.value)
+                    mapController.setZoom(Double.fromBits(prefs.getLong("mapPosZ", 18.0.toBits())))
+                    val startPoint = GeoPoint(
+                        Double.fromBits(prefs.getLong("mapPosX", 40.27803692395751.toBits())),
+                        Double.fromBits(prefs.getLong("mapPosY", 69.62923931506361.toBits()))
+                    )
                     map.controller.setCenter(startPoint)
-
                     mRotationGestureOverlay = RotationGestureOverlay(it, map)
                     mRotationGestureOverlay.isEnabled = false
 
@@ -259,7 +266,6 @@ fun CustomMainMap(
                                                         map.mapCenter.latitude,
                                                         map.mapCenter.longitude
                                                     )
-                                                    zoomLevel.value = map.zoomLevelDouble
                                                 }
                                                 MotionEvent.ACTION_CANCEL -> {
                                                     Log.e(
@@ -316,7 +322,6 @@ fun CustomMainMap(
                                                         map.mapCenter.latitude,
                                                         map.mapCenter.longitude
                                                     )
-                                                    zoomLevel.value = map.zoomLevelDouble
                                                 }
                                                 else -> {
                                                     Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
@@ -338,7 +343,6 @@ fun CustomMainMap(
                                             WHICH_ADDRESS
                                         )
                                     }
-                                    zoomLevel.value = map.zoomLevelDouble
                                     return true
                                 }
 

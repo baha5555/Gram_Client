@@ -1,8 +1,13 @@
 package com.example.gramclient.presentation.screens.authorization
 
+import android.app.Application
+import android.content.Context
+import android.os.Vibrator
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,12 +31,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authUseCase: AuthUseCase ,
+    application: Application,
+    private val authUseCase: AuthUseCase,
     private val identificationUseCase: IdentificationUseCase,
     private val prefs: CustomPreference
-): ViewModel() {
-
-
+): AndroidViewModel(application) {
+    val context get() = getApplication<Application>()
+    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
     private val _stateAuth = mutableStateOf(AuthResponseState())
     val stateAuth: State<AuthResponseState> = _stateAuth
@@ -62,17 +68,17 @@ class AuthViewModel @Inject constructor(
         smsCode.value=code
     }
 
-    fun authorization(phone: Int, onSuccess: () -> Unit){
+    fun authorization(phone: String, onSuccess: () -> Unit){
         phoneNumber.value=phone.toString()
         authUseCase.invoke(phone).onEach { result: Resource<AuthResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
                         val response: AuthResponse? = result.data
-                        _stateAuth.value =
-                            AuthResponseState(response = response)
+                        _stateAuth.value = AuthResponseState(response = response)
                         Log.e("TariffsResponse", "AuthResponse->\n ${_stateAuth.value}")
                         client_regiter_id.value=response?.result?.client_register_id
+                        Toast.makeText(context, ""+ (_stateAuth.value.response?.result?.sms_code ?: "not"), Toast.LENGTH_LONG).show()
                         onSuccess.invoke()
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")

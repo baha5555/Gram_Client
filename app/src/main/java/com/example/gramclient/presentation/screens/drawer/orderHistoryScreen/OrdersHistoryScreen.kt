@@ -22,7 +22,7 @@ import com.example.gramclient.R
 import com.example.gramclient.domain.orderHistoryScreen.OrderHistoryResult
 import com.example.gramclient.domain.orderHistoryScreen.ToAddresse
 import com.example.gramclient.presentation.components.CustomTopBar
-import com.example.gramclient.presentation.screens.authorization.LoadingIndicator
+import com.example.gramclient.presentation.components.LoadingIndicator
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
