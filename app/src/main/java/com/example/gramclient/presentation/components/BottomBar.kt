@@ -78,7 +78,7 @@ fun BottomBar(
             onClick = {
                 coroutineScope.launch {
                     if (prefs.getAccessToken() == "") {
-                        navigator.replaceAll(AuthScreen())
+                        navigator.push(AuthScreen())
                     } else {
                         isDialogOpen.value = true
                     }

@@ -277,7 +277,7 @@ fun AddressesContent(
                 Spacer(modifier = Modifier.width(20.dp))
                 if(address.address=="") {
                     Text(
-                        text = "Куда едем?", color=Color.Gray,
+                        text = "АКуда едем?", color=Color.Gray,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }else {

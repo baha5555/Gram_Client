@@ -78,7 +78,7 @@ fun SideBarMenu() {
                 Text(
                     modifier = Modifier.clickable {
                         coroutineScope.launch {
-                            if (prefs.getAccessToken() == "") navigator.push(AuthScreen())
+                            if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
                             else navigator.push(ProfileScreen())
                         }
                     },
@@ -88,7 +88,7 @@ fun SideBarMenu() {
                 )
                 Text(
                     modifier = Modifier.clickable {
-                        if (prefs.getAccessToken() == "") navigator.push(AuthScreen())
+                        if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
                         else navigator.push(ProfileScreen())
                     },
                     text = if (Values.Email.value!="" && Values.Email.value!=null) Values.Email.value else "Выбрать Почту...",
