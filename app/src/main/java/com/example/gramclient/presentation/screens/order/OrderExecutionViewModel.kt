@@ -1,8 +1,13 @@
 package com.example.gramclient.presentation.screens.order
 
+import android.app.Application
+import android.content.Context
+import android.os.Vibrator
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,6 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrderExecutionViewModel  @Inject constructor(
+    application: Application,
     private val sendAddRatingUseCase: SendAddRatingUseCase,
     private val getActiveOrdersUseCase: GetActiveOrdersUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase,
@@ -35,7 +41,10 @@ class OrderExecutionViewModel  @Inject constructor(
     private val realtimeDatabaseUseCase: RealtimeDatabaseUseCase,
     private val realtimeClientDatabaseUseCase: RealtimeClientDatabaseUseCase,
     private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase
-): ViewModel() {
+): AndroidViewModel(application) {
+    val context get() = getApplication<Application>()
+    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateSearchAddress: State<AddRatingResponseState> = _stateAddRating
 
@@ -204,6 +213,8 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
             when (result){
                 is Resource.Success -> {
                     try {
+                        Toast.makeText(context, "Заказ успешно отменен", Toast.LENGTH_LONG).show()
+                        vibrator.vibrate(700)
                         val response: CancelOrderResponse? = result.data
                         _stateCancelOrder.value =
                             CancelOrderResponseState(response = response)
