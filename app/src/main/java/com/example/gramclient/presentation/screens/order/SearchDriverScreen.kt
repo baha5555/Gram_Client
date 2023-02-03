@@ -2,6 +2,7 @@ package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -34,10 +35,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
-import com.example.gramclient.presentation.components.CustomCircleButton
-import com.example.gramclient.presentation.components.CustomDialog
-import com.example.gramclient.presentation.components.CustomMainMap
-import com.example.gramclient.presentation.components.SideBarMenu
+import com.example.gramclient.presentation.MainActivity
+import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
@@ -54,6 +53,22 @@ class SearchDriverScreen : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
+        var pressedTime: Long = 0
+        val activity = (LocalContext.current as? MainActivity)
+        val context1= LocalContext.current
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+
+        BackHandler(enabled = drawerState.isClosed) {
+            if (pressedTime + 2000 > System.currentTimeMillis()) {
+                activity?.finish()
+            } else {
+                Toast.makeText(context1, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+            }
+            pressedTime = System.currentTimeMillis();
+        }
+
+
         val navigator = LocalNavigator.currentOrThrow
         val mainViewModel: MainViewModel = hiltViewModel()
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
@@ -72,7 +87,7 @@ class SearchDriverScreen : Screen {
         var sheetPeekHeight by remember {
             mutableStateOf(200)
         }
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
+
         if (isGet.value && Values.PhoneNumber.value != "") {
             orderExecutionViewModel.readAllOrders()
             orderExecutionViewModel.readAllClient(Values.PhoneNumber.value)
@@ -80,7 +95,11 @@ class SearchDriverScreen : Screen {
         }
         val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
         val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
+
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            BackHandler(enabled = drawerState.isOpen) {
+                scope.launch { drawerState.close() }
+            }
             ModalDrawer(
                 drawerState = drawerState,
                 gesturesEnabled = !drawerState.isClosed,
