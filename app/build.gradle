@@ -145,5 +145,6 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     //Permision
     implementation "com.google.accompanist:accompanist-permissions:0.28.0"
-
+    // Navigator
+    implementation "cafe.adriel.voyager:voyager-navigator:1.0.0-rc03"
 }

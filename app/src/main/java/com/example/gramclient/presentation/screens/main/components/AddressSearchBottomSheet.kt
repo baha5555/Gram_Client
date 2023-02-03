@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -25,7 +26,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddressSearchBottomSheet(
     heightFraction: Float = 0.98f,
-    navController: NavHostController,
     isSearchState: MutableState<Boolean>,
     mainViewModel: MainViewModel,
     bottomSheetState: BottomSheetScaffoldState,
@@ -46,11 +46,11 @@ fun AddressSearchBottomSheet(
             .background(Color.White)
             .padding(15.dp)
     ) {
+
         if (!isSearchState.value) {
                 if(searchText.value !="")
                     searchText.value = ""
             ToAddressField(
-                navController,
                 WHICH_ADDRESS = WHICH_ADDRESS,
                 toAddress = toAddress,
                 isSearchState = isSearchState,
@@ -76,7 +76,6 @@ fun AddressSearchBottomSheet(
             SearchResultContent(
                 searchText = searchText,
                 focusManager = focusManager,
-                navController = navController,
                 isAddressList = isAddressList,
                 bottomSheetState = bottomSheetState,
                 isSearchState = isSearchState,

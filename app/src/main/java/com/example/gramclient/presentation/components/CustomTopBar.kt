@@ -12,6 +12,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.utils.RoutesName
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -19,10 +21,10 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun CustomTopBar(
     title: String,
-    navController: NavHostController,
     actionNum: Int = 0,
     quitOnClick:()->Unit = {}
 ) {
+    val navigator = LocalNavigator.currentOrThrow
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = Color.White
@@ -30,7 +32,7 @@ fun CustomTopBar(
     TopAppBar(
         title = { Text(title, fontSize = 18.sp) }, backgroundColor = Color.White,
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(onClick = { navigator.pop() }) {
                 Image(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_blue),
                     contentDescription = ""
@@ -45,7 +47,7 @@ fun CustomTopBar(
                         fontSize = 18.sp,
                         modifier = Modifier
                             .clickable {
-                                navController.navigate(RoutesName.SETTING_SELECT_REGION_SCREEN)
+                                //navController.navigate(RoutesName.SETTING_SELECT_REGION_SCREEN)
                             }
                             .padding(end = 15.dp)
                     )

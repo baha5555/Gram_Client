@@ -197,7 +197,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
             }
         }.launchIn(viewModelScope)
     }
-    fun cancelOrder(order_id: Int, navController: NavController,onSuccess:()->Unit){
+    fun cancelOrder(order_id: Int, onSuccess:()->Unit){
         cancelOrderUseCase.invoke(order_id).onEach { result: Resource<CancelOrderResponse> ->
             when (result){
                 is Resource.Success -> {

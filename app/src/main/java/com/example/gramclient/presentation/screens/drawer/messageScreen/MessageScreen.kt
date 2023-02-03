@@ -37,7 +37,7 @@ fun MessageScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         backgroundColor = BackgroundColor,
-        topBar = { CustomTopBar(title = "Поддержка", navController = navController)},
+        topBar = { CustomTopBar(title = "Поддержка")},
         bottomBar = {
             BottomAppBar(
                 modifier= Modifier

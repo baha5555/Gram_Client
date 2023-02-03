@@ -50,7 +50,6 @@ fun MainBottomSheetContent(
     stateCalculate: CalculateResponseState,
     stateTariffs: TariffsResponseState,
     stateAllowances: AllowancesResponseState,
-    navController: NavHostController,
     isSearchState: MutableState<Boolean>,
     focusRequester: FocusRequester,
 ){
@@ -138,7 +137,6 @@ fun MainBottomSheetContent(
                 SearchResultContent(
                     searchText = searchText,
                     focusManager = focusManager,
-                    navController = navController,
                     isAddressList = isAddressList,
                     bottomSheetState = scaffoldState,
                     isSearchState = isSearchState,

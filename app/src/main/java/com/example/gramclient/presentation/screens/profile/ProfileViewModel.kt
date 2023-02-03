@@ -46,7 +46,7 @@ class ProfileViewModel @Inject constructor(
                     try {
                         val tariffsResponse: GetProfileInfoResponse? = result.data
                         _stateGetProfileInfo.value =
-                            GetProfileInfoResponseState(response = tariffsResponse?.result)
+                            GetProfileInfoResponseState(response = tariffsResponse?.result, success = true)
                         stateGetProfileInfo.value.response.let {
                             if (it != null) {
                                 Values.FirstName.value = it.first_name

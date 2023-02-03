@@ -24,10 +24,8 @@ fun SettingLanguageScreen(navController: NavHostController) {
             .fillMaxSize()
             .background(BackgroundColor),
     ) {
-        CustomTopBar(title = "Язык", navController = navController)
+        CustomTopBar(title = "Язык")
         CheckBoxGroupGroup()
-
-
     }
 }
 

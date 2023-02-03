@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation
+package com.example.gramclient.presentation.screens.drawer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,86 +14,88 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import cafe.adriel.voyager.core.screen.Screen
 import com.example.gramclient.presentation.components.CustomTopBar
-import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants.KONFIG_URL
 
-@Composable
-fun AboutScreen(navController: NavHostController) {
-    val mAnnotatedLinkString = buildAnnotatedString {
-        addStringAnnotation(
-            tag = "URL",
-            annotation = KONFIG_URL,
-            start = 0,
-            end = 0
-        )
-    }
-    val mUriHandler = LocalUriHandler.current
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        CustomTopBar(title = "О приложении", navController = navController)
+class AboutScreen() : Screen {
+    @Composable
+    override fun Content() {
+        val mAnnotatedLinkString = buildAnnotatedString {
+            addStringAnnotation(
+                tag = "URL",
+                annotation = KONFIG_URL,
+                start = 0,
+                end = 0
+            )
+        }
+        val mUriHandler = LocalUriHandler.current
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp, horizontal = 30.dp)
+                .fillMaxSize()
+                .background(Color.White)
         ) {
-            Text(
-                text = "Gram - заказ такси",
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 24.sp
-            )
-            Text(text = "версия 1.1", fontSize = 20.sp)
-            Spacer(modifier = Modifier.height(30.dp))
-            Text(
-                text = "Приложение предназначено для создания заказа автотранспорта, услуг и информирования заказчика о его исполнении.",
-                fontSize = 20.sp
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-            Text(
-                text = "Созданный заказ посредством приложения передается партнерам сервиса для последующего исполнения.",
-                fontSize = 20.sp
-            )
-            Spacer(
+            CustomTopBar(title = "О приложении")
+            Column(
                 modifier = Modifier
-                    .height(30.dp)
-            )
-            Text(
-                modifier = Modifier.clickable {
-                    mAnnotatedLinkString
-                        .getStringAnnotations("URL", 0, 0)
-                        .firstOrNull()
-                        ?.let { stringAnnotation ->
-                            mUriHandler.openUri(stringAnnotation.item)
-                        }
-                },
-                text = "Условия оказания услуг",
+                    .fillMaxWidth()
+                    .padding(vertical = 15.dp, horizontal = 30.dp)
+            ) {
+                Text(
+                    text = "Gram - заказ такси",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 24.sp
+                )
+                Text(text = "версия 1.1", fontSize = 20.sp)
+                Spacer(modifier = Modifier.height(30.dp))
+                Text(
+                    text = "Приложение предназначено для создания заказа автотранспорта, услуг и информирования заказчика о его исполнении.",
+                    fontSize = 20.sp
+                )
+                Spacer(modifier = Modifier.height(30.dp))
+                Text(
+                    text = "Созданный заказ посредством приложения передается партнерам сервиса для последующего исполнения.",
+                    fontSize = 20.sp
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(30.dp)
+                )
+                Text(
+                    modifier = Modifier.clickable {
+                        mAnnotatedLinkString
+                            .getStringAnnotations("URL", 0, 0)
+                            .firstOrNull()
+                            ?.let { stringAnnotation ->
+                                mUriHandler.openUri(stringAnnotation.item)
+                            }
+                    },
+                    text = "Условия оказания услуг",
 
-                textDecoration = TextDecoration.Underline,
-                color = PrimaryColor,
-                fontSize = 20.sp
-            )
-            Spacer(modifier = Modifier.height(30.dp)
-            )
-            Text(
-                modifier = Modifier.clickable {
-                    mAnnotatedLinkString
-                        .getStringAnnotations("URL", 0, 0)
-                        .firstOrNull()
-                        ?.let { stringAnnotation ->
-                            mUriHandler.openUri(stringAnnotation.item)
-                        }
-                },
-                text = "Политика конфиденциальности",
-                textDecoration = TextDecoration.Underline,
-                color = PrimaryColor,
-                fontSize = 20.sp
-            )
+                    textDecoration = TextDecoration.Underline,
+                    color = PrimaryColor,
+                    fontSize = 20.sp
+                )
+                Spacer(modifier = Modifier.height(30.dp)
+                )
+                Text(
+                    modifier = Modifier.clickable {
+                        mAnnotatedLinkString
+                            .getStringAnnotations("URL", 0, 0)
+                            .firstOrNull()
+                            ?.let { stringAnnotation ->
+                                mUriHandler.openUri(stringAnnotation.item)
+                            }
+                    },
+                    text = "Политика конфиденциальности",
+                    textDecoration = TextDecoration.Underline,
+                    color = PrimaryColor,
+                    fontSize = 20.sp
+                )
 
+            }
         }
     }
 }

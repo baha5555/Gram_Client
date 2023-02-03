@@ -37,7 +37,6 @@ fun searchSection(
     bottomSheetState: BottomSheetScaffoldState,
     scope: CoroutineScope,
     orderExecutionViewModel: OrderExecutionViewModel,
-    navController: NavHostController,
     isAddressList: MutableState<Boolean>,
     focusManager: FocusManager,
     mainViewModel: MainViewModel,

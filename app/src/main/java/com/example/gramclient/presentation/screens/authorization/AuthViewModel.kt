@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.utils.Resource
-import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.AuthUseCase
 import com.example.gramclient.domain.athorization.IdentificationResponse
@@ -55,7 +54,7 @@ class AuthViewModel @Inject constructor(
         scope.launch {
             smsCode.value = code
             delay(2000)
-            identification(smsCode.value!!, client_regiter_id.value!!, navController,fcm_token)
+            //identification(smsCode.value!!, client_regiter_id.value!!, navController,fcm_token)
         }
     }
 
@@ -63,7 +62,7 @@ class AuthViewModel @Inject constructor(
         smsCode.value=code
     }
 
-    fun authorization(phone: Int, navController: NavHostController){
+    fun authorization(phone: Int, onSuccess: () -> Unit){
         phoneNumber.value=phone.toString()
         authUseCase.invoke(phone).onEach { result: Resource<AuthResponse> ->
             when (result){
@@ -74,11 +73,7 @@ class AuthViewModel @Inject constructor(
                             AuthResponseState(response = response)
                         Log.e("TariffsResponse", "AuthResponse->\n ${_stateAuth.value}")
                         client_regiter_id.value=response?.result?.client_register_id
-                        navController.navigate(RoutesName.IDENTIFICATION_SCREEN) {
-                            popUpTo(RoutesName.AUTH_SCREEN) {
-                                inclusive = true
-                            }
-                        }
+                        onSuccess.invoke()
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
@@ -98,9 +93,9 @@ class AuthViewModel @Inject constructor(
 
     fun identification(
         sms_code: String,
-        client_regiter_id:String,
-        navController: NavHostController,
-        fcm_token:String
+        client_regiter_id: String,
+        fcm_token: String,
+        onSuccess: () -> Unit
     ){
         var code=sms_code
         identificationUseCase.invoke(client_regiter_id, code,fcm_token).onEach { result: Resource<IdentificationResponse> ->
@@ -111,12 +106,8 @@ class AuthViewModel @Inject constructor(
                         IdentificationResponseState(response = response?.result)
                     Log.e("authresponse", "authresponseSuccess->\n ${_stateLogin.value}\n")
                     prefs.setAccessToken("Bearer ${response?.result?.access_token}")
-                    navController.navigate(RoutesName.MAIN_SCREEN) {
-                        popUpTo(RoutesName.IDENTIFICATION_SCREEN) {
-                            inclusive = true
-                        }
-                    }
                     smsCode.value=""
+                    onSuccess.invoke()
                 }
                 is Resource.Error -> {
                     Log.e("authresponse", "authresponseError->\n ${result.message}")
