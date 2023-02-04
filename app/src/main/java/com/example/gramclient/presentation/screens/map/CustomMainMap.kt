@@ -1,6 +1,4 @@
-@file:Suppress("DEPRECATION")
-
-package com.example.gramclient.presentation.components
+package com.example.gramclient.presentation.screens.map
 
 import TwoFingerDrag
 import android.annotation.SuppressLint
@@ -51,14 +49,11 @@ import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
-import com.example.gramclient.presentation.screens.map.UserTouchSurface
 import com.example.gramclient.presentation.screens.order.OrderExecutionScreen
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
-import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.PreferencesName
-import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.utils.Values
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -79,6 +74,8 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 lateinit var fromAddres2: Address
 lateinit var toAddress2: List<Address>
 private lateinit var map: MapView
+@SuppressLint("StaticFieldLeak")
+lateinit var markers: Markers
 
 private lateinit var userTouchSurface: UserTouchSurface
 lateinit var mRotationGestureOverlay: RotationGestureOverlay
@@ -160,6 +157,7 @@ fun CustomMainMap(
             factory = {
                 View.inflate(it, R.layout.map, null).apply {
                     map = this.findViewById(R.id.map)
+                    markers=Markers(context, map)
                     userTouchSurface = this.findViewById(R.id.userTouchSurface)
                     btnLocation = this.findViewById(R.id.btnLocation)
                     getAddressMarker = this.findViewById(R.id.getAddressMarker)
@@ -210,7 +208,7 @@ fun CustomMainMap(
                         map.controller.animateTo(mLocationOverlay.myLocation)
                         if(mLocationOverlay.myLocation!=null){
                             scope.launch {
-                                if (currentRoute == RoutesName.SEARCH_ADDRESS_SCREEN) {
+                                if (currentRoute == SearchAddressScreen().key) {
                                     if(WHICH_ADDRESS != null)
                                         mainViewModel.getAddressFromMap(
                                             mLocationOverlay.myLocation.longitude,
@@ -230,6 +228,10 @@ fun CustomMainMap(
                     }
                     SearchDriverScreen().key, OrderExecutionScreen().key -> {
                         //showRoadAB(it.context, fromAddress, toAddress)
+                        Log.i("addMarker", "create")
+                        if(Values.DriverLocation.value!=GeoPoint(0.0,0.0)){
+                            markers.addDriverMarker(Values.DriverLocation.value, "asd", R.drawable.car_econom_icon)
+                        }
                     }
                     SearchAddressScreen().key -> {
                         map.overlays.clear()

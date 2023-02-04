@@ -11,11 +11,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
-import com.example.gramclient.utils.RoutesName
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable

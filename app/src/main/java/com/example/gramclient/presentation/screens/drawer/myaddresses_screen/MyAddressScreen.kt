@@ -16,13 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
-import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.presentation.components.CustomTopAppBar
 
 @Composable
 fun MyAddressesScreen(navController: NavHostController) {
     Scaffold(topBar = {
-        CustomTopAppBar(navController = navController, action = { AddAddress(navController) })
+        CustomTopAppBar(navController = navController, action = { AddAddress() })
     }) {
         Column(
             Modifier
@@ -46,8 +45,10 @@ fun MyAddressesScreen(navController: NavHostController) {
 }
 
 @Composable
-fun AddAddress(navController: NavHostController) {
-    IconButton(onClick = {navController.navigate(RoutesName.EDIT_ADDRESSES_SCREEN) }) {
+fun AddAddress() {
+    IconButton(onClick = {
+       // navController.navigate(RoutesName.EDIT_ADDRESSES_SCREEN)
+    }) {
         Image(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_add),
             contentDescription = "back"

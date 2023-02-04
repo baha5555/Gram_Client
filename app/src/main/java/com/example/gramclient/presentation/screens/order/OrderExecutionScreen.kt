@@ -20,7 +20,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -28,6 +27,7 @@ import com.example.gramclient.R
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.map.CustomMainMap
 import com.example.gramclient.presentation.screens.order.components.*
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
@@ -64,6 +64,7 @@ class OrderExecutionScreen : Screen{
 
         LaunchedEffect(key1 = true){
             orderExecutionViewModel.readAllOrders()
+            //orderExecutionViewModel.getDriverLocation(1480)
         }
         if(Values.DriverLocation.value.latitude!=0.0){
             Log.i("asdasda", ""+Values.DriverLocation.value)

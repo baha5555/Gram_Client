@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                 MyFirebaseMessagingService().onCreate()
             }
         }
-        startSmartUserConsent()
+        //startSmartUserConsent()
     }
 
     private fun startSmartUserConsent() {

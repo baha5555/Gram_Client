@@ -286,8 +286,11 @@ class OrderExecutionViewModel  @Inject constructor(
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 try {
-                    Values.DriverLocation.value.latitude = dataSnapshot.child("performer_locations/$orderId/lat").value.toString().toDouble()
-                    Values.DriverLocation.value.longitude = dataSnapshot.child("performer_locations/$orderId/lng").value.toString().toDouble()
+                    val geoPoint = GeoPoint(0.0, 0.0)
+                    geoPoint.latitude = dataSnapshot.child("performer_locations/$orderId/lat").value.toString().toDouble()
+                    geoPoint.longitude = dataSnapshot.child("performer_locations/$orderId/lng").value.toString().toDouble()
+                    Values.DriverLocation.value=geoPoint
+                    Log.i("adafas", "change = "+Values.DriverLocation.value)
                 } catch (e: Exception) {
                     Values.DriverLocation.value = GeoPoint(0.0, 0.0)
                 }

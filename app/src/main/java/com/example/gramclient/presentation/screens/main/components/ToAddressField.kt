@@ -21,7 +21,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
@@ -29,7 +28,6 @@ import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants
-import com.example.gramclient.utils.RoutesName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

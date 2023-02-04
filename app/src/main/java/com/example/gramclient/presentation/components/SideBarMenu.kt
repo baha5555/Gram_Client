@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation.components
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -20,13 +19,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
-import com.example.gramclient.utils.PreferencesName
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.MainActivity
@@ -34,10 +29,7 @@ import com.example.gramclient.presentation.screens.authorization.AuthScreen
 import com.example.gramclient.presentation.screens.drawer.AboutScreen
 import com.example.gramclient.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
 import com.example.gramclient.presentation.screens.profile.ProfileScreen
-import com.example.gramclient.utils.RoutesName
-import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.utils.Values
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
