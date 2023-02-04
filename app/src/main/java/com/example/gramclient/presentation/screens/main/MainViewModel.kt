@@ -54,10 +54,6 @@ class MainViewModel @Inject constructor(
     private val _stateCreateOrder = mutableStateOf(OrderResponseState())
     val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
-
-
-
-
     val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом", 12))
 
     private var _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
@@ -68,7 +64,6 @@ class MainViewModel @Inject constructor(
 
     private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
     val fromAddress: State<Address> = _fromAddress
-
 
     fun updateFromAddress(address:Address) {
         _fromAddress.value = address
@@ -81,7 +76,6 @@ class MainViewModel @Inject constructor(
             Values.ToAddress.value = listOf(address)
         }
     }
-
 
     fun updateSelectedTariff(
         value: TariffsResult,
@@ -191,6 +185,7 @@ class MainViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
     fun getActualLocation(context: Context) {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(
             context)
@@ -217,6 +212,7 @@ class MainViewModel @Inject constructor(
         }
 
     }
+
     fun searchAddress(addressName: String){
         searchAddressUseCase.invoke(addressName).onEach { result: Resource<SearchAddressResponse> ->
             when (result){

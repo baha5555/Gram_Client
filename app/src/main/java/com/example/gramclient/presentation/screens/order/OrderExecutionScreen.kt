@@ -33,6 +33,7 @@ import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
+import com.example.gramclient.utils.Values
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -63,6 +64,9 @@ class OrderExecutionScreen : Screen{
 
         LaunchedEffect(key1 = true){
             orderExecutionViewModel.readAllOrders()
+        }
+        if(Values.DriverLocation.value.latitude!=0.0){
+            Log.i("asdasda", ""+Values.DriverLocation.value)
         }
 
         var selectRealtimeDatabaseOrder:RealtimeDatabaseOrder by remember {
@@ -130,6 +134,8 @@ class OrderExecutionScreen : Screen{
                                 searchText.value = ""
                         }
                         selectRealtimeDatabaseOrder.let { order ->
+                            if(order.id!=-1) orderExecutionViewModel.getDriverLocation(order.id)
+
                             if (order.performer != null) {
                                 performerSection(performer = order, orderExecutionViewModel)
                                 stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
