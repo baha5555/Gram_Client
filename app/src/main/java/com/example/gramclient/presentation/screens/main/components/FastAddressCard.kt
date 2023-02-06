@@ -33,7 +33,6 @@ fun FastAddressCard(
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(20.dp))
-                .clickable { }
                 .padding(top = 15.dp, start = 15.dp, end = 15.dp)
         ) {
             Text(text = title, color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Bold)
