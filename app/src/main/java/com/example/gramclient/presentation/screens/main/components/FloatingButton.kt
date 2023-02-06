@@ -28,7 +28,9 @@ fun FloatingButton(
     bottomSheetState: BottomSheetScaffoldState
 ) {
     FloatingActionButton(
-
+        modifier = Modifier
+            .size(50.dp)
+            .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
         backgroundColor = PrimaryColor,
         onClick = {
             scope.launch {
@@ -56,7 +58,9 @@ fun FloatingButton1(
 
     FloatingActionButton(
 
-
+        modifier = Modifier
+            .size(50.dp)
+            .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
         backgroundColor = Color.White,
         onClick = {
             coroutineScope.launch {

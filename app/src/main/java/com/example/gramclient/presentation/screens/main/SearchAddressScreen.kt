@@ -96,16 +96,12 @@ class SearchAddressScreen : Screen {
                         BottomSheetScaffold(
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
-                                Column(modifier = Modifier
-                                    .size(50.dp)
-                                    .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),) {
-                                    FloatingButton(
-                                        scope = coroutineScope,
-                                        drawerState = drawerState,
-                                        bottomSheetState = bottomSheetState
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(start = 80.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
 
-                                    )
-                                    Spacer(modifier = Modifier.height(5.dp))
+
                                     stateRealtimeDatabaseOrders.response?.let { response ->
                                         response.observeAsState().value?.let { orders ->
                                             orderCount.value = orders.size
@@ -123,6 +119,11 @@ class SearchAddressScreen : Screen {
                                             }
                                         }
                                     }
+                                    FloatingButton(
+                                        scope = coroutineScope,
+                                        drawerState = drawerState,
+                                        bottomSheetState = bottomSheetState
+                                    )
                                 }
 
                             },
