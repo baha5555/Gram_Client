@@ -18,7 +18,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.gramclient.R
-import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
+import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

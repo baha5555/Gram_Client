@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gramclient.R
-import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
+import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.CustomCircleButton
 import com.example.gramclient.presentation.components.CustomDialog
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel

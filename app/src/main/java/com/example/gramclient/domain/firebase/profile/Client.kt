@@ -1,4 +1,4 @@
-package com.example.gramclient.domain.realtimeDatabase.profile
+package com.example.gramclient.domain.firebase.profile
 
 import androidx.room.ColumnInfo
 
