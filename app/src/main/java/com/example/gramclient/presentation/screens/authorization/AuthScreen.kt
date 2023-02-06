@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.screens.authorization
 
+import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.tween
@@ -38,8 +39,16 @@ import com.example.gramclient.utils.Constants
 class AuthScreen : Screen {
     @Composable
     override fun Content() {
-        CustomBackHandle()
+        //CustomBackHandle()
         val navigator = LocalNavigator.currentOrThrow
+
+        LaunchedEffect(key1 = true){
+            Log.i("asdad", "level="+navigator.level)
+            Log.i("asdad", "parent="+ (navigator.parent?.lastItem?.key ?: "net"))
+            Log.i("asdad", "lastItem="+navigator.lastItem.key)
+            Log.i("asdad", "disposeBehavior="+navigator.disposeBehavior)
+
+        }
         val viewModel: AuthViewModel = hiltViewModel()
         val phone = remember { mutableStateOf("") }
 

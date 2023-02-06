@@ -18,22 +18,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gramclient.R
-import com.example.gramclient.utils.RoutesName
 import com.example.gramclient.presentation.components.CustomSwitch
 import com.example.gramclient.presentation.components.CustomTopBar
 import com.example.gramclient.ui.theme.BackgroundColor
 
 @Composable
-fun SettingScreen(navController: NavHostController) {
+fun SettingScreen() {
     Scaffold(topBar = { CustomTopBar("Параметры") }) {
         Column(
             Modifier
                 .fillMaxSize()
                 .background(BackgroundColor)
         ) {
-            Column(Modifier.clickable {
-                navController.navigate(RoutesName.SETTING_REGION_SCREEN)
-            }) {
+            Column(Modifier.clickable {}) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -59,7 +56,7 @@ fun SettingScreen(navController: NavHostController) {
                         ),
                 )
             }
-            Column(Modifier.clickable { navController.navigate(RoutesName.SETTING_LANGUAGE_SCREEN) }) {
+            Column(Modifier.clickable {}) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

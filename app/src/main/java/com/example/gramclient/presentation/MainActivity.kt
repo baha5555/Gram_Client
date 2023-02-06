@@ -1,22 +1,30 @@
 package com.example.gramclient.presentation
 
 import android.content.*
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.gramclient.*
 import com.example.gramclient.presentation.screens.SplashScreen
 import com.example.gramclient.presentation.screens.authorization.AuthViewModel
+import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.ui.theme.GramClientTheme
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Constants.FCM_TOKEN
+import com.example.gramclient.utils.Constants.STATE_DRIVER_IN_SITE
+import com.example.gramclient.utils.Constants.STATE_DRIVER_IN_SITE_ORDER_ID
 import com.example.gramclient.utils.MyFirebaseMessagingService
 import com.example.gramclient.utils.SmsBroadcastReceiver
 import com.google.android.gms.auth.api.phone.SmsRetriever
@@ -35,20 +43,32 @@ class MainActivity : ComponentActivity() {
     private val REQ_USER_CONSENT = 200
     var smsBroadcastReceiver: SmsBroadcastReceiver? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
             GramClientTheme {
+                val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
                 navController = rememberNavController()
                 scope = rememberCoroutineScope()
                 Permissions()
                 Navigator(screen = SplashScreen())
+                if (STATE_DRIVER_IN_SITE.value) {
+                    orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.let { response ->
+                        response.observeAsState().value?.let {
+                            for (i in it) {
+                                if (i.id == STATE_DRIVER_IN_SITE_ORDER_ID.value)
+                                    DriverInSiteScreen(i, isDialog = STATE_DRIVER_IN_SITE)
+                            }
+                        }
+                    }
+                }
                 MyFirebaseMessagingService().onCreate()
             }
         }
-        startSmartUserConsent()
+        //startSmartUserConsent()
     }
 
     private fun startSmartUserConsent() {

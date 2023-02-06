@@ -23,10 +23,17 @@ import com.example.gramclient.domain.realtimeDatabase.realtimeClientOrderIdDatab
 import com.example.gramclient.domain.realtimeDatabase.realtimeDatabaseResponseState
 import com.example.gramclient.presentation.screens.main.states.CancelOrderResponseState
 import com.example.gramclient.utils.Resource
+import com.example.gramclient.utils.Values
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,7 +70,7 @@ class OrderExecutionViewModel  @Inject constructor(
     private val _stateEditOrder = mutableStateOf(EditOrderResponseState())
     val stateEditOrder: State<EditOrderResponseState> = _stateEditOrder
 
-private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
+    private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
     val selectedOrder: State<RealtimeDatabaseOrder> = _selectedOrder
 
     fun updateSelectedOrder(order: RealtimeDatabaseOrder) {
@@ -181,6 +188,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
             }
         }.launchIn(viewModelScope)
     }
+
     fun getActiveOrders(){
         getActiveOrdersUseCase.invoke().onEach { result: Resource<ActiveOrdersResponse> ->
             when (result){
@@ -206,6 +214,7 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
             }
         }.launchIn(viewModelScope)
     }
+
     fun cancelOrder(order_id: Int, onSuccess:()->Unit){
         cancelOrderUseCase.invoke(order_id).onEach { result: Resource<CancelOrderResponse> ->
             when (result){
@@ -237,7 +246,6 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
     }
 
     fun editOrder(toAddressId: Int) {
-
         editOrderUseCase.invoke(
             order_id = selectedOrder.value.id,
             dop_phone = null,
@@ -271,5 +279,24 @@ private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun getDriverLocation(orderId:Int){
+        val postReference = Firebase.database.reference
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                try {
+                    val geoPoint = GeoPoint(0.0, 0.0)
+                    geoPoint.latitude = dataSnapshot.child("performer_locations/$orderId/lat").value.toString().toDouble()
+                    geoPoint.longitude = dataSnapshot.child("performer_locations/$orderId/lng").value.toString().toDouble()
+                    Values.DriverLocation.value=geoPoint
+                    Log.i("adafas", "change = "+Values.DriverLocation.value)
+                } catch (e: Exception) {
+                    Values.DriverLocation.value = GeoPoint(0.0, 0.0)
+                }
+            }
+            override fun onCancelled(databaseError: DatabaseError) {}
+        }
+        postReference.addValueEventListener(postListener)
     }
 }

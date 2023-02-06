@@ -16,7 +16,7 @@ data class RealtimeDatabaseOrder(
     @ColumnInfo
     val from_address: Address?=null,
     @ColumnInfo
-    val id: Int=0,
+    val id: Int=-1,
     @ColumnInfo
     val phone: String?=null,
     @ColumnInfo
