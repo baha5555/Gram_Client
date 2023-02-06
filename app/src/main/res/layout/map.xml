@@ -18,7 +18,7 @@
         tools:ignore="MissingClass"
         android:fitsSystemWindows="false"/>
 
-    <com.example.gramclient.presentation.map.UserTouchSurface
+    <com.example.gramclient.presentation.screens.map.UserTouchSurface
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         app:layout_constraintBottom_toBottomOf="parent"

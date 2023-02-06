@@ -37,9 +37,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:127008143878:android:49bb52003d69690ad42187",
+        "mobilesdk_app_id": "1:127008143878:android:05905c50e14ea007d42187",
         "android_client_info": {
-          "package_name": "com.example.gramclient"
+          "package_name": "com.example.noteapp"
         }
       },
       "oauth_client": [
@@ -66,36 +66,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:127008143878:android:e937bb711a99c5fcd42187",
-        "android_client_info": {
-          "package_name": "com.example.testrealtime"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "127008143878-f2digacm4o8djh39j20d177gca09vr1t.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDMOX07fmKe3pN_y7aFvR8ctN9qgDUCj3I"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "127008143878-f2digacm4o8djh39j20d177gca09vr1t.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:127008143878:android:3c61698d53c8a5ead42187",
+        "mobilesdk_app_id": "1:127008143878:android:5b6e9668ae814052d42187",
         "android_client_info": {
           "package_name": "com.gram.gramclient"
         }
@@ -124,9 +95,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:127008143878:android:c0a58fa03fb2b0a0d42187",
+        "mobilesdk_app_id": "1:127008143878:android:0de5935563296895d42187",
         "android_client_info": {
-          "package_name": "ru.mvlikhachev.notesappmvvm"
+          "package_name": "com.gram.traffic"
         }
       },
       "oauth_client": [

@@ -1,11 +1,11 @@
 package com.example.gramclient.domain.mainScreen
 
 data class Address(
-    var name: String,
-    var id: Int,
-    val lat: String,
-    val lng: String,
-//    val city: String,
+    var address: String="",
+    var id: Int=0,
+    val address_lat: String="",
+    val address_lng: String="",
+    val city: String="",
 //    val district: String,
 //    val model: String,
 //    val region: String,

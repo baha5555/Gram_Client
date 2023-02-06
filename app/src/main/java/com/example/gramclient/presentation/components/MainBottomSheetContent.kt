@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation.components
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -22,28 +21,26 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.gramclient.Constants
-import com.example.gramclient.PreferencesName
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
-import com.example.gramclient.presentation.mainScreen.MainViewModel
-import com.example.gramclient.presentation.mainScreen.SearchResultContent
-import com.example.gramclient.presentation.mainScreen.SearchTextField
-import com.example.gramclient.presentation.mainScreen.states.AllowancesResponseState
-import com.example.gramclient.presentation.mainScreen.states.CalculateResponseState
-import com.example.gramclient.presentation.mainScreen.states.TariffsResponseState
+import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.main.components.*
+import com.example.gramclient.presentation.screens.main.states.AllowancesResponseState
+import com.example.gramclient.presentation.screens.main.states.CalculateResponseState
+import com.example.gramclient.presentation.screens.main.states.TariffsResponseState
 import com.example.gramclient.ui.theme.BackgroundColor
 import currentFraction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainBottomSheetContent(
@@ -52,13 +49,12 @@ fun MainBottomSheetContent(
     mainViewModel: MainViewModel,
     stateCalculate: CalculateResponseState,
     stateTariffs: TariffsResponseState,
-    preferences: SharedPreferences,
     stateAllowances: AllowancesResponseState,
-    navController: NavHostController,
     isSearchState: MutableState<Boolean>,
     focusRequester: FocusRequester,
 ){
     val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
+
     val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
 
 
@@ -73,11 +69,7 @@ fun MainBottomSheetContent(
 
     val focusManager = LocalFocusManager.current
 
-    val stateSearchAddress by mainViewModel.stateSearchAddress
-
     val coroutineScope= rememberCoroutineScope()
-
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,12 +77,13 @@ fun MainBottomSheetContent(
             .fillMaxHeight(fraction = heightFraction)
     ) {
         if(!isSearchState.value){
+                if(searchText.value!="")
+                    searchText.value = ""
             SheetContent (
                 currentFraction=scaffoldState.currentFraction,
                 addressContent = {
                     AddressesContent(
                         currentFraction = scaffoldState.currentFraction,
-                        navController =navController,
                         address_from =fromAddress,
                         address_to =toAddress,
                         bottomSheetState =scaffoldState,
@@ -101,7 +94,6 @@ fun MainBottomSheetContent(
                 },
                 tariffsContent = {
                     TariffsContent(
-                        scaffoldState = scaffoldState,
                         currentFraction = scaffoldState.currentFraction,
                         selected_tariff =selected_tariff,
                         stateCalculate =stateCalculate,
@@ -109,7 +101,6 @@ fun MainBottomSheetContent(
                         stateTariffs =stateTariffs,
                         tariffListIcons =tariffListIcons,
                         mainViewModel =mainViewModel,
-                        preferences =preferences,
                         tariffIcons =tariffIcons
                     )
                 },
@@ -138,8 +129,6 @@ fun MainBottomSheetContent(
                     .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)) {
                 SearchTextField(
                     searchText = searchText,
-                    preferences = preferences,
-                    navController = navController,
                     focusRequester = focusRequester,
                     isSearchState = isSearchState,
                     bottomSheetState = scaffoldState,
@@ -148,13 +137,12 @@ fun MainBottomSheetContent(
                 SearchResultContent(
                     searchText = searchText,
                     focusManager = focusManager,
-                    navController = navController,
                     isAddressList = isAddressList,
                     bottomSheetState = scaffoldState,
                     isSearchState = isSearchState,
                     scope = coroutineScope,
                     mainViewModel = mainViewModel,
-                    WHICH_ADDRESS = WHICH_ADDRESS
+                    WHICH_ADDRESS = WHICH_ADDRESS,
                 )
             }
         }
@@ -204,7 +192,6 @@ fun SheetContent(
 @Composable
 fun AddressesContent(
     currentFraction: Float,
-    navController: NavHostController,
     address_from: Address,
     address_to: List<Address>,
     bottomSheetState: BottomSheetScaffoldState,
@@ -253,11 +240,11 @@ fun AddressesContent(
                 contentDescription = "Logo"
             )
             Spacer(modifier = Modifier.width(20.dp))
-            if(address_from.name == "") {
+            if(address_from.address == "") {
                 Text(text = "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
             }else {
                 Text(
-                    address_from.name,
+                    address_from.address,
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -288,14 +275,14 @@ fun AddressesContent(
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                if(address.name=="") {
+                if(address.address=="") {
                     Text(
-                        text = "Куда едем?", color=Color.Gray,
+                        text = "АКуда едем?", color=Color.Gray,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }else {
                     Text(
-                        address.name,
+                        address.address,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -313,14 +300,12 @@ fun AddressesContent(
 @Composable
 fun TariffsContent(
     currentFraction: Float,
-    scaffoldState: BottomSheetScaffoldState,
     selected_tariff: State<TariffsResult?>?,
     stateCalculate: CalculateResponseState,
     address_to: List<Address>,
     stateTariffs: TariffsResponseState,
     tariffListIcons: Array<Int>,
     mainViewModel: MainViewModel,
-    preferences: SharedPreferences,
     tariffIcons: Array<Int>
 ){
     Column(modifier = Modifier
@@ -342,7 +327,7 @@ fun TariffsContent(
         ) {
             Text(text = selected_tariff?.value!!.name, fontWeight = FontWeight.Bold, fontSize = 25.sp)
             stateCalculate.response?.let {
-                Text(text = if(address_to[0].name == "") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
+                Text(text = if(address_to[0].address == "") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
             }
             if (stateCalculate.response == null || stateCalculate.error != ""){
                 CustomPulseLoader(isLoading = true)
@@ -351,13 +336,30 @@ fun TariffsContent(
         Column(horizontalAlignment = Alignment.Start) {
             Image(
                 modifier = Modifier
+                    .padding(end =
+                    when(selected_tariff?.value!!.id) {
+                        1 -> 110.dp
+                        2-> 145.dp
+                        4 -> 130.dp
+                        5 -> 130.dp
+                        else -> 310.dp
+                    }, bottom = 30.dp)
                     .fillMaxWidth(0f + currentFraction)
                     .graphicsLayer(alpha = 0f + currentFraction)
                     .height(0.dp + (currentFraction * 80).dp),
-                painter = painterResource(if(selected_tariff?.value!!.id==1) tariffIcons[0] else if(selected_tariff.value!!.id==2) tariffIcons[1] else if(selected_tariff.value!!.id==4) tariffIcons[2] else if(selected_tariff.value!!.id==5) tariffIcons[3] else tariffIcons[4]),
+                painter = painterResource(
+                    when(selected_tariff.value!!.id) {
+                        1 -> tariffIcons[0]
+                        2 -> tariffIcons[1]
+                        3 -> tariffIcons[2]
+                        4 -> tariffIcons[2]
+                        5 -> tariffIcons[3]
+                        else -> tariffIcons[4]
+                    }),
                 contentDescription = "icon"
             )
         }
+
         stateTariffs.response?.let { tariffs ->
             if (tariffs.size != 0) {
                 LazyRow(
@@ -366,7 +368,12 @@ fun TariffsContent(
                 ) {
                     items(items = tariffs, itemContent = { tariff ->
                         TariffItem(
-                            icon = if (tariff.id == 1) tariffListIcons[0] else if (tariff.id == 2) tariffListIcons[1] else if (tariff.id == 4) tariffListIcons[2] else if (tariff.id == 5) tariffListIcons[3] else tariffListIcons[4],
+                            icon = when(tariff.id){
+                                1->tariffListIcons[0]
+                                2-> tariffListIcons[1]
+                                4-> tariffListIcons[2]
+                                5-> tariffListIcons[3]
+                                else -> tariffListIcons[4] },
                             name = tariff.name,
                             price = tariff.min_price,
                             isSelected = selected_tariff?.value == tariff,

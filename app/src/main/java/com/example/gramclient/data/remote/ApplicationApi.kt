@@ -10,6 +10,7 @@ import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
 import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
+import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
@@ -22,13 +23,14 @@ import retrofit2.http.*
 interface ApplicationApi {
     @FormUrlEncoded
     @POST("/api/auth/client-registers")
-    suspend fun authorization(@Field("phone_number") phone_number: Long): AuthResponse
+    suspend fun authorization(@Field("phone_number") phone_number: String): AuthResponse
 
     @FormUrlEncoded
     @POST("/api/auth/client-registers/2")
     suspend fun identification(
         @Field("client_register_id") client_register_id: String,
-        @Field("sms_code") sms_code: Long
+        @Field("sms_code") sms_code: String,
+        @Field("fcm_token")fcm_token:String
     ): IdentificationResponse
 
     @GET("/api/orders/tariffs")
@@ -51,8 +53,8 @@ interface ApplicationApi {
         @Header("Authorization") token: String,
         @Part("first_name") first_name: RequestBody,
         @Part("last_name") last_name: RequestBody,
-        @Query("email") email: String,
-        @Part avatar: MultipartBody.Part
+        @Query("email") email: String?,
+        @Part avatar: MultipartBody.Part?
     ): ProfileResponse
 
     @FormUrlEncoded
@@ -71,7 +73,7 @@ interface ApplicationApi {
     ): AddRatingResponse
 
     @FormUrlEncoded
-    @POST("/api/orders/search-addresses")
+    @POST("/api/mob-app/orders/search-addresses")
     suspend fun searchAddress(
         @Field("search") addressName: String,
     ): SearchAddressResponse
@@ -107,6 +109,12 @@ interface ApplicationApi {
     suspend fun getActiveOrders(
         @Header("Authorization") token: String,
     ): ActiveOrdersResponse
+
+    @POST("api/orders/connect-client-performer/{order_id}")
+    suspend fun connectClientWithDriver(
+        @Header("Authorization")token:String,
+        @Path("order_id")order_id:String
+    ):connectClientWithDriverResponse
 
     @PATCH("/api/orders/{order_id}")
     suspend fun editOrder(

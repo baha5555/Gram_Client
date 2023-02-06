@@ -1,8 +1,7 @@
 package com.example.gramclient.domain.profile
 
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
-import com.example.gramclient.domain.mainScreen.TariffsResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -13,11 +12,11 @@ class GetProfileInfoUseCase @Inject constructor(
     private val repository: AppRepository
 ) {
 
-    operator fun invoke(token:String): Flow<Resource<GetProfileInfoResponse>> =
+    operator fun invoke(): Flow<Resource<GetProfileInfoResponse>> =
         flow{
             try {
                 emit(Resource.Loading<GetProfileInfoResponse>())
-                val response: GetProfileInfoResponse = repository.getProfileInfo(token)
+                val response: GetProfileInfoResponse = repository.getProfileInfo()
                 emit(Resource.Success<GetProfileInfoResponse>(response))
             }catch (e: HttpException) {
                 emit(

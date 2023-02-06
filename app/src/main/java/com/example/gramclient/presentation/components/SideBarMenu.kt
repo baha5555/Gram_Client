@@ -1,14 +1,12 @@
 package com.example.gramclient.presentation.components
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,24 +19,27 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
-import com.example.gramclient.PreferencesName
 import com.example.gramclient.R
-import com.example.gramclient.RoutesName
-import com.example.gramclient.presentation.profile.ProfileViewModel
+import com.example.gramclient.app.preference.CustomPreference
+import com.example.gramclient.presentation.MainActivity
+import com.example.gramclient.presentation.screens.authorization.AuthScreen
+import com.example.gramclient.presentation.screens.drawer.AboutScreen
+import com.example.gramclient.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
+import com.example.gramclient.presentation.screens.profile.ProfileScreen
+import com.example.gramclient.utils.Values
+import kotlinx.coroutines.launch
 
 @Composable
-fun SideBarMenu(
-    navController: NavHostController,
-    preferences: SharedPreferences,
-    viewModel: ProfileViewModel = hiltViewModel()
-) {
+fun SideBarMenu() {
     val isDialogOpen = remember { mutableStateOf(false) }
-    val stateGetProfileInfo by viewModel.stateGetProfileInfo
+    val prefs = CustomPreference(LocalContext.current)
+    val navigator = LocalNavigator.currentOrThrow
 
+    val coroutineScope = rememberCoroutineScope()
+    //val currentScreen = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,28 +54,36 @@ fun SideBarMenu(
         ) {
             Box {
                 Image(
-                    painter = rememberAsyncImagePainter(model = stateGetProfileInfo.response?.avatar_url?:R.drawable.avatar),
+                    painter = rememberAsyncImagePainter(
+                        model = if (Values.ImageUrl.value != "") Values.ImageUrl.value
+                            ?: R.drawable.camera_plus_light else R.drawable.camera_plus_light
+                    ),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(50.dp)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                        .padding(if(Values.ImageUrl.value == "")5.dp else 0.dp),
                     contentDescription = "",
                 )
             }
-            Column(Modifier.padding(start=15.dp)){
+            Column(Modifier.padding(start = 15.dp)) {
                 Text(
                     modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                        coroutineScope.launch {
+                            if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
+                            else navigator.push(ProfileScreen())
+                        }
                     },
-                    text = if (stateGetProfileInfo.response?.first_name != null && stateGetProfileInfo.response?.last_name != null) stateGetProfileInfo.response?.first_name + ' ' + stateGetProfileInfo.response?.last_name else "Выбрать Имя...",
-                    fontSize = 22.sp,
+                    text =if(Values.FirstName.value!="" && Values.LastName.value!="" && Values.FirstName.value!=null && Values.LastName.value!=null) Values.FirstName.value+" "+Values.LastName.value else "Выбрать Имя...",
+                fontSize = 22.sp,
                     color = Color.White
                 )
                 Text(
                     modifier = Modifier.clickable {
-                        navController.navigate(RoutesName.PROFILE_SCREEN)
+                        if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
+                        else navigator.push(ProfileScreen())
                     },
-                    text = if (stateGetProfileInfo.response?.email != null) stateGetProfileInfo.response!!.email else "Выбрать Почту...",
+                    text = if (Values.Email.value!="" && Values.Email.value!=null) Values.Email.value else "Выбрать Почту...",
                     fontSize = 18.sp,
                     color = Color.White
                 )
@@ -106,17 +115,14 @@ fun SideBarMenu(
                 "Выход",
             )
             for (i in iconList.indices) {
-                ShowItems(iconList[i], textList[i], navController, isDialogOpen)
+                ShowItems(iconList[i], textList[i], isDialogOpen)
             }
         }
+        val activity = (LocalContext.current as MainActivity)
         CustomDialog(
-            text = "Вы уверены что хотите выйти?",
+            text = "Действительно выйти?",
             okBtnClick = {
-                isDialogOpen.value = false
-                preferences.edit()
-                    .putString(PreferencesName.ACCESS_TOKEN, "")
-                    .apply()
-                navController.navigate(RoutesName.AUTH_SCREEN)
+                activity.finish()
             },
             cancelBtnClick = { isDialogOpen.value = false },
             isDialogOpen = isDialogOpen.value
@@ -128,27 +134,52 @@ fun SideBarMenu(
 fun ShowItems(
     icon: ImageVector,
     text: String,
-    navController: NavHostController,
     isDialogOpen: MutableState<Boolean>
 ) {
     val context = LocalContext.current
+    val navigator = LocalNavigator.currentOrThrow
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 when (text) {
-                    "Параметры" -> navController.navigate(RoutesName.SETTING_SCREEN)
-                    "Мои адреса" -> navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)
-                    "Поддержка" -> navController.navigate(RoutesName.SUPPORT_SCREEN)
-                    "О приложении" -> navController.navigate(RoutesName.ABOUT_SCREEN)
+                    "Параметры" -> Toast
+                        .makeText(
+                            context,
+                            "Эта страница на стадии разработки",
+                            Toast.LENGTH_LONG
+                        )
+                        .show() /*navController.navigate(RoutesName.SETTING_SCREEN)*/
+                    "Мои адреса" -> Toast
+                        .makeText(
+                            context,
+                            "Эта страница на стадии разработки",
+                            Toast.LENGTH_LONG
+                        )
+                        .show() /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
+                    "Поддержка" -> Toast
+                        .makeText(
+                            context,
+                            "Эта страница на стадии разработки",
+                            Toast.LENGTH_LONG
+                        )
+                        .show() /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
+                    "О приложении" -> navigator.push(AboutScreen())
                     "Выход" -> {
                         isDialogOpen.value = true
                     }
                     "История заказов" -> {
-                        navController.navigate(RoutesName.ORDERS_HISTORY_SCREEN)
+                        navigator.push(OrdersHistoryScreen())
                     }
                     "Промокоды" -> {
-                        navController.navigate(RoutesName.PROMO_CODE_SCREEN)
+                        Toast
+                            .makeText(
+                                context,
+                                "Эта страница на стадии разработки",
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
+//                        navController.navigate(RoutesName.PROMO_CODE_SCREEN)
                     }
                     "Позвонить оператору" -> {
                         val callIntent: Intent = Uri

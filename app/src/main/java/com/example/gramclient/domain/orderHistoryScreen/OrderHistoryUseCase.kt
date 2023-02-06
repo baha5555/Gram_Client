@@ -1,8 +1,7 @@
 package com.example.gramclient.domain.orderHistoryScreen
 
-import com.example.gramclient.Resource
+import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
-import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -13,11 +12,11 @@ class OrderHistoryUseCase @Inject constructor(
     private val repository: AppRepository
 ) {
 
-    operator fun invoke(token:String): Flow<Resource<orderHistoryResponse>> =
+    operator fun invoke(): Flow<Resource<orderHistoryResponse>> =
         flow{
             try {
                 emit(Resource.Loading<orderHistoryResponse>())
-                val response: orderHistoryResponse = repository.getOrderHistory(token)
+                val response: orderHistoryResponse = repository.getOrderHistory()
                 emit(Resource.Success<orderHistoryResponse>(response))
             }catch (e: HttpException) {
                 emit(
