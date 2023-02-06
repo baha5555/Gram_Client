@@ -1,4 +1,4 @@
-package com.example.gramclient.domain.realtimeDatabase
+package com.example.gramclient.data.firebase
 
 import android.util.Log
 import androidx.lifecycle.LiveData

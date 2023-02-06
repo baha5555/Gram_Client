@@ -3,6 +3,7 @@ package com.example.gramclient.domain.realtimeDatabase
 import androidx.lifecycle.LiveData
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
+import com.example.gramclient.domain.FirebaseRepository
 import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -10,13 +11,12 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class RealtimeDatabaseUseCase @Inject constructor(private val repository: AppRepository) {
+class RealtimeDatabaseUseCase @Inject constructor(private val repository: FirebaseRepository) {
     operator fun invoke(): Flow<Resource<LiveData<List<RealtimeDatabaseOrder>>>> =
         flow {
             try {
                 emit(Resource.Loading<LiveData<List<RealtimeDatabaseOrder>>>())
-                val response: LiveData<List<RealtimeDatabaseOrder>> =
-                    repository.readAllOrders
+                val response: LiveData<List<RealtimeDatabaseOrder>> = repository.getOrders()
                 emit(Resource.Success<LiveData<List<RealtimeDatabaseOrder>>>(response))
             } catch (e: HttpException) {
                 emit(
