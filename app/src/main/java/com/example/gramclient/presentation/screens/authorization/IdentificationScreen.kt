@@ -23,6 +23,8 @@ import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.MainScreen
+import com.example.gramclient.presentation.screens.main.SearchAddressScreen
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Constants.FCM_TOKEN
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -65,7 +67,10 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                     it.result.client_register_id,
                                     fcm_token
                                 ) {
-                                    navigator.replaceAll(MainScreen())
+                                    if(Constants.IDENTIFY_TO_SCREEN == "MAINSCREEN")
+                                        navigator.replaceAll(MainScreen())
+                                    else
+                                        navigator.replaceAll(SearchAddressScreen())
                                     if(phone.value!=null) prefs.setPhoneNumber(phone.value!!)
                                 }
                             }

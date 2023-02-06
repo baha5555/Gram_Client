@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.R
@@ -52,6 +55,7 @@ fun MainBottomSheetContent(
     stateAllowances: AllowancesResponseState,
     isSearchState: MutableState<Boolean>,
     focusRequester: FocusRequester,
+    dopPhone:()->Unit
 ){
     val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
 
@@ -105,7 +109,7 @@ fun MainBottomSheetContent(
                     )
                 },
                 optionsContent = {
-                    OptionsContent()
+                    OptionsContent(dopPhone)
                 },
                 allowancesContent = {
                     AllowancesContent(
@@ -277,7 +281,7 @@ fun AddressesContent(
                 Spacer(modifier = Modifier.width(20.dp))
                 if(address.address=="") {
                     Text(
-                        text = "АКуда едем?", color=Color.Gray,
+                        text = "Куда едем?", color=Color.Gray,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }else {
@@ -336,14 +340,16 @@ fun TariffsContent(
         Column(horizontalAlignment = Alignment.Start) {
             Image(
                 modifier = Modifier
-                    .padding(end =
-                    when(selected_tariff?.value!!.id) {
-                        1 -> 110.dp
-                        2-> 145.dp
-                        4 -> 130.dp
-                        5 -> 130.dp
-                        else -> 310.dp
-                    }, bottom = 30.dp)
+                    .padding(
+                        end =
+                        when (selected_tariff?.value!!.id) {
+                            1 -> 110.dp
+                            2 -> 145.dp
+                            4 -> 130.dp
+                            5 -> 130.dp
+                            else -> 310.dp
+                        }, bottom = 30.dp
+                    )
                     .fillMaxWidth(0f + currentFraction)
                     .graphicsLayer(alpha = 0f + currentFraction)
                     .height(0.dp + (currentFraction * 80).dp),
@@ -392,16 +398,19 @@ fun TariffsContent(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OptionsContent() {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(
-            Color.White,
-            shape = RoundedCornerShape(20.dp)
-        )
-        .padding(horizontal = 20.dp, vertical = 0.dp)
-    ){
+fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color.White,
+                shape = RoundedCornerShape(20.dp)
+            )
+            .padding(horizontal = 20.dp, vertical = 0.dp)
+    ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -420,14 +429,26 @@ fun OptionsContent() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp),
+                .padding(15.dp)
+                .clickable {
+                    if(mainViewModel.dopPhone.value!="")
+                        mainViewModel.updateDopPhone("")
+                    else
+                        dopPhone()
+                },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Заказ другому человеку", fontSize = 16.sp)
-            Image(
-                modifier = Modifier.size(18.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+            Column {
+                Text(text = "Заказ другому человеку", fontSize = 16.sp)
+                if(mainViewModel.dopPhone.value!="")
+                    Text(text = mainViewModel.dopPhone.value, fontSize = 12.sp, color = Color.Gray)
+            }
+            if(mainViewModel.dopPhone.value!="")
+                Icon(
+                modifier = Modifier
+                    .size(18.dp),
+                imageVector = Icons.Default.Done,
                 contentDescription = "icon"
             )
         }

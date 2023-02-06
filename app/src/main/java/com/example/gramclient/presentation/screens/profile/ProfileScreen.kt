@@ -44,6 +44,8 @@ import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.authorization.AuthScreen
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.FontSilver
+import com.example.gramclient.utils.Constants
+import com.example.gramclient.utils.Constants.SOON
 import com.example.gramclient.utils.Values
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -205,7 +207,7 @@ class ProfileScreen : Screen{
                                     .fillMaxWidth(),
                                 value = (profileEmail.value ?: getProfileEmail ?: ""),
                                 onValueChange = { profileEmail.value = it },
-                                label = { Text(text = "Email*") },
+                                label = { Text(text = "Email") },
                                 colors = TextFieldDefaults.textFieldColors(
                                     backgroundColor = BackgroundColor,
                                     unfocusedLabelColor = FontSilver,
@@ -234,6 +236,26 @@ class ProfileScreen : Screen{
                                     color = Color.Gray
                                 )
                                 Divider()
+                            }
+                            Spacer(modifier = Modifier.height(49.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+
+                            ) {
+                                Text(
+                                    text = "Получение рассылки",
+                                    color = Color.Black,
+                                    fontSize = 15.sp
+                                )
+                                Row(modifier = Modifier.padding(end = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Text(text = SOON, modifier = Modifier.padding(end = 10.dp))
+                                    val switchON = remember {
+                                        mutableStateOf(false) // Initially the switch is ON
+                                    }
+                                    CustomSwitch(switchON) {}
+                                }
                             }
 
                             Spacer(modifier = Modifier.height(49.dp))
@@ -305,27 +327,6 @@ class ProfileScreen : Screen{
                                 )
                             }
                             Spacer(modifier = Modifier.height(49.dp))
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-
-                            ) {
-                                Text(
-                                    text = "Получение рассылки",
-                                    color = Color.Black,
-                                    fontSize = 15.sp
-                                )
-                                Box(modifier = Modifier.padding(end = 5.dp)) {
-                                    val switchON = remember {
-                                        mutableStateOf(false) // Initially the switch is ON
-                                    }
-                                    CustomSwitch(switchON) {}
-                                }
-
-                            }
-                            Spacer(modifier = Modifier.height(49.dp))
-
                         }
                     }
                 }

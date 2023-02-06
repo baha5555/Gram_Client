@@ -160,57 +160,57 @@ class SearchDriverScreen : Screen {
 
                                 }
 
-                                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                                    repeat(5) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(150.dp, 30.dp)
-                                                .padding(start = 15.dp)
-                                                .border(
-                                                    width = 1.dp,
-                                                    color = PrimaryColor,
-                                                    shape = RoundedCornerShape(35.dp)
-                                                )
-                                                .clip(RoundedCornerShape(35.dp))
-                                        ) {
-                                            Image(
-                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
-                                                contentDescription = "ic_box"
-                                            )
-                                            Text(
-                                                text = "Доставка",
-                                                fontSize = 12.sp,
-                                                modifier = Modifier.align(
-                                                    Alignment.Center
-                                                )
-                                            )
-                                        }
-                                        Box(
-                                            modifier = Modifier
-                                                .size(150.dp, 30.dp)
-                                                .padding(start = 15.dp)
-                                                .border(
-                                                    width = 1.dp,
-                                                    color = PrimaryColor,
-                                                    shape = RoundedCornerShape(35.dp)
-                                                )
-                                                .clip(RoundedCornerShape(35.dp))
-                                        ) {
-                                            Image(
-                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
-                                                contentDescription = "ic_box"
-                                            )
-                                            Text(
-                                                text = "Аренда авто",
-                                                fontSize = 12.sp,
-                                                modifier = Modifier.align(
-                                                    Alignment.Center
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-                                Spacer(Modifier.requiredHeight(20.dp))
+//                                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+//                                    repeat(5) {
+//                                        Box(
+//                                            modifier = Modifier
+//                                                .size(150.dp, 30.dp)
+//                                                .padding(start = 15.dp)
+//                                                .border(
+//                                                    width = 1.dp,
+//                                                    color = PrimaryColor,
+//                                                    shape = RoundedCornerShape(35.dp)
+//                                                )
+//                                                .clip(RoundedCornerShape(35.dp))
+//                                        ) {
+//                                            Image(
+//                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
+//                                                contentDescription = "ic_box"
+//                                            )
+//                                            Text(
+//                                                text = "Доставка",
+//                                                fontSize = 12.sp,
+//                                                modifier = Modifier.align(
+//                                                    Alignment.Center
+//                                                )
+//                                            )
+//                                        }
+//                                        Box(
+//                                            modifier = Modifier
+//                                                .size(150.dp, 30.dp)
+//                                                .padding(start = 15.dp)
+//                                                .border(
+//                                                    width = 1.dp,
+//                                                    color = PrimaryColor,
+//                                                    shape = RoundedCornerShape(35.dp)
+//                                                )
+//                                                .clip(RoundedCornerShape(35.dp))
+//                                        ) {
+//                                            Image(
+//                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
+//                                                contentDescription = "ic_box"
+//                                            )
+//                                            Text(
+//                                                text = "Аренда авто",
+//                                                fontSize = 12.sp,
+//                                                modifier = Modifier.align(
+//                                                    Alignment.Center
+//                                                )
+//                                            )
+//                                        }
+//                                    }
+//                                }
+                                Spacer(Modifier.requiredHeight(0.dp))
                             }
                         }) {
 
