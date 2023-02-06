@@ -10,6 +10,7 @@ import android.graphics.*
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
+import android.opengl.Visibility
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.util.Log
@@ -26,6 +27,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +41,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -50,8 +53,11 @@ import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
+import com.example.gramclient.presentation.screens.main.components.FloatingButton1
 import com.example.gramclient.presentation.screens.order.OrderExecutionScreen
+import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
+import com.example.gramclient.presentation.screens.order.orderCount
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.PreferencesName
@@ -85,6 +91,8 @@ lateinit var mLocationOverlay: MyLocationNewOverlay
 
 @SuppressLint("StaticFieldLeak")
 lateinit var btnLocation: ImageButton
+@SuppressLint("StaticFieldLeak")
+lateinit var btnBack: ImageButton
 
 @SuppressLint("StaticFieldLeak")
 lateinit var getAddressMarker: ImageView
@@ -107,6 +115,9 @@ fun CustomMainMap(
     val stateStatusGPS = remember {
         mutableStateOf(manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
     }
+    val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
+    val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -142,6 +153,7 @@ fun CustomMainMap(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+
     if (stateStatusGPS.value) {
         val toAddress by Values.ToAddress
         val fromAddress by Values.FromAddress
@@ -164,6 +176,10 @@ fun CustomMainMap(
                     markers=Markers(context, map)
                     userTouchSurface = this.findViewById(R.id.userTouchSurface)
                     btnLocation = this.findViewById(R.id.btnLocation)
+                    btnBack = this.findViewById(R.id.btnBack)
+                    btnBack.setOnClickListener {
+                        navigator.replaceAll(SearchDriverScreen())
+                    }
                     getAddressMarker = this.findViewById(R.id.getAddressMarker)
                     Configuration.getInstance()
                         .load(it, PreferenceManager.getDefaultSharedPreferences(it))
@@ -363,6 +379,20 @@ fun CustomMainMap(
                 }
             }
         )
+        stateRealtimeDatabaseOrders.response?.let { response ->
+            response.observeAsState().value?.let { orders ->
+                orderCount.value = orders.size
+                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
+                    responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
+                        if (clientOrdersId.active_orders != null) {
+                            btnBack.visibility=View.VISIBLE
+                        }else{
+                            btnBack.visibility=View.INVISIBLE
+                        }
+                    }
+                }
+            }
+        }
     } else {
         val context = LocalContext.current
         val activity = (context as MainActivity)

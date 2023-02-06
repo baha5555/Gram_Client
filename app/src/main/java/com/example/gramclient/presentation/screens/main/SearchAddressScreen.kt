@@ -17,7 +17,9 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.room.Index.Order
 import cafe.adriel.voyager.core.screen.Screen
+import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
@@ -54,6 +56,12 @@ class SearchAddressScreen : Screen {
 
         CustomBackHandle(drawerState.isClosed)
 
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+        val prefs: CustomPreference = CustomPreference(context)
+        LaunchedEffect(key1 = true){
+            orderExecutionViewModel.readAllOrders()
+            orderExecutionViewModel.readAllClient(prefs.getPhoneNumber(),{})
+        }
         if (!initialApiCalled) {
             LaunchedEffect(Unit) {
                 mainViewModel.getActualLocation(context)
@@ -71,10 +79,7 @@ class SearchAddressScreen : Screen {
         val toAddress by mainViewModel.toAddress
         val fromAddress by mainViewModel.fromAddress
         val scope = rememberCoroutineScope()
-        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
 
-        val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
-        val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             BackHandler(enabled = drawerState.isOpen) {
                 scope.launch { drawerState.close() }
@@ -102,25 +107,6 @@ class SearchAddressScreen : Screen {
                                         .padding(start = 80.dp),
                                     horizontalArrangement = Arrangement.End
                                 ) {
-
-
-                                    stateRealtimeDatabaseOrders.response?.let { response ->
-                                        response.observeAsState().value?.let { orders ->
-                                            orderCount.value = orders.size
-                                            stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
-                                                responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
-                                                    if (clientOrdersId.active_orders != null) {
-                                                        FloatingButton1(
-                                                            scope = coroutineScope,
-                                                            drawerState = drawerState,
-                                                            bottomSheetState = bottomSheetState
-                                                        )
-                                                    }
-
-                                                }
-                                            }
-                                        }
-                                    }
                                     FloatingButton(
                                         scope = coroutineScope,
                                         drawerState = drawerState,

@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -13,12 +12,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.screens.main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -48,8 +45,7 @@ fun AddressSearchBottomSheet(
     ) {
 
         if (!isSearchState.value) {
-                if(searchText.value !="")
-                    searchText.value = ""
+            if(searchText.value !="") searchText.value = ""
             ToAddressField(
                 WHICH_ADDRESS = WHICH_ADDRESS,
                 toAddress = toAddress,
