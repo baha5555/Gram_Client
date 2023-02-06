@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
+import com.example.gramclient.R
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -17,11 +18,12 @@ class Markers(private val context: Context, private val map: MapView) {
         firstMarker.title = title
         map.overlays.add(firstMarker)
     }
-    fun addDriverMarker(geoPoint: GeoPoint, title: String, icon: Int) {
+    fun addDriverMarker(geoPoint: GeoPoint, title: String, pOrientation: Float) {
         val marker = Marker(map)
         marker.position = geoPoint
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-        marker.icon = ContextCompat.getDrawable(context, icon)
+        marker.icon = ContextCompat.getDrawable(context, R.drawable.ic_map_car_white)
+        marker.rotation = pOrientation
         marker.title = title
         if(inxDriverMarker.value == -1){
             map.overlays.add(marker)

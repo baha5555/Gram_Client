@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.*
+import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.preference.PreferenceManager
@@ -69,6 +70,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 lateinit var fromAddres2: Address
@@ -87,6 +89,8 @@ lateinit var btnLocation: ImageButton
 @SuppressLint("StaticFieldLeak")
 lateinit var getAddressMarker: ImageView
 var currentRoute: String? = null
+val myLocationPoint = mutableStateOf(GeoPoint(0.0, 0.0))
+
 
 @Composable
 fun CustomMainMap(
@@ -197,7 +201,7 @@ fun CustomMainMap(
                             getAddressMarker.visibility = View.GONE
                             map.overlays.clear()
                             addOverlays()
-                            showRoadAB(it, fromAddress, toAddress)
+                            //showRoadAB(it, fromAddress, toAddress)
                         }
                         SearchAddressScreen().key -> {
                             map.overlays.clear()
@@ -219,6 +223,7 @@ fun CustomMainMap(
                             }
                         }
                     }
+                    setChangeLocationListener()
                 }
             },
             update = {
@@ -226,11 +231,11 @@ fun CustomMainMap(
                     MainScreen().key -> {
                         if(fromAddress!= fromAddres2 || toAddress!= toAddress2) showRoadAB(it.context, fromAddress, toAddress)
                     }
-                    SearchDriverScreen().key, OrderExecutionScreen().key -> {
+                    OrderExecutionScreen().key -> {
                         //showRoadAB(it.context, fromAddress, toAddress)
                         Log.i("addMarker", "create")
                         if(Values.DriverLocation.value!=GeoPoint(0.0,0.0)){
-                            markers.addDriverMarker(Values.DriverLocation.value, "asd", R.drawable.car_econom_icon)
+                            //markers.addDriverMarker(Values.DriverLocation.value, "")
                         }
                     }
                     SearchAddressScreen().key -> {
@@ -551,6 +556,38 @@ fun View.margin(
         top?.run { topMargin = dpToPx(this) }
         right?.run { rightMargin = dpToPx(this) }
         bottom?.run { bottomMargin = dpToPx(this) }
+    }
+}
+private fun setChangeLocationListener() {
+    mLocationOverlay.myLocationProvider.startLocationProvider { location: Location, source: IMyLocationProvider? ->
+        printoutDebugInfo(location)
+        mLocationOverlay.onLocationChanged(
+            location, source
+        )
+    }
+    map.overlays.add(mLocationOverlay)
+}
+@SuppressLint("WrongConstant")
+private fun printoutDebugInfo(
+    l1: Location?,
+) {
+    val location: Location? = l1 ?: mLocationOverlay.lastFix
+    Log.i("myLocation", ""+location)
+    if (location != null) {
+        myLocationPoint.value.latitude=location.latitude
+        myLocationPoint.value.longitude=location.longitude
+    }
+    if ((location != null)) {
+        var pOrientation = 360 - location.bearing
+        if (pOrientation < 0) pOrientation += 360f
+        if (pOrientation > 360) pOrientation -= 360f
+        pOrientation = (pOrientation.toInt().toFloat()) / 5
+        pOrientation = (pOrientation.toInt().toFloat()) * 5
+        //markers.addDriverMarker(geoPoint = GeoPoint(location.latitude, location.longitude),"", pOrientation)
+
+        if (location.speed >= 0.01) {
+            //map.controller.animateTo(mLocationOverlay.myLocation, map.zoomLevelDouble, 1000, pOrientation)
+        }
     }
 }
 
