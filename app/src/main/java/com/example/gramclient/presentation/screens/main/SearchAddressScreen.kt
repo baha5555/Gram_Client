@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,12 +24,15 @@ import com.example.gramclient.utils.Constants
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
+import com.example.gramclient.presentation.screens.main.components.FloatingButton1
 import com.example.gramclient.presentation.screens.main.components.FromAddressField
+import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.presentation.screens.order.orderCount
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import kotlinx.coroutines.launch
 
 
-class SearchAddressScreen : Screen{
+class SearchAddressScreen : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
@@ -68,6 +72,10 @@ class SearchAddressScreen : Screen{
         val toAddress by mainViewModel.toAddress
         val fromAddress by mainViewModel.fromAddress
         val scope = rememberCoroutineScope()
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+
+        val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
+        val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             BackHandler(enabled = drawerState.isOpen) {
                 scope.launch { drawerState.close() }
@@ -89,11 +97,35 @@ class SearchAddressScreen : Screen{
                         BottomSheetScaffold(
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
+                                Column(modifier = Modifier
+                                    .size(50.dp)
+                                    .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),) {
                                     FloatingButton(
                                         scope = coroutineScope,
                                         drawerState = drawerState,
                                         bottomSheetState = bottomSheetState
+
                                     )
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                    stateRealtimeDatabaseOrders.response?.let { response ->
+                                        response.observeAsState().value?.let { orders ->
+                                            orderCount.value = orders.size
+                                            stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
+                                                responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
+                                                    if (clientOrdersId.active_orders != null) {
+                                                        FloatingButton1(
+                                                            scope = coroutineScope,
+                                                            drawerState = drawerState,
+                                                            bottomSheetState = bottomSheetState
+                                                        )
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                             },
                             drawerGesturesEnabled = false,
                             sheetBackgroundColor = Color.White,
