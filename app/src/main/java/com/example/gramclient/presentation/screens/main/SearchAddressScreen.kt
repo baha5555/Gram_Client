@@ -97,8 +97,10 @@ class SearchAddressScreen : Screen {
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
                                 Row(
-                                    modifier = Modifier.fillMaxWidth().padding(start = 80.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 80.dp),
+                                    horizontalArrangement = Arrangement.End
                                 ) {
 
 
