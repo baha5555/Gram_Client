@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/User/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/from_marker.xml" value="0.2715" />
+        <entry key="..\:/Users/User/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/ic_checkbox.xml" value="0.131" />
+        <entry key="..\:/Users/User/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/ic_person.xml" value="0.298" />
+        <entry key="..\:/Users/User/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/to_marker.xml" value="0.2715" />
+        <entry key="..\:/Users/User/Desktop/Gram projects/client_gram_android/app/src/main/res/layout/map.xml" value="0.2942708333333333" />
         <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/avatar.xml" value="0.245" />
         <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/cancel_icon.xml" value="0.245" />
         <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/cancel_icons.xml" value="0.245" />
@@ -46,7 +51,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
