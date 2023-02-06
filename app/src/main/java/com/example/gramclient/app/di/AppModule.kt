@@ -3,8 +3,10 @@ package com.example.gramclient.app.di
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.data.AppRepositoryImpl
+import com.example.gramclient.data.AppFirebaseRepositoryImpl
 import com.example.gramclient.data.remote.ApplicationApi
 import com.example.gramclient.domain.AppRepository
+import com.example.gramclient.domain.FirebaseRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,4 +42,8 @@ object AppModule {
     @Singleton
     fun provideAppRepository(api: ApplicationApi, customPreference: CustomPreference): AppRepository =
         AppRepositoryImpl(api, customPreference)
+
+    @Provides
+    @Singleton
+    fun provideFirebaseRepository(): FirebaseRepository = AppFirebaseRepositoryImpl()
 }

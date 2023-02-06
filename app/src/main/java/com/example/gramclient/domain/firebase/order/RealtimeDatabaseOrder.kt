@@ -1,4 +1,4 @@
-package com.example.gramclient.domain.realtimeDatabase.Order
+package com.example.gramclient.domain.firebase.order
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
