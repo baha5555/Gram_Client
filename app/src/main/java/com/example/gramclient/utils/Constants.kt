@@ -8,9 +8,11 @@ object Constants {
     var FCM_TOKEN:String? = ""
     const val LOCAL_BASE_URL="http://10.250.1.96/"
     const val BASE_URL="http://testapi.client.gram.tj/"
+    var IDENTIFY_TO_SCREEN = ""
     const val PREFIX="992"
     const val FROM_ADDRESS="FROM_ADDRESS"
     const val TO_ADDRESS="TO_ADDRESS"
+    const val SOON = "(Скоро)"
     val STATE_ARROW_BACK_IN_ADDRESS_SEARCH_SCREEN = mutableStateOf(false)
     var STATE_RAITING: MutableState<Boolean> = mutableStateOf(false)
     var STATE_RAITING_ORDER_ID: MutableState<Int> = mutableStateOf(-1)
