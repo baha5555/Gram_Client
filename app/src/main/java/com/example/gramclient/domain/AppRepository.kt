@@ -1,6 +1,5 @@
 package com.example.gramclient.domain
 
-import androidx.lifecycle.LiveData
 import com.example.gramclient.domain.athorization.AuthResponse
 import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
@@ -17,13 +16,11 @@ import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
-import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 interface AppRepository {
     suspend fun authorization(phone_number: String): AuthResponse
-    val readAllOrders: LiveData<List<RealtimeDatabaseOrder>>
 
     suspend fun identification(
         client_register_id: String,

@@ -24,11 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.gramclient.R
-import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
+import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.CustomButton
-import java.text.SimpleDateFormat
-import java.time.Clock
-import java.time.LocalDateTime
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)

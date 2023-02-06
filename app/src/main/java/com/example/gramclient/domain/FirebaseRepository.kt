@@ -1,9 +1,9 @@
 package com.example.gramclient.domain
 
-import com.example.gramclient.data.firebase.AllClientLiveData
-import com.example.gramclient.data.firebase.AllOrdersLiveData
+import com.example.gramclient.data.firebase.GetClientOrderLiveData
+import com.example.gramclient.data.firebase.GetOrdersLiveData
 
 interface FirebaseRepository {
-    suspend fun getClientOrder(client: String, goToSearchAddressScreen: () -> Unit): AllClientLiveData
-    suspend fun getOrders(): AllOrdersLiveData
+    suspend fun getClientOrder(client: String, goToSearchAddressScreen: () -> Unit): GetClientOrderLiveData
+    suspend fun getOrders(): GetOrdersLiveData
 }

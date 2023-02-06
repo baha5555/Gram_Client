@@ -9,18 +9,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.*
-import com.example.gramclient.domain.realtimeDatabase.Order.RealtimeDatabaseOrder
-import com.example.gramclient.domain.realtimeDatabase.RealtimeClientDatabaseUseCase
-import com.example.gramclient.domain.realtimeDatabase.RealtimeDatabaseUseCase
-import com.example.gramclient.domain.realtimeDatabase.profile.Client
-import com.example.gramclient.domain.realtimeDatabase.realtimeClientOrderIdDatabaseResponseState
-import com.example.gramclient.domain.realtimeDatabase.realtimeDatabaseResponseState
+import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
+import com.example.gramclient.domain.firebase.GetClientOrderUseCase
+import com.example.gramclient.domain.firebase.GetOrdersUseCase
+import com.example.gramclient.domain.firebase.profile.Client
+import com.example.gramclient.presentation.screens.order.states.GetClientOrderState
+import com.example.gramclient.presentation.screens.order.states.GetOrdersState
 import com.example.gramclient.presentation.screens.main.states.CancelOrderResponseState
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.utils.Values
@@ -43,23 +41,23 @@ class OrderExecutionViewModel  @Inject constructor(
     private val getActiveOrdersUseCase: GetActiveOrdersUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase,
     private val editOrderUseCase: EditOrderUseCase,
-    private val realtimeDatabaseUseCase: RealtimeDatabaseUseCase,
-    private val realtimeClientDatabaseUseCase: RealtimeClientDatabaseUseCase,
+    private val getOrdersUseCase: GetOrdersUseCase,
+    private val getClientOrderUseCase: GetClientOrderUseCase,
     private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase
 ): AndroidViewModel(application) {
     val context get() = getApplication<Application>()
-    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateSearchAddress: State<AddRatingResponseState> = _stateAddRating
 
     private val _stateConnectClientWithDriver = mutableStateOf(ConnectClientWithDriverResponseState())
     val stateConnectClientWithDriver = _stateConnectClientWithDriver
-    private val _stateRealtimeOrdersDatabase = mutableStateOf(realtimeDatabaseResponseState())
-    val stateRealtimeOrdersDatabase: State<realtimeDatabaseResponseState> = _stateRealtimeOrdersDatabase
+    private val _stateRealtimeOrdersDatabase = mutableStateOf(GetOrdersState())
+    val stateRealtimeOrdersDatabase: State<GetOrdersState> = _stateRealtimeOrdersDatabase
 
-    private val _stateRealtimeClientOrderIdDatabase = mutableStateOf(realtimeClientOrderIdDatabaseResponseState())
-    val stateRealtimeClientOrderIdDatabase: State<realtimeClientOrderIdDatabaseResponseState> = _stateRealtimeClientOrderIdDatabase
+    private val _stateRealtimeClientOrderIdDatabase = mutableStateOf(GetClientOrderState())
+    val stateRealtimeClientOrderIdDatabase: State<GetClientOrderState> = _stateRealtimeClientOrderIdDatabase
 
     private val _stateActiveOrders = mutableStateOf(ActiveOrdersResponseState())
     val stateActiveOrders: State<ActiveOrdersResponseState> = _stateActiveOrders
@@ -78,55 +76,39 @@ class OrderExecutionViewModel  @Inject constructor(
     }
 
     fun readAllOrders() {
-            realtimeDatabaseUseCase.invoke().onEach { result: Resource<LiveData<List<RealtimeDatabaseOrder>>> ->
+            getOrdersUseCase.invoke().onEach { result: Resource<LiveData<List<RealtimeDatabaseOrder>>> ->
                 when (result){
                     is Resource.Success -> {
                         try {
                             val addressResponse: LiveData<List<RealtimeDatabaseOrder>>? = result.data
 
                                 _stateRealtimeOrdersDatabase.value =
-                                    realtimeDatabaseResponseState(response = addressResponse)
+                                    GetOrdersState(response = addressResponse)
                             Log.e("readAllOrdersFromRealtimeResponse", "Success->\n ${_stateRealtimeOrdersDatabase.value.response?.value}")
                         }catch (e: Exception) {
                             Log.d("readAllOrdersFromRealtimeResponse", "${e.message} Exception")
                         }
                     }
-                    is Resource.Error -> {
-                        Log.e("readAllOrdersFromRealtimeResponse", "readAllOrdersFromRealtimeResponseError->\n ${result.message}")
-                        _stateRealtimeOrdersDatabase.value = realtimeDatabaseResponseState(
-                            error = "${result.message}"
-                        )
-                    }
-                    is Resource.Loading -> {
-                        _stateRealtimeOrdersDatabase.value = realtimeDatabaseResponseState(isLoading = true)
-                    }
+                    else -> {}
                 }
             }.launchIn(viewModelScope)
     }
     fun readAllClient(client:String, goToSearchAddressScreen:()->Unit) {
-        realtimeClientDatabaseUseCase.invoke(client,goToSearchAddressScreen).onEach { result: Resource<LiveData<Client>> ->
+        getClientOrderUseCase.invoke(client,goToSearchAddressScreen).onEach { result: Resource<LiveData<Client>> ->
             when (result){
                 is Resource.Success -> {
                     try {
                         val realtimeClientOrderIdDatabaseResponseResponse: LiveData<Client>? = result.data
 
                         _stateRealtimeClientOrderIdDatabase.value =
-                            realtimeClientOrderIdDatabaseResponseState(response = realtimeClientOrderIdDatabaseResponseResponse)
+                            GetClientOrderState(response = realtimeClientOrderIdDatabaseResponseResponse)
 
                         Log.e("RealtimeClientOrderIdDatabaseResponse", "Success->\n ${_stateRealtimeClientOrderIdDatabase.value.response?.value }")
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("RealtimeClientOrderIdDatabaseResponse", "RealtimeClientOrderIdDatabaseResponseError->\n ${result.message}")
-                    _stateRealtimeClientOrderIdDatabase.value = realtimeClientOrderIdDatabaseResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateRealtimeClientOrderIdDatabase.value = realtimeClientOrderIdDatabaseResponseState(isLoading = true)
-                }
+                else -> {}
             }
         }.launchIn(viewModelScope)
     }
