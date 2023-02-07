@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
@@ -38,6 +37,7 @@ import com.example.gramclient.presentation.screens.main.states.AllowancesRespons
 import com.example.gramclient.presentation.screens.main.states.CalculateResponseState
 import com.example.gramclient.presentation.screens.main.states.TariffsResponseState
 import com.example.gramclient.ui.theme.BackgroundColor
+import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import currentFraction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -414,11 +414,20 @@ fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp),
+                .padding(15.dp)
+                .clickable {
+                        stateOfDopInfoForDriver.value = "COMMENT_TO_ORDER"
+                        dopPhone()
+                },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Коментарий водителю", fontSize = 16.sp)
+            Column {
+                Text(text = "Коментарий водителю", fontSize = 16.sp)
+            if(mainViewModel.commentToOrder.value!="")
+            Text(text = if(mainViewModel.commentToOrder.value.length<35)
+            mainViewModel.commentToOrder.value else "${mainViewModel.commentToOrder.value.take(35)}...", fontSize = 12.sp,color = Color.Gray)
+            }
             Image(
                 modifier = Modifier.size(18.dp),
                 imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
@@ -434,7 +443,10 @@ fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel
                     if(mainViewModel.dopPhone.value!="")
                         mainViewModel.updateDopPhone("")
                     else
+                    {
+                        stateOfDopInfoForDriver.value = "TO_ANOTHER_HUMAN"
                         dopPhone()
+                    }
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

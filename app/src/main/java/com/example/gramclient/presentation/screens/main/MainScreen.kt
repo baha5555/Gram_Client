@@ -2,7 +2,6 @@ package com.example.gramclient.presentation.screens.main
 
 import android.app.Activity
 import android.content.Context
-import android.inputmethodservice.Keyboard
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -24,7 +23,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,12 +34,12 @@ import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.screens.main.components.CustomDopInfoForDriver
 import com.example.gramclient.presentation.screens.map.CustomMainMap
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
-import com.example.gramclient.ui.theme.BackgroundColor
+import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
-import okio.utf8Size
 
 class MainScreen : Screen{
     @OptIn(ExperimentalMaterialApi::class)
@@ -60,7 +58,9 @@ class MainScreen : Screen{
         var dopPhoneState by remember {
             mutableStateOf("")
         }
-        val dopPhone = mainViewModel.dopPhone
+        var commentToOrderState by remember {
+            mainViewModel.commentToOrder
+        }
         val modalSheetState = rememberModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
             confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
@@ -109,63 +109,50 @@ class MainScreen : Screen{
         ModalBottomSheetLayout(
             sheetState = modalSheetState,
             sheetContent = {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.9f)
-                    .padding(start = 10.dp, top = 10.dp)) {
-                    Text(
-                        text = "Заказать другому человеку?",
-                        fontSize = 18.sp,
-                        modifier = Modifier.padding(end = 10.dp)
-                    )
-                    TextField(
-                        value = dopPhoneState, onValueChange = {
+                if(stateOfDopInfoForDriver.value == "TO_ANOTHER_HUMAN")
+                    CustomDopInfoForDriver(
+                        onClick = {
+                            if(dopPhoneState[0]=='9' && dopPhoneState[1]=='9' && dopPhoneState[2]=='2' && dopPhoneState.length==12)
+                            {
+                                hideKeyboard(activity = activity)
+                                mainViewModel.updateDopPhone(dopPhoneState)
+                                coroutineScope.launch {
+                                    modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                                }
+                                dopPhoneState = ""
+                            }
+                            else if(dopPhoneState[0]!='9' && dopPhoneState[1]!='9' || dopPhoneState[2]!='2'){
+                                Toast.makeText(context,"Номер должен начинаться с 992",Toast.LENGTH_SHORT).show()
+                            }
+                            else if(dopPhoneState.length<12) {
+                                Toast.makeText(context, "Неподходящая длина", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        textFieldValue = dopPhoneState,
+                        onValueChange = {
                             if(it.length<=12)
                                 dopPhoneState = it
                         },
-                        placeholder = { Text(text = "Введите номер") },
-                        singleLine = true,
-                        shape = RoundedCornerShape(15.dp),
-                        colors = TextFieldDefaults.textFieldColors(
-                            textColor = Color.Black,
-                            cursorColor = Color.Black,
-                            leadingIconColor = Color.Black,
-                            trailingIconColor = Color.Black,
-                            backgroundColor = BackgroundColor,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent
-                        )
+                        placeholder = "Введите номер телефона",
+                        title = "Кто поедет на такси?",
+                        stateTextField = true
                     )
-                    if(dopPhoneState!="") {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.BottomCenter
-                        ) {
-                            CustomButton(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-                                text = "Сохранить", textSize = 16, onClick = {
-                                    if(dopPhoneState[0]=='9' && dopPhoneState[1]=='9' && dopPhoneState[2]=='2' && dopPhoneState.length==12)
-                                    {
-                                        hideKeyboard(activity = activity)
-                                        mainViewModel.updateDopPhone(dopPhoneState)
-                                        coroutineScope.launch {
-                                            modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
-                                        }
-                                        dopPhoneState = ""
-                                    }
-                                    else if(dopPhoneState[0]!='9' && dopPhoneState[1]!='9' || dopPhoneState[2]!='2'){
-                                        Toast.makeText(context,"Номер должен начинаться с 992",Toast.LENGTH_SHORT).show()
-                                    }
-                                    else if(dopPhoneState.length<12){
-                                        Toast.makeText(context,"Неподходящая длина",Toast.LENGTH_SHORT).show()
-                                    }
-                                },
-                                textBold = false
-                            )
-                        }
-                    }
-                }
+                else
+                        CustomDopInfoForDriver(
+                            onClick = {
+                                hideKeyboard(activity = activity)
+                                mainViewModel.updateCommentToOrder(commentToOrderState)
+                                coroutineScope.launch {
+                                    modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                                }
+                            },
+                            textFieldValue = commentToOrderState,
+                            onValueChange = {
+                                mainViewModel.updateCommentToOrder(it)
+                            },
+                            placeholder = "Комментарий водителю",
+                            title = "Комментарий водителю"
+                        )
             },
             sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
         ) {
@@ -291,8 +278,11 @@ class MainScreen : Screen{
                                         stateTariffs = stateTariffs,
                                         stateAllowances = stateAllowances,
                                         isSearchState = isSearchState,
-                                        focusRequester = focusRequester
+                                        focusRequester = focusRequester,
                                     ) {
+
+                                        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                                        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
                                         coroutineScope.launch {
                                             modalSheetState.animateTo(ModalBottomSheetValue.Expanded)
                                         }
