@@ -28,7 +28,10 @@ import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.screens.authorization.AuthScreen
 import com.example.gramclient.presentation.screens.drawer.AboutScreen
 import com.example.gramclient.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
+import com.example.gramclient.presentation.screens.main.SearchAddressScreen
+import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import com.example.gramclient.presentation.screens.profile.ProfileScreen
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Values
 import kotlinx.coroutines.launch
 
@@ -38,6 +41,7 @@ fun SideBarMenu() {
     val prefs = CustomPreference(LocalContext.current)
     val navigator = LocalNavigator.currentOrThrow
 
+    val currentScreen = navigator.lastItem.key
     val coroutineScope = rememberCoroutineScope()
     //val currentScreen = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
     Column(
@@ -80,7 +84,12 @@ fun SideBarMenu() {
                 )
                 Text(
                     modifier = Modifier.clickable {
-                        if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
+                        if (prefs.getAccessToken() == "")
+                        {
+                            if(currentScreen==SearchAddressScreen().key)
+                                Constants.IDENTIFY_TO_SCREEN = "SearchAddressScreen"
+                            navigator.plusAssign(AuthScreen())
+                        }
                         else navigator.push(ProfileScreen())
                     },
                     text = if (Values.Email.value!="" && Values.Email.value!=null) Values.Email.value else "Выбрать Почту...",

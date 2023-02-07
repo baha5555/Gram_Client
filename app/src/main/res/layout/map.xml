@@ -40,6 +40,17 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:src="@drawable/btn_back"
+        app:layout_constraintBottom_toTopOf="@+id/btnLocation"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="invisible"
+        />
+
 <!--    <ImageView-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->

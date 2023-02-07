@@ -65,9 +65,16 @@ class MainViewModel @Inject constructor(
     private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
     val fromAddress: State<Address> = _fromAddress
 
+    private val _dopPhone = mutableStateOf("")
+    val dopPhone = _dopPhone
+
     fun updateFromAddress(address:Address) {
         _fromAddress.value = address
         Values.FromAddress.value = address
+    }
+
+    fun updateDopPhone(phone:String){
+        _dopPhone.value = phone
     }
 
     fun updateToAddress(address:Address?) {
@@ -241,7 +248,7 @@ class MainViewModel @Inject constructor(
 
     fun createOrder(orderExecutionViewModel: OrderExecutionViewModel) {
         createOrderUseCase.invoke(
-            dop_phone = null,
+            dop_phone = if(_dopPhone.value!="")_dopPhone.value else null,
             from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
             to_addresses = if(toAddress.value[0].id != 0) listOf(AddressModel(toAddress.value.get(0).id)) else null,
             comment = null,

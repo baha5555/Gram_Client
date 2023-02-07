@@ -23,6 +23,7 @@ import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.screens.authorization.AuthScreen
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
+import com.example.gramclient.utils.Constants.IDENTIFY_TO_SCREEN
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -78,6 +79,7 @@ fun BottomBar(
             onClick = {
                 coroutineScope.launch {
                     if (prefs.getAccessToken() == "") {
+                        IDENTIFY_TO_SCREEN = "MAINSCREEN"
                         navigator.push(AuthScreen())
                     } else {
                         isDialogOpen.value = true
