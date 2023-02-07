@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,16 +17,12 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
-import com.example.gramclient.utils.Constants
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
-import com.example.gramclient.presentation.screens.main.components.FloatingButton1
 import com.example.gramclient.presentation.screens.main.components.FromAddressField
-import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
-import com.example.gramclient.presentation.screens.order.orderCount
-import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.presentation.screens.map.CustomMainMap
+import com.example.gramclient.utils.Constants
 import kotlinx.coroutines.launch
 
 
@@ -37,7 +32,7 @@ class SearchAddressScreen : Screen {
     override fun Content() {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val mainViewModel: MainViewModel = hiltViewModel()
-        var isSearchState = remember { mutableStateOf(false) }
+        val isSearchState = remember { mutableStateOf(false) }
         var sheetPeekHeight = remember { mutableStateOf(280) }
 
         var WHICH_ADDRESS = remember { mutableStateOf(Constants.TO_ADDRESS) }
@@ -71,10 +66,6 @@ class SearchAddressScreen : Screen {
         val toAddress by mainViewModel.toAddress
         val fromAddress by mainViewModel.fromAddress
         val scope = rememberCoroutineScope()
-        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
-
-        val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
-        val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             BackHandler(enabled = drawerState.isOpen) {
                 scope.launch { drawerState.close() }
@@ -102,26 +93,6 @@ class SearchAddressScreen : Screen {
                                         .padding(start = 80.dp),
                                     horizontalArrangement = Arrangement.End
                                 ) {
-
-
-                                    stateRealtimeDatabaseOrders.response?.let { response ->
-                                        response.observeAsState().value?.let { orders ->
-                                            orderCount.value = orders.size
-                                            stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
-                                                responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
-                                                    if (clientOrdersId.active_orders != null) {
-                                                        FloatingButton1(
-                                                            scope = coroutineScope,
-                                                            drawerState = drawerState,
-                                                            bottomSheetState = bottomSheetState
-                                                        )
-                                                    }
-
-                                                }
-                                            }
-                                        }
-                                    }
-                                    Spacer(modifier = Modifier.width(10.dp))
                                     FloatingButton(
                                         scope = coroutineScope,
                                         drawerState = drawerState,

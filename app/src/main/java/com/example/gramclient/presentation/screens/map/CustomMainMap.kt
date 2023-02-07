@@ -10,7 +10,6 @@ import android.graphics.*
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
-import android.opengl.Visibility
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.util.Log
@@ -53,7 +52,6 @@ import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
-import com.example.gramclient.presentation.screens.main.components.FloatingButton1
 import com.example.gramclient.presentation.screens.order.OrderExecutionScreen
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
@@ -503,7 +501,7 @@ fun showRoadAB(
             map.overlays.clear()
             val road = roadManager.getRoad(waypoints)
             val roadOverlay = RoadManager.buildRoadOverlay(road)
-            val blueColorValue: Int = Color.parseColor("#36457C")
+            val blueColorValue: Int = Color.parseColor("#009CC3")
             roadOverlay.color = blueColorValue
             roadOverlay.width = 15f
             roadOverlay.paint.strokeJoin = Paint.Join.ROUND

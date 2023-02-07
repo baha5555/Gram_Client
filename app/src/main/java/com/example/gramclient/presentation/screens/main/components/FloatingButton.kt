@@ -45,33 +45,3 @@ fun FloatingButton(
         )
     }
 }
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun FloatingButton1(
-    scope: CoroutineScope,
-    drawerState: DrawerState,
-    bottomSheetState: BottomSheetScaffoldState
-) {
-    val navigator = LocalNavigator.currentOrThrow
-    val coroutineScope = rememberCoroutineScope()
-
-    FloatingActionButton(
-
-        modifier = Modifier
-            .size(50.dp)
-            .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
-        backgroundColor = Color.White,
-        onClick = {
-            coroutineScope.launch {
-                navigator.replaceAll(SearchDriverScreen())
-            }
-        }
-    ) {
-        Icon(
-            Icons.Filled.ArrowBack,
-            contentDescription = "Menu", tint = Color.Black,
-            modifier = Modifier.size(25.dp)
-        )
-    }
-}
