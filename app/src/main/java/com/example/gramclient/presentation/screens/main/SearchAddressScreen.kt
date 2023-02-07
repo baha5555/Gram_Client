@@ -121,6 +121,7 @@ class SearchAddressScreen : Screen {
                                             }
                                         }
                                     }
+                                    Spacer(modifier = Modifier.width(10.dp))
                                     FloatingButton(
                                         scope = coroutineScope,
                                         drawerState = drawerState,
