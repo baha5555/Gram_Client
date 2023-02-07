@@ -177,8 +177,7 @@ class OrderExecutionViewModel  @Inject constructor(
                 is Resource.Success -> {
                     try {
                         val response: ActiveOrdersResponse? = result.data
-                        _stateActiveOrders.value =
-                            ActiveOrdersResponseState(response = response?.result, success = true)
+                        _stateActiveOrders.value = ActiveOrdersResponseState(response = response?.result, success = true)
                         Log.e("ActiveOrdersResponse", "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}")
                     }catch (e: Exception) {
                         Log.d("ActiveOrdersResponse", "${e.message} Exception")

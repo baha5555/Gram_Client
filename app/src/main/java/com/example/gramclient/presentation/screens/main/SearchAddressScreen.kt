@@ -17,11 +17,13 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
+import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.main.components.FromAddressField
 import com.example.gramclient.presentation.screens.map.CustomMainMap
+import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.utils.Constants
 import kotlinx.coroutines.launch
 
@@ -32,6 +34,7 @@ class SearchAddressScreen : Screen {
     override fun Content() {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val mainViewModel: MainViewModel = hiltViewModel()
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val isSearchState = remember { mutableStateOf(false) }
         var sheetPeekHeight = remember { mutableStateOf(280) }
 
@@ -42,18 +45,14 @@ class SearchAddressScreen : Screen {
         )
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
-
-        var initialApiCalled by rememberSaveable { mutableStateOf(false) }
-
+        val prefs = CustomPreference(context)
         val focusRequester = remember { FocusRequester() }
 
         CustomBackHandle(drawerState.isClosed)
 
-        if (!initialApiCalled) {
-            LaunchedEffect(Unit) {
-                mainViewModel.getActualLocation(context)
-                initialApiCalled = true
-            }
+        LaunchedEffect(true) {
+            mainViewModel.getActualLocation(context)
+            orderExecutionViewModel.readAllClient(prefs.getPhoneNumber()){}
         }
         LaunchedEffect(bottomSheetState.bottomSheetState.currentValue) {
             if (bottomSheetState.bottomSheetState.isCollapsed) {

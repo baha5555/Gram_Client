@@ -3,9 +3,9 @@ package com.example.gramclient.domain.mainScreen
 data class Address(
     var address: String="",
     var id: Int=0,
-    val address_lat: String="",
-    val address_lng: String="",
-    val city: String="",
+    var address_lat: String="",
+    var address_lng: String="",
+    var city: String="",
 //    val district: String,
 //    val model: String,
 //    val region: String,

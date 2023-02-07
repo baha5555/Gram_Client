@@ -21,7 +21,8 @@ import com.example.gramclient.R
 
 @Composable
 fun FastAddressCard(
-    title: String
+    title: String,
+    onClick: () -> Unit
 ) {
     Box(modifier = Modifier.size(115.dp)) {
         Image(
@@ -30,7 +31,10 @@ fun FastAddressCard(
         )
         Image(
             painter = painterResource(id = R.drawable.back_fast_address),
-            contentDescription = null
+            contentDescription = null,
+            modifier = Modifier.clip(RoundedCornerShape(20.dp)).clickable {
+                onClick.invoke()
+            }
         )
         Column(
             modifier = Modifier
