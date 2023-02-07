@@ -11,10 +11,11 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.mainScreen.*
+import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesResponse
+import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesUseCase
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.screens.main.states.*
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
@@ -34,6 +35,7 @@ class MainViewModel @Inject constructor(
     private val searchAddressUseCase: SearchAddressUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
     private val getPriceUseCase: GetPriceUseCase,
+    private val fastAddressesUseCase: FastAddressesUseCase
 ):ViewModel() {
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
@@ -358,6 +360,34 @@ class MainViewModel @Inject constructor(
                     _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
                 }
             }
+        }.launchIn(viewModelScope)
+    }
+
+    private val _stateFastAddress = mutableStateOf(FastAddressesResponseState())
+    val stateFastAddress: State<FastAddressesResponseState> = _stateFastAddress
+    fun getFastAddresses(){
+        fastAddressesUseCase.invoke().onEach { result: Resource<FastAddressesResponse> ->
+            when(result){
+                is Resource.Success -> {
+                    try {
+                        val fastAddressesResponse: FastAddressesResponse? = result.data
+                        _stateFastAddress.value = FastAddressesResponseState(response = fastAddressesResponse?.result)
+                        Log.e("FastAddressesResponse", "FastAddressesResponseResponseSuccess->\n ${result.data}")
+                    }catch (e: Exception) {
+                        Log.d("FastAddressesResponse", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("FastAddressesResponse", "FastAddressesResponseError->\n ${result.message}")
+                    _stateFastAddress.value = FastAddressesResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateFastAddress.value = FastAddressesResponseState(isLoading = true)
+                }
+            }
+
         }.launchIn(viewModelScope)
     }
 }

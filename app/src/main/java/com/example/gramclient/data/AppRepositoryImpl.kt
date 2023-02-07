@@ -9,6 +9,7 @@ import com.example.gramclient.domain.athorization.IdentificationResponse
 import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.SearchAddressResponse
+import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
@@ -117,4 +118,6 @@ class AppRepositoryImpl(
         tariff_id,
         allowances
     )
+
+    override suspend fun getFastAddresses() : FastAddressesResponse = api.getFastAddresses(prefs.getAccessToken())
 }

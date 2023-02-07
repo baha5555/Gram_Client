@@ -6,6 +6,7 @@ import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.mainScreen.TariffsResponse
+import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
@@ -75,5 +76,6 @@ interface AppRepository {
         allowances: String?,
     ): UpdateOrderResponse
 
+    suspend fun getFastAddresses(): FastAddressesResponse
 }
 

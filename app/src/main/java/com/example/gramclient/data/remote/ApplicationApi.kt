@@ -6,6 +6,7 @@ import com.example.gramclient.domain.mainScreen.AddressByPointResponse
 import com.example.gramclient.domain.mainScreen.AllowancesResponse
 import com.example.gramclient.domain.mainScreen.SearchAddressResponse
 import com.example.gramclient.domain.mainScreen.TariffsResponse
+import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesResponse
 import com.example.gramclient.domain.mainScreen.order.CalculateResponse
 import com.example.gramclient.domain.mainScreen.order.CancelOrderResponse
 import com.example.gramclient.domain.mainScreen.order.OrderResponse
@@ -128,5 +129,10 @@ interface ApplicationApi {
         @Query("tariff_id") tariff_id : Int,
         @Query("allowances") allowances: String?,
     ): UpdateOrderResponse
+
+    @GET("/api/mob-app/popular-addresses")
+    suspend fun getFastAddresses(
+        @Header("Authorization") token: String,
+    ) : FastAddressesResponse
 
 }

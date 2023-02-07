@@ -54,7 +54,7 @@ fun AddressSearchBottomSheet(
                 scope = coroutineScope
             )
             Spacer(modifier = Modifier.height(15.dp))
-            FastAddresses()
+            FastAddresses(mainViewModel)
             Spacer(modifier = Modifier.height(15.dp))
             Services()
         } else {
