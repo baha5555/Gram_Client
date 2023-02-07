@@ -70,6 +70,9 @@ class MainViewModel @Inject constructor(
     private val _dopPhone = mutableStateOf("")
     val dopPhone = _dopPhone
 
+    private val _commentToOrder = mutableStateOf("")
+    val commentToOrder = _commentToOrder
+
     fun updateFromAddress(address:Address) {
         _fromAddress.value = address
         Values.FromAddress.value = address
@@ -77,6 +80,10 @@ class MainViewModel @Inject constructor(
 
     fun updateDopPhone(phone:String){
         _dopPhone.value = phone
+    }
+
+    fun updateCommentToOrder(comment:String){
+        _commentToOrder.value = comment
     }
 
     fun updateToAddress(address:Address?) {
@@ -253,13 +260,15 @@ class MainViewModel @Inject constructor(
             dop_phone = if(_dopPhone.value!="")_dopPhone.value else null,
             from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
             to_addresses = if(toAddress.value[0].id != 0) listOf(AddressModel(toAddress.value.get(0).id)) else null,
-            comment = null,
+            comment = if(_commentToOrder.value!="")_commentToOrder.value else null,
             tariff_id = selectedTariff?.value?.id ?: 1,
             allowances= if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
+                        updateDopPhone("")
+                        updateCommentToOrder("")
                         val response: OrderResponse? = result.data
                         _stateCreateOrder.value =
                             OrderResponseState(response = response)
