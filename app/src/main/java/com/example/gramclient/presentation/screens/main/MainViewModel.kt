@@ -279,6 +279,7 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     try {
                         updateDopPhone("")
+                        updatePlanTrip("")
                         updateCommentToOrder("")
                         val response: OrderResponse? = result.data
                         _stateCreateOrder.value =

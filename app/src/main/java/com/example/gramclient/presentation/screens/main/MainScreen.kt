@@ -107,9 +107,6 @@ class MainScreen : Screen{
         }
 
         val activity = LocalContext.current  as MainActivity
-        if(!modalSheetState.isAnimationRunning){
-            hideKeyboard(activity = activity)
-        }
 
         val selectedDate = remember{mutableStateOf("")}
         val selectedTime = remember {
@@ -183,7 +180,6 @@ class MainScreen : Screen{
                         title = "Запланировать поездку",
                         stateViewOfInfo = true,
                         planTripTenMinutesOnClick = {
-                            hideKeyboard(activity = activity)
                             val currentTime = LocalDateTime.now()
                             val newTime = currentTime.plusMinutes(10)
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -194,7 +190,6 @@ class MainScreen : Screen{
                             }
                         },
                         planTripFifteenMinutesOnClick = {
-                            hideKeyboard(activity = activity)
                             val currentTime = LocalDateTime.now()
                             val newTime = currentTime.plusMinutes(15)
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
