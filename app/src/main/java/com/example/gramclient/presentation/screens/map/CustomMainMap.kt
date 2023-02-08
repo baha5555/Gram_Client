@@ -185,6 +185,8 @@ fun CustomMainMap(
                     userTouchSurface = this.findViewById(R.id.userTouchSurface)
                     btnLocation = this.findViewById(R.id.btnLocation)
                     btnBack = this.findViewById(R.id.btnBack)
+                    btnLocation.visibility=View.GONE
+                    btnBack.visibility=View.GONE
                     btnBack.setOnClickListener {
                         navigator.replaceAll(SearchDriverScreen())
                     }
@@ -261,7 +263,7 @@ fun CustomMainMap(
                         if (Values.ToAddress2.value != mainViewModel.toAddress.value ||
                             Values.FromAddress2.value != mainViewModel.fromAddress.value
                         ) {
-                            //Log.i("showRoad", "m-"+mainViewModel.fromAddress.value)
+                            map.overlays.clear()
                             showRoadAB(
                                 it.context,
                                 mainViewModel.fromAddress,
@@ -277,6 +279,7 @@ fun CustomMainMap(
                         ) {
                             if(!isGet.value)return@AndroidView
                             Log.i("showRoad", "m-"+mainViewModel.fromAddress.value)
+                            map.overlays.clear()
                             showRoadAB(
                                 it.context,
                                 mainViewModel.fromAddress,
@@ -537,7 +540,6 @@ fun showRoadAB(
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
     GlobalScope.launch {
         try {
-            map.overlays.clear()
             val waypoints = ArrayList<GeoPoint>()
             val fromAddressPoint = GeoPoint(0, 0)
             fromAddressPoint.latitude = fromAddress.value.address_lat.toDouble()
