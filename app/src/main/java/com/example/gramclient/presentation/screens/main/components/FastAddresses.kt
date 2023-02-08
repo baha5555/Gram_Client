@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation.screens.main.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,7 +12,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.map.map
 import com.valentinilk.shimmer.shimmer
+import org.osmdroid.util.GeoPoint
 
 @Composable
 fun FastAddresses(mainViewModel: MainViewModel) {
@@ -30,9 +31,6 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                         .clip(RoundedCornerShape(20.dp))
                         .background(color = Color(0xFF9C9C9C))
                         .padding(top = 15.dp, start = 15.dp, end = 15.dp)
-                        .clickable {
-
-                        }
                 ) {
                 }
                 Spacer(modifier = Modifier.width(10.dp))
@@ -45,6 +43,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                 item {
                     FastAddressCard(title = "" + it.address){
                         mainViewModel.updateToAddress(toAddress)
+                        map.controller.animateTo(GeoPoint(it.address_lat.toDouble(), it.address_lng.toDouble()))
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                 }

@@ -75,7 +75,7 @@ class MainViewModel @Inject constructor(
 
     fun updateFromAddress(address:Address) {
         _fromAddress.value = address
-        Values.FromAddress.value = address
+        Log.i("addresses", "From-"+address)
     }
 
     fun updateDopPhone(phone:String){
@@ -89,7 +89,7 @@ class MainViewModel @Inject constructor(
     fun updateToAddress(address:Address?) {
         if(address != null){
             _toAddress.value = listOf(address)
-            Values.ToAddress.value = listOf(address)
+            Log.i("addresses", "To-"+_toAddress.value)
         }
     }
 
