@@ -89,6 +89,7 @@ interface ApplicationApi {
         @Field("comment") comment: String?,
         @Query("tariff_id") tariff_id : Int,
         @Field("allowances") allowances: String?,
+        @Field("date_time")date_time:String?
     ): OrderResponse
 
     @FormUrlEncoded
