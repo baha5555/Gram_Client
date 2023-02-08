@@ -18,7 +18,8 @@ class CreateOrderUseCase @Inject constructor(private val repository: AppReposito
         to_addresses: List<AddressModel>?,
         comment: String?,
         tariff_id: Int,
-        allowances: String?
+        allowances: String?,
+        date_time:String?
     ): Flow<Resource<OrderResponse>> =
         flow{
             try {
@@ -27,7 +28,7 @@ class CreateOrderUseCase @Inject constructor(private val repository: AppReposito
                 if(to_addresses != null) {
                     jsonToAddress = Gson().toJson(to_addresses)
                 }
-                val response: OrderResponse = repository.createOrder(dop_phone, from_address, jsonToAddress, comment, tariff_id, allowances)
+                val response: OrderResponse = repository.createOrder(dop_phone, from_address, jsonToAddress, comment, tariff_id, allowances,date_time)
                 emit(Resource.Success<OrderResponse>(response))
             }catch (e: HttpException) {
                 emit(

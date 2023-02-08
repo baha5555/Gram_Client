@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -42,6 +43,7 @@ import currentFraction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
@@ -398,6 +400,7 @@ fun TariffsContent(
     }
 }
 
+@SuppressLint("NewApi")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel()) {
@@ -468,14 +471,23 @@ fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp),
+                .padding(15.dp)
+                .clickable {
+                    stateOfDopInfoForDriver.value = "PLAN_TRIP"
+                    dopPhone()
+                },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Запланировать поездку", fontSize = 16.sp)
-            Image(
-                modifier = Modifier.size(18.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+            Column {
+                Text(text = "Запланировать поездку", fontSize = 16.sp)
+                if (mainViewModel.planTrip.value != "")
+                    Text(text = mainViewModel.planTrip.value, fontSize = 12.sp, color = Color.Gray)
+            }
+            Icon(
+                modifier = Modifier
+                    .size(18.dp),
+                imageVector = if(mainViewModel.planTrip.value != "") Icons.Default.Done else Icons.Default.LockClock,
                 contentDescription = "icon"
             )
         }
