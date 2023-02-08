@@ -43,6 +43,9 @@ class OrderExecutionScreen : Screen{
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
+        val isGet = remember {
+            mutableStateOf(true)
+        }
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val mainViewModel: MainViewModel = hiltViewModel()
         val navigator = LocalNavigator.currentOrThrow
@@ -64,7 +67,6 @@ class OrderExecutionScreen : Screen{
 
         LaunchedEffect(key1 = true){
             orderExecutionViewModel.readAllOrders()
-            //orderExecutionViewModel.getDriverLocation(1480)
         }
         if(Values.DriverLocation.value.latitude!=0.0){
             Log.i("asdasda", ""+Values.DriverLocation.value)
@@ -95,8 +97,8 @@ class OrderExecutionScreen : Screen{
         var stateCancelOrderText by remember {
             mutableStateOf("Вы уверены, что хотите отменить данный заказ?")
         }
-
         scope.launch {
+            Log.e("runRe","get")
             stateRealtimeDatabaseOrders.let { orders ->
                 orders?.forEach { order ->
                     if (order.id == selectedOrder.id) {
@@ -107,14 +109,14 @@ class OrderExecutionScreen : Screen{
             }
 
             selectRealtimeDatabaseOrder.from_address?.let {
-                mainViewModel.updateFromAddress(it)
-                Log.e("From_address","$it")
+                //mainViewModel.updateFromAddress(it)
+                Log.e("From_address-1","$it")
             }
 
             selectRealtimeDatabaseOrder.to_address?.let { to_Addresses->
                 to_Addresses.forEach { address->
-                    mainViewModel.updateToAddress(address)
-                    Log.e("To_address","$address")
+                    //mainViewModel.updateToAddress(address)
+                    Log.e("To_address-1","$address")
                 }
             }
         }
@@ -135,7 +137,21 @@ class OrderExecutionScreen : Screen{
                                 searchText.value = ""
                         }
                         selectRealtimeDatabaseOrder.let { order ->
+                            Log.i("orderAddresses", ""+order.from_address)
                             if(order.id!=-1) orderExecutionViewModel.getDriverLocation(order.id)
+                            if(isGet.value){
+                                order.from_address.let {
+                                    if (it != null) {
+                                        isGet.value=false
+                                        mainViewModel.updateFromAddress(it)
+                                    }
+                                }
+                                order.to_address.let {
+                                    it?.forEach { it2->
+                                        mainViewModel.updateToAddress(it2)
+                                    }
+                                }
+                            }
 
                             if (order.performer != null) {
                                 performerSection(performer = order, orderExecutionViewModel)

@@ -77,9 +77,8 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
-lateinit var fromAddres2: Address
-lateinit var toAddress2: List<Address>
-private lateinit var map: MapView
+lateinit var map: MapView
+
 @SuppressLint("StaticFieldLeak")
 lateinit var markers: Markers
 
@@ -89,6 +88,7 @@ lateinit var mLocationOverlay: MyLocationNewOverlay
 
 @SuppressLint("StaticFieldLeak")
 lateinit var btnLocation: ImageButton
+
 @SuppressLint("StaticFieldLeak")
 lateinit var btnBack: ImageButton
 
@@ -103,8 +103,12 @@ fun CustomMainMap(
     mainViewModel: MainViewModel,
     WHICH_ADDRESS: MutableState<String>? = null
 ) {
+    val isGet = remember {
+        mutableStateOf(false)
+    }
     val context = LocalContext.current
-    val prefs: SharedPreferences = context.getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
+    val prefs: SharedPreferences =
+        context.getSharedPreferences(PreferencesName.APP_PREFERENCES, Context.MODE_PRIVATE)
     val navigator = LocalNavigator.currentOrThrow
     currentRoute = navigator.lastItem.key
 
@@ -118,6 +122,14 @@ fun CustomMainMap(
     val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
+        if(currentRoute==OrderExecutionScreen().key){
+            Log.i("showRoad", "run")
+            mainViewModel.updateToAddress(Address())
+            mainViewModel.updateFromAddress(Address())
+            isGet.value=true
+        }
+        Values.FromAddress2.value= Address("", 0, "", "")
+        Values.ToAddress2.value = listOf<Address>(Address("", 0, "", ""))
         val observer = LifecycleEventObserver { _, event ->
             stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
             when (event) {
@@ -149,20 +161,18 @@ fun CustomMainMap(
                 .putLong("mapPosY", map.mapCenter.longitude.toBits())
                 .putLong("mapPosZ", map.zoomLevelDouble.toBits()).apply()
             lifecycleOwner.lifecycle.removeObserver(observer)
+            Values.FromAddress2.value= Address("", 0, "", "")
+            Values.ToAddress2.value = listOf<Address>(Address("", 0, "", ""))
         }
     }
 
     if (stateStatusGPS.value) {
-        val toAddress by Values.ToAddress
-        val fromAddress by Values.FromAddress
-        toAddress2 = toAddress
-        fromAddres2 = fromAddress
         val scope = rememberCoroutineScope()
         val startPointForMarker = remember {
             mutableStateOf(
                 GeoPoint(
-                    if (toAddress[0].address_lat != "") toAddress[0].address_lat.toDouble() else 40.27803692395751,
-                    if (toAddress[0].address_lng != "") toAddress[0].address_lng.toDouble() else 69.62923931506361
+                    if (mainViewModel.toAddress.value[0].address_lat != "") mainViewModel.toAddress.value[0].address_lat.toDouble() else 40.27803692395751,
+                    if (mainViewModel.toAddress.value[0].address_lng != "") mainViewModel.toAddress.value[0].address_lng.toDouble() else 69.62923931506361
                 )
             )
         }
@@ -171,7 +181,7 @@ fun CustomMainMap(
             factory = {
                 View.inflate(it, R.layout.map, null).apply {
                     map = this.findViewById(R.id.map)
-                    markers=Markers(context, map)
+                    markers = Markers(context, map)
                     userTouchSurface = this.findViewById(R.id.userTouchSurface)
                     btnLocation = this.findViewById(R.id.btnLocation)
                     btnBack = this.findViewById(R.id.btnBack)
@@ -208,26 +218,31 @@ fun CustomMainMap(
                             getAddressMarker.visibility = View.GONE
                             map.overlays.clear()
                             addOverlays()
-                            showRoadAB(it, fromAddress, toAddress)
                         }
-                        SearchDriverScreen().key, OrderExecutionScreen().key -> {
+                        SearchDriverScreen().key -> {
                             btnLocation.visibility = View.GONE
                             getAddressMarker.visibility = View.GONE
                             map.overlays.clear()
                             addOverlays()
-                            showRoadAB(it, fromAddress, toAddress)
                         }
                         SearchAddressScreen().key -> {
                             map.overlays.clear()
                             addOverlays()
                         }
+                        OrderExecutionScreen().key -> {
+                            btnLocation.visibility = View.GONE
+                            getAddressMarker.visibility = View.GONE
+                            map.overlays.clear()
+                            addOverlays()
+                        }
+
                     }
                     btnLocation.setOnClickListener {
                         map.controller.animateTo(mLocationOverlay.myLocation)
-                        if(mLocationOverlay.myLocation!=null){
+                        if (mLocationOverlay.myLocation != null) {
                             scope.launch {
                                 if (currentRoute == SearchAddressScreen().key) {
-                                    if(WHICH_ADDRESS != null)
+                                    if (WHICH_ADDRESS != null)
                                         mainViewModel.getAddressFromMap(
                                             mLocationOverlay.myLocation.longitude,
                                             mLocationOverlay.myLocation.latitude,
@@ -243,12 +258,34 @@ fun CustomMainMap(
             update = {
                 when (currentRoute) {
                     MainScreen().key -> {
-                        if(fromAddress!= fromAddres2 || toAddress!= toAddress2) showRoadAB(it.context, fromAddress, toAddress)
+                        if (Values.ToAddress2.value != mainViewModel.toAddress.value ||
+                            Values.FromAddress2.value != mainViewModel.fromAddress.value
+                        ) {
+                            //Log.i("showRoad", "m-"+mainViewModel.fromAddress.value)
+                            showRoadAB(
+                                it.context,
+                                mainViewModel.fromAddress,
+                                mainViewModel.toAddress
+                            )
+                            Values.ToAddress2.value = mainViewModel.toAddress.value
+                            Values.FromAddress2.value = mainViewModel.fromAddress.value
+                        }
                     }
                     OrderExecutionScreen().key -> {
-                        showRoadAB(it.context, fromAddress, toAddress)
-                        Log.i("addMarker", "create")
-                        if(Values.DriverLocation.value!=GeoPoint(0.0,0.0)){
+                        if (Values.ToAddress2.value != mainViewModel.toAddress.value ||
+                            Values.FromAddress2.value != mainViewModel.fromAddress.value
+                        ) {
+                            if(!isGet.value)return@AndroidView
+                            Log.i("showRoad", "m-"+mainViewModel.fromAddress.value)
+                            showRoadAB(
+                                it.context,
+                                mainViewModel.fromAddress,
+                                mainViewModel.toAddress
+                            )
+                            Values.ToAddress2.value = mainViewModel.toAddress.value
+                            Values.FromAddress2.value = mainViewModel.fromAddress.value
+                        }
+                        if (Values.DriverLocation.value != GeoPoint(0.0, 0.0)) {
                             //markers.addDriverMarker(Values.DriverLocation.value, "")
                         }
                     }
@@ -269,11 +306,17 @@ fun CustomMainMap(
                                                     )
                                                 }
                                                 MotionEvent.ACTION_DOWN -> {
-                                                    Log.e("singleTapConfirmedHelper", "Action was DOWN")
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was DOWN"
+                                                    )
 
                                                 }
                                                 MotionEvent.ACTION_UP -> {
-                                                    Log.e("singleTapConfirmedHelper", "Action was UP")
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was UP"
+                                                    )
                                                     if (WHICH_ADDRESS != null) {
                                                         mainViewModel.getAddressFromMap(
                                                             map.mapCenter.longitude,
@@ -281,7 +324,7 @@ fun CustomMainMap(
                                                             WHICH_ADDRESS
                                                         )
                                                     }
-                                                    Log.e("singleTapConfirmedHelper", "$toAddress")
+                                                    Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
                                                     startPointForMarker.value = GeoPoint(
                                                         map.mapCenter.latitude,
@@ -303,7 +346,10 @@ fun CustomMainMap(
 
                                                 }
                                                 else -> {
-                                                    Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "ACTION_CANCEL"
+                                                    )
                                                 }
                                             }
                                         }
@@ -329,7 +375,10 @@ fun CustomMainMap(
                                                     )
                                                 }
                                                 MotionEvent.ACTION_POINTER_2_UP -> {
-                                                    Log.e("singleTapConfirmedHelper", "Action was UP")
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was UP"
+                                                    )
                                                     if (WHICH_ADDRESS != null) {
                                                         mainViewModel.getAddressFromMap(
                                                             map.mapCenter.longitude,
@@ -337,7 +386,7 @@ fun CustomMainMap(
                                                             WHICH_ADDRESS
                                                         )
                                                     }
-                                                    Log.e("singleTapConfirmedHelper", "$toAddress")
+                                                    Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
                                                     startPointForMarker.value = GeoPoint(
                                                         map.mapCenter.latitude,
@@ -345,7 +394,10 @@ fun CustomMainMap(
                                                     )
                                                 }
                                                 else -> {
-                                                    Log.e("singleTapConfirmedHelper", "ACTION_CANCEL")
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "ACTION_CANCEL"
+                                                    )
                                                 }
                                             }
                                         }
@@ -383,9 +435,9 @@ fun CustomMainMap(
                 stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
                     responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
                         if (clientOrdersId.active_orders != null) {
-                            btnBack.visibility=View.VISIBLE
-                        }else{
-                            btnBack.visibility=View.INVISIBLE
+                            btnBack.visibility = View.VISIBLE
+                        } else {
+                            btnBack.visibility = View.INVISIBLE
                         }
                     }
                 }
@@ -419,7 +471,10 @@ fun CustomMainMap(
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
                             .weight(1f),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = BackgroundColor, contentColor = Black),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = BackgroundColor,
+                            contentColor = Black
+                        ),
                         onClick = {
                             activity.finish()
                         }
@@ -431,30 +486,35 @@ fun CustomMainMap(
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
                             .weight(1f),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor, contentColor = White),
-                        onClick = { Intent(
-                            Settings.ACTION_LOCATION_SOURCE_SETTINGS,
-                            Uri.fromParts(
-                                "package",
-                                context.packageName,
-                                null
-                            )
-                        ).also { intent ->
-                            try {
-                                context.startActivity(
-                                    intent
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = PrimaryColor,
+                            contentColor = White
+                        ),
+                        onClick = {
+                            Intent(
+                                Settings.ACTION_LOCATION_SOURCE_SETTINGS,
+                                Uri.fromParts(
+                                    "package",
+                                    context.packageName,
+                                    null
                                 )
-                            } catch (e: ActivityNotFoundException) {
-                                Intent(
-                                    Settings.ACTION_LOCATION_SOURCE_SETTINGS
-                                ).also { intentCatch ->
+                            ).also { intent ->
+                                try {
                                     context.startActivity(
-                                        intentCatch
+                                        intent
                                     )
+                                } catch (e: ActivityNotFoundException) {
+                                    Intent(
+                                        Settings.ACTION_LOCATION_SOURCE_SETTINGS
+                                    ).also { intentCatch ->
+                                        context.startActivity(
+                                            intentCatch
+                                        )
+                                    }
                                 }
-                            }
 
-                        } }
+                            }
+                        }
                     ) {
                         Text(text = "Настройки", fontSize = 18.sp, color = White)
                     }
@@ -471,22 +531,23 @@ fun addOverlays() {
 
 fun showRoadAB(
     context: Context,
-    fromAddress: Address,
-    toAddress: List<Address>,
+    fromAddress: State<Address>,
+    toAddress: State<List<Address>>,
 ) {
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
     GlobalScope.launch {
         try {
+            map.overlays.clear()
             val waypoints = ArrayList<GeoPoint>()
             val fromAddressPoint = GeoPoint(0, 0)
-            fromAddressPoint.latitude = fromAddress.address_lat.toDouble()
-            fromAddressPoint.longitude = fromAddress.address_lng.toDouble()
+            fromAddressPoint.latitude = fromAddress.value.address_lat.toDouble()
+            fromAddressPoint.longitude = fromAddress.value.address_lng.toDouble()
             waypoints.add(fromAddressPoint)
 
 
             val toAddressesPoints = ArrayList<GeoPoint>()
             val toAddressesNames = ArrayList<String>()
-            toAddress.forEach { address ->
+            toAddress.value.forEach { address ->
                 val toAddressPoint = GeoPoint(0, 0)
                 toAddressPoint.latitude = address.address_lat.toDouble()
                 toAddressPoint.longitude = address.address_lng.toDouble()
@@ -513,7 +574,7 @@ fun showRoadAB(
                     context,
                     map,
                     geoPoint = fromAddressPoint,
-                    title = fromAddress.address,
+                    title = fromAddress.value.address,
                     R.drawable.ic_from_address_marker
                 )
                 toAddressesPoints.forEachIndexed { inx, it ->
@@ -527,7 +588,6 @@ fun showRoadAB(
                 }
             }
             addOverlays()
-
         } catch (_: Exception) {
 
         }
@@ -586,6 +646,7 @@ fun View.margin(
         bottom?.run { bottomMargin = dpToPx(this) }
     }
 }
+
 private fun setChangeLocationListener() {
     mLocationOverlay.myLocationProvider.startLocationProvider { location: Location, source: IMyLocationProvider? ->
         printoutDebugInfo(location)
@@ -595,15 +656,16 @@ private fun setChangeLocationListener() {
     }
     map.overlays.add(mLocationOverlay)
 }
+
 @SuppressLint("WrongConstant")
 private fun printoutDebugInfo(
     l1: Location?,
 ) {
     val location: Location? = l1 ?: mLocationOverlay.lastFix
-    Log.i("myLocation", ""+location)
+    Log.i("myLocation", "" + location)
     if (location != null) {
-        myLocationPoint.value.latitude=location.latitude
-        myLocationPoint.value.longitude=location.longitude
+        myLocationPoint.value.latitude = location.latitude
+        myLocationPoint.value.longitude = location.longitude
     }
     if ((location != null)) {
         var pOrientation = 360 - location.bearing
