@@ -215,7 +215,7 @@ fun CustomMainMap(
                             getAddressMarker.visibility = View.GONE
                             map.overlays.clear()
                             addOverlays()
-                            //showRoadAB(it, fromAddress, toAddress)
+                            showRoadAB(it, fromAddress, toAddress)
                         }
                         SearchAddressScreen().key -> {
                             map.overlays.clear()
@@ -246,7 +246,7 @@ fun CustomMainMap(
                         if(fromAddress!= fromAddres2 || toAddress!= toAddress2) showRoadAB(it.context, fromAddress, toAddress)
                     }
                     OrderExecutionScreen().key -> {
-                        //showRoadAB(it.context, fromAddress, toAddress)
+                        showRoadAB(it.context, fromAddress, toAddress)
                         Log.i("addMarker", "create")
                         if(Values.DriverLocation.value!=GeoPoint(0.0,0.0)){
                             //markers.addDriverMarker(Values.DriverLocation.value, "")

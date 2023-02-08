@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.screens.main
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -25,6 +26,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,6 +69,10 @@ class MainViewModel @Inject constructor(
     private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
     val fromAddress: State<Address> = _fromAddress
 
+    @SuppressLint("NewApi")
+    private val _planTrip = mutableStateOf<String>("")
+    val planTrip = _planTrip
+
     private val _dopPhone = mutableStateOf("")
     val dopPhone = _dopPhone
 
@@ -76,6 +82,10 @@ class MainViewModel @Inject constructor(
     fun updateFromAddress(address:Address) {
         _fromAddress.value = address
         Values.FromAddress.value = address
+    }
+
+    fun updatePlanTrip(plan:String){
+        _planTrip.value = plan
     }
 
     fun updateDopPhone(phone:String){
@@ -262,7 +272,8 @@ class MainViewModel @Inject constructor(
             to_addresses = if(toAddress.value[0].id != 0) listOf(AddressModel(toAddress.value.get(0).id)) else null,
             comment = if(_commentToOrder.value!="")_commentToOrder.value else null,
             tariff_id = selectedTariff?.value?.id ?: 1,
-            allowances= if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null
+            allowances= if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
+            date_time = if(_planTrip.value!="") _planTrip.value else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -272,7 +283,7 @@ class MainViewModel @Inject constructor(
                         val response: OrderResponse? = result.data
                         _stateCreateOrder.value =
                             OrderResponseState(response = response)
-                        Log.e("OrderResponse", "OrderResponseSuccess->\n ${_stateCreateOrder.value}")
+                        Log.e("OrderResponse", "OrderResponseSuccess->\n ${_stateCreateOrder.value}\n -> ${_planTrip.value}")
                         orderExecutionViewModel.getActiveOrders()
                     }catch (e: Exception) {
                         Log.d("OrderResponse", "${e.message} Exception")

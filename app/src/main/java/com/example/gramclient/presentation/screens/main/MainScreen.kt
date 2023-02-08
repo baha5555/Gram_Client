@@ -1,10 +1,13 @@
 package com.example.gramclient.presentation.screens.main
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -40,8 +43,12 @@ import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class MainScreen : Screen{
+    @SuppressLint("UnrememberedMutableState")
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
@@ -100,7 +107,14 @@ class MainScreen : Screen{
         }
 
         val activity = LocalContext.current  as MainActivity
+        if(!modalSheetState.isAnimationRunning){
+            hideKeyboard(activity = activity)
+        }
 
+        val selectedDate = remember{mutableStateOf("")}
+        val selectedTime = remember {
+            mutableStateOf("")
+        }
         val stateTariffs by mainViewModel.stateTariffs
 
         val stateAllowances by mainViewModel.stateAllowances
@@ -137,7 +151,7 @@ class MainScreen : Screen{
                         title = "Кто поедет на такси?",
                         stateTextField = true
                     )
-                else
+                else if(stateOfDopInfoForDriver.value == "COMMENT_TO_ORDER")
                         CustomDopInfoForDriver(
                             onClick = {
                                 hideKeyboard(activity = activity)
@@ -153,6 +167,50 @@ class MainScreen : Screen{
                             placeholder = "Комментарий водителю",
                             title = "Комментарий водителю"
                         )
+                else if(stateOfDopInfoForDriver.value == "PLAN_TRIP"){
+                    CustomDopInfoForDriver(
+                        onClick = {
+                            if (selectedTime.value != "" && selectedDate.value != "") {
+                                mainViewModel.updatePlanTrip("${selectedDate.value} ${selectedTime.value}")
+                                coroutineScope.launch {
+                                    modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                                }
+                            }
+                        },
+                        textFieldValue = "",
+                        onValueChange = {},
+                        placeholder = "",
+                        title = "Запланировать поездку",
+                        stateViewOfInfo = true,
+                        planTripTenMinutesOnClick = {
+                            hideKeyboard(activity = activity)
+                            val currentTime = LocalDateTime.now()
+                            val newTime = currentTime.plusMinutes(10)
+                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                            val formattedTime = newTime.format(formatter)
+                            mainViewModel.updatePlanTrip(formattedTime)
+                            coroutineScope.launch {
+                                modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                            }
+                        },
+                        planTripFifteenMinutesOnClick = {
+                            hideKeyboard(activity = activity)
+                            val currentTime = LocalDateTime.now()
+                            val newTime = currentTime.plusMinutes(15)
+                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                            val formattedTime = newTime.format(formatter)
+                            mainViewModel.updatePlanTrip(formattedTime)
+                            coroutineScope.launch {
+                                modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                            }
+                        },
+                        selectedDate = selectedDate,
+                        selectedTime = selectedTime
+                    )
+                }
+                else {
+                    Spacer(modifier = Modifier.height(5.dp))
+                }
             },
             sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
         ) {
@@ -280,9 +338,14 @@ class MainScreen : Screen{
                                         isSearchState = isSearchState,
                                         focusRequester = focusRequester,
                                     ) {
-
-                                        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+                                        if(stateOfDopInfoForDriver.value!="PLAN_TRIP" && stateOfDopInfoForDriver.value!="") {
+                                            val inputMethodManager =
+                                                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                                            inputMethodManager.toggleSoftInput(
+                                                InputMethodManager.SHOW_FORCED,
+                                                0
+                                            )
+                                        }
                                         coroutineScope.launch {
                                             modalSheetState.animateTo(ModalBottomSheetValue.Expanded)
                                         }
