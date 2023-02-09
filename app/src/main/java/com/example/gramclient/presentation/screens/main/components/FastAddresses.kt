@@ -10,7 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.domain.mainScreen.Address
+import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.map.map
 import com.valentinilk.shimmer.shimmer
@@ -21,6 +24,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
     LaunchedEffect(key1 = true) {
         mainViewModel.getFastAddresses()
     }
+    val navigator = LocalNavigator.currentOrThrow
     val stateFastAddresses = mainViewModel.stateFastAddress.value
     if (stateFastAddresses.isLoading) {
         Row(Modifier.shimmer()) {
@@ -43,6 +47,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                 item {
                     FastAddressCard(title = "" + it.address){
                         mainViewModel.updateToAddress(toAddress)
+                        navigator.push(MainScreen())
                         map.controller.animateTo(GeoPoint(it.address_lat.toDouble(), it.address_lng.toDouble()))
                     }
                     Spacer(modifier = Modifier.width(10.dp))
