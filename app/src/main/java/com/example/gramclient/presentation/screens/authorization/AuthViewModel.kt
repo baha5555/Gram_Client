@@ -78,7 +78,7 @@ class AuthViewModel @Inject constructor(
                         _stateAuth.value = AuthResponseState(response = response)
                         Log.e("TariffsResponse", "AuthResponse->\n ${_stateAuth.value}")
                         client_regiter_id.value=response?.result?.client_register_id
-                        Toast.makeText(context, ""+ (_stateAuth.value.response?.result?.sms_code ?: "not"), Toast.LENGTH_LONG).show()
+//                        Toast.makeText(context, ""+ (_stateAuth.value.response?.result?.sms_code ?: "not"), Toast.LENGTH_LONG).show()
                         onSuccess.invoke()
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
