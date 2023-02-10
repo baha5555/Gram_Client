@@ -55,8 +55,8 @@ fun AddressSearchBottomSheet(
             )
             Spacer(modifier = Modifier.height(15.dp))
             FastAddresses(mainViewModel)
-            Spacer(modifier = Modifier.height(15.dp))
-            Services()
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Services()
         } else {
             LaunchedEffect(Unit) {
                 delay(200)
