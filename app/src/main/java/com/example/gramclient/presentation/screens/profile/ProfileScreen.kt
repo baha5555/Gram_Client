@@ -332,9 +332,6 @@ class ProfileScreen : Screen{
                 }
             }
         }
-        if (stateGetProfileInfo.error != "") CustomRequestError {
-            viewModel.getProfileInfo()
-        }
         if (stateProfile.value.error != null) {
             if (stateProfile.value.error!![0].first_name != null && stateProfile.value.error!![0].last_name != null) {
                 Toast.makeText(
@@ -355,9 +352,6 @@ class ProfileScreen : Screen{
             } else if (stateProfile.value.error!![0].email != null) {
                 Toast.makeText(context, "Неправильный формат почты", Toast.LENGTH_LONG).show()
             }
-        }
-        if (stateGetProfileInfo.error != "") CustomRequestError {
-            viewModel.getProfileInfo()
         }
     }
 }

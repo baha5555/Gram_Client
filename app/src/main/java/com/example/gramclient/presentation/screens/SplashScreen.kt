@@ -28,7 +28,6 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
-import com.example.gramclient.presentation.components.CustomRequestError
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
@@ -41,12 +40,10 @@ class SplashScreen : Screen {
     override fun Content() {
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val profileViewModel: ProfileViewModel = hiltViewModel()
-        val mainViewModel: MainViewModel = hiltViewModel()
 
         val navigator = LocalNavigator.currentOrThrow
         val currentKey = navigator.lastItem.key
         val activeOrders = orderExecutionViewModel.stateActiveOrders.value
-        val profileInfo = profileViewModel.stateGetProfileInfo.value
 
         val prefs = CustomPreference(LocalContext.current)
         LaunchedEffect(key1 = true) {
@@ -67,11 +64,6 @@ class SplashScreen : Screen {
         }
         }
         Splash()
-        if(activeOrders.error!="" && profileInfo.error!="" && mainViewModel.stateFastAddress.value.error!="") CustomRequestError{
-            orderExecutionViewModel.getActiveOrders()
-            profileViewModel.getProfileInfo()
-           // mainViewModel.getFastAddresses()
-        }
     }
 
     @Composable

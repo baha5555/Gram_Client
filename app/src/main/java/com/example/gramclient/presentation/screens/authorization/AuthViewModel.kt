@@ -56,7 +56,7 @@ class AuthViewModel @Inject constructor(
         _isAutoInsert.value = value
     }
 
-    fun setCodeAutomaticly(code:String, navController: NavHostController, scope:CoroutineScope,fcm_token:String){
+    fun setCodeAutomaticly(code:String, scope:CoroutineScope,fcm_token:String){
         scope.launch {
             smsCode.value = code
             delay(2000)

@@ -37,7 +37,6 @@ import kotlinx.coroutines.CoroutineScope
 class MainActivity : ComponentActivity() {
 
     private lateinit var authViewModel: AuthViewModel
-    private lateinit var navController: NavHostController
     private lateinit var scope: CoroutineScope
 
     private val REQ_USER_CONSENT = 200
@@ -50,21 +49,7 @@ class MainActivity : ComponentActivity() {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
             GramClientTheme {
-                val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
-                navController = rememberNavController()
-                scope = rememberCoroutineScope()
-                Permissions()
-                Navigator(screen = SplashScreen())
-                if (STATE_DRIVER_IN_SITE.value) {
-                    orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.let { response ->
-                        response.observeAsState().value?.let {
-                            for (i in it) {
-                                if (i.id == STATE_DRIVER_IN_SITE_ORDER_ID.value)
-                                    DriverInSiteScreen(i, isDialog = STATE_DRIVER_IN_SITE)
-                            }
-                        }
-                    }
-                }
+                RootScreen()
                 MyFirebaseMessagingService().onCreate()
             }
         }
@@ -95,7 +80,7 @@ class MainActivity : ComponentActivity() {
         var code = message.filter { it.isDigit() }
         Log.e("setEditValue", code)
         FCM_TOKEN?.let {
-            authViewModel.setCodeAutomaticly(code, navController, scope, it)
+            authViewModel.setCodeAutomaticly(code, scope, it)
         }
     }
 
