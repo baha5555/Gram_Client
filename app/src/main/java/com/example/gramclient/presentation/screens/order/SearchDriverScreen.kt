@@ -45,6 +45,7 @@ import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
+import com.example.gramclient.utils.Values
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
@@ -219,10 +220,13 @@ class SearchDriverScreen : Screen {
                                 scaffoldState = bottomSheetScaffoldState,
                                 floatingActionButton = {
                                     FloatingButton(
-                                        scope = scope,
-                                        drawerState = drawerState,
-                                        bottomSheetState = bottomSheetState
-                                    )
+                                        bottomSheetState = bottomSheetState,
+                                        icon = Icons.Filled.Menu
+                                    ){
+                                        scope.launch {
+                                            drawerState.open()
+                                        }
+                                    }
                                 },
                                 sheetContent = {
                                     Column(
@@ -441,7 +445,9 @@ class SearchDriverScreen : Screen {
         CustomDialog(text = "Вы уверены что хотите отменить заказ?",
             okBtnClick = {
                 cancelOrderIsDialogOpen.value = false
-                orderExecutionViewModel.cancelOrder(order.id, {})
+                orderExecutionViewModel.cancelOrder(order.id) {
+                    //if (!Values.BtnBack.value) navigator.replaceAll(SearchAddressScreen())
+                }
             },
             cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
             isDialogOpen = cancelOrderIsDialogOpen.value

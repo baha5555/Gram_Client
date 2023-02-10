@@ -5,8 +5,13 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.LocationSearching
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -17,14 +22,23 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.main.components.FromAddressField
 import com.example.gramclient.presentation.screens.map.CustomMainMap
+import com.example.gramclient.presentation.screens.map.currentRoute
+import com.example.gramclient.presentation.screens.map.mLocationOverlay
+import com.example.gramclient.presentation.screens.map.map
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.presentation.screens.order.SearchDriverScreen
+import com.example.gramclient.presentation.screens.order.orderCount
+import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants
+import com.example.gramclient.utils.Values
 import kotlinx.coroutines.launch
 
 
@@ -35,6 +49,8 @@ class SearchAddressScreen : Screen {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val mainViewModel: MainViewModel = hiltViewModel()
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+        val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
+        val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
         val isSearchState = remember { mutableStateOf(false) }
         var sheetPeekHeight = remember { mutableStateOf(280) }
 
@@ -45,6 +61,7 @@ class SearchAddressScreen : Screen {
         )
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
+        val navigator = LocalNavigator.currentOrThrow
         val prefs = CustomPreference(context)
         val focusRequester = remember { FocusRequester() }
 
@@ -86,19 +103,57 @@ class SearchAddressScreen : Screen {
                         BottomSheetScaffold(
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
+                                stateRealtimeDatabaseOrders.response?.let { response ->
+                                    response.observeAsState().value?.let { orders ->
+                                        orderCount.value = orders.size
+                                        stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
+                                            responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
+                                                Box(modifier = Modifier.offset(25.dp, (-55).dp)){
+                                                    FloatingButton(
+                                                        bottomSheetState = bottomSheetState,
+                                                        Icons.Filled.ArrowBack,
+                                                        backgroundColor = Color.White,
+                                                        contentColor = PrimaryColor
+                                                    ){
+                                                        navigator.replaceAll(SearchDriverScreen())
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(start = 80.dp),
-                                    horizontalArrangement = Arrangement.End
+                                        .padding(start = 25.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     FloatingButton(
-                                        scope = coroutineScope,
-                                        drawerState = drawerState,
-                                        bottomSheetState = bottomSheetState
-                                    )
+                                        bottomSheetState = bottomSheetState,
+                                        Icons.Filled.MyLocation
+                                    ){
+                                        map.controller.animateTo(mLocationOverlay.myLocation)
+                                        if (mLocationOverlay.myLocation != null) {
+                                            scope.launch {
+                                                if (currentRoute == SearchAddressScreen().key) {
+                                                    mainViewModel.getAddressFromMap(
+                                                        mLocationOverlay.myLocation.longitude,
+                                                        mLocationOverlay.myLocation.latitude,
+                                                        WHICH_ADDRESS
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                    FloatingButton(
+                                        bottomSheetState = bottomSheetState,
+                                        Icons.Filled.Menu
+                                    ){
+                                        scope.launch {
+                                            drawerState.open()
+                                        }
+                                    }
                                 }
-
                             },
                             drawerGesturesEnabled = false,
                             sheetBackgroundColor = Color.White,

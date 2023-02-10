@@ -87,12 +87,6 @@ lateinit var mRotationGestureOverlay: RotationGestureOverlay
 lateinit var mLocationOverlay: MyLocationNewOverlay
 
 @SuppressLint("StaticFieldLeak")
-lateinit var btnLocation: ImageButton
-
-@SuppressLint("StaticFieldLeak")
-lateinit var btnBack: ImageButton
-
-@SuppressLint("StaticFieldLeak")
 lateinit var getAddressMarker: ImageView
 var currentRoute: String? = null
 val myLocationPoint = mutableStateOf(GeoPoint(0.0, 0.0))
@@ -117,9 +111,7 @@ fun CustomMainMap(
     val stateStatusGPS = remember {
         mutableStateOf(manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
     }
-    val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
-    val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
-    val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
+
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         if(currentRoute==OrderExecutionScreen().key){
@@ -183,13 +175,6 @@ fun CustomMainMap(
                     map = this.findViewById(R.id.map)
                     markers = Markers(context, map)
                     userTouchSurface = this.findViewById(R.id.userTouchSurface)
-                    btnLocation = this.findViewById(R.id.btnLocation)
-                    btnBack = this.findViewById(R.id.btnBack)
-                    btnLocation.visibility=View.GONE
-                    btnBack.visibility=View.GONE
-                    btnBack.setOnClickListener {
-                        navigator.replaceAll(SearchDriverScreen())
-                    }
                     getAddressMarker = this.findViewById(R.id.getAddressMarker)
                     Configuration.getInstance()
                         .load(it, PreferenceManager.getDefaultSharedPreferences(it))
@@ -215,14 +200,11 @@ fun CustomMainMap(
                     myLocationShow(it, mLocationOverlay)
                     when (currentRoute) {
                         MainScreen().key -> {
-                            btnLocation.margin(0f, 0f, 0f, 355f)
-                            btnLocation.visibility = View.GONE
                             getAddressMarker.visibility = View.GONE
                             map.overlays.clear()
                             addOverlays()
                         }
                         SearchDriverScreen().key -> {
-                            btnLocation.visibility = View.GONE
                             getAddressMarker.visibility = View.GONE
                             map.overlays.clear()
                             addOverlays()
@@ -232,27 +214,11 @@ fun CustomMainMap(
                             addOverlays()
                         }
                         OrderExecutionScreen().key -> {
-                            btnLocation.visibility = View.GONE
                             getAddressMarker.visibility = View.GONE
                             map.overlays.clear()
                             addOverlays()
                         }
 
-                    }
-                    btnLocation.setOnClickListener {
-                        map.controller.animateTo(mLocationOverlay.myLocation)
-                        if (mLocationOverlay.myLocation != null) {
-                            scope.launch {
-                                if (currentRoute == SearchAddressScreen().key) {
-                                    if (WHICH_ADDRESS != null)
-                                        mainViewModel.getAddressFromMap(
-                                            mLocationOverlay.myLocation.longitude,
-                                            mLocationOverlay.myLocation.latitude,
-                                            WHICH_ADDRESS
-                                        )
-                                }
-                            }
-                        }
                     }
                     setChangeLocationListener()
                 }
@@ -432,20 +398,6 @@ fun CustomMainMap(
                 }
             }
         )
-        stateRealtimeDatabaseOrders.response?.let { response ->
-            response.observeAsState().value?.let { orders ->
-                orderCount.value = orders.size
-                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
-                    responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
-                        if (clientOrdersId.active_orders != null) {
-                            btnBack.visibility = View.VISIBLE
-                        } else {
-                            btnBack.visibility = View.INVISIBLE
-                        }
-                    }
-                }
-            }
-        }
     } else {
         val context = LocalContext.current
         val activity = (context as MainActivity)
