@@ -34,6 +34,9 @@ import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomBackHandle
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.ui.theme.BackgroundColor
+import com.example.gramclient.ui.theme.textSp12
+import com.example.gramclient.ui.theme.textSp14
+import com.example.gramclient.ui.theme.textSp18
 import com.example.gramclient.utils.Constants
 
 class AuthScreen : Screen {
@@ -116,36 +119,21 @@ class AuthScreen : Screen {
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            OutlinedTextField(
-                                value = "",
-                                onValueChange = {
-                                    ""
-                                },
-                                placeholder = {
-                                    Text(text = "+992", fontSize = 18.sp)
-                                },
+                            Row(
                                 modifier = Modifier
-                                    .padding(bottom = 40.dp)
-                                    .background(Color.White, shape = RoundedCornerShape(5.dp))
-                                    .fillMaxWidth(0.35f),
-                                shape = RoundedCornerShape(5.dp),
-                                enabled = false,
-                                singleLine = true,
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    focusedBorderColor = Color.Black,
-                                    unfocusedBorderColor = Color.Transparent,
-                                    cursorColor = Color.Black,
-                                    textColor = Color.Black,
-                                    disabledTextColor = Color.Black,
-                                    placeholderColor = Color.Black
-                                ),
-                                leadingIcon = {
-                                    Image(
-                                        imageVector = ImageVector.vectorResource(id = R.drawable.tj_flat),
-                                        contentDescription = "Проверено"
-                                    )
-                                }
-                            )
+                                .padding(bottom = 40.dp)
+                                .background(Color.White, shape = RoundedCornerShape(5.dp))
+                                .fillMaxWidth(0.35f)
+                                    .clip (RoundedCornerShape(5.dp)),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    modifier=Modifier.padding(vertical = 16.dp, horizontal = 3.dp),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.tj_flat),
+                                    contentDescription = "Проверено"
+                                )
+                                Text(text = "+992", fontSize = 18.sp,modifier=Modifier.padding(vertical = 16.dp, horizontal = 3.dp))
+                            }
                             OutlinedTextField(
                                 value = phone.value,
                                 onValueChange = {
@@ -156,9 +144,9 @@ class AuthScreen : Screen {
                                     if (it.length == 9) nextBtnEnabled.value = true
                                 },
                                 placeholder = {
-                                    Text(text = "Телефон", fontSize = 18.sp)
+                                    Text(text = "Телефон", fontSize = textSp18.sp)
                                 },
-                                textStyle = TextStyle.Default.copy(fontSize = 18.sp),
+                                textStyle = TextStyle.Default.copy(fontSize = textSp18.sp),
                                 modifier = Modifier
                                     .background(Color.White, shape = RoundedCornerShape(5.dp))
                                     .fillMaxWidth(0.95f),
@@ -197,7 +185,9 @@ class AuthScreen : Screen {
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Подтверждая номер телефона, я соглашаюсь с ", color = Color.Gray)
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = "Подтверждая номер телефона, я соглашаюсь с ", color = Color.Gray)
                 Text(text = " правилами работы сервиса и политикой обработки персональных данных.",
                     textAlign = TextAlign.Center,
                     color = Color.Blue,
