@@ -2,10 +2,14 @@ package com.example.gramclient.presentation.screens.main
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,13 +21,17 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
+import com.example.gramclient.presentation.screens.main.components.ArrowBack
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.main.components.FromAddressField
 import com.example.gramclient.presentation.screens.map.CustomMainMap
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.presentation.screens.order.orderCount
 import com.example.gramclient.utils.Constants
 import kotlinx.coroutines.launch
 
@@ -37,6 +45,8 @@ class SearchAddressScreen : Screen {
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val isSearchState = remember { mutableStateOf(false) }
         var sheetPeekHeight = remember { mutableStateOf(280) }
+        val navigator = LocalNavigator.currentOrThrow
+
 
         var WHICH_ADDRESS = remember { mutableStateOf(Constants.TO_ADDRESS) }
 
@@ -65,6 +75,8 @@ class SearchAddressScreen : Screen {
         val toAddress by mainViewModel.toAddress
         val fromAddress by mainViewModel.fromAddress
         val scope = rememberCoroutineScope()
+        val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
+        val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             BackHandler(enabled = drawerState.isOpen) {
                 scope.launch { drawerState.close() }
@@ -83,21 +95,40 @@ class SearchAddressScreen : Screen {
                 },
                 content = {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 30.dp),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            FloatingActionButton(
+                                modifier = Modifier
+                                    .size(50.dp),
+                                backgroundColor = Color.White,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        navigator.replaceAll(SearchAddressScreen())
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Filled.ArrowBack,
+                                    contentDescription = "Menu", tint = Color.Black,
+                                    modifier = Modifier.size(25.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
                         BottomSheetScaffold(
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 80.dp),
-                                    horizontalArrangement = Arrangement.End
-                                ) {
+
                                     FloatingButton(
                                         scope = coroutineScope,
                                         drawerState = drawerState,
                                         bottomSheetState = bottomSheetState
                                     )
-                                }
+
 
                             },
                             drawerGesturesEnabled = false,
@@ -134,6 +165,15 @@ class SearchAddressScreen : Screen {
                                     isSearchState.value = true
                                     WHICH_ADDRESS.value = Constants.FROM_ADDRESS
                                 }
+                                stateRealtimeDatabaseOrders.response?.let { response ->
+                                    response.observeAsState().value?.let { orders ->
+                                        orderCount.value = orders.size
+                                        stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
+                                            responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
+                                               if (orders.size!=null){
+                                                   ArrowBack()
+                                               }
+                                            }}}}
                             }
                         }
                     }
