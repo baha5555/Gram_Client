@@ -45,6 +45,7 @@ import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
+import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
@@ -74,10 +75,18 @@ class SearchDriverScreen : Screen {
         }
         val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
         val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
-
+        stateRealtimeClientOrderIdDatabase.response?.observeAsState().let { qwe ->
+            qwe?.value.let { qwer ->
+                if (qwer?.active_orders?.size != null) {
+                    navigator.replace(SearchDriverScreen())
+                } else {
+                    navigator.replace(SearchAddressScreen())
+                }
+            }
+        }
         CustomBackHandle(drawerState.isClosed)
 
-        LaunchedEffect(key1 = true ){
+        LaunchedEffect(key1 = true) {
             orderExecutionViewModel.readAllOrders()
             orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
             {
@@ -438,7 +447,8 @@ class SearchDriverScreen : Screen {
                 }
             }
         }
-        CustomDialog(text = "Вы уверены что хотите отменить заказ?",
+        CustomDialog(
+            text = "Вы уверены что хотите отменить заказ?",
             okBtnClick = {
                 cancelOrderIsDialogOpen.value = false
                 orderExecutionViewModel.cancelOrder(order.id, {})
@@ -446,7 +456,8 @@ class SearchDriverScreen : Screen {
             cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
             isDialogOpen = cancelOrderIsDialogOpen.value
         )
-        CustomDialog(text = "Позвонить водителю?",
+        CustomDialog(
+            text = "Позвонить водителю?",
             okBtnClick = {
                 connectClientWithDriverIsDialogOpen.value = false
                 orderExecutionViewModel.connectClientWithDriver(
