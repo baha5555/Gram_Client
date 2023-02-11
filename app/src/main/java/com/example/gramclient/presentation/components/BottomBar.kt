@@ -70,7 +70,7 @@ fun BottomBar(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.Black)
-                    .width(260.dp)
+                    .fillMaxWidth(0.8f)
                     .height(54.dp)
                     .padding(top = 0.dp),
                 text = "Заказать",

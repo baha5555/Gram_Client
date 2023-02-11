@@ -518,12 +518,17 @@ fun AllowancesContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row() {
-                            Text(text = allowance.name, fontSize = 16.sp)
-                            Text(text = " (${allowance.price}c)", fontSize = 16.sp, color = Color.Gray)
-                        }
-                        CustomSwitch(switchON = allowance.isSelected) {
-                            mainViewModel.includeAllowance(allowance)
+                        Text(modifier = Modifier.fillMaxWidth(0.7f),text = allowance.name, fontSize = 16.sp)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = " (${allowance.price}c)",
+                                fontSize = 16.sp,
+                                color = Color.Gray,
+                                modifier=Modifier.padding(end = 18.dp)
+                            )
+                            CustomSwitch(switchON = allowance.isSelected) {
+                                mainViewModel.includeAllowance(allowance)
+                            }
                         }
                     }
                     Divider()
