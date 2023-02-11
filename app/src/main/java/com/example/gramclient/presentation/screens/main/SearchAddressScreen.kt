@@ -95,30 +95,6 @@ class SearchAddressScreen : Screen {
                 },
                 content = {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(start = 30.dp),
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            FloatingActionButton(
-                                modifier = Modifier
-                                    .size(50.dp),
-                                backgroundColor = Color.White,
-                                onClick = {
-                                    coroutineScope.launch {
-                                        navigator.replaceAll(SearchAddressScreen())
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    Icons.Filled.ArrowBack,
-                                    contentDescription = "Menu", tint = Color.Black,
-                                    modifier = Modifier.size(25.dp)
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(10.dp))
                         BottomSheetScaffold(
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
