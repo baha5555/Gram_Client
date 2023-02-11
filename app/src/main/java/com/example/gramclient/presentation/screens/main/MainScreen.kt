@@ -71,7 +71,9 @@ class MainScreen : Screen{
         val modalSheetState = rememberModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
             confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
-
+        val modalSheetBottomBarState = rememberModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Expanded,
+            confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
         val context = LocalContext.current
         val scaffoldState = rememberScaffoldState()
 
@@ -204,16 +206,6 @@ class MainScreen : Screen{
                     )
                 }
                 else {
-                    Spacer(modifier = Modifier.height(5.dp))
-                }
-            },
-            sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
-        ) {
-            BottomSheetScaffold(
-                sheetBackgroundColor = Color.White,
-                scaffoldState = bottomSheetState,
-                sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                sheetContent = {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -272,84 +264,87 @@ class MainScreen : Screen{
                             textBold = true,
                             onClick = {
                                 coroutineScope.launch {
-                                    bottomSheetState.bottomSheetState.collapse()
+                                    modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
                                 }
                             })
                     }
-                },
-                sheetPeekHeight = 0.dp,
-            ) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Scaffold(scaffoldState = scaffoldState, bottomBar = {
-                            if (!isSearchState.value) {
-                                BottomBar(mainBottomSheetState, bottomSheetState,
-                                    createOrder = {
-                                        mainViewModel.createOrder(orderExecutionViewModel)
-                                    }
-                                )
-                            }
-                        }) {
-                            BottomSheetScaffold(
-                                sheetBackgroundColor = Color.Transparent,
-                                scaffoldState = mainBottomSheetState,
-                                floatingActionButton = {
-                                    Column(
+                }
+//                else {
+//                    Spacer(modifier = Modifier.height(5.dp))
+//                }
+            },
+            sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
+        ) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Scaffold(scaffoldState = scaffoldState, bottomBar = {
+                        if (!isSearchState.value) {
+                            BottomBar(mainBottomSheetState, modalSheetState,
+                                createOrder = {
+                                    mainViewModel.createOrder(orderExecutionViewModel)
+                                }
+                            )
+                        }
+                    }) {
+                        BottomSheetScaffold(
+                            sheetBackgroundColor = Color.Transparent,
+                            scaffoldState = mainBottomSheetState,
+                            floatingActionButton = {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 30.dp)
+                                        .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
+                                    horizontalAlignment = Alignment.Start
+                                ) {
+                                    FloatingActionButton(
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 30.dp)
-                                            .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
-                                        horizontalAlignment = Alignment.Start
-                                    ) {
-                                        FloatingActionButton(
-                                            modifier = Modifier
-                                                .size(50.dp),
-                                            backgroundColor = Color.White,
-                                            onClick = {
-                                                coroutineScope.launch {
-                                                    navigator.replaceAll(SearchAddressScreen())
-                                                }
+                                            .size(50.dp),
+                                        backgroundColor = Color.White,
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                navigator.replaceAll(SearchAddressScreen())
                                             }
-                                        ) {
-                                            Icon(
-                                                Icons.Filled.ArrowBack,
-                                                contentDescription = "Menu", tint = Color.Black,
-                                                modifier = Modifier.size(25.dp)
-                                            )
                                         }
-                                    }
-                                },
-                                sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                                sheetContent = {
-                                    MainBottomSheetContent(
-                                        scaffoldState = mainBottomSheetState,
-                                        mainViewModel = mainViewModel,
-                                        stateCalculate = stateCalculate,
-                                        stateTariffs = stateTariffs,
-                                        stateAllowances = stateAllowances,
-                                        isSearchState = isSearchState,
-                                        focusRequester = focusRequester,
                                     ) {
-                                        if(stateOfDopInfoForDriver.value!="PLAN_TRIP" && stateOfDopInfoForDriver.value!="") {
-                                            val inputMethodManager =
-                                                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                            inputMethodManager.toggleSoftInput(
-                                                InputMethodManager.SHOW_FORCED,
-                                                0
-                                            )
-                                        }
-                                        coroutineScope.launch {
-                                            modalSheetState.animateTo(ModalBottomSheetValue.Expanded)
-                                        }
+                                        Icon(
+                                            Icons.Filled.ArrowBack,
+                                            contentDescription = "Menu", tint = Color.Black,
+                                            modifier = Modifier.size(25.dp)
+                                        )
                                     }
-                                },
-                                sheetPeekHeight = 325.dp,
-                            ) {
-                                CustomMainMap(mainViewModel = mainViewModel)
-                            }
+                                }
+                            },
+                            sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                            sheetContent = {
+                                MainBottomSheetContent(
+                                    scaffoldState = mainBottomSheetState,
+                                    mainViewModel = mainViewModel,
+                                    stateCalculate = stateCalculate,
+                                    stateTariffs = stateTariffs,
+                                    stateAllowances = stateAllowances,
+                                    isSearchState = isSearchState,
+                                    focusRequester = focusRequester,
+                                ) {
+                                    if (stateOfDopInfoForDriver.value != "PLAN_TRIP" && stateOfDopInfoForDriver.value != "") {
+                                        val inputMethodManager =
+                                            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                                        inputMethodManager.toggleSoftInput(
+                                            InputMethodManager.SHOW_FORCED,
+                                            0
+                                        )
+                                    }
+                                    coroutineScope.launch {
+                                        modalSheetState.animateTo(ModalBottomSheetValue.Expanded)
+                                    }
+                                }
+                            },
+                            sheetPeekHeight = 325.dp,
+                        ) {
+                            CustomMainMap(mainViewModel = mainViewModel)
                         }
                     }
                 }
