@@ -10,12 +10,11 @@ import javax.inject.Inject
 
 class GetClientOrderUseCase @Inject constructor(private val repository: FirebaseRepository) {
     operator fun invoke(
-        client: String,
-        goToSearchAddressScreen: () -> Unit
+        client: String
     ): Flow<Resource<LiveData<Client>>> =
         flow {
             try {
-                val response: LiveData<Client> = repository.getClientOrder(client, goToSearchAddressScreen)
+                val response: LiveData<Client> = repository.getClientOrder(client)
                 emit(Resource.Success(response))
             }catch (_: Exception){
 

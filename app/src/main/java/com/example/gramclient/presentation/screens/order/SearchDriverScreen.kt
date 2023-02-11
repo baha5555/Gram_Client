@@ -36,6 +36,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
+import com.example.gramclient.domain.firebase.profile.Client
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
@@ -77,14 +78,6 @@ class SearchDriverScreen : Screen {
         val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
 
         CustomBackHandle(drawerState.isClosed)
-
-        LaunchedEffect(key1 = true ){
-            orderExecutionViewModel.readAllOrders()
-            orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
-            {
-
-            }
-        }
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             BackHandler(enabled = drawerState.isOpen) {
@@ -446,7 +439,10 @@ class SearchDriverScreen : Screen {
             okBtnClick = {
                 cancelOrderIsDialogOpen.value = false
                 orderExecutionViewModel.cancelOrder(order.id) {
-                    //if (!Values.BtnBack.value) navigator.replaceAll(SearchAddressScreen())
+
+                }
+                if(Values.ClientOrders.value?.active_orders?.size==1){
+                    navigator.replaceAll(SearchAddressScreen())
                 }
             },
             cancelBtnClick = { cancelOrderIsDialogOpen.value = false },

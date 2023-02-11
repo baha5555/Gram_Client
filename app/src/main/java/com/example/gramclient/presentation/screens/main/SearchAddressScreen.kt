@@ -62,14 +62,12 @@ class SearchAddressScreen : Screen {
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
-        val prefs = CustomPreference(context)
         val focusRequester = remember { FocusRequester() }
 
         CustomBackHandle(drawerState.isClosed)
 
         LaunchedEffect(true) {
             mainViewModel.getActualLocation(context)
-            orderExecutionViewModel.readAllClient(prefs.getPhoneNumber()){}
         }
         LaunchedEffect(bottomSheetState.bottomSheetState.currentValue) {
             if (bottomSheetState.bottomSheetState.isCollapsed) {
@@ -103,22 +101,15 @@ class SearchAddressScreen : Screen {
                         BottomSheetScaffold(
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
-                                stateRealtimeDatabaseOrders.response?.let { response ->
-                                    response.observeAsState().value?.let { orders ->
-                                        orderCount.value = orders.size
-                                        stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
-                                            responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
-                                                Box(modifier = Modifier.offset(25.dp, (-55).dp)){
-                                                    FloatingButton(
-                                                        bottomSheetState = bottomSheetState,
-                                                        Icons.Filled.ArrowBack,
-                                                        backgroundColor = Color.White,
-                                                        contentColor = PrimaryColor
-                                                    ){
-                                                        navigator.replaceAll(SearchDriverScreen())
-                                                    }
-                                                }
-                                            }
+                                if(Values.ClientOrders.value!=null){
+                                    Box(modifier = Modifier.offset(25.dp, (-55).dp)){
+                                        FloatingButton(
+                                            bottomSheetState = bottomSheetState,
+                                            Icons.Filled.ArrowBack,
+                                            backgroundColor = Color.White,
+                                            contentColor = PrimaryColor
+                                        ){
+                                            navigator.replaceAll(SearchDriverScreen())
                                         }
                                     }
                                 }
@@ -171,7 +162,7 @@ class SearchAddressScreen : Screen {
                                     toAddress = toAddress
                                 )
                             },
-                            sheetPeekHeight = sheetPeekHeight.value.dp,
+                            sheetPeekHeight = sheetPeekHeight.value.dp-65.dp,
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),

@@ -27,6 +27,7 @@ import com.example.gramclient.R
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.map.CustomMainMap
 import com.example.gramclient.presentation.screens.order.components.*
 import com.example.gramclient.ui.theme.BackgroundColor
@@ -38,7 +39,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class OrderExecutionScreen : Screen{
+class OrderExecutionScreen : Screen {
     @SuppressLint("CoroutineCreationDuringComposition")
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
@@ -55,7 +56,8 @@ class OrderExecutionScreen : Screen{
 
         val coroutineScope = rememberCoroutineScope()
 
-        val stateRealtimeDatabaseOrders = orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
+        val stateRealtimeDatabaseOrders =
+            orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
 
         val isDialogOpen = remember { mutableStateOf(false) }
 
@@ -65,20 +67,20 @@ class OrderExecutionScreen : Screen{
             mutableStateOf(0)
         }
 
-        LaunchedEffect(key1 = true){
-            orderExecutionViewModel.readAllOrders()
+        LaunchedEffect(key1 = true) {
+            //orderExecutionViewModel.readAllOrders()
         }
-        if(Values.DriverLocation.value.latitude!=0.0){
-            Log.i("asdasda", ""+Values.DriverLocation.value)
+        if (Values.DriverLocation.value.latitude != 0.0) {
+            Log.i("asdasda", "" + Values.DriverLocation.value)
         }
 
-        var selectRealtimeDatabaseOrder:RealtimeDatabaseOrder by remember {
+        var selectRealtimeDatabaseOrder: RealtimeDatabaseOrder by remember {
             mutableStateOf(RealtimeDatabaseOrder())
         }
         // searchState dependencies ->
-        var WHICH_ADDRESS = remember{ mutableStateOf("") }
-        val isAddressList= remember { mutableStateOf(true) }
-        val searchText=remember{ mutableStateOf("") }
+        var WHICH_ADDRESS = remember { mutableStateOf("") }
+        val isAddressList = remember { mutableStateOf(true) }
+        val searchText = remember { mutableStateOf("") }
         val focusManager = LocalFocusManager.current
         val isSearchState = remember { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
@@ -98,7 +100,7 @@ class OrderExecutionScreen : Screen{
             mutableStateOf("Вы уверены, что хотите отменить данный заказ?")
         }
         scope.launch {
-            Log.e("runRe","get")
+            Log.e("runRe", "get")
             stateRealtimeDatabaseOrders.let { orders ->
                 orders?.forEach { order ->
                     if (order.id == selectedOrder.id) {
@@ -110,13 +112,13 @@ class OrderExecutionScreen : Screen{
 
             selectRealtimeDatabaseOrder.from_address?.let {
                 //mainViewModel.updateFromAddress(it)
-                Log.e("From_address-1","$it")
+                Log.e("From_address-1", "$it")
             }
 
-            selectRealtimeDatabaseOrder.to_address?.let { to_Addresses->
-                to_Addresses.forEach { address->
+            selectRealtimeDatabaseOrder.to_address?.let { to_Addresses ->
+                to_Addresses.forEach { address ->
                     //mainViewModel.updateToAddress(address)
-                    Log.e("To_address-1","$address")
+                    Log.e("To_address-1", "$address")
                 }
             }
         }
@@ -131,23 +133,23 @@ class OrderExecutionScreen : Screen{
                         .wrapContentHeight(unbounded = true)
                         .background(BackgroundColor)
                 ) {
-                    if(!isSearchState.value) {
-                        scope.launch{
-                            if(searchText.value != "")
+                    if (!isSearchState.value) {
+                        scope.launch {
+                            if (searchText.value != "")
                                 searchText.value = ""
                         }
                         selectRealtimeDatabaseOrder.let { order ->
-                            Log.i("orderAddresses", ""+order.from_address)
-                            if(order.id!=-1) orderExecutionViewModel.getDriverLocation(order.id)
-                            if(isGet.value){
+                            Log.i("orderAddresses", "" + order.from_address)
+                            if (order.id != -1) orderExecutionViewModel.getDriverLocation(order.id)
+                            if (isGet.value) {
                                 order.from_address.let {
                                     if (it != null) {
-                                        isGet.value=false
+                                        isGet.value = false
                                         mainViewModel.updateFromAddress(it)
                                     }
                                 }
                                 order.to_address.let {
-                                    it?.forEach { it2->
+                                    it?.forEach { it2 ->
                                         mainViewModel.updateToAddress(it2)
                                     }
                                 }
@@ -155,7 +157,8 @@ class OrderExecutionScreen : Screen{
 
                             if (order.performer != null) {
                                 performerSection(performer = order, orderExecutionViewModel)
-                                stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
+                                stateCancelOrderText =
+                                    "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
                             }
                             orderSection(order, scope, sheetState, isSearchState)
                             Spacer(modifier = Modifier.height(10.dp))
@@ -163,14 +166,23 @@ class OrderExecutionScreen : Screen{
                             actionSection(cancelOrderOnClick = {
                                 isDialogOpen.value = true
                                 orderId = order.id
-                                if(order.status == "Исполняется"){
-                                    stateCancelOrderText = "Вы не можете отменить активный заказ.\nЭто может сделать только оператор"
+                                if (order.status == "Исполняется") {
+                                    stateCancelOrderText =
+                                        "Вы не можете отменить активный заказ.\nЭто может сделать только оператор"
                                 }
                             })
                         }
-                    }else{
+                    } else {
                         searchSection(
-                            searchText, focusRequester, isSearchState, sheetState, scope, orderExecutionViewModel, isAddressList, focusManager, mainViewModel
+                            searchText,
+                            focusRequester,
+                            isSearchState,
+                            sheetState,
+                            scope,
+                            orderExecutionViewModel,
+                            isAddressList,
+                            focusManager,
+                            mainViewModel
                         )
                     }
                 }
@@ -179,11 +191,16 @@ class OrderExecutionScreen : Screen{
         ) {
             Box {
                 CustomMainMap(
-                    mainViewModel = mainViewModel)
-                if(stateCancelOrderText!="Вы не можете отменить активный заказ.\nЭто может сделать только оператор") {
+                    mainViewModel = mainViewModel
+                )
+                if (stateCancelOrderText != "Вы не можете отменить активный заказ.\nЭто может сделать только оператор") {
                     CustomDialog(
                         text = stateCancelOrderText,
                         okBtnClick = {
+                            if(Values.ClientOrders.value?.active_orders?.size==1){
+                                navigator.replaceAll(SearchAddressScreen())
+                                return@CustomDialog
+                            }
                             coroutineScope.launch {
                                 isDialogOpen.value = false
                                 sheetState.bottomSheetState.collapse()
@@ -196,8 +213,7 @@ class OrderExecutionScreen : Screen{
                         cancelBtnClick = { isDialogOpen.value = false },
                         isDialogOpen = isDialogOpen.value
                     )
-                }
-                else {
+                } else {
                     CustomCancelDialog(
                         text = stateCancelOrderText,
                         okBtnClick = {

@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -24,6 +25,7 @@ import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
+import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Constants.FCM_TOKEN
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +38,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
         val prefs = CustomPreference(context)
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val modifier: Modifier = Modifier
         var time: Int by remember { mutableStateOf(25) }
         val code = viewModel.smsCode.observeAsState()
@@ -71,7 +74,11 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                         navigator.replaceAll(MainScreen())
                                     else
                                         navigator.replaceAll(SearchAddressScreen())
-                                    if(phone.value!=null) prefs.setPhoneNumber(phone.value!!)
+                                    if(phone.value!=null) {
+                                        prefs.setPhoneNumber(phone.value!!)
+                                        orderExecutionViewModel.readAllOrders()
+                                        orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
+                                    }
                                 }
                             }
                             initialApiCalled = true

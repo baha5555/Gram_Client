@@ -105,6 +105,7 @@ class ProfileScreen : Screen{
                     Values.FirstName.value=""
                     Values.LastName.value=""
                     Values.Email.value=""
+                    Values.ClientOrders.value=null
                     navigator.replaceAll(AuthScreen())
                 },
                 cancelBtnClick = { isDialogOpen.value = false },

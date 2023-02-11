@@ -15,11 +15,15 @@ class GetOrdersLiveData: LiveData<List<RealtimeDatabaseOrder>>() {
     private val listener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
             val notes = mutableListOf<RealtimeDatabaseOrder>()
-            snapshot.children.map { it ->
-                Log.e("token Order", "$it<-")
-                notes.add(it.getValue(RealtimeDatabaseOrder::class.java) ?: RealtimeDatabaseOrder())
+            value = try {
+                snapshot.children.map { it ->
+                    Log.e("token Order", "$it<-")
+                    notes.add(it.getValue(RealtimeDatabaseOrder::class.java) ?: RealtimeDatabaseOrder())
+                }
+                notes
+            }catch (_: Exception){
+                notes
             }
-            value = notes
         }
         override fun onCancelled(error: DatabaseError) {
 

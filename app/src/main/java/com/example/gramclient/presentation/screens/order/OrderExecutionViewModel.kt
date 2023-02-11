@@ -93,8 +93,9 @@ class OrderExecutionViewModel  @Inject constructor(
                 }
             }.launchIn(viewModelScope)
     }
-    fun readAllClient(client:String, goToSearchAddressScreen:()->Unit) {
-        getClientOrderUseCase.invoke(client,goToSearchAddressScreen).onEach { result: Resource<LiveData<Client>> ->
+    fun readAllClient(client:String) {
+        if(client=="")return
+        getClientOrderUseCase.invoke(client).onEach { result: Resource<LiveData<Client>> ->
             when (result){
                 is Resource.Success -> {
                     try {
@@ -243,7 +244,7 @@ class OrderExecutionViewModel  @Inject constructor(
                         val response: UpdateOrderResponse? = result.data
                         _stateEditOrder.value =
                             EditOrderResponseState(response = response)
-                        readAllOrders()
+                        //readAllOrders()
                         Log.e("EditOrderResponse", "EditOrderResponseSuccess->\n ${_stateEditOrder.value}")
                     }catch (e: Exception) {
                         Log.d("EditOrderResponse", "${e.message} Exception")
