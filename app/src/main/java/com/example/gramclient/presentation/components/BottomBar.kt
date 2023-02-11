@@ -23,14 +23,16 @@ import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.screens.authorization.AuthScreen
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Constants.IDENTIFY_TO_SCREEN
+import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomBar(
     mainBottomSheetState: BottomSheetScaffoldState,
-    bottomSheetState: BottomSheetScaffoldState,
+    modalBottomSheetValue: ModalBottomSheetState,
     createOrder: () -> Unit
 ) {
     val navigator = LocalNavigator.currentOrThrow
@@ -52,11 +54,12 @@ fun BottomBar(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             IconButton(onClick = {
+                stateOfDopInfoForDriver.value = "PAYMENT_METHOD"
                 coroutineScope.launch {
-                    if(bottomSheetState.bottomSheetState.isCollapsed){
-                        bottomSheetState.bottomSheetState.expand()
-                    } else{
-                        bottomSheetState.bottomSheetState.collapse()
+                    if (modalBottomSheetValue.isVisible) {
+                        modalBottomSheetValue.animateTo(ModalBottomSheetValue.Hidden)
+                    } else {
+                        modalBottomSheetValue.animateTo(ModalBottomSheetValue.Expanded)
                     }
                 }
             }) {
@@ -70,7 +73,7 @@ fun BottomBar(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.Black)
-                    .width(260.dp)
+                    .fillMaxWidth(0.8f)
                     .height(54.dp)
                     .padding(top = 0.dp),
                 text = "Заказать",
