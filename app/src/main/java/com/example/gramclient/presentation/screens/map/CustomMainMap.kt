@@ -17,7 +17,6 @@ import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,7 +25,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,7 +39,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -53,9 +51,7 @@ import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.order.OrderExecutionScreen
-import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
-import com.example.gramclient.presentation.screens.order.orderCount
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.PreferencesName
@@ -114,13 +110,13 @@ fun CustomMainMap(
 
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        if(currentRoute==OrderExecutionScreen().key){
+        if (currentRoute == OrderExecutionScreen().key) {
             Log.i("showRoad", "run")
-            mainViewModel.updateToAddress(Address())
+            //mainViewModel.updateToAddress(Address())
             mainViewModel.updateFromAddress(Address())
-            isGet.value=true
+            isGet.value = true
         }
-        Values.FromAddress2.value= Address("", 0, "", "")
+        Values.FromAddress2.value = Address("", 0, "", "")
         Values.ToAddress2.value = listOf<Address>(Address("", 0, "", ""))
         val observer = LifecycleEventObserver { _, event ->
             stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -153,7 +149,7 @@ fun CustomMainMap(
                 .putLong("mapPosY", map.mapCenter.longitude.toBits())
                 .putLong("mapPosZ", map.zoomLevelDouble.toBits()).apply()
             lifecycleOwner.lifecycle.removeObserver(observer)
-            Values.FromAddress2.value= Address("", 0, "", "")
+            Values.FromAddress2.value = Address("", 0, "", "")
             Values.ToAddress2.value = listOf<Address>(Address("", 0, "", ""))
         }
     }
@@ -218,32 +214,30 @@ fun CustomMainMap(
             update = {
                 when (currentRoute) {
                     MainScreen().key -> {
-                        if (Values.ToAddress2.value != mainViewModel.toAddress.value ||
+                        if (Values.ToAddress2.value != mainViewModel.toAddresses ||
                             Values.FromAddress2.value != mainViewModel.fromAddress.value
                         ) {
                             map.overlays.clear()
                             showRoadAB(
                                 it.context,
                                 mainViewModel.fromAddress,
-                                mainViewModel.toAddress
+                                mainViewModel.toAddresses
                             )
-                            Values.ToAddress2.value = mainViewModel.toAddress.value
+                            Values.ToAddress2.value = mainViewModel.toAddresses
                             Values.FromAddress2.value = mainViewModel.fromAddress.value
                         }
                     }
                     OrderExecutionScreen().key -> {
-                        if (Values.ToAddress2.value != mainViewModel.toAddress.value ||
+                        if (Values.ToAddress2.value != mainViewModel.toAddresses ||
                             Values.FromAddress2.value != mainViewModel.fromAddress.value
                         ) {
-                            if(!isGet.value)return@AndroidView
-                            Log.i("showRoad", "m-"+mainViewModel.fromAddress.value)
                             map.overlays.clear()
                             showRoadAB(
                                 it.context,
                                 mainViewModel.fromAddress,
-                                mainViewModel.toAddress
+                                mainViewModel.toAddresses
                             )
-                            Values.ToAddress2.value = mainViewModel.toAddress.value
+                            Values.ToAddress2.value = mainViewModel.toAddresses
                             Values.FromAddress2.value = mainViewModel.fromAddress.value
                         }
                         if (Values.DriverLocation.value != GeoPoint(0.0, 0.0)) {
@@ -470,7 +464,7 @@ fun addOverlays() {
 fun showRoadAB(
     context: Context,
     fromAddress: State<Address>,
-    toAddress: State<List<Address>>,
+    toAddress: SnapshotStateList<Address>,
 ) {
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
     GlobalScope.launch {
@@ -484,7 +478,7 @@ fun showRoadAB(
 
             val toAddressesPoints = ArrayList<GeoPoint>()
             val toAddressesNames = ArrayList<String>()
-            toAddress.value.forEach { address ->
+            toAddress.forEach { address ->
                 val toAddressPoint = GeoPoint(0, 0)
                 toAddressPoint.latitude = address.address_lat.toDouble()
                 toAddressPoint.longitude = address.address_lng.toDouble()

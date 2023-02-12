@@ -19,14 +19,12 @@ import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesUseCas
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.screens.main.states.*
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
-import com.example.gramclient.utils.Values
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.burnoutcrew.reorderable.ItemPosition
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,10 +61,8 @@ class MainViewModel @Inject constructor(
     private var _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
     val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
 
-    private var _toAddress = mutableStateOf(listOf<Address>(Address("", 0, "", "")))
     private var _toAddresses = mutableStateListOf<Address>()
     val toAddresses : SnapshotStateList<Address> = _toAddresses
-    val toAddress: State<List<Address>> = _toAddress
 
     private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
     val fromAddress: State<Address> = _fromAddress
@@ -110,10 +106,12 @@ class MainViewModel @Inject constructor(
         _commentToOrder.value = comment
     }
 
-    fun updateToAddress(address:Address?) {
-        if(address != null){
-            _toAddress.value = listOf(address)
-            Log.i("addresses", "To-"+_toAddress.value)
+    fun updateToAddress(inx:Int, address:Address?) {
+        if(_toAddresses.size==0) addToAddress(address)
+        else{
+            if (address != null) {
+                _toAddresses[inx] = address
+            }
         }
     }
     fun addToAddress(address:Address?) {
@@ -121,6 +119,9 @@ class MainViewModel @Inject constructor(
             if(_toAddresses.contains(address)) return
             _toAddresses.add(address)
         }
+    }
+    fun clearToAddress() {
+        _toAddresses.clear()
     }
 
     fun updateSelectedTariff(
@@ -289,10 +290,10 @@ class MainViewModel @Inject constructor(
         createOrderUseCase.invoke(
             dop_phone = if(_dopPhone.value!="")_dopPhone.value else null,
             from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
-            to_addresses = if(toAddress.value[0].id != 0) listOf(AddressModel(toAddress.value.get(0).id)) else null,
+            to_addresses = if(toAddresses.size!=0) toAddresses else null,
             comment = if(_commentToOrder.value!="")_commentToOrder.value else null,
             tariff_id = selectedTariff?.value?.id ?: 1,
-            allowances= if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
+            allowances = if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
             date_time = if(_planTrip.value!="") _planTrip.value else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result){
@@ -328,7 +329,7 @@ class MainViewModel @Inject constructor(
             tariff_id = selectedTariff?.value?.id ?: 1,
             allowances = if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
             from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
-            to_addresses = if(toAddress.value[0].id != 0) listOf(AddressModel(toAddress.value[0].id)) else null
+            to_addresses = if(toAddresses.size!=0) toAddresses else null
         ).onEach { result: Resource<CalculateResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -377,15 +378,10 @@ class MainViewModel @Inject constructor(
                                 )
                             }
                             Constants.TO_ADDRESS -> {
-                                updateToAddress(
-                                    Address(_stateAddressPoint.value.response!!.name,
-                                        _stateAddressPoint.value.response!!.id,
-                                        _stateAddressPoint.value.response!!.lat,
-                                        _stateAddressPoint.value.response!!.lng)
-                                )
+
                             }
                         }
-                        Log.e("singleTapConfirmedHelper", "$toAddress")
+                        Log.e("singleTapConfirmedHelper", "${toAddresses.size}")
 
                     }catch (e: Exception) {
                         Log.d("AddressByPointResponse", "${e.message} Exception")

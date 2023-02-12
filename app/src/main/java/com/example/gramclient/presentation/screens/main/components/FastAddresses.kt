@@ -46,7 +46,8 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                 val toAddress = Address(it.address, it.id, it.address_lat, it.address_lng, it.city)
                 item {
                     FastAddressCard(title = "" + it.address){
-                        mainViewModel.updateToAddress(toAddress)
+                        mainViewModel.clearToAddress()
+                        mainViewModel.addToAddress(toAddress)
                         navigator.push(MainScreen())
                         map.controller.animateTo(GeoPoint(it.address_lat.toDouble(), it.address_lng.toDouble()))
                     }

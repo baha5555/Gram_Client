@@ -77,7 +77,7 @@ class SearchAddressScreen : Screen {
                 Log.e("singleTapConfirmedHelper", "isExpanded")
             }
         }
-        val toAddress by mainViewModel.toAddress
+        val toAddress = mainViewModel.toAddresses
         val fromAddress by mainViewModel.fromAddress
         val scope = rememberCoroutineScope()
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {

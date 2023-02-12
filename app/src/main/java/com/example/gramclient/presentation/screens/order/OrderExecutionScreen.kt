@@ -145,12 +145,12 @@ class OrderExecutionScreen : Screen {
                                 order.from_address.let {
                                     if (it != null) {
                                         isGet.value = false
-                                        mainViewModel.updateFromAddress(it)
+                                        //mainViewModel.updateFromAddress(it)
                                     }
                                 }
                                 order.to_address.let {
                                     it?.forEach { it2 ->
-                                        mainViewModel.updateToAddress(it2)
+                                        //mainViewModel.updateToAddress(it2)
                                     }
                                 }
                             }

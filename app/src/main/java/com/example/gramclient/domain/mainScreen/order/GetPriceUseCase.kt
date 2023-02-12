@@ -1,7 +1,9 @@
 package com.example.gramclient.domain.mainScreen.order
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
+import com.example.gramclient.domain.mainScreen.Address
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,7 +18,7 @@ class GetPriceUseCase @Inject constructor(private val repository: AppRepository)
         tariff_id: Int,
         allowances: String?,
         from_address: Int?,
-        to_addresses: List<AddressModel>?
+        to_addresses: SnapshotStateList<Address>?
     ): Flow<Resource<CalculateResponse>> =
         flow{
             try {

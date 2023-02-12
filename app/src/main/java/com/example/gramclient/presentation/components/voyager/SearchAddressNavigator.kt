@@ -30,7 +30,7 @@ import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.utils.Constants
 import kotlinx.coroutines.launch
 
-class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) :Screen {
+class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
@@ -45,7 +45,7 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) :Screen
         val focusRequester = remember { FocusRequester() }
         val bottomNavigator = LocalBottomSheetNavigator.current
 
-        LaunchedEffect(true){
+        LaunchedEffect(true) {
             focusRequester.requestFocus()
         }
         Column(
@@ -56,7 +56,8 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) :Screen
                     Color.White,
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                 )
-                .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)) {
+                .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)
+        ) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 TextField(
                     value = searchText.value,
@@ -86,7 +87,7 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) :Screen
                             IconButton(
                                 modifier = Modifier.offset(x = (-40).dp),
                                 onClick = {
-                                    scope.launch { searchText.value = ""}
+                                    scope.launch { searchText.value = "" }
                                 }
                             ) {
                                 Icon(
@@ -118,7 +119,12 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) :Screen
                         .align(Alignment.CenterEnd)
                         .padding(end = 20.dp)
                         .clickable {
-                            bottomNavigator.hide()
+                            if (bottomNavigator
+                                    .pop()
+                                    .not()
+                            ) {
+                                bottomNavigator.hide()
+                            }
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -132,7 +138,12 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) :Screen
                                 .background(Color(0xFFE0DBDB))
                         )
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text(text = "Карта", fontSize = 14.sp, color = Color.Black, modifier = Modifier)
+                        Text(
+                            text = "Карта",
+                            fontSize = 14.sp,
+                            color = Color.Black,
+                            modifier = Modifier
+                        )
                     }
                 }
             }
@@ -144,27 +155,36 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) :Screen
             {
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val stateSearchAddress by mainViewModel.stateSearchAddress
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(10.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(shape = RoundedCornerShape(10.dp))
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Loader(isLoading = stateSearchAddress.isLoading)
                     }
                     stateSearchAddress.response?.let { items ->
-                        if(items.isNotEmpty()) {
-                            items.forEach{
+                        if (items.isNotEmpty()) {
+                            items.forEach {
                                 AddressListItem(
                                     addressText = it.address,
                                     onItemClick = { selectedAddress ->
                                         address.value = selectedAddress
-                                        bottomNavigator.hide()
+                                        if (inx == -2) bottomNavigator.replaceAll(AddStopScreen())
+                                        else bottomNavigator.hide()
                                         if (keyboardController != null) {
                                             keyboardController.hide()
                                         }
-                                        when(whichScreen){
+                                        when (whichScreen) {
                                             Constants.TO_ADDRESS -> {
-                                                mainViewModel.updateToAddress(it)
+                                                if (inx > -1) {
+                                                    mainViewModel.updateToAddress(inx, it)
+                                                }else{
+                                                    mainViewModel.addToAddress(it)
+                                                }
                                             }
                                             Constants.ADD_TO_ADDRESS -> {
                                                 mainViewModel.addToAddress(it)

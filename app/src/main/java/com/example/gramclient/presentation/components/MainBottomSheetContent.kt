@@ -80,7 +80,7 @@ fun MainBottomSheetContent(
 
 
     val fromAddress by mainViewModel.fromAddress
-    val toAddress by mainViewModel.toAddress
+    val toAddress = mainViewModel.toAddresses
     val selected_tariff = mainViewModel.selectedTariff?.observeAsState()
 
     var WHICH_ADDRESS = remember { mutableStateOf("") }
@@ -105,8 +105,7 @@ fun MainBottomSheetContent(
                 addressContent = {
                     AddressesContent(
                         currentFraction = scaffoldState.currentFraction,
-                        address_from = fromAddress,
-                        address_to = toAddress
+                        address_from = fromAddress
                     )
                 },
                 tariffsContent = {
@@ -151,16 +150,6 @@ fun MainBottomSheetContent(
                     isSearchState = isSearchState,
                     bottomSheetState = scaffoldState,
                     scope = coroutineScope
-                )
-                SearchResultContent(
-                    searchText = searchText,
-                    focusManager = focusManager,
-                    isAddressList = isAddressList,
-                    bottomSheetState = scaffoldState,
-                    isSearchState = isSearchState,
-                    scope = coroutineScope,
-                    mainViewModel = mainViewModel,
-                    WHICH_ADDRESS = WHICH_ADDRESS,
                 )
             }
         }
@@ -207,12 +196,11 @@ fun SheetContent(
 @Composable
 fun AddressesContent(
     currentFraction: Float,
-    address_from: Address,
-    address_to: List<Address>
+    address_from: Address
 ) {
     val mainViewModel: MainViewModel = hiltViewModel()
     val toAddresses = mainViewModel.toAddresses
-    val bottomNavigator= LocalBottomSheetNavigator.current
+    val bottomNavigator = LocalBottomSheetNavigator.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -273,23 +261,27 @@ fun AddressesContent(
         ) {
             Divider()
         }
-        toAddresses.forEach{
+        toAddresses.forEach {
 
         }
         Row(
             modifier = Modifier
                 .clickable {
-                    if(toAddresses.size<=1){
-                        bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS))
-                    }else{
+                    if (toAddresses.size <= 1) {
+                        bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS, inx = 0))
+                    } else {
                         bottomNavigator.show(AddStopScreen())
                     }
                 }
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 15.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 15.dp).fillMaxWidth(0.8f)
+            ) {
                 Image(
                     modifier = Modifier
                         .size(20.dp),
@@ -312,15 +304,17 @@ fun AddressesContent(
                     }
                     else -> {
                         Text(
-                            ""+toAddresses.size+" остоновки",
+                            "" + toAddresses.size + " остоновки",
                             maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
             }
-            IconButton(onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS)) }) {
-                Icon(imageVector = Icons.Default.Add, "")
-            }
+            Icon(imageVector = Icons.Default.Add, "", modifier = Modifier
+                .size(35.dp)
+                .clickable {
+                    bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS))
+                })
 
         }
         Column(
@@ -370,7 +364,7 @@ fun TariffsContent(
             )
             stateCalculate.response?.let {
                 Text(
-                    text = if (address_to[0].address == "") "от ${it.result.amount} c" else "${it.result.amount} c",
+                    text = if (address_to.isEmpty()) "от ${it.result.amount} c" else "${it.result.amount} c",
                     fontSize = 25.sp
                 )
             }

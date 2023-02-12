@@ -1,7 +1,10 @@
 package com.example.gramclient.domain.mainScreen.order
 
+import android.util.Log
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
+import com.example.gramclient.domain.mainScreen.Address
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -15,7 +18,7 @@ class CreateOrderUseCase @Inject constructor(private val repository: AppReposito
     operator fun invoke(
         dop_phone: String?,
         from_address: Int?,
-        to_addresses: List<AddressModel>?,
+        to_addresses: SnapshotStateList<Address>?,
         comment: String?,
         tariff_id: Int,
         allowances: String?,
@@ -24,11 +27,11 @@ class CreateOrderUseCase @Inject constructor(private val repository: AppReposito
         flow{
             try {
                 emit(Resource.Loading<OrderResponse>())
-                var jsonToAddress: String? = null
-                if(to_addresses != null) {
-                    jsonToAddress = Gson().toJson(to_addresses)
+                val toAddressesList = arrayListOf<String>()
+                to_addresses?.forEach{
+                    toAddressesList.add("{\"search_address_id\":${it.id}}")
                 }
-                val response: OrderResponse = repository.createOrder(dop_phone, from_address, jsonToAddress, comment, tariff_id, allowances,date_time)
+                val response: OrderResponse = repository.createOrder(dop_phone, from_address, toAddressesList.toString(), comment, tariff_id, allowances,date_time)
                 emit(Resource.Success<OrderResponse>(response))
             }catch (e: HttpException) {
                 emit(

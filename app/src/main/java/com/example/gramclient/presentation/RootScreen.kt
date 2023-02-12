@@ -2,11 +2,15 @@ package com.example.gramclient.presentation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
@@ -33,7 +37,7 @@ fun RootScreen() {
         onDispose {  }
     }
     Permissions()
-    BottomSheetNavigator {
+    BottomSheetNavigator(sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)) {
         Navigator(screen = SplashScreen())
     }
     ReturnRequest()
