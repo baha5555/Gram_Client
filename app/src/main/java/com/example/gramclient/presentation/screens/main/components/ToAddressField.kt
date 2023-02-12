@@ -22,9 +22,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
+import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.MainScreen
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants
@@ -42,6 +44,7 @@ fun ToAddressField(
     toAddress: List<Address>
 ) {
     val navigator = LocalNavigator.currentOrThrow
+    val bottomNavigator = LocalBottomSheetNavigator.current
     toAddress.forEach { address ->
         Box(
             modifier = Modifier
@@ -49,6 +52,8 @@ fun ToAddressField(
                 .height(50.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .clickable {
+                    bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS))
+                    return@clickable
                     scope.launch {
                         bottomSheetState.bottomSheetState.expand()
                     }

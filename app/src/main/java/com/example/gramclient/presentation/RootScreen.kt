@@ -2,13 +2,14 @@ package com.example.gramclient.presentation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.material.Text
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.CustomRequestError
 import com.example.gramclient.presentation.screens.SplashScreen
@@ -17,7 +18,9 @@ import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Values
+import org.burnoutcrew.reorderable.*
 
+@OptIn(ExperimentalMaterialApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RootScreen() {
@@ -30,7 +33,9 @@ fun RootScreen() {
         onDispose {  }
     }
     Permissions()
-    Navigator(screen = SplashScreen())
+    BottomSheetNavigator {
+        Navigator(screen = SplashScreen())
+    }
     ReturnRequest()
     if (Constants.STATE_DRIVER_IN_SITE.value) {
         orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.let { response ->

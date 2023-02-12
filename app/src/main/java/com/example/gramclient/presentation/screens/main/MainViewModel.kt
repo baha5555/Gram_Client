@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
@@ -64,6 +65,7 @@ class MainViewModel @Inject constructor(
     val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
 
     private val _toAddress = mutableStateOf(listOf<Address>(Address("", 0, "", "")))
+    private val _toAddresses = mutableStateListOf<Address>()
     val toAddress: State<List<Address>> = _toAddress
 
     private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
@@ -100,6 +102,10 @@ class MainViewModel @Inject constructor(
         if(address != null){
             _toAddress.value = listOf(address)
             Log.i("addresses", "To-"+_toAddress.value)
+        }
+    }
+    fun addToAddress(address:Address?) {
+        if(address != null){
         }
     }
 

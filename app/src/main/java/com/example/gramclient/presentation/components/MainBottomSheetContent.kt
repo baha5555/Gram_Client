@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.runtime.*
@@ -28,10 +29,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
+import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.components.*
 import com.example.gramclient.presentation.screens.main.states.AllowancesResponseState
@@ -43,7 +46,6 @@ import currentFraction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 @SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
@@ -57,57 +59,65 @@ fun MainBottomSheetContent(
     stateAllowances: AllowancesResponseState,
     isSearchState: MutableState<Boolean>,
     focusRequester: FocusRequester,
-    dopPhone:()->Unit
-){
-    val tariffIcons = arrayOf(R.drawable.car_econom_pic, R.drawable.car_comfort_pic, R.drawable.car_business_pic, R.drawable.car_miniven_pic, R.drawable.courier_icon)
+    dopPhone: () -> Unit
+) {
+    val tariffIcons = arrayOf(
+        R.drawable.car_econom_pic,
+        R.drawable.car_comfort_pic,
+        R.drawable.car_business_pic,
+        R.drawable.car_miniven_pic,
+        R.drawable.courier_icon
+    )
 
-    val tariffListIcons = arrayOf(R.drawable.car_econom_icon, R.drawable.car_comfort_icon, R.drawable.car_business_icon, R.drawable.car_miniven_icon, R.drawable.courier_icon)
+    val tariffListIcons = arrayOf(
+        R.drawable.car_econom_icon,
+        R.drawable.car_comfort_icon,
+        R.drawable.car_business_icon,
+        R.drawable.car_miniven_icon,
+        R.drawable.courier_icon
+    )
 
 
     val fromAddress by mainViewModel.fromAddress
     val toAddress by mainViewModel.toAddress
-    val selected_tariff=mainViewModel.selectedTariff?.observeAsState()
+    val selected_tariff = mainViewModel.selectedTariff?.observeAsState()
 
-    var WHICH_ADDRESS = remember{ mutableStateOf("") }
-    val isAddressList= remember { mutableStateOf(true) }
+    var WHICH_ADDRESS = remember { mutableStateOf("") }
+    val isAddressList = remember { mutableStateOf(true) }
 
-    val searchText=remember{ mutableStateOf("") }
+    val searchText = remember { mutableStateOf("") }
 
     val focusManager = LocalFocusManager.current
 
-    val coroutineScope= rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .focusRequester(focusRequester)
             .fillMaxHeight(fraction = heightFraction)
     ) {
-        if(!isSearchState.value){
-                if(searchText.value!="")
-                    searchText.value = ""
-            SheetContent (
-                currentFraction=scaffoldState.currentFraction,
+        if (!isSearchState.value) {
+            if (searchText.value != "")
+                searchText.value = ""
+            SheetContent(
+                currentFraction = scaffoldState.currentFraction,
                 addressContent = {
                     AddressesContent(
                         currentFraction = scaffoldState.currentFraction,
-                        address_from =fromAddress,
-                        address_to =toAddress,
-                        bottomSheetState =scaffoldState,
-                        isSearchState =isSearchState,
-                        WHICH_ADDRESS =WHICH_ADDRESS,
-                        scope =coroutineScope
+                        address_from = fromAddress,
+                        address_to = toAddress
                     )
                 },
                 tariffsContent = {
                     TariffsContent(
                         currentFraction = scaffoldState.currentFraction,
-                        selected_tariff =selected_tariff,
-                        stateCalculate =stateCalculate,
-                        address_to =toAddress,
-                        stateTariffs =stateTariffs,
-                        tariffListIcons =tariffListIcons,
-                        mainViewModel =mainViewModel,
-                        tariffIcons =tariffIcons
+                        selected_tariff = selected_tariff,
+                        stateCalculate = stateCalculate,
+                        address_to = toAddress,
+                        stateTariffs = stateTariffs,
+                        tariffListIcons = tariffListIcons,
+                        mainViewModel = mainViewModel,
+                        tariffIcons = tariffIcons
                     )
                 },
                 optionsContent = {
@@ -115,12 +125,12 @@ fun MainBottomSheetContent(
                 },
                 allowancesContent = {
                     AllowancesContent(
-                        stateAllowances=stateAllowances,
-                        mainViewModel=mainViewModel,
+                        stateAllowances = stateAllowances,
+                        mainViewModel = mainViewModel,
                     )
                 }
             )
-        }else{
+        } else {
             LaunchedEffect(Unit) {
                 delay(200)
                 focusRequester.requestFocus()
@@ -132,7 +142,8 @@ fun MainBottomSheetContent(
                         Color.White,
                         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                     )
-                    .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)) {
+                    .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)
+            ) {
                 SearchTextField(
                     searchText = searchText,
                     focusRequester = focusRequester,
@@ -156,9 +167,6 @@ fun MainBottomSheetContent(
 }
 
 
-
-
-
 @Composable
 fun SheetContent(
     addressContent: @Composable() (ColumnScope.() -> Unit),
@@ -178,7 +186,7 @@ fun SheetContent(
     ) {
         Column {
             addressContent()
-            Spacer(modifier = Modifier.height(0.dp+(currentFraction*10).dp))
+            Spacer(modifier = Modifier.height(0.dp + (currentFraction * 10).dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -199,41 +207,36 @@ fun SheetContent(
 fun AddressesContent(
     currentFraction: Float,
     address_from: Address,
-    address_to: List<Address>,
-    bottomSheetState: BottomSheetScaffoldState,
-    WHICH_ADDRESS: MutableState<String>,
-    isSearchState: MutableState<Boolean>,
-    scope: CoroutineScope,
+    address_to: List<Address>
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(
-            Color.White,
-            shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
-        )
-        .padding(top = 15.dp, bottom = 0.dp + (currentFraction * 15).dp)
-    ){
+    val bottomNavigator= LocalBottomSheetNavigator.current
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color.White,
+                shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
+            )
+            .padding(top = 15.dp, bottom = 0.dp + (currentFraction * 15).dp)
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
-        ){
-            Spacer(modifier = Modifier
-                .width(45.dp)
-                .height(5.dp)
-                .graphicsLayer(translationY = -15f)
-                .clip(RoundedCornerShape(50.dp))
-                .background(Color(0xFFCACAC2))
+        ) {
+            Spacer(
+                modifier = Modifier
+                    .width(45.dp)
+                    .height(5.dp)
+                    .graphicsLayer(translationY = -15f)
+                    .clip(RoundedCornerShape(50.dp))
+                    .background(Color(0xFFCACAC2))
             )
         }
         Row(
             modifier = Modifier
                 .clickable {
-                    scope.launch {
-                        bottomSheetState.bottomSheetState.expand()
-                        isSearchState.value = true
-                        WHICH_ADDRESS.value = Constants.FROM_ADDRESS
-                    }
+                    bottomNavigator.show(SearchAddressNavigator(Constants.FROM_ADDRESS))
                 }
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 15.dp),
@@ -246,56 +249,67 @@ fun AddressesContent(
                 contentDescription = "Logo"
             )
             Spacer(modifier = Modifier.width(20.dp))
-            if(address_from.address == "") {
-                Text(text = "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color=Color.Gray)
-            }else {
+            if (address_from.address == "") {
+                Text(
+                    text = "Откуда?",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.Gray
+                )
+            } else {
                 Text(
                     address_from.address,
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
             }
         }
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 60.dp, end = 20.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 60.dp, end = 20.dp)
+        ) {
             Divider()
         }
         address_to.forEach { address ->
             Row(
                 modifier = Modifier
                     .clickable {
-                        scope.launch {
-                            bottomSheetState.bottomSheetState.expand()
-                            isSearchState.value = true
-                            WHICH_ADDRESS.value = Constants.TO_ADDRESS
-                        }
+                        bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS))
                     }
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 15.dp),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.to_marker),
-                    contentDescription = "Logo"
-                )
-                Spacer(modifier = Modifier.width(20.dp))
-                if(address.address=="") {
-                    Text(
-                        text = "Куда едем?", color=Color.Gray,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        modifier = Modifier
+                            .size(20.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.to_marker),
+                        contentDescription = "Logo"
                     )
-                }else {
-                    Text(
-                        address.address,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis
-                    )
+                    Spacer(modifier = Modifier.width(20.dp))
+                    if (address.address == "") {
+                        Text(
+                            text = "Куда едем?", color = Color.Gray,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis
+                        )
+                    } else {
+                        Text(
+                            address.address,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
+                IconButton(onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS)) }) {
+                    Icon(imageVector = Icons.Default.Add, "")
+                }
+
             }
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 60.dp, end = 20.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 60.dp, end = 20.dp)
+            ) {
                 Divider()
             }
         }
@@ -313,15 +327,16 @@ fun TariffsContent(
     tariffListIcons: Array<Int>,
     mainViewModel: MainViewModel,
     tariffIcons: Array<Int>
-){
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(
-            Color.White,
-            shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
-        )
-        .padding(horizontal = 20.dp, vertical = 15.dp)
-    ){
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color.White,
+                shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
+            )
+            .padding(horizontal = 20.dp, vertical = 15.dp)
+    ) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -331,11 +346,18 @@ fun TariffsContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = selected_tariff?.value!!.name, fontWeight = FontWeight.Bold, fontSize = 25.sp)
+            Text(
+                text = selected_tariff?.value!!.name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp
+            )
             stateCalculate.response?.let {
-                Text(text = if(address_to[0].address == "") "от ${it.result.amount} c" else "${it.result.amount} c", fontSize = 25.sp)
+                Text(
+                    text = if (address_to[0].address == "") "от ${it.result.amount} c" else "${it.result.amount} c",
+                    fontSize = 25.sp
+                )
             }
-            if (stateCalculate.response == null || stateCalculate.error != ""){
+            if (stateCalculate.response == null || stateCalculate.error != "") {
                 CustomPulseLoader(isLoading = true)
             }
         }
@@ -356,14 +378,15 @@ fun TariffsContent(
                     .graphicsLayer(alpha = 0f + currentFraction)
                     .height(0.dp + (currentFraction * 80).dp),
                 painter = painterResource(
-                    when(selected_tariff.value!!.id) {
+                    when (selected_tariff.value!!.id) {
                         1 -> tariffIcons[0]
                         2 -> tariffIcons[1]
                         3 -> tariffIcons[2]
                         4 -> tariffIcons[2]
                         5 -> tariffIcons[3]
                         else -> tariffIcons[4]
-                    }),
+                    }
+                ),
                 contentDescription = "icon"
             )
         }
@@ -376,12 +399,13 @@ fun TariffsContent(
                 ) {
                     items(items = tariffs, itemContent = { tariff ->
                         TariffItem(
-                            icon = when(tariff.id){
-                                1->tariffListIcons[0]
-                                2-> tariffListIcons[1]
-                                4-> tariffListIcons[2]
-                                5-> tariffListIcons[3]
-                                else -> tariffListIcons[4] },
+                            icon = when (tariff.id) {
+                                1 -> tariffListIcons[0]
+                                2 -> tariffListIcons[1]
+                                4 -> tariffListIcons[2]
+                                5 -> tariffListIcons[3]
+                                else -> tariffListIcons[4]
+                            },
                             name = tariff.name,
                             price = tariff.min_price,
                             isSelected = selected_tariff?.value == tariff,
@@ -394,8 +418,8 @@ fun TariffsContent(
                 }
             }
         }
-        if (stateTariffs.response == null || stateTariffs.error != ""){
-                CustomRectangleShimmer(enabled = true)
+        if (stateTariffs.response == null || stateTariffs.error != "") {
+            CustomRectangleShimmer(enabled = true)
         }
     }
 }
@@ -403,7 +427,7 @@ fun TariffsContent(
 @SuppressLint("NewApi")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel()) {
+fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltViewModel()) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -419,17 +443,23 @@ fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                        stateOfDopInfoForDriver.value = "COMMENT_TO_ORDER"
-                        dopPhone()
+                    stateOfDopInfoForDriver.value = "COMMENT_TO_ORDER"
+                    dopPhone()
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(text = "Коментарий водителю", fontSize = 16.sp)
-            if(mainViewModel.commentToOrder.value!="")
-            Text(text = if(mainViewModel.commentToOrder.value.length<35)
-            mainViewModel.commentToOrder.value else "${mainViewModel.commentToOrder.value.take(35)}...", fontSize = 12.sp,color = Color.Gray)
+                if (mainViewModel.commentToOrder.value != "")
+                    Text(
+                        text = if (mainViewModel.commentToOrder.value.length < 35)
+                            mainViewModel.commentToOrder.value else "${
+                            mainViewModel.commentToOrder.value.take(
+                                35
+                            )
+                        }...", fontSize = 12.sp, color = Color.Gray
+                    )
             }
             Image(
                 modifier = Modifier.size(18.dp),
@@ -443,10 +473,9 @@ fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                    if(mainViewModel.dopPhone.value!="")
+                    if (mainViewModel.dopPhone.value != "")
                         mainViewModel.updateDopPhone("")
-                    else
-                    {
+                    else {
                         stateOfDopInfoForDriver.value = "TO_ANOTHER_HUMAN"
                         dopPhone()
                     }
@@ -456,16 +485,16 @@ fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel
         ) {
             Column {
                 Text(text = "Заказ другому человеку", fontSize = 16.sp)
-                if(mainViewModel.dopPhone.value!="")
+                if (mainViewModel.dopPhone.value != "")
                     Text(text = mainViewModel.dopPhone.value, fontSize = 12.sp, color = Color.Gray)
             }
-            if(mainViewModel.dopPhone.value!="")
+            if (mainViewModel.dopPhone.value != "")
                 Icon(
-                modifier = Modifier
-                    .size(18.dp),
-                imageVector = Icons.Default.Done,
-                contentDescription = "icon"
-            )
+                    modifier = Modifier
+                        .size(18.dp),
+                    imageVector = Icons.Default.Done,
+                    contentDescription = "icon"
+                )
         }
         Divider()
         Row(
@@ -487,7 +516,7 @@ fun OptionsContent(dopPhone:()->Unit,mainViewModel:MainViewModel = hiltViewModel
             Icon(
                 modifier = Modifier
                     .size(18.dp),
-                imageVector = if(mainViewModel.planTrip.value != "") Icons.Default.Done else Icons.Default.LockClock,
+                imageVector = if (mainViewModel.planTrip.value != "") Icons.Default.Done else Icons.Default.LockClock,
                 contentDescription = "icon"
             )
         }
@@ -500,17 +529,18 @@ fun AllowancesContent(
     stateAllowances: AllowancesResponseState,
     mainViewModel: MainViewModel,
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(
-            Color.White,
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-        )
-        .padding(horizontal = 20.dp, vertical = 15.dp)
-    ){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color.White,
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            )
+            .padding(horizontal = 20.dp, vertical = 15.dp)
+    ) {
         stateAllowances.response?.let { allowances ->
             if (allowances.size != 0) {
-                allowances.forEach { allowance->
+                allowances.forEach { allowance ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -518,13 +548,17 @@ fun AllowancesContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(modifier = Modifier.fillMaxWidth(0.7f),text = allowance.name, fontSize = 16.sp)
+                        Text(
+                            modifier = Modifier.fillMaxWidth(0.7f),
+                            text = allowance.name,
+                            fontSize = 16.sp
+                        )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = " (${allowance.price}c)",
                                 fontSize = 16.sp,
                                 color = Color.Gray,
-                                modifier=Modifier.padding(end = 18.dp)
+                                modifier = Modifier.padding(end = 18.dp)
                             )
                             CustomSwitch(switchON = allowance.isSelected) {
                                 mainViewModel.includeAllowance(allowance)
@@ -535,7 +569,7 @@ fun AllowancesContent(
                 }
             }
         }
-        if (stateAllowances.response == null || stateAllowances.error != ""){
+        if (stateAllowances.response == null || stateAllowances.error != "") {
             CustomLinearShimmer(enabled = true)
         }
     }

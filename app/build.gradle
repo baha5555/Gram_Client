@@ -147,6 +147,11 @@ dependencies {
     implementation "com.google.accompanist:accompanist-permissions:0.28.0"
     // Navigator
     implementation "cafe.adriel.voyager:voyager-navigator:1.0.0-rc03"
+    // BottomSheetNavigator
+    implementation "cafe.adriel.voyager:voyager-bottom-sheet-navigator:1.0.0-rc03"
     //Shimmer
     implementation 'com.valentinilk.shimmer:compose-shimmer:1.0.3'
+    //Reorder
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.7.0")
+
 }

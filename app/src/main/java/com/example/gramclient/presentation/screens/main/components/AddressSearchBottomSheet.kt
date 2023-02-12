@@ -32,8 +32,6 @@ fun AddressSearchBottomSheet(
     toAddress: List<Address>
 ) {
     val searchText = remember { mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
-    val isAddressList = remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -57,28 +55,6 @@ fun AddressSearchBottomSheet(
             FastAddresses(mainViewModel)
 //            Spacer(modifier = Modifier.height(15.dp))
 //            Services()
-        } else {
-            LaunchedEffect(Unit) {
-                delay(200)
-                focusRequester.requestFocus()
-            }
-            SearchTextField(
-                searchText = searchText,
-                focusRequester = focusRequester,
-                isSearchState = isSearchState,
-                scope = coroutineScope,
-                bottomSheetState = bottomSheetState
-            )
-            SearchResultContent(
-                searchText = searchText,
-                focusManager = focusManager,
-                isAddressList = isAddressList,
-                bottomSheetState = bottomSheetState,
-                isSearchState = isSearchState,
-                scope = coroutineScope,
-                mainViewModel = mainViewModel,
-                WHICH_ADDRESS = WHICH_ADDRESS
-            )
         }
     }
 }
