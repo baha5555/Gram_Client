@@ -34,6 +34,7 @@ import com.example.gramclient.utils.Constants
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
+import com.example.gramclient.presentation.components.voyager.AddStopScreen
 import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.components.*
@@ -209,6 +210,8 @@ fun AddressesContent(
     address_from: Address,
     address_to: List<Address>
 ) {
+    val mainViewModel: MainViewModel = hiltViewModel()
+    val toAddresses = mainViewModel.toAddresses
     val bottomNavigator= LocalBottomSheetNavigator.current
     Column(
         modifier = Modifier
@@ -270,48 +273,62 @@ fun AddressesContent(
         ) {
             Divider()
         }
-        address_to.forEach { address ->
-            Row(
-                modifier = Modifier
-                    .clickable {
+        toAddresses.forEach{
+
+        }
+        Row(
+            modifier = Modifier
+                .clickable {
+                    if(toAddresses.size<=1){
                         bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS))
+                    }else{
+                        bottomNavigator.show(AddStopScreen())
                     }
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 15.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        modifier = Modifier
-                            .size(20.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.to_marker),
-                        contentDescription = "Logo"
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
-                    if (address.address == "") {
+                }
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 15.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.to_marker),
+                    contentDescription = "Logo"
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                when (toAddresses.size) {
+                    0 -> {
                         Text(
                             text = "Куда едем?", color = Color.Gray,
                             maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
-                    } else {
+                    }
+                    1 -> {
                         Text(
-                            address.address,
+                            toAddresses[0].address,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    else -> {
+                        Text(
+                            ""+toAddresses.size+" остоновки",
                             maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
-                IconButton(onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS)) }) {
-                    Icon(imageVector = Icons.Default.Add, "")
-                }
+            }
+            IconButton(onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS)) }) {
+                Icon(imageVector = Icons.Default.Add, "")
+            }
 
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 60.dp, end = 20.dp)
-            ) {
-                Divider()
-            }
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 60.dp, end = 20.dp)
+        ) {
+            Divider()
         }
     }
 }

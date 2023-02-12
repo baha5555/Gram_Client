@@ -45,11 +45,7 @@ fun AddressSearchBottomSheet(
         if (!isSearchState.value) {
             if(searchText.value !="") searchText.value = ""
             ToAddressField(
-                WHICH_ADDRESS = WHICH_ADDRESS,
-                toAddress = toAddress,
-                isSearchState = isSearchState,
-                bottomSheetState = bottomSheetState,
-                scope = coroutineScope
+                toAddress = toAddress
             )
             Spacer(modifier = Modifier.height(15.dp))
             FastAddresses(mainViewModel)

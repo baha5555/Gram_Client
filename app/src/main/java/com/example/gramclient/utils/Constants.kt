@@ -12,6 +12,7 @@ object Constants {
     const val PREFIX="992"
     const val FROM_ADDRESS="FROM_ADDRESS"
     const val TO_ADDRESS="TO_ADDRESS"
+    const val ADD_TO_ADDRESS="ADD_TO_ADDRESS"
     const val SOON = "(Скоро)"
     var stateOfDopInfoForDriver = mutableStateOf("")
     val STATE_ARROW_BACK_IN_ADDRESS_SEARCH_SCREEN = mutableStateOf(false)

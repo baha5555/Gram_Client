@@ -37,10 +37,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ToAddressField(
-    WHICH_ADDRESS: MutableState<String>,
-    isSearchState: MutableState<Boolean>,
-    bottomSheetState: BottomSheetScaffoldState,
-    scope: CoroutineScope,
     toAddress: List<Address>
 ) {
     val navigator = LocalNavigator.currentOrThrow
@@ -53,12 +49,6 @@ fun ToAddressField(
                 .clip(RoundedCornerShape(20.dp))
                 .clickable {
                     bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS))
-                    return@clickable
-                    scope.launch {
-                        bottomSheetState.bottomSheetState.expand()
-                    }
-                    isSearchState.value = true
-                    WHICH_ADDRESS.value = Constants.TO_ADDRESS
                 }
                 .background(PrimaryColor)
                 .padding(horizontal = 5.dp)

@@ -14,3 +14,7 @@ data class Address(
 //    val synonyms: Any,
 //    val village: String
 )
+data class Address2(
+    var address: String="",
+    var id: Int=0
+)

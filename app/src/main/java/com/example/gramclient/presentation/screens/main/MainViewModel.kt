@@ -5,10 +5,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,6 +25,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.burnoutcrew.reorderable.ItemPosition
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -64,8 +63,9 @@ class MainViewModel @Inject constructor(
     private var _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
     val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
 
-    private val _toAddress = mutableStateOf(listOf<Address>(Address("", 0, "", "")))
-    private val _toAddresses = mutableStateListOf<Address>()
+    private var _toAddress = mutableStateOf(listOf<Address>(Address("", 0, "", "")))
+    private var _toAddresses = mutableStateListOf<Address>()
+    val toAddresses : SnapshotStateList<Address> = _toAddresses
     val toAddress: State<List<Address>> = _toAddress
 
     private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
@@ -80,6 +80,18 @@ class MainViewModel @Inject constructor(
 
     private val _commentToOrder = mutableStateOf("")
     val commentToOrder = _commentToOrder
+
+    //var data = List(10) { "item $it" }.toMutableStateList()
+    //var data = toAddresses
+
+    fun move(from: ItemPosition, to: ItemPosition) {
+        _toAddresses = _toAddresses.apply {
+            add(to.index, removeAt(from.index))
+        }
+    }
+    fun removeAddStop(address: Address?) {
+        _toAddresses.remove(address)
+    }
 
     fun updateFromAddress(address:Address) {
         _fromAddress.value = address
@@ -106,6 +118,8 @@ class MainViewModel @Inject constructor(
     }
     fun addToAddress(address:Address?) {
         if(address != null){
+            if(_toAddresses.contains(address)) return
+            _toAddresses.add(address)
         }
     }
 

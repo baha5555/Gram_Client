@@ -158,17 +158,20 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) :Screen
                                     addressText = it.address,
                                     onItemClick = { selectedAddress ->
                                         address.value = selectedAddress
-                                        when(whichScreen){
-                                            Constants.TO_ADDRESS->{
-                                                mainViewModel.updateToAddress(it)
-                                            }
-                                            else -> {
-                                                mainViewModel.updateFromAddress(it)
-                                            }
-                                        }
                                         bottomNavigator.hide()
                                         if (keyboardController != null) {
                                             keyboardController.hide()
+                                        }
+                                        when(whichScreen){
+                                            Constants.TO_ADDRESS -> {
+                                                mainViewModel.updateToAddress(it)
+                                            }
+                                            Constants.ADD_TO_ADDRESS -> {
+                                                mainViewModel.addToAddress(it)
+                                            }
+                                            Constants.FROM_ADDRESS -> {
+                                                mainViewModel.updateFromAddress(it)
+                                            }
                                         }
                                     }
                                 )

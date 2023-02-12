@@ -160,14 +160,6 @@ fun CustomMainMap(
 
     if (stateStatusGPS.value) {
         val scope = rememberCoroutineScope()
-        val startPointForMarker = remember {
-            mutableStateOf(
-                GeoPoint(
-                    if (mainViewModel.toAddress.value[0].address_lat != "") mainViewModel.toAddress.value[0].address_lat.toDouble() else 40.27803692395751,
-                    if (mainViewModel.toAddress.value[0].address_lng != "") mainViewModel.toAddress.value[0].address_lng.toDouble() else 69.62923931506361
-                )
-            )
-        }
 
         AndroidView(
             factory = {
@@ -295,10 +287,6 @@ fun CustomMainMap(
                                                     }
                                                     Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
-                                                    startPointForMarker.value = GeoPoint(
-                                                        map.mapCenter.latitude,
-                                                        map.mapCenter.longitude
-                                                    )
                                                 }
                                                 MotionEvent.ACTION_CANCEL -> {
                                                     Log.e(
@@ -357,10 +345,6 @@ fun CustomMainMap(
                                                     }
                                                     Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
-                                                    startPointForMarker.value = GeoPoint(
-                                                        map.mapCenter.latitude,
-                                                        map.mapCenter.longitude
-                                                    )
                                                 }
                                                 else -> {
                                                     Log.e(
@@ -377,7 +361,6 @@ fun CustomMainMap(
                             MapEventsOverlay(object : MapEventsReceiver {
                                 override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
                                     map.postInvalidate()
-                                    startPointForMarker.value = GeoPoint(p.latitude, p.longitude)
                                     if (WHICH_ADDRESS != null) {
                                         mainViewModel.getAddressFromMap(
                                             map.mapCenter.longitude,
