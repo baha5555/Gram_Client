@@ -83,7 +83,6 @@ class MainScreen : Screen{
         val coroutineScope = rememberCoroutineScope()
 
         var initialApiCalled by rememberSaveable { mutableStateOf(false) }
-        var isSearchState = remember { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
 
         val prefs = CustomPreference(LocalContext.current)
@@ -101,7 +100,6 @@ class MainScreen : Screen{
 
         LaunchedEffect(mainBottomSheetState.bottomSheetState.currentValue) {
             if (mainBottomSheetState.bottomSheetState.isCollapsed) {
-                isSearchState.value = false
                 Log.e("singleTapConfirmedHelper", "isCollapsed")
             } else {
                 Log.e("singleTapConfirmedHelper", "isExpanded")
@@ -281,13 +279,11 @@ class MainScreen : Screen{
                     contentAlignment = Alignment.CenterStart
                 ) {
                     Scaffold(scaffoldState = scaffoldState, bottomBar = {
-                        if (!isSearchState.value) {
-                            BottomBar(mainBottomSheetState, modalSheetState,
-                                createOrder = {
-                                    mainViewModel.createOrder(orderExecutionViewModel)
-                                }
-                            )
-                        }
+                        BottomBar(mainBottomSheetState, modalSheetState,
+                            createOrder = {
+                                mainViewModel.createOrder(orderExecutionViewModel)
+                            }
+                        )
                     }) {
                         BottomSheetScaffold(
                             sheetBackgroundColor = Color.Transparent,
@@ -325,9 +321,7 @@ class MainScreen : Screen{
                                     mainViewModel = mainViewModel,
                                     stateCalculate = stateCalculate,
                                     stateTariffs = stateTariffs,
-                                    stateAllowances = stateAllowances,
-                                    isSearchState = isSearchState,
-                                    focusRequester = focusRequester,
+                                    stateAllowances = stateAllowances
                                 ) {
                                     if (stateOfDopInfoForDriver.value != "PLAN_TRIP" && stateOfDopInfoForDriver.value != "") {
                                         val inputMethodManager =

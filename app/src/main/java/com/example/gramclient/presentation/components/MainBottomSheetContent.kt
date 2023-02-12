@@ -58,8 +58,6 @@ fun MainBottomSheetContent(
     stateCalculate: CalculateResponseState,
     stateTariffs: TariffsResponseState,
     stateAllowances: AllowancesResponseState,
-    isSearchState: MutableState<Boolean>,
-    focusRequester: FocusRequester,
     dopPhone: () -> Unit
 ) {
     val tariffIcons = arrayOf(
@@ -77,82 +75,47 @@ fun MainBottomSheetContent(
         R.drawable.car_miniven_icon,
         R.drawable.courier_icon
     )
-
-
     val fromAddress by mainViewModel.fromAddress
     val toAddress = mainViewModel.toAddresses
     val selected_tariff = mainViewModel.selectedTariff?.observeAsState()
-
-    var WHICH_ADDRESS = remember { mutableStateOf("") }
-    val isAddressList = remember { mutableStateOf(true) }
-
     val searchText = remember { mutableStateOf("") }
-
-    val focusManager = LocalFocusManager.current
-
-    val coroutineScope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .focusRequester(focusRequester)
             .fillMaxHeight(fraction = heightFraction)
     ) {
-        if (!isSearchState.value) {
-            if (searchText.value != "")
-                searchText.value = ""
-            SheetContent(
-                currentFraction = scaffoldState.currentFraction,
-                addressContent = {
-                    AddressesContent(
-                        currentFraction = scaffoldState.currentFraction,
-                        address_from = fromAddress
-                    )
-                },
-                tariffsContent = {
-                    TariffsContent(
-                        currentFraction = scaffoldState.currentFraction,
-                        selected_tariff = selected_tariff,
-                        stateCalculate = stateCalculate,
-                        address_to = toAddress,
-                        stateTariffs = stateTariffs,
-                        tariffListIcons = tariffListIcons,
-                        mainViewModel = mainViewModel,
-                        tariffIcons = tariffIcons
-                    )
-                },
-                optionsContent = {
-                    OptionsContent(dopPhone)
-                },
-                allowancesContent = {
-                    AllowancesContent(
-                        stateAllowances = stateAllowances,
-                        mainViewModel = mainViewModel,
-                    )
-                }
-            )
-        } else {
-            LaunchedEffect(Unit) {
-                delay(200)
-                focusRequester.requestFocus()
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Color.White,
-                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-                    )
-                    .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)
-            ) {
-                SearchTextField(
-                    searchText = searchText,
-                    focusRequester = focusRequester,
-                    isSearchState = isSearchState,
-                    bottomSheetState = scaffoldState,
-                    scope = coroutineScope
+        if (searchText.value != "")
+            searchText.value = ""
+        SheetContent(
+            currentFraction = scaffoldState.currentFraction,
+            addressContent = {
+                AddressesContent(
+                    currentFraction = scaffoldState.currentFraction,
+                    address_from = fromAddress
+                )
+            },
+            tariffsContent = {
+                TariffsContent(
+                    currentFraction = scaffoldState.currentFraction,
+                    selected_tariff = selected_tariff,
+                    stateCalculate = stateCalculate,
+                    address_to = toAddress,
+                    stateTariffs = stateTariffs,
+                    tariffListIcons = tariffListIcons,
+                    mainViewModel = mainViewModel,
+                    tariffIcons = tariffIcons
+                )
+            },
+            optionsContent = {
+                OptionsContent(dopPhone)
+            },
+            allowancesContent = {
+                AllowancesContent(
+                    stateAllowances = stateAllowances,
+                    mainViewModel = mainViewModel,
                 )
             }
-        }
+        )
     }
 }
 
@@ -304,7 +267,7 @@ fun AddressesContent(
                     }
                     else -> {
                         Text(
-                            "" + toAddresses.size + " остоновки",
+                            "" + toAddresses.size + " - остановки",
                             maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
                     }

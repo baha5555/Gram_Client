@@ -109,7 +109,7 @@ class AddStopScreen : Screen {
                         .height(50.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Добавить остоновку", color = Color.White, fontSize = 16.sp)
+                    Text("Добавить остановку", color = Color.White, fontSize = 16.sp)
                 }
             }
         }
