@@ -66,10 +66,10 @@ interface ApplicationApi {
     ): AddressByPointResponse
 
     @FormUrlEncoded
-    @POST("/api/orders/{order_id}/add-rating")
+    @POST("/api/orders/add-rating")
     suspend fun sendRating(
         @Header("Authorization") token: String,
-        @Path("order_id") order_id: Int,
+        @Query("order_id") order_id: Int,
         @Field("add_rating") add_rating: Int,
     ): AddRatingResponse
 
@@ -101,10 +101,10 @@ interface ApplicationApi {
         @Field("to_addresses") to_addresses: String?,
     ): CalculateResponse
 
-    @POST("/api/orders/{order_id}/cancel")
+    @POST("/api/orders/cancel")
     suspend fun cancelOrder(
         @Header("Authorization") token: String,
-        @Path("order_id") order_id: Int,
+        @Query("order_id") order_id: Int,
     ): CancelOrderResponse
 
     @GET("/api/orders/active")
