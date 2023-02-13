@@ -1,5 +1,6 @@
 package com.example.gramclient.domain.mainScreen.order
 
+import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
@@ -22,23 +23,23 @@ class GetPriceUseCase @Inject constructor(private val repository: AppRepository)
     ): Flow<Resource<CalculateResponse>> =
         flow{
             try {
-                emit(Resource.Loading<CalculateResponse>())
-                var jsonToAddress: String? = null
-                if(to_addresses != null) {
-                    jsonToAddress = Gson().toJson(to_addresses)
+                emit(Resource.Loading())
+                val toAddressesList = arrayListOf<String>()
+                to_addresses?.forEach{
+                    toAddressesList.add("{\"search_address_id\":${it.id}}")
                 }
-                val response: CalculateResponse = repository.getPrice(tariff_id, allowances, from_address, jsonToAddress)
-                emit(Resource.Success<CalculateResponse>(response))
+                val response: CalculateResponse = repository.getPrice(tariff_id, allowances, from_address, toAddressesList.toString())
+                emit(Resource.Success(response))
             }catch (e: HttpException) {
                 emit(
-                    Resource.Error<CalculateResponse>(
+                    Resource.Error(
                         e.localizedMessage ?: "Произошла непредвиденная ошибка"
                     )
                 )
             } catch (e: IOException) {
-                emit(Resource.Error<CalculateResponse>("Не удалось связаться с сервером. Проверьте подключение к Интернету."))
+                emit(Resource.Error("Не удалось связаться с сервером. Проверьте подключение к Интернету."))
             } catch (e: Exception) {
-                emit(Resource.Error<CalculateResponse>("${e.message}"))
+                emit(Resource.Error("${e.message}"))
             }
         }
 }

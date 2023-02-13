@@ -370,15 +370,14 @@ class MainViewModel @Inject constructor(
                         Log.e("AddressByPointResponse", "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}")
                         when(WHICH_ADDRESS.value){
                             Constants.FROM_ADDRESS -> {
-                                updateFromAddress(
-                                    Address(_stateAddressPoint.value.response!!.name,
-                                        _stateAddressPoint.value.response!!.id,
-                                        _stateAddressPoint.value.response!!.lat,
-                                        _stateAddressPoint.value.response!!.lng)
-                                )
+
                             }
                             Constants.TO_ADDRESS -> {
-
+                                clearToAddress()
+                                addToAddress(Address(_stateAddressPoint.value.response!!.name,
+                                    _stateAddressPoint.value.response!!.id,
+                                    _stateAddressPoint.value.response!!.lat,
+                                    _stateAddressPoint.value.response!!.lng))
                             }
                         }
                         Log.e("singleTapConfirmedHelper", "${toAddresses.size}")
