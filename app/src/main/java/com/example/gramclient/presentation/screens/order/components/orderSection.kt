@@ -44,7 +44,8 @@ fun orderSection(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(){
+            Row(modifier = Modifier
+                .fillMaxWidth(0.9f)){
                 Image(
                     modifier = Modifier
                         .size(20.dp),
@@ -52,10 +53,11 @@ fun orderSection(
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                Text(text = order.from_address?.address ?: "Откуда?", maxLines = 1, overflow = TextOverflow.Ellipsis, color= Color.Black)
+                Text(text = order.from_address?.address ?: "Откуда?"/*, maxLines = 1*/, overflow = TextOverflow.Ellipsis, color= Color.Black)
             }
             Image(
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(18.dp)
+                    .fillMaxWidth(0.1f),
                 imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
                 contentDescription = "icon"
             )

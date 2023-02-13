@@ -1,6 +1,7 @@
 package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
@@ -49,6 +50,8 @@ import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.example.gramclient.utils.Values
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 val orderCount = mutableStateOf(-1)
 
@@ -120,7 +123,7 @@ class SearchDriverScreen : Screen {
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Row(verticalAlignment = Alignment.CenterVertically,modifier=Modifier.fillMaxWidth(0.8f)) {
                                         Image(
                                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
                                             contentDescription = "car_eco",
@@ -134,7 +137,9 @@ class SearchDriverScreen : Screen {
                                         )
                                     }
                                     Row(
-                                        modifier = Modifier.padding(end = 10.dp),
+                                        modifier = Modifier
+                                            .padding(end = 10.dp)
+                                            .fillMaxWidth(0.35f),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Divider(
@@ -293,7 +298,7 @@ class SearchDriverScreen : Screen {
         }
     }
 
-    @SuppressLint("SimpleDateFormat", "CoroutineCreationDuringComposition")
+    @SuppressLint("SimpleDateFormat", "CoroutineCreationDuringComposition", "NewApi")
     @Composable
     fun orderCard(
         orderExecutionViewModel: OrderExecutionViewModel,
@@ -362,7 +367,7 @@ class SearchDriverScreen : Screen {
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column() {
+                Column(modifier=Modifier.fillMaxWidth(0.75f)) {
                     Text(
                         text = if (order.performer == null) "Ищем ближайших водителей..."
                         else {
@@ -385,9 +390,7 @@ class SearchDriverScreen : Screen {
                         color = Color.Black
                     )
                 }
-                if (order.performer == null) {
-                    Text(text = "00:00", fontSize = 14.sp, color = Color.Black)
-                } else {
+                    if (order.performer != null)  {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = order.performer.transport?.car_number ?: "",
@@ -505,5 +508,4 @@ class SearchDriverScreen : Screen {
             ) {}
         }
     }
-
 }
