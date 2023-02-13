@@ -14,6 +14,7 @@ import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.orderHistory.Character
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
@@ -47,6 +48,12 @@ interface ApplicationApi {
 
     @GET("/api/orders")
     suspend fun getOrderHistory(@Header("Authorization") token: String): orderHistoryResponse
+
+    @GET("/api/orders")
+    suspend fun getOrderHistoryCharacter(
+        @Header("Authorization") token: String,
+        @Query("page") page:Int
+    ): Character
 
     @Multipart
     @POST("/api/profile")

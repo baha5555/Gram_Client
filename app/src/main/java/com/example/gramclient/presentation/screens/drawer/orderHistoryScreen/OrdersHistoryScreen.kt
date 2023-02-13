@@ -3,7 +3,6 @@ package com.example.gramclient.presentation.screens.drawer.orderHistoryScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,11 +15,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import cafe.adriel.voyager.core.screen.Screen
 import com.example.gramclient.R
+import com.example.gramclient.domain.orderHistory.ToAddresse
 import com.example.gramclient.domain.orderHistoryScreen.OrderHistoryResult
-import com.example.gramclient.domain.orderHistoryScreen.ToAddresse
 import com.example.gramclient.presentation.components.CustomTopBar
 import com.example.gramclient.presentation.components.LoadingIndicator
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -36,6 +36,8 @@ class OrdersHistoryScreen : Screen{
         val ordersHistory: List<OrderHistoryResult>? =
             stateGetOrderHistory.value.response
         val state = rememberSwipeRefreshState(stateGetOrderHistory.value.isLoading)
+        val character= viewModel.character.collectAsLazyPagingItems()
+        val toAddresse = ordersHistory?.forEach { it.to_addresses?.size }
         LaunchedEffect(key1 = true) {
             viewModel.getOrderHistory()
         }
@@ -57,20 +59,19 @@ class OrdersHistoryScreen : Screen{
                         viewModel.getOrderHistory()
                     }
                 ) {
-                    LazyColumn {
-                        items(taxiOrdersNonNull) { item: OrderHistoryResult ->
-                            item.to_addresses?.let { toAddress ->
-                                item.from_address?.name?.let { fromAddress ->
-                                    ListHistoryItem(
-                                        status = item.status,
-                                        createdAt = item.created_at,
-                                        fromAddress = fromAddress,
-                                        toAddresse = toAddress
-                                    )
-                                }
+                    LazyColumn(content = {
+                        items(character){item->
+                            item?.data?.forEach {
+                                ListHistoryItem(
+                                    status = it.status,
+                                    createdAt = it.created_at,
+                                    fromAddress = it.from_address.name,
+                                    toAddresse =it.to_addresses
+                                )
                             }
+
                         }
-                    }
+                    })
                 }
             }
         }
