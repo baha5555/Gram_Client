@@ -82,7 +82,7 @@ fun searchSection(
                     }
                 }
             },
-            placeholder = { Text(text = "Введите адрес для поиска") },
+            placeholder = { Text(text = "Введите адрес для поиска",modifier=Modifier.fillMaxWidth(0.9f)) },
             singleLine = true,
             shape = RoundedCornerShape(15.dp),
             colors = TextFieldDefaults.textFieldColors(
