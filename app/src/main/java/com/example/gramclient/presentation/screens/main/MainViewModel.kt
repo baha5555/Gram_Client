@@ -2,12 +2,14 @@ package com.example.gramclient.presentation.screens.main
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +20,8 @@ import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesRespon
 import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesUseCase
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.screens.main.states.*
+import com.example.gramclient.presentation.screens.map.map
+import com.example.gramclient.presentation.screens.map.showRoadAB
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
@@ -29,6 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    application: Application,
     private val getTariffsUseCase: GetTariffsUseCase,
     private val getAllowancesUseCase: GetAllowancesUseCase,
     private val getAddressByPointUseCase: GetAddressByPointUseCase,
@@ -36,7 +41,8 @@ class MainViewModel @Inject constructor(
     private val createOrderUseCase: CreateOrderUseCase,
     private val getPriceUseCase: GetPriceUseCase,
     private val fastAddressesUseCase: FastAddressesUseCase
-):ViewModel() {
+) : AndroidViewModel(application) {
+    val context get() = getApplication<Application>()
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
     val stateTariffs: State<TariffsResponseState> = _stateTariffs
@@ -56,13 +62,15 @@ class MainViewModel @Inject constructor(
     private val _stateCreateOrder = mutableStateOf(OrderResponseState())
     val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
-    val selectedTariff :MutableLiveData<TariffsResult>? = MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом", 12))
+    val selectedTariff: MutableLiveData<TariffsResult>? =
+        MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом", 12))
 
-    private var _selectedAllowances: MutableList<AllowanceRequest> = mutableListOf<AllowanceRequest>()
+    private var _selectedAllowances: MutableList<AllowanceRequest> =
+        mutableListOf<AllowanceRequest>()
     val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
 
     private var _toAddresses = mutableStateListOf<Address>()
-    val toAddresses : SnapshotStateList<Address> = _toAddresses
+    val toAddresses: SnapshotStateList<Address> = _toAddresses
 
     private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
     val fromAddress: State<Address> = _fromAddress
@@ -84,42 +92,58 @@ class MainViewModel @Inject constructor(
         _toAddresses = _toAddresses.apply {
             add(to.index, removeAt(from.index))
         }
+        showRoad()
     }
+
     fun removeAddStop(address: Address?) {
         _toAddresses.remove(address)
+        showRoad()
     }
 
-    fun updateFromAddress(address:Address) {
+    fun updateFromAddress(address: Address) {
         _fromAddress.value = address
-        Log.i("addresses", "From-"+address)
+        showRoad()
+        Log.i("addresses", "From-" + address)
     }
 
-    fun updatePlanTrip(plan:String){
+    fun updatePlanTrip(plan: String) {
         _planTrip.value = plan
     }
 
-    fun updateDopPhone(phone:String){
+    fun updateDopPhone(phone: String) {
         _dopPhone.value = phone
     }
 
-    fun updateCommentToOrder(comment:String){
+    fun updateCommentToOrder(comment: String) {
         _commentToOrder.value = comment
     }
 
-    fun updateToAddress(inx:Int, address:Address?) {
-        if(_toAddresses.size==0) addToAddress(address)
-        else{
+    fun updateToAddress(inx: Int, address: Address?) {
+        if (_toAddresses.size == 0) addToAddress(address)
+        else {
             if (address != null) {
                 _toAddresses[inx] = address
+                showRoad()
             }
         }
     }
-    fun addToAddress(address:Address?) {
-        if(address != null){
-            if(_toAddresses.contains(address)) return
+
+    fun addToAddress(address: Address?) {
+        if (address != null) {
+            if (_toAddresses.contains(address)) return
             _toAddresses.add(address)
+            showRoad()
         }
     }
+    fun showRoad(){
+        map.overlays.clear()
+        showRoadAB(
+            context,
+            _fromAddress,
+            _toAddresses
+        )
+    }
+
     fun clearToAddress() {
         _toAddresses.clear()
     }
@@ -127,38 +151,53 @@ class MainViewModel @Inject constructor(
     fun updateSelectedTariff(
         value: TariffsResult,
     ) {
-        selectedTariff?.value=value
+        selectedTariff?.value = value
         _selectedAllowances = mutableListOf()
-        selectedAllowances.value=_selectedAllowances
+        selectedAllowances.value = _selectedAllowances
         getPrice()
     }
 
-    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance){
-        if(toDesiredAllowance.isSelected.value){
-            Log.e("IncludeAllowance", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance) {
+        if (toDesiredAllowance.isSelected.value) {
+            Log.e(
+                "IncludeAllowance",
+                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
+            )
             _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
-            selectedAllowances.value=_selectedAllowances
+            selectedAllowances.value = _selectedAllowances
             getPrice()
-            Log.e("IncludeAllowance", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
-        }else{
-            Log.e("IncludeAllowance", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            Log.e(
+                "IncludeAllowance",
+                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
+            )
+        } else {
+            Log.e(
+                "IncludeAllowance",
+                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
+            )
             _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
-            selectedAllowances.value=_selectedAllowances
+            selectedAllowances.value = _selectedAllowances
             getPrice()
-            Log.e("IncludeAllowance", "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}")
+            Log.e(
+                "IncludeAllowance",
+                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
+            )
         }
     }
 
-    fun getTariffs(){
+    fun getTariffs() {
         getTariffsUseCase.invoke().onEach { result: Resource<TariffsResponse> ->
-            when (result){
+            when (result) {
                 is Resource.Success -> {
                     try {
                         val tariffsResponse: TariffsResponse? = result.data
                         _stateTariffs.value =
                             TariffsResponseState(response = tariffsResponse?.result)
-                        Log.e("TariffsResponse", "TariffsResponseSuccess->\n ${_stateTariffs.value}")
-                    }catch (e: Exception) {
+                        Log.e(
+                            "TariffsResponse",
+                            "TariffsResponseSuccess->\n ${_stateTariffs.value}"
+                        )
+                    } catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
@@ -175,101 +214,122 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getAllowancesByTariffId(tariff_id:Int){
-        getAllowancesUseCase.invoke(tariff_id = tariff_id).onEach { result: Resource<AllowancesResponse> ->
-            when (result){
-                is Resource.Success -> {
-                    try {
-                        val allowancesResponse: AllowancesResponse? = result.data
-                        _stateAllowances.value =
-                            AllowancesResponseState(response = allowancesResponse?.result?.map { it.toDesiredAllowance() })
-                        Log.e("AllowancesResponse", "AllowancesResponseSuccess->\n ${_stateAllowances.value}")
-                    }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+    fun getAllowancesByTariffId(tariff_id: Int) {
+        getAllowancesUseCase.invoke(tariff_id = tariff_id)
+            .onEach { result: Resource<AllowancesResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val allowancesResponse: AllowancesResponse? = result.data
+                            _stateAllowances.value =
+                                AllowancesResponseState(response = allowancesResponse?.result?.map { it.toDesiredAllowance() })
+                            Log.e(
+                                "AllowancesResponse",
+                                "AllowancesResponseSuccess->\n ${_stateAllowances.value}"
+                            )
+                        } catch (e: Exception) {
+                            Log.d("Exception", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
+                        Log.e("AllowancesResponse", "AllowancesResponseError->\n ${result.message}")
+                        _stateAllowances.value = AllowancesResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateAllowances.value = AllowancesResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("AllowancesResponse", "AllowancesResponseError->\n ${result.message}")
-                    _stateAllowances.value = AllowancesResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateAllowances.value = AllowancesResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
-    fun getAddressByPoint(lng: Double, lat: Double){
-        getAddressByPointUseCase.invoke(lng, lat).onEach { result: Resource<AddressByPointResponse> ->
-            when (result){
-                is Resource.Success -> {
-                    try {
-                        val addressResponse: AddressByPointResponse? = result.data
-                        _stateAddressPoint.value =
-                            AddressByPointResponseState(response = addressResponse?.result)
-                        Log.e("AddressByPointResponse", "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}")
-                        updateFromAddress(
-                            Address(_stateAddressPoint.value.response!!.name,
-                            _stateAddressPoint.value.response!!.id,
-                            _stateAddressPoint.value.response!!.lat,
-                            _stateAddressPoint.value.response!!.lng)
+    fun getAddressByPoint(lng: Double, lat: Double) {
+        getAddressByPointUseCase.invoke(lng, lat)
+            .onEach { result: Resource<AddressByPointResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val addressResponse: AddressByPointResponse? = result.data
+                            _stateAddressPoint.value =
+                                AddressByPointResponseState(response = addressResponse?.result)
+                            Log.e(
+                                "AddressByPointResponse",
+                                "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
+                            )
+                            updateFromAddress(
+                                Address(
+                                    _stateAddressPoint.value.response!!.name,
+                                    _stateAddressPoint.value.response!!.id,
+                                    _stateAddressPoint.value.response!!.lat,
+                                    _stateAddressPoint.value.response!!.lng
+                                )
+                            )
+                        } catch (e: Exception) {
+                            Log.d("AddressByPointResponse", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
+                        Log.e(
+                            "AddressByPointResponse",
+                            "AddressByPointResponseError->\n ${result.message}"
                         )
-                    }catch (e: Exception) {
-                        Log.d("AddressByPointResponse", "${e.message} Exception")
+                        _stateAddressPoint.value = AddressByPointResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("AddressByPointResponse", "AddressByPointResponseError->\n ${result.message}")
-                    _stateAddressPoint.value = AddressByPointResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun getActualLocation(context: Context) {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(
-            context)
+            context
+        )
         val task = fusedLocationProviderClient.lastLocation
 
         if (ActivityCompat
                 .checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED && ActivityCompat
                 .checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED){
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
-            ActivityCompat.requestPermissions(context as Activity, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 101)
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                101
+            )
             return
         }
 
         task.addOnSuccessListener {
-            if (it != null){
+            if (it != null) {
                 getAddressByPoint(it.longitude, it.latitude)
-                Log.e("ActualLocation","Location - > ${it.longitude}  + ${it.latitude}")
-            }
-            else{
+                Log.e("ActualLocation", "Location - > ${it.longitude}  + ${it.latitude}")
+            } else {
                 Log.e("ActualLocation", "NULL")
             }
         }
 
     }
 
-    fun searchAddress(addressName: String){
+    fun searchAddress(addressName: String) {
         searchAddressUseCase.invoke(addressName).onEach { result: Resource<SearchAddressResponse> ->
-            when (result){
+            when (result) {
                 is Resource.Success -> {
                     try {
                         val addressResponse: SearchAddressResponse? = result.data
                         _stateSearchAddress.value =
                             SearchAddressResponseState(response = addressResponse?.result)
-                        Log.e("SearchAddressResponse", "SearchAddressResponseSuccess->\n ${_stateSearchAddress.value}")
-                    }catch (e: Exception) {
+                        Log.e(
+                            "SearchAddressResponse",
+                            "SearchAddressResponseSuccess->\n ${_stateSearchAddress.value}"
+                        )
+                    } catch (e: Exception) {
                         Log.d("SearchAddressResponse", "${e.message} Exception")
                     }
                 }
@@ -288,15 +348,17 @@ class MainViewModel @Inject constructor(
 
     fun createOrder(orderExecutionViewModel: OrderExecutionViewModel) {
         createOrderUseCase.invoke(
-            dop_phone = if(_dopPhone.value!="")_dopPhone.value else null,
-            from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
-            to_addresses = if(toAddresses.size!=0) toAddresses else null,
-            comment = if(_commentToOrder.value!="")_commentToOrder.value else null,
+            dop_phone = if (_dopPhone.value != "") _dopPhone.value else null,
+            from_address = if (fromAddress.value.id != 0) fromAddress.value.id else null,
+            to_addresses = if (toAddresses.size != 0) toAddresses else null,
+            comment = if (_commentToOrder.value != "") _commentToOrder.value else null,
             tariff_id = selectedTariff?.value?.id ?: 1,
-            allowances = if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
-            date_time = if(_planTrip.value!="") _planTrip.value else null
+            allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
+                selectedAllowances.value
+            ) else null,
+            date_time = if (_planTrip.value != "") _planTrip.value else null
         ).onEach { result: Resource<OrderResponse> ->
-            when (result){
+            when (result) {
                 is Resource.Success -> {
                     try {
                         updateDopPhone("")
@@ -305,9 +367,12 @@ class MainViewModel @Inject constructor(
                         val response: OrderResponse? = result.data
                         _stateCreateOrder.value =
                             OrderResponseState(response = response)
-                        Log.e("OrderResponse", "OrderResponseSuccess->\n ${_stateCreateOrder.value}\n -> ${_planTrip.value}")
+                        Log.e(
+                            "OrderResponse",
+                            "OrderResponseSuccess->\n ${_stateCreateOrder.value}\n -> ${_planTrip.value}"
+                        )
                         orderExecutionViewModel.getActiveOrders()
-                    }catch (e: Exception) {
+                    } catch (e: Exception) {
                         Log.d("OrderResponse", "${e.message} Exception")
                     }
                 }
@@ -327,18 +392,23 @@ class MainViewModel @Inject constructor(
     fun getPrice() {
         getPriceUseCase.invoke(
             tariff_id = selectedTariff?.value?.id ?: 1,
-            allowances = if(selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(selectedAllowances.value) else null,
-            from_address = if(fromAddress.value.id != 0) fromAddress.value.id else null,
-            to_addresses = if(toAddresses.size!=0) toAddresses else null
+            allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
+                selectedAllowances.value
+            ) else null,
+            from_address = if (fromAddress.value.id != 0) fromAddress.value.id else null,
+            to_addresses = if (toAddresses.size != 0) toAddresses else null
         ).onEach { result: Resource<CalculateResponse> ->
-            when (result){
+            when (result) {
                 is Resource.Success -> {
                     try {
                         val response: CalculateResponse? = result.data
                         _stateCalculate.value =
                             CalculateResponseState(response = response)
-                        Log.e("CalculateResponse", "CalculateResponseSuccess->\n ${_stateCalculate.value}")
-                    }catch (e: Exception) {
+                        Log.e(
+                            "CalculateResponse",
+                            "CalculateResponseSuccess->\n ${_stateCalculate.value}"
+                        )
+                    } catch (e: Exception) {
                         Log.d("CalculateResponse", "${e.message} Exception")
                     }
                 }
@@ -359,62 +429,80 @@ class MainViewModel @Inject constructor(
         lng: Double,
         lat: Double,
         WHICH_ADDRESS: MutableState<String>
-    ){
-        getAddressByPointUseCase.invoke(lng, lat).onEach { result: Resource<AddressByPointResponse> ->
-            when (result){
-                is Resource.Success -> {
-                    try {
-                        val addressResponse: AddressByPointResponse? = result.data
-                        _stateAddressPoint.value =
-                            AddressByPointResponseState(response = addressResponse?.result)
-                        Log.e("AddressByPointResponse", "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}")
-                        when(WHICH_ADDRESS.value){
-                            Constants.FROM_ADDRESS -> {
+    ) {
+        getAddressByPointUseCase.invoke(lng, lat)
+            .onEach { result: Resource<AddressByPointResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val addressResponse: AddressByPointResponse? = result.data
+                            _stateAddressPoint.value =
+                                AddressByPointResponseState(response = addressResponse?.result)
+                            Log.e(
+                                "AddressByPointResponse",
+                                "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
+                            )
+                            when (WHICH_ADDRESS.value) {
+                                Constants.FROM_ADDRESS -> {
 
+                                }
+                                Constants.TO_ADDRESS -> {
+                                    clearToAddress()
+                                    addToAddress(
+                                        Address(
+                                            _stateAddressPoint.value.response!!.name,
+                                            _stateAddressPoint.value.response!!.id,
+                                            _stateAddressPoint.value.response!!.lat,
+                                            _stateAddressPoint.value.response!!.lng
+                                        )
+                                    )
+                                }
                             }
-                            Constants.TO_ADDRESS -> {
-                                clearToAddress()
-                                addToAddress(Address(_stateAddressPoint.value.response!!.name,
-                                    _stateAddressPoint.value.response!!.id,
-                                    _stateAddressPoint.value.response!!.lat,
-                                    _stateAddressPoint.value.response!!.lng))
-                            }
+                            Log.e("singleTapConfirmedHelper", "${toAddresses.size}")
+
+                        } catch (e: Exception) {
+                            Log.d("AddressByPointResponse", "${e.message} Exception")
                         }
-                        Log.e("singleTapConfirmedHelper", "${toAddresses.size}")
-
-                    }catch (e: Exception) {
-                        Log.d("AddressByPointResponse", "${e.message} Exception")
+                    }
+                    is Resource.Error -> {
+                        Log.e(
+                            "AddressByPointResponse",
+                            "AddressByPointResponseError->\n ${result.message}"
+                        )
+                        _stateAddressPoint.value = AddressByPointResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("AddressByPointResponse", "AddressByPointResponseError->\n ${result.message}")
-                    _stateAddressPoint.value = AddressByPointResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     private val _stateFastAddress = mutableStateOf(FastAddressesResponseState())
     val stateFastAddress: State<FastAddressesResponseState> = _stateFastAddress
-    fun getFastAddresses(){
+    fun getFastAddresses() {
         fastAddressesUseCase.invoke().onEach { result: Resource<FastAddressesResponse> ->
-            when(result){
+            when (result) {
                 is Resource.Success -> {
                     try {
                         val fastAddressesResponse: FastAddressesResponse? = result.data
-                        _stateFastAddress.value = FastAddressesResponseState(response = fastAddressesResponse?.result)
-                        Log.e("FastAddressesResponse", "FastAddressesResponseResponseSuccess->\n ${result.data}")
-                    }catch (e: Exception) {
+                        _stateFastAddress.value =
+                            FastAddressesResponseState(response = fastAddressesResponse?.result)
+                        Log.e(
+                            "FastAddressesResponse",
+                            "FastAddressesResponseResponseSuccess->\n ${result.data}"
+                        )
+                    } catch (e: Exception) {
                         Log.d("FastAddressesResponse", "${e.message} Exception")
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("FastAddressesResponse", "FastAddressesResponseError->\n ${result.message}")
+                    Log.e(
+                        "FastAddressesResponse",
+                        "FastAddressesResponseError->\n ${result.message}"
+                    )
                     _stateFastAddress.value = FastAddressesResponseState(
                         error = "${result.message}"
                     )

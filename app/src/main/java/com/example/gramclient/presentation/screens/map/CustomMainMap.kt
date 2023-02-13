@@ -116,8 +116,6 @@ fun CustomMainMap(
             mainViewModel.updateFromAddress(Address())
             isGet.value = true
         }
-        Values.FromAddress2.value = Address("", 0, "", "")
-        Values.ToAddress2.value = listOf<Address>(Address("", 0, "", ""))
         val observer = LifecycleEventObserver { _, event ->
             stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
             when (event) {
@@ -149,8 +147,6 @@ fun CustomMainMap(
                 .putLong("mapPosY", map.mapCenter.longitude.toBits())
                 .putLong("mapPosZ", map.zoomLevelDouble.toBits()).apply()
             lifecycleOwner.lifecycle.removeObserver(observer)
-            Values.FromAddress2.value = Address("", 0, "", "")
-            Values.ToAddress2.value = listOf<Address>(Address("", 0, "", ""))
         }
     }
 
@@ -214,32 +210,10 @@ fun CustomMainMap(
             update = {
                 when (currentRoute) {
                     MainScreen().key -> {
-                        if (Values.ToAddress2.value != mainViewModel.toAddresses ||
-                            Values.FromAddress2.value != mainViewModel.fromAddress.value
-                        ) {
-                            map.overlays.clear()
-                            showRoadAB(
-                                it.context,
-                                mainViewModel.fromAddress,
-                                mainViewModel.toAddresses
-                            )
-                            Values.ToAddress2.value = mainViewModel.toAddresses
-                            Values.FromAddress2.value = mainViewModel.fromAddress.value
-                        }
+
                     }
                     OrderExecutionScreen().key -> {
-                        if (Values.ToAddress2.value != mainViewModel.toAddresses ||
-                            Values.FromAddress2.value != mainViewModel.fromAddress.value
-                        ) {
-                            map.overlays.clear()
-                            showRoadAB(
-                                it.context,
-                                mainViewModel.fromAddress,
-                                mainViewModel.toAddresses
-                            )
-                            Values.ToAddress2.value = mainViewModel.toAddresses
-                            Values.FromAddress2.value = mainViewModel.fromAddress.value
-                        }
+
                         if (Values.DriverLocation.value != GeoPoint(0.0, 0.0)) {
                             //markers.addDriverMarker(Values.DriverLocation.value, "")
                         }
@@ -466,6 +440,7 @@ fun showRoadAB(
     fromAddress: State<Address>,
     toAddress: SnapshotStateList<Address>,
 ) {
+    if(currentRoute==SearchAddressScreen().key) return
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
     GlobalScope.launch {
         try {
