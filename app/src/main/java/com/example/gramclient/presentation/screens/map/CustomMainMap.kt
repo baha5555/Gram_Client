@@ -115,6 +115,8 @@ fun CustomMainMap(
             //mainViewModel.updateToAddress(Address())
             mainViewModel.updateFromAddress(Address())
             isGet.value = true
+        }else if (currentRoute == MainScreen().key){
+            mainViewModel.showRoad()
         }
         val observer = LifecycleEventObserver { _, event ->
             stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
