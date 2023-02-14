@@ -60,6 +60,9 @@ class AddStopScreen : Screen {
                             .shadow(elevation.value)
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
+                            .clickable {
+                                bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS, inx))
+                            }
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

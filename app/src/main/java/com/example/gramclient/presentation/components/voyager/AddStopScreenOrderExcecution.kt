@@ -61,6 +61,9 @@ class AddStopScreenOrderExcecution : Screen {
                             .shadow(elevation.value)
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
+                            .clickable {
+                                bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.TO_ADDRESS, inx))
+                            }
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -112,7 +115,7 @@ class AddStopScreenOrderExcecution : Screen {
             }
             item {
                 Button(
-                    onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS, -2))},
+                    onClick = { bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.ADD_TO_ADDRESS))},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp)
