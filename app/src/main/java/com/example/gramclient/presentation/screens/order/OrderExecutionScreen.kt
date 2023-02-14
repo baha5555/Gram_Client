@@ -67,8 +67,10 @@ class OrderExecutionScreen : Screen {
             mutableStateOf(0)
         }
 
-        LaunchedEffect(key1 = true) {
-            //orderExecutionViewModel.readAllOrders()
+        DisposableEffect(key1 = true ){
+            onDispose {
+                orderExecutionViewModel.clearAddresses()
+            }
         }
         if (Values.DriverLocation.value.latitude != 0.0) {
             Log.i("asdasda", "" + Values.DriverLocation.value)
@@ -111,15 +113,21 @@ class OrderExecutionScreen : Screen {
             }
 
             selectRealtimeDatabaseOrder.from_address?.let {
-                //mainViewModel.updateFromAddress(it)
+                if (it != mainViewModel.fromAddress.value) {
+                    orderExecutionViewModel.updateFromAddress(it)
+                }
                 Log.e("From_address-1", "$it")
             }
 
             selectRealtimeDatabaseOrder.to_address?.let { to_Addresses ->
-                to_Addresses.forEach { address ->
-                    //mainViewModel.updateToAddress(address)
-                    Log.e("To_address-1", "$address")
+                orderExecutionViewModel.updateToAddress(clear = true)
+                if (to_Addresses.toMutableStateList() != mainViewModel.toAddresses) {
+                    //orderExecutionViewModel.updateToAddress(to_Addresses.toMutableStateList())
+                    to_Addresses.toMutableStateList().forEach {
+                        orderExecutionViewModel.updateToAddress(it)
+                    }
                 }
+                Log.e("From_address-1", ""+to_Addresses.toMutableStateList().size)
             }
         }
         BottomSheetScaffold(
@@ -197,7 +205,7 @@ class OrderExecutionScreen : Screen {
                     CustomDialog(
                         text = stateCancelOrderText,
                         okBtnClick = {
-                            if(Values.ClientOrders.value?.active_orders?.size==1){
+                            if (Values.ClientOrders.value?.active_orders?.size == 1) {
                                 navigator.replaceAll(SearchAddressScreen())
                                 return@CustomDialog
                             }
