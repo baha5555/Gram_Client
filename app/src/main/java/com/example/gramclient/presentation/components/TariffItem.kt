@@ -63,6 +63,6 @@ fun TariffItem(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
-            }, color = if (isSelected) Color.White else Color.Black)
+            }.padding(end = 20.dp), color = if (isSelected) Color.White else Color.Black)
     }
 }

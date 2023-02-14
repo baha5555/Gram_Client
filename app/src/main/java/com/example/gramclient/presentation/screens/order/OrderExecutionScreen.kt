@@ -32,6 +32,8 @@ import com.example.gramclient.presentation.screens.map.CustomMainMap
 import com.example.gramclient.presentation.screens.order.components.*
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants
+import com.example.gramclient.utils.Constants.SOON
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.example.gramclient.utils.Values
@@ -60,6 +62,10 @@ class OrderExecutionScreen : Screen {
             orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
 
         val isDialogOpen = remember { mutableStateOf(false) }
+
+        val modalSheetState = rememberModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden,
+            confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
 
         val scope = rememberCoroutineScope()
 
@@ -122,7 +128,25 @@ class OrderExecutionScreen : Screen {
                 }
             }
         }
-        BottomSheetScaffold(
+        ModalBottomSheetLayout(
+            sheetContent ={
+                selectRealtimeDatabaseOrder.let { order ->
+                    CustomInfoOfActiveOrder(
+                        performerName =order.performer?.first_name+order.performer?.last_name,
+                        performerPhone = order.performer?.phone?:"",
+                        transportModel = order.performer?.transport?.model?:"",
+                        transportNumber =order.performer?.transport?.car_number?:"",
+                        transportColor =order.performer?.transport?.color?:"",
+                        toAddress = order.to_address?: listOf(),
+                        fromAddress = order.from_address?.address?:"",
+                        orderTime = order.created_at?:"",
+                        tariffName =order.tariff?:"",
+                        tariffPrice = (order.price?:0).toString(),
+                        paymentMethod =SOON
+                    )
+                }
+        }, sheetState = modalSheetState ) {
+            BottomSheetScaffold(
             scaffoldState = sheetState,
             sheetBackgroundColor = Color(0xFFffffff),
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
@@ -162,7 +186,7 @@ class OrderExecutionScreen : Screen {
                             }
                             orderSection(order, scope, sheetState, isSearchState)
                             Spacer(modifier = Modifier.height(10.dp))
-                            optionSection()
+                            optionSection(modalSheetState)
                             actionSection(cancelOrderOnClick = {
                                 isDialogOpen.value = true
                                 orderId = order.id
@@ -303,6 +327,6 @@ class OrderExecutionScreen : Screen {
                 }
             }
         }
+        }
     }
-
 }
