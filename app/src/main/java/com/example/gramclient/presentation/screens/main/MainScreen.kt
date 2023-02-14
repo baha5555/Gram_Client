@@ -71,9 +71,6 @@ class MainScreen : Screen{
         val modalSheetState = rememberModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
             confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
-        val modalSheetBottomBarState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Expanded,
-            confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
         val context = LocalContext.current
         val scaffoldState = rememberScaffoldState()
 
