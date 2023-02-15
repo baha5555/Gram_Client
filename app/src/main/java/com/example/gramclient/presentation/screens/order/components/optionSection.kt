@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun optionSection(modalBottomSheetState: ModalBottomSheetState){
+fun optionSection(onClick:()->Unit){
 
     val switch= remember{ mutableStateOf(false) }
 
@@ -72,9 +72,7 @@ fun optionSection(modalBottomSheetState: ModalBottomSheetState){
         Row(
             modifier = Modifier
                 .clickable {
-                    scope.launch {
-                        modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded)
-                    }
+                    onClick()
                 }
                 .fillMaxWidth()
                 .padding(15.dp),

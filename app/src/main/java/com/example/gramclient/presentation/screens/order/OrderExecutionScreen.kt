@@ -63,10 +63,6 @@ class OrderExecutionScreen : Screen {
 
         val isDialogOpen = remember { mutableStateOf(false) }
 
-        val modalSheetState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-            confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
-
         val scope = rememberCoroutineScope()
 
         val ratingState = remember {
@@ -136,24 +132,6 @@ class OrderExecutionScreen : Screen {
                 Log.e("From_address-1", ""+to_Addresses.toMutableStateList().size)
             }
         }
-        ModalBottomSheetLayout(
-            sheetContent ={
-                selectRealtimeDatabaseOrder.let { order ->
-                    CustomInfoOfActiveOrder(
-                        performerName =order.performer?.first_name+order.performer?.last_name,
-                        performerPhone = order.performer?.phone?:"",
-                        transportModel = order.performer?.transport?.model?:"",
-                        transportNumber =order.performer?.transport?.car_number?:"",
-                        transportColor =order.performer?.transport?.color?:"",
-                        toAddress = order.to_address?: listOf(),
-                        fromAddress = order.from_address?.address?:"",
-                        orderTime = order.created_at?:"",
-                        tariffName =order.tariff?:"",
-                        tariffPrice = (order.price?:0).toString(),
-                        paymentMethod =SOON
-                    )
-                }
-        }, sheetState = modalSheetState ) {
             BottomSheetScaffold(
             scaffoldState = sheetState,
             sheetBackgroundColor = Color(0xFFffffff),
@@ -194,7 +172,9 @@ class OrderExecutionScreen : Screen {
                             }
                             orderSection(order, scope, sheetState, isSearchState)
                             Spacer(modifier = Modifier.height(10.dp))
-                            optionSection(modalSheetState)
+                            optionSection(onClick = {
+                                navigator.replace(CustomInfoOfActiveOrder())
+                            })
                             actionSection(cancelOrderOnClick = {
                                 isDialogOpen.value = true
                                 orderId = order.id
@@ -334,7 +314,6 @@ class OrderExecutionScreen : Screen {
                     }
                 }
             }
-        }
         }
     }
 }
