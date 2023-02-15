@@ -145,6 +145,7 @@ class OrderExecutionViewModel  @Inject constructor(
         map.overlays.clear()
     }
     fun addToAddress(address: Address){
+        if (_toAddresses.contains(address)) return
         _toAddresses.add(address)
         editOrder(_toAddresses)
         mapController.showRoadAB(_fromAddress, _toAddresses)

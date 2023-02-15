@@ -28,10 +28,10 @@ fun CustomTopBar(
         color = Color.White
     )
     TopAppBar(
-        title = { Text(title, fontSize = 18.sp) }, backgroundColor = Color.White,
+        title = { Text(title, fontSize = 18.sp) }, backgroundColor = MaterialTheme.colors.background,
         navigationIcon = {
             IconButton(onClick = { navigator.pop() }) {
-                Image(
+                Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_blue),
                     contentDescription = ""
                 )
@@ -52,7 +52,7 @@ fun CustomTopBar(
                 }
                 2 -> {
                     IconButton(onClick = {  }) {
-                        Image(
+                        Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_delete_blue),
                             contentDescription = ""
                         )
@@ -60,7 +60,7 @@ fun CustomTopBar(
                 }
                 3 -> {
                     IconButton(onClick =  quitOnClick ){
-                        Image(
+                        Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_logout_blue),
                             contentDescription = ""
                         )
