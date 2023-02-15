@@ -100,7 +100,7 @@ class SearchDriverScreen : Screen {
                 content = {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 
-                        Scaffold(backgroundColor = Color(0xFFEEEEEE), bottomBar = {
+                        Scaffold(backgroundColor = MaterialTheme.colors.background, bottomBar = {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -110,7 +110,6 @@ class SearchDriverScreen : Screen {
                                             topStart = 25.dp, topEnd = 25.dp
                                         )
                                     )
-                                    .background(Color.White)
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -158,61 +157,9 @@ class SearchDriverScreen : Screen {
                                     }
 
                                 }
-
-//                                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-//                                    repeat(5) {
-//                                        Box(
-//                                            modifier = Modifier
-//                                                .size(150.dp, 30.dp)
-//                                                .padding(start = 15.dp)
-//                                                .border(
-//                                                    width = 1.dp,
-//                                                    color = PrimaryColor,
-//                                                    shape = RoundedCornerShape(35.dp)
-//                                                )
-//                                                .clip(RoundedCornerShape(35.dp))
-//                                        ) {
-//                                            Image(
-//                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
-//                                                contentDescription = "ic_box"
-//                                            )
-//                                            Text(
-//                                                text = "Доставка",
-//                                                fontSize = 12.sp,
-//                                                modifier = Modifier.align(
-//                                                    Alignment.Center
-//                                                )
-//                                            )
-//                                        }
-//                                        Box(
-//                                            modifier = Modifier
-//                                                .size(150.dp, 30.dp)
-//                                                .padding(start = 15.dp)
-//                                                .border(
-//                                                    width = 1.dp,
-//                                                    color = PrimaryColor,
-//                                                    shape = RoundedCornerShape(35.dp)
-//                                                )
-//                                                .clip(RoundedCornerShape(35.dp))
-//                                        ) {
-//                                            Image(
-//                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
-//                                                contentDescription = "ic_box"
-//                                            )
-//                                            Text(
-//                                                text = "Аренда авто",
-//                                                fontSize = 12.sp,
-//                                                modifier = Modifier.align(
-//                                                    Alignment.Center
-//                                                )
-//                                            )
-//                                        }
-//                                    }
-//                                }
                                 Spacer(Modifier.requiredHeight(0.dp))
                             }
                         }) {
-
                             BottomSheetScaffold(
                                 sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
                                 scaffoldState = bottomSheetScaffoldState,
@@ -231,7 +178,7 @@ class SearchDriverScreen : Screen {
                                         Modifier
                                             .fillMaxWidth()
                                             .wrapContentHeight()
-                                            .background(Color(0xFFEEEEEE))
+                                            .background(MaterialTheme.colors.onSecondary)
                                     ) {
                                         stateRealtimeDatabaseOrders.response?.let { response ->
                                             response.observeAsState().value?.let { orders ->
@@ -263,10 +210,7 @@ class SearchDriverScreen : Screen {
                                                                                 },
                                                                                 isOpen = isOpen,
                                                                             )
-                                                                            Spacer(
-                                                                                Modifier.height(
-                                                                                    10.dp
-                                                                                )
+                                                                            Spacer(Modifier.height(10.dp)
                                                                             )
                                                                         }
                                                                     }
@@ -274,9 +218,7 @@ class SearchDriverScreen : Screen {
                                                             }
                                                             item {
                                                                 Spacer(
-                                                                    modifier = Modifier.height(
-                                                                        120.dp
-                                                                    )
+                                                                    modifier = Modifier.height(120.dp)
                                                                 )
                                                             }
                                                         }
@@ -338,7 +280,7 @@ class SearchDriverScreen : Screen {
             .clip(RoundedCornerShape(20.dp))
             .clickable { sheetPeekHeightUpOnClick() }
             .fillMaxWidth()
-            .background(color = Color.White, shape = RoundedCornerShape(20.dp))) {
+            .background(color = MaterialTheme.colors.background, shape = RoundedCornerShape(20.dp))) {
             if (order.performer == null) {
                 Row(
                     modifier = Modifier
@@ -348,7 +290,7 @@ class SearchDriverScreen : Screen {
                         )
                 ) {
                     LinearProgressIndicator(
-                        color = PrimaryColor,
+                        color = MaterialTheme.colors.onBackground,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(shape = RoundedCornerShape(percent = 50))

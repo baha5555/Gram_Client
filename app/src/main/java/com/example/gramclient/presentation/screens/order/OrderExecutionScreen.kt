@@ -156,14 +156,14 @@ class OrderExecutionScreen : Screen {
         }, sheetState = modalSheetState ) {
             BottomSheetScaffold(
             scaffoldState = sheetState,
-            sheetBackgroundColor = Color(0xFFffffff),
+            sheetBackgroundColor = MaterialTheme.colors.background,
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight(unbounded = true)
-                        .background(BackgroundColor)
+                        .background(MaterialTheme.colors.onSecondary)
                 ) {
                     if (!isSearchState.value) {
                         scope.launch {

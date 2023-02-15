@@ -33,7 +33,7 @@ fun optionSection(modalBottomSheetState: ModalBottomSheetState){
     val scope = rememberCoroutineScope()
     Column(modifier = Modifier
         .fillMaxWidth()
-        .background(Color.White)
+        .background(MaterialTheme.colors.background)
         .padding(bottom = 10.dp)
     ){
         Row(

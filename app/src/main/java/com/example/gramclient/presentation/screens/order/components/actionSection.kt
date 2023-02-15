@@ -2,6 +2,7 @@ package com.example.gramclient.presentation.screens.order.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
@@ -19,7 +20,7 @@ fun actionSection(cancelOrderOnClick:()->Unit){
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(Color.White)
+            .background(MaterialTheme.colors.background)
             .padding(20.dp),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.Center
