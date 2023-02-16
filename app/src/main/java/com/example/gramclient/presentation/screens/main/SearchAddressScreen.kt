@@ -16,14 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
@@ -121,7 +124,7 @@ class SearchAddressScreen : Screen {
                                 ) {
                                     FloatingButton(
                                         bottomSheetState = bottomSheetState,
-                                        Icons.Filled.MyLocation
+                                        ImageVector.vectorResource(id = R.drawable.btn_show_location)
                                     ){
                                         map.controller.animateTo(mLocationOverlay.myLocation)
                                         if (mLocationOverlay.myLocation != null) {

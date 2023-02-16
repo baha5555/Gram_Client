@@ -100,7 +100,7 @@ fun optionSection(modalBottomSheetState: ModalBottomSheetState){
         Divider(modifier = Modifier
             .fillMaxWidth()
             .padding(start = 55.dp, end = 15.dp))
-        Row(
+/*        Row(
             modifier = Modifier
                 .clickable {
 //                        scope.launch {
@@ -133,6 +133,6 @@ fun optionSection(modalBottomSheetState: ModalBottomSheetState){
                 }
                 Spacer(modifier = Modifier.width(15.dp))
             }
-        }
+        }*/
     }
 }

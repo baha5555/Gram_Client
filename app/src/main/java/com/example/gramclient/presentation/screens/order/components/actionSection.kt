@@ -28,15 +28,15 @@ fun actionSection(cancelOrderOnClick:()->Unit){
     ){
         CustomCircleButton(text = "Отменить\nзаказ",
             icon = Icons.Default.Close,cancelOrderOnClick)
-        Spacer(modifier = Modifier.width(20.dp))
-        CustomCircleButton(text = "Отправить\nмаршрут",
-            icon = ImageVector.vectorResource(id = R.drawable.share_icon)) {
-            //method
-        }
-        Spacer(modifier = Modifier.width(20.dp))
-        CustomCircleButton(text = "Безопас-\nность",
-            icon = ImageVector.vectorResource(id = R.drawable.safety_icon)) {
-            //method
-        }
+//        Spacer(modifier = Modifier.width(20.dp))
+//        CustomCircleButton(text = "Отправить\nмаршрут",
+//            icon = ImageVector.vectorResource(id = R.drawable.share_icon)) {
+//            //method
+//        }
+//        Spacer(modifier = Modifier.width(20.dp))
+//        CustomCircleButton(text = "Безопас-\nность",
+//            icon = ImageVector.vectorResource(id = R.drawable.safety_icon)) {
+//            //method
+//        }
     }
 }
