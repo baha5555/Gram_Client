@@ -8,9 +8,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,7 +71,7 @@ class AuthScreen : Screen {
         Column(
             Modifier
                 .fillMaxHeight()
-                .background(color = BackgroundColor),
+                .background(color = MaterialTheme.colors.secondary),
             Arrangement.SpaceBetween
         ) {
             Column(
@@ -104,10 +102,11 @@ class AuthScreen : Screen {
                         easing = LinearOutSlowInEasing
                     )
                 )
-                Image(
+                Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
                     "",
-                    modifier = Modifier.offset(arrowLocation.x.dp, arrowLocation.y.dp)
+                    modifier = Modifier.offset(arrowLocation.x.dp, arrowLocation.y.dp),
+                    tint = MaterialTheme.colors.onBackground
                 )
 
                 Column(modifier = Modifier.padding(start = 40.dp, end = 40.dp)) {
@@ -121,14 +120,14 @@ class AuthScreen : Screen {
                         ) {
                             Row(
                                 modifier = Modifier
-                                .padding(bottom = 40.dp)
-                                .background(Color.White, shape = RoundedCornerShape(5.dp))
-                                .fillMaxWidth(0.35f)
+                                    .padding(bottom = 40.dp)
+                                    .background(MaterialTheme.colors.background, shape = RoundedCornerShape(5.dp))
+                                    .fillMaxWidth(0.35f)
                                     .clip (RoundedCornerShape(5.dp)),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Image(
-                                    modifier=Modifier.padding(vertical = 16.dp, horizontal = 3.dp),
+                                    modifier=Modifier.padding(vertical = 16.dp, horizontal = 3.dp).background(Color.White),
                                     imageVector = ImageVector.vectorResource(id = R.drawable.tj_flat),
                                     contentDescription = "Проверено"
                                 )
@@ -148,7 +147,7 @@ class AuthScreen : Screen {
                                 },
                                 textStyle = TextStyle.Default.copy(fontSize = textSp18.sp),
                                 modifier = Modifier
-                                    .background(Color.White, shape = RoundedCornerShape(5.dp))
+                                    .background(MaterialTheme.colors.background, shape = RoundedCornerShape(5.dp))
                                     .fillMaxWidth(0.95f),
                                 shape = RoundedCornerShape(5.dp),
                                 singleLine = true,

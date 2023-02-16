@@ -147,7 +147,7 @@ class SearchAddressScreen : Screen {
                                 }
                             },
                             drawerGesturesEnabled = false,
-                            sheetBackgroundColor = Color.White,
+                            sheetBackgroundColor = MaterialTheme.colors.background,
                             scaffoldState = bottomSheetState,
                             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                             sheetGesturesEnabled = !bottomSheetState.bottomSheetState.isCollapsed,
@@ -155,10 +155,7 @@ class SearchAddressScreen : Screen {
                                 AddressSearchBottomSheet(
                                     isSearchState = isSearchState,
                                     mainViewModel = mainViewModel,
-                                    bottomSheetState = bottomSheetState,
                                     focusRequester = focusRequester,
-                                    coroutineScope = coroutineScope,
-                                    WHICH_ADDRESS = WHICH_ADDRESS,
                                     toAddress = toAddress
                                 )
                             },

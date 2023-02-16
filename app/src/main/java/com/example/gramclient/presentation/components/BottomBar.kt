@@ -40,7 +40,7 @@ fun BottomBar(
     val isDialogOpen=remember{ mutableStateOf(false) }
     val prefs = CustomPreference(LocalContext.current)
     BottomAppBar(
-        backgroundColor = Color(0xFFF7F7F7),
+        backgroundColor = MaterialTheme.colors.background,
         contentColor = Color.White,
         modifier = Modifier
             .fillMaxWidth()
@@ -72,7 +72,7 @@ fun BottomBar(
             CustomButton(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color.Black)
+                    .background(MaterialTheme.colors.primary)
                     .fillMaxWidth(0.8f)
                     .height(54.dp)
                     .padding(top = 0.dp),
@@ -98,7 +98,7 @@ fun BottomBar(
                     }
                 }
             }) {
-                Image(
+                Icon(
                     modifier = Modifier.size(if(mainBottomSheetState.bottomSheetState.isCollapsed) 30.dp else 20.dp),
                     imageVector = ImageVector.vectorResource(if(mainBottomSheetState.bottomSheetState.isCollapsed) R.drawable.options_icon else R.drawable.arrow_down),
                     contentDescription = "icon"

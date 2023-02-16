@@ -324,7 +324,8 @@ class SearchDriverScreen : Screen {
                                     ""
                                 }
                             }
-                        }, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black
+                        }, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colors.onBackground
                     )
                     Text(
                         text = if (order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color ?: ""} ${order.performer.transport?.model ?: ""}",
@@ -340,7 +341,7 @@ class SearchDriverScreen : Screen {
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .offset(0.dp, 0.dp)
-                                .background(BackgroundColor)
+                                .background(MaterialTheme.colors.secondary).padding(2.dp)
                         )
                         Image(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),

@@ -5,6 +5,7 @@ package com.example.gramclient.presentation.components
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -35,7 +36,7 @@ fun TariffItem(
             .clickable {
                 onSelected()
             }
-            .background(if (isSelected) PrimaryColor else Color(0xFFFFFFFF))
+            .background(if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.background)
             .padding(10.dp)
 
 

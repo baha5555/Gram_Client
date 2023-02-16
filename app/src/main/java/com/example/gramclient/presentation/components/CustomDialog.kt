@@ -37,7 +37,8 @@ fun CustomDialog(
                     Text(
                         text = text,
                         fontSize = 18.sp,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colors.onBackground
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
@@ -82,14 +83,13 @@ fun CustomCancelDialog(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(MaterialTheme.colors.background)
                     .padding(10.dp)
             ) {
                 Text(
                     text = text,
                     fontSize = 18.sp,
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.Black
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
@@ -102,10 +102,10 @@ fun CustomCancelDialog(
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
                             .weight(1f),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor, contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                         onClick = { okBtnClick() }
                     ) {
-                        Text(text = "OK", fontSize = 18.sp, color = Color.White)
+                        Text(text = "OK", fontSize = 18.sp)
                     }
                 }
             }

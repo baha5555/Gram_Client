@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
@@ -32,6 +33,12 @@ fun CustomSwitch(
     gapBetweenThumbAndTrackEdge: Dp = 3.dp,
     onClick: () -> Unit
 ) {
+    var primaryColor:Color = PrimaryColor
+    if(MaterialTheme.colors.isLight){
+        primaryColor = PrimaryColor
+    }else{
+        primaryColor = Color(0xFF3A3A3A)
+    }
     val thumbRadius = (height / 2) - gapBetweenThumbAndTrackEdge
     val animatePosition = animateFloatAsState(
         targetValue = if (switchON.value)
@@ -51,11 +58,12 @@ fun CustomSwitch(
                         onClick()
                     }
                 )
-            }.background( Color(0xFF928F8F), shape = CircleShape)
+            }
+            .background(Color(0xFF928F8F), shape = CircleShape)
     ) {
         // Track
         drawRoundRect(
-            color = if (switchON.value) PrimaryColor else Color(0xFFB6B4B4),
+            color = if (switchON.value) primaryColor else Color(0xFFB6B4B4),
             cornerRadius = CornerRadius(x = 10.dp.toPx(), y = 10.dp.toPx()),
         )
 
