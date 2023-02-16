@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -62,7 +63,12 @@ class AddStopScreenOrderExcecution : Screen {
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
                             .clickable {
-                                bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.TO_ADDRESS, inx))
+                                bottomNavigator.show(
+                                    SearchAddressOrderExecutionNavigator(
+                                        Constants.TO_ADDRESS,
+                                        inx
+                                    )
+                                )
                             }
                     ) {
                         Row(

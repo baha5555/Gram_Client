@@ -46,7 +46,8 @@ class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int
         val bottomNavigator = LocalBottomSheetNavigator.current
 
         LaunchedEffect(true) {
-            focusRequester.requestFocus()
+            orderExecutionViewModel.searchAddress("")
+            //focusRequester.requestFocus()
         }
         Column(
             modifier = Modifier
@@ -56,7 +57,7 @@ class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int
                     MaterialTheme.colors.background,
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                 )
-                .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)
+                .padding(top = 15.dp, start = 15.dp, end = 15.dp)
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 TextField(

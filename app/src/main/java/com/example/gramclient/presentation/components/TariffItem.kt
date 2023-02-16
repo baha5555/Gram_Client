@@ -36,7 +36,7 @@ fun TariffItem(
             .clickable {
                 onSelected()
             }
-            .background(if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.background)
+            .background(if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.secondary)
             .padding(10.dp)
 
 
