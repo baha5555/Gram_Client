@@ -1,7 +1,6 @@
 package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
@@ -37,21 +36,17 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
-import com.example.gramclient.domain.firebase.profile.Client
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.map.CustomMainMap
-import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.example.gramclient.utils.Values
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 val orderCount = mutableStateOf(-1)
 
@@ -117,7 +112,7 @@ class SearchDriverScreen : Screen {
                                         .padding(15.dp)
                                         .height(50.dp)
                                         .clip(RoundedCornerShape(20.dp))
-                                        .background(PrimaryColor)
+                                        .background(MaterialTheme.colors.primary)
                                         .clickable { navigator.replace(SearchAddressScreen()) },
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
@@ -178,7 +173,7 @@ class SearchDriverScreen : Screen {
                                         Modifier
                                             .fillMaxWidth()
                                             .wrapContentHeight()
-                                            .background(MaterialTheme.colors.onSecondary)
+                                            .background(MaterialTheme.colors.secondary)
                                     ) {
                                         stateRealtimeDatabaseOrders.response?.let { response ->
                                             response.observeAsState().value?.let { orders ->
@@ -341,7 +336,8 @@ class SearchDriverScreen : Screen {
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .offset(0.dp, 0.dp)
-                                .background(MaterialTheme.colors.secondary).padding(2.dp)
+                                .background(MaterialTheme.colors.secondary)
+                                .padding(2.dp)
                         )
                         Image(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
@@ -368,7 +364,7 @@ class SearchDriverScreen : Screen {
                         }
                     } else {
                         CustomCircleButton(
-                            text = "Связаться", icon = R.drawable.phone
+                            text = "Связаться", icon = ImageVector.vectorResource(id = R.drawable.phone)
                         ) {
                             connectClientWithDriverIsDialogOpen.value = true
                         }

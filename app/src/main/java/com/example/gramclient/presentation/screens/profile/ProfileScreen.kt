@@ -124,7 +124,7 @@ class ProfileScreen : Screen{
                 LazyColumn(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .background(MaterialTheme.colors.background)
+                        .background(MaterialTheme.colors.secondary)
                         .fillMaxSize()
                 ) {
                     item {

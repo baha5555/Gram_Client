@@ -53,7 +53,7 @@ class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int
                 .fillMaxWidth()
                 .fillMaxHeight(0.92f)
                 .background(
-                    Color.White,
+                    MaterialTheme.colors.background,
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                 )
                 .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)
@@ -104,11 +104,6 @@ class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int
                     singleLine = true,
                     shape = RoundedCornerShape(15.dp),
                     colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.Black,
-                        cursorColor = Color.Black,
-                        leadingIconColor = Color.Black,
-                        trailingIconColor = Color.Black,
-                        backgroundColor = BackgroundColor,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent

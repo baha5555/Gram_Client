@@ -13,8 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -122,7 +124,7 @@ fun performerSection(
             }
             Spacer(modifier = Modifier.width(20.dp))
             Spacer(modifier = Modifier.width(20.dp))
-            CustomCircleButton(text = "Связаться", icon = R.drawable.phone) {
+            CustomCircleButton(text = "Связаться", icon = ImageVector.vectorResource(id = R.drawable.phone)) {
                 connectClientWithDriverIsDialogOpen.value = true
             }
         }

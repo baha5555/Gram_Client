@@ -31,7 +31,7 @@ fun CustomDialog(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .fillMaxWidth()
-                        .background(MaterialTheme.colors.background)
+                        .background(MaterialTheme.colors.secondary)
                         .padding(10.dp)
                 ) {
                     Text(

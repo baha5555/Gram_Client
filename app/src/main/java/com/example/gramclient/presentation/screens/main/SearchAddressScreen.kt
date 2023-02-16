@@ -106,8 +106,8 @@ class SearchAddressScreen : Screen {
                                         FloatingButton(
                                             bottomSheetState = bottomSheetState,
                                             Icons.Filled.ArrowBack,
-                                            backgroundColor = Color.White,
-                                            contentColor = PrimaryColor
+                                            backgroundColor = MaterialTheme.colors.background,
+                                            contentColor = MaterialTheme.colors.onBackground
                                         ){
                                             navigator.replaceAll(SearchDriverScreen())
                                         }

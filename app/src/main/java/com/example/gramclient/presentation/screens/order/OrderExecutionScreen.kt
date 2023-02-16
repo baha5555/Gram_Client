@@ -163,7 +163,7 @@ class OrderExecutionScreen : Screen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight(unbounded = true)
-                        .background(MaterialTheme.colors.onSecondary)
+                        .background(MaterialTheme.colors.secondary)
                 ) {
                     if (!isSearchState.value) {
                         scope.launch {

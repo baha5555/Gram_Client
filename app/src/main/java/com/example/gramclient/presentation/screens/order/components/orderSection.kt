@@ -118,10 +118,15 @@ fun orderSection(
                 modifier = Modifier
                     .clickable {
                         scope.launch {
-                            if(order.to_address.size>1){
+                            if (order.to_address.size > 1) {
                                 bottomNavigator.show(AddStopScreenOrderExcecution())
-                            }else{
-                                bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.TO_ADDRESS, inx = 0))
+                            } else {
+                                bottomNavigator.show(
+                                    SearchAddressOrderExecutionNavigator(
+                                        Constants.TO_ADDRESS,
+                                        inx = 0
+                                    )
+                                )
                             }
                         }
                     }
@@ -134,7 +139,9 @@ fun orderSection(
                     Image(
                         modifier = Modifier
                             .size(20.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.to_marker),
+                        imageVector = if (MaterialTheme.colors.isLight) ImageVector.vectorResource(R.drawable.to_marker) else ImageVector.vectorResource(
+                            R.drawable.to_marker_dark
+                        ),
                         contentDescription = "Logo"
                     )
                     Spacer(modifier = Modifier.width(20.dp))

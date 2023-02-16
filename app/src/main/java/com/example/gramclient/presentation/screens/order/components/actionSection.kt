@@ -8,7 +8,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.gramclient.R
 import com.example.gramclient.presentation.components.CustomCircleButton
@@ -29,12 +30,12 @@ fun actionSection(cancelOrderOnClick:()->Unit){
             icon = Icons.Default.Close,cancelOrderOnClick)
         Spacer(modifier = Modifier.width(20.dp))
         CustomCircleButton(text = "Отправить\nмаршрут",
-            icon = R.drawable.share_icon) {
+            icon = ImageVector.vectorResource(id = R.drawable.share_icon)) {
             //method
         }
         Spacer(modifier = Modifier.width(20.dp))
         CustomCircleButton(text = "Безопас-\nность",
-            icon = R.drawable.safety_icon) {
+            icon = ImageVector.vectorResource(id = R.drawable.safety_icon)) {
             //method
         }
     }

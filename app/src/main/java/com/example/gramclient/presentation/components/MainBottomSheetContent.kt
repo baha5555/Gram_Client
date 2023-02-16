@@ -249,7 +249,8 @@ fun AddressesContent(
                 Image(
                     modifier = Modifier
                         .size(20.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.to_marker),
+                    imageVector = if (MaterialTheme.colors.isLight) ImageVector.vectorResource(R.drawable.to_marker)
+                    else ImageVector.vectorResource(R.drawable.to_marker_dark),
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))

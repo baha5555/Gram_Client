@@ -49,11 +49,11 @@ fun SupportContent(stateContent: MutableState<String>) {
                 Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_LONG).show()
 
             }
-            CustomCircleButton(text = "Доверенные\nконтакты", icon = R.drawable.ic_contact) {
+            CustomCircleButton(text = "Доверенные\nконтакты", icon = ImageVector.vectorResource(id = R.drawable.ic_contact)) {
 //                stateContent.value = "Contact"
                 Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_LONG).show()
             }
-            CustomCircleButton(text = "Скорая \nи полиция", icon = R.drawable.ic_alarm_light) {
+            CustomCircleButton(text = "Скорая \nи полиция", icon = ImageVector.vectorResource(id = R.drawable.ic_alarm_light)) {
 //                stateContent.value = "AmbulancePolice"
                 Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_LONG).show()
             }
@@ -153,8 +153,15 @@ fun EmergencySituation(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_LONG).show()
-                    /*navController.navigate(RoutesName.MESSAGE_SCREEN)*/}
+                        Toast
+                            .makeText(
+                                context,
+                                "Эти страницы на стадии разработки",
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
+                        /*navController.navigate(RoutesName.MESSAGE_SCREEN)*/
+                    }
                     .padding(vertical = 15.dp, horizontal = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
