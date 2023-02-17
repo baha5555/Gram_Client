@@ -324,8 +324,7 @@ class SearchDriverScreen : Screen {
                     )
                     Text(
                         text = if (order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color ?: ""} ${order.performer.transport?.model ?: ""}",
-                        fontSize = 14.sp,
-                        color = Color.Black
+                        fontSize = 14.sp
                     )
                 }
                     if (order.performer != null)  {

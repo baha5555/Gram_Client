@@ -87,12 +87,12 @@ fun performerSection(
                     else "Скоро приедет ${performer.performer?.first_name}"
                 }
                 else -> {"Вы завершили поездку"}
-            }, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            }, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
         ){
-            Text(text = "${performer.performer?.transport?.color?:"Не указан"} ${performer.performer?.transport?.model?:"Не указан"}", fontSize = 16.sp, color = Color.Black)
+            Text(text = "${performer.performer?.transport?.color?:"Не указан"} ${performer.performer?.transport?.model?:"Не указан"}", fontSize = 16.sp)
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 modifier = Modifier

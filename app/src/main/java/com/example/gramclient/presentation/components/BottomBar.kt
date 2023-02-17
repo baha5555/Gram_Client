@@ -101,7 +101,8 @@ fun BottomBar(
                 Icon(
                     modifier = Modifier.size(if(mainBottomSheetState.bottomSheetState.isCollapsed) 30.dp else 20.dp),
                     imageVector = ImageVector.vectorResource(if(mainBottomSheetState.bottomSheetState.isCollapsed) R.drawable.options_icon else R.drawable.arrow_down),
-                    contentDescription = "icon"
+                    contentDescription = "icon",
+                    tint = MaterialTheme.colors.primary
                 )
             }
         }
