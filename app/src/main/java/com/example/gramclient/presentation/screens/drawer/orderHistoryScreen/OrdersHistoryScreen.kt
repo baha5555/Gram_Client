@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.screens.drawer.orderHistoryScreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,59 +20,39 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import cafe.adriel.voyager.core.screen.Screen
 import com.example.gramclient.R
-import com.example.gramclient.domain.orderHistory.ToAddresse
 import com.example.gramclient.domain.orderHistoryScreen.OrderHistoryResult
+import com.example.gramclient.domain.orderHistoryScreen.ToAddresse
 import com.example.gramclient.presentation.components.CustomTopBar
 import com.example.gramclient.presentation.components.LoadingIndicator
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
-class OrdersHistoryScreen : Screen{
+class OrdersHistoryScreen : Screen {
     @Composable
     override fun Content() {
         val viewModel: OrderHistoryViewModel = hiltViewModel()
-
-        var notOrderVisible by remember { mutableStateOf(false) }
-        val stateGetOrderHistory = viewModel.stateGetOrderHistory
-        val ordersHistory: List<OrderHistoryResult>? =
-            stateGetOrderHistory.value.response
-        val state = rememberSwipeRefreshState(stateGetOrderHistory.value.isLoading)
-        val character= viewModel.character.collectAsLazyPagingItems()
-        val toAddresse = ordersHistory?.forEach { it.to_addresses?.size }
-        LaunchedEffect(key1 = true) {
-            viewModel.getOrderHistory()
+        val paging = viewModel.paging().collectAsLazyPagingItems()
+        LaunchedEffect(key1 = true){
+            Log.e("PAGING","${paging}")
         }
         Scaffold(topBar = {
             CustomTopBar(title = "История заказов")
         }) {
-
-            when {
-                stateGetOrderHistory.value.isLoading -> {
-                    LoadingIndicator(isLoading = true)
-                }
-            }
-            ordersHistory?.let { taxiOrdersNonNull ->
-                SwipeRefresh(
-                    modifier = Modifier.fillMaxSize(),
-                    state = state,
-                    onRefresh = {
-                        notOrderVisible = false
-                        viewModel.getOrderHistory()
-                    }
-                ) {
-                    LazyColumn(content = {
-                        items(character){item->
-                            item?.data?.forEach {
+            LazyColumn {
+                items(paging) {
+                    Log.e("PAGING","->${it}")
+                    it?.let { it1 ->
+                        it.from_address?.name?.let { it2 ->
+                            it.to_addresses?.let { it3 ->
                                 ListHistoryItem(
                                     status = it.status,
                                     createdAt = it.created_at,
-                                    fromAddress = it.from_address.name,
-                                    toAddresse =it.to_addresses
+                                    fromAddress = it2,
+                                    toAddresse = it3
                                 )
                             }
-
                         }
-                    })
+                    }
                 }
             }
         }
@@ -82,7 +63,7 @@ class OrdersHistoryScreen : Screen{
 @Composable
 fun ListHistoryItem(
     status: String,
-    createdAt:String,
+    createdAt: String,
     fromAddress: String,
     toAddresse: List<ToAddresse>,
 ) {
@@ -163,7 +144,7 @@ fun ListHistoryItem(
                 }
             }
             IconButton(
-                onClick = {/* expanded.value = true */},
+                onClick = {/* expanded.value = true */ },
                 modifier = Modifier
                     .fillMaxWidth(0.1f)
                     .padding(end = 5.dp)

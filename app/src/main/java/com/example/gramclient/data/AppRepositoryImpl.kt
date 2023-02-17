@@ -17,7 +17,7 @@ import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
-import com.example.gramclient.domain.orderHistory.Character
+
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
 import com.example.gramclient.domain.profile.ProfileResponse
@@ -46,7 +46,7 @@ class AppRepositoryImpl(
     override suspend fun getOrderHistory(): orderHistoryResponse =
         api.getOrderHistory(prefs.getAccessToken())
 
-    override suspend fun getOrderHistoryCharacter(page: Int):Character=
+    override suspend fun getOrderHistoryResponse(page: Int): orderHistoryResponse =
         api.getOrderHistoryCharacter(prefs.getAccessToken(),page)
 
     override suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse =
