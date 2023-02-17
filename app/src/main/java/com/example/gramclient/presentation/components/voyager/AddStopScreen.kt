@@ -70,7 +70,7 @@ class AddStopScreen : Screen {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.8f)) {
-                                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(start = 10.dp).padding(vertical = 10.dp).size(30.dp).border(1.dp, Color.Black, RoundedCornerShape(100))) {
+                                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(start = 10.dp).padding(vertical = 10.dp).size(30.dp).border(1.dp, MaterialTheme.colors.onBackground, RoundedCornerShape(100))) {
                                     Text(text = "" + (inx+1), fontSize = 18.sp)
                                 }
                                 Text(
@@ -94,7 +94,6 @@ class AddStopScreen : Screen {
                                 Icon(
                                     imageVector = Icons.Outlined.Menu,
                                     contentDescription = "",
-                                    tint = Color.Black,
                                     modifier = Modifier.size(35.dp).padding(end = 10.dp)
                                 )
                             }

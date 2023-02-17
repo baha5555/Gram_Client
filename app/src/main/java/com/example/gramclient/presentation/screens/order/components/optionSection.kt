@@ -33,7 +33,7 @@ fun optionSection(onClick:()->Unit){
     val scope = rememberCoroutineScope()
     Column(modifier = Modifier
         .fillMaxWidth()
-        .background(Color.White)
+        .background(MaterialTheme.colors.background)
         .padding(bottom = 10.dp)
     ){
         Row(
@@ -98,7 +98,7 @@ fun optionSection(onClick:()->Unit){
         Divider(modifier = Modifier
             .fillMaxWidth()
             .padding(start = 55.dp, end = 15.dp))
-        Row(
+/*        Row(
             modifier = Modifier
                 .clickable {
 //                        scope.launch {
@@ -131,6 +131,6 @@ fun optionSection(onClick:()->Unit){
                 }
                 Spacer(modifier = Modifier.width(15.dp))
             }
-        }
+        }*/
     }
 }

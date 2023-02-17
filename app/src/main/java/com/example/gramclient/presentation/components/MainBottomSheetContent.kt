@@ -132,7 +132,7 @@ fun SheetContent(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                BackgroundColor,
+                MaterialTheme.colors.secondary,
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             )
             .padding(bottom = 80.dp)
@@ -168,14 +168,13 @@ fun AddressesContent(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Color.White,
+                MaterialTheme.colors.background,
                 shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
             )
             .padding(top = 15.dp, bottom = 0.dp + (currentFraction * 15).dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
             Spacer(
@@ -243,12 +242,15 @@ fun AddressesContent(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 15.dp).fillMaxWidth(0.8f)
+                modifier = Modifier
+                    .padding(vertical = 15.dp)
+                    .fillMaxWidth(0.8f)
             ) {
                 Image(
                     modifier = Modifier
                         .size(20.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.to_marker),
+                    imageVector = if (MaterialTheme.colors.isLight) ImageVector.vectorResource(R.drawable.to_marker)
+                    else ImageVector.vectorResource(R.drawable.to_marker_dark),
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
@@ -306,7 +308,7 @@ fun TariffsContent(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Color.White,
+                MaterialTheme.colors.background,
                 shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
             )
             .padding(horizontal = 20.dp, vertical = 15.dp)
@@ -322,8 +324,8 @@ fun TariffsContent(
         ) {
             Text(
                 text = selected_tariff?.value!!.name,
-                fontWeight = FontWeight.Bold,
-                fontSize = 25.sp
+                fontSize = 25.sp,
+                color = MaterialTheme.colors.onBackground
             )
             stateCalculate.response?.let {
                 Text(
@@ -406,7 +408,7 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Color.White,
+                MaterialTheme.colors.background,
                 shape = RoundedCornerShape(20.dp)
             )
             .padding(horizontal = 20.dp, vertical = 0.dp)
@@ -507,7 +509,7 @@ fun AllowancesContent(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Color.White,
+                MaterialTheme.colors.background,
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             )
             .padding(horizontal = 20.dp, vertical = 15.dp)

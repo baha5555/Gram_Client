@@ -91,7 +91,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                         .padding(16.dp)
                 ) {
                     val (logo, text, codeField, text2, error) = createRefs()
-                    Image(
+                    Icon(
                         modifier = Modifier
                             .constrainAs(logo) {
                                 start.linkTo(parent.start)
@@ -102,7 +102,8 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                             .width(176.dp)
                             .height(50.07.dp),
                         imageVector = ImageVector.vectorResource(R.drawable.logo_gram_black),
-                        contentDescription = "Logo"
+                        contentDescription = "Logo",
+                        tint = MaterialTheme.colors.onBackground
                     )
 
                     Column(

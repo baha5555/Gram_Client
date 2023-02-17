@@ -46,17 +46,18 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
         val bottomNavigator = LocalBottomSheetNavigator.current
 
         LaunchedEffect(true) {
-            focusRequester.requestFocus()
+            mainViewModel.searchAddress("")
+            //focusRequester.requestFocus()
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.92f)
                 .background(
-                    Color.White,
+                    MaterialTheme.colors.background,
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                 )
-                .padding(bottom = 80.dp, top = 15.dp, start = 15.dp, end = 15.dp)
+                .padding(top = 15.dp, start = 15.dp, end = 15.dp)
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 TextField(
@@ -70,7 +71,7 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
+                    textStyle = TextStyle(fontSize = 18.sp),
                     leadingIcon = {
                         IconButton(onClick = { /*navController.popBackStack()*/ }) {
                             Icon(
@@ -104,11 +105,7 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                     singleLine = true,
                     shape = RoundedCornerShape(15.dp),
                     colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.Black,
-                        cursorColor = Color.Black,
-                        leadingIconColor = Color.Black,
-                        trailingIconColor = Color.Black,
-                        backgroundColor = BackgroundColor,
+                        backgroundColor = MaterialTheme.colors.background,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent

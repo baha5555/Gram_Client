@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,19 +27,18 @@ fun CustomDialog(
 ){
     if(isDialogOpen){
         Dialog(onDismissRequest = { /*TODO*/ }) {
-
                 Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .fillMaxWidth()
-                        .background(Color.White)
+                        .background(MaterialTheme.colors.secondary)
                         .padding(10.dp)
                 ) {
                     Text(
                         text = text,
                         fontSize = 18.sp,
                         modifier = Modifier.fillMaxWidth(),
-                        color = Color.Black
+                        color = MaterialTheme.colors.onBackground
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
@@ -50,7 +50,7 @@ fun CustomDialog(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .weight(1f),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = BackgroundColor, contentColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
                             onClick = { cancelBtnClick() }
                         ) {
                             Text(text = "Нет", fontSize = 18.sp)
@@ -60,10 +60,10 @@ fun CustomDialog(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .weight(1f),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor, contentColor = Color.White),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                             onClick = { okBtnClick() }
                         ) {
-                            Text(text = "Да", fontSize = 18.sp, color = Color.White)
+                            Text(text = "Да", fontSize = 18.sp)
                         }
                     }
                 }
@@ -83,14 +83,13 @@ fun CustomCancelDialog(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(MaterialTheme.colors.background)
                     .padding(10.dp)
             ) {
                 Text(
                     text = text,
                     fontSize = 18.sp,
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.Black
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
@@ -103,10 +102,10 @@ fun CustomCancelDialog(
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
                             .weight(1f),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor, contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                         onClick = { okBtnClick() }
                     ) {
-                        Text(text = "OK", fontSize = 18.sp, color = Color.White)
+                        Text(text = "OK", fontSize = 18.sp)
                     }
                 }
             }

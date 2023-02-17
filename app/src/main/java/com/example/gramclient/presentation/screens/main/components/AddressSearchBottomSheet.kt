@@ -19,16 +19,12 @@ import kotlinx.coroutines.delay
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AddressSearchBottomSheet(
     heightFraction: Float = 0.98f,
     isSearchState: MutableState<Boolean>,
     mainViewModel: MainViewModel,
-    bottomSheetState: BottomSheetScaffoldState,
     focusRequester: FocusRequester,
-    coroutineScope: CoroutineScope,
-    WHICH_ADDRESS: MutableState<String>,
     toAddress: List<Address>
 ) {
     val searchText = remember { mutableStateOf("") }
@@ -38,7 +34,6 @@ fun AddressSearchBottomSheet(
             .fillMaxWidth()
             .focusRequester(focusRequester)
             .fillMaxHeight(fraction = heightFraction)
-            .background(Color.White)
             .padding(15.dp)
     ) {
 

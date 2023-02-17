@@ -6,6 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -71,14 +73,15 @@ class SplashScreen : Screen {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = BackgroundColor),
+                .background(color = MaterialTheme.colors.secondary),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(verticalAlignment = Alignment.Bottom) {
-                Image(
+                Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
-                    ""
+                    "",
+                    tint = MaterialTheme.colors.onSecondary
                 )
 
                 val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.day_and_night))

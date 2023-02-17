@@ -1,9 +1,12 @@
 package com.example.gramclient.presentation.screens.main.addressComponents
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
@@ -31,40 +34,44 @@ fun AddressList(
     address: MutableState<String>,
     focusManager: FocusManager,
     mainViewModel: MainViewModel = hiltViewModel(),
-    onclick: (address:Address) -> Unit
+    onclick: (address: Address) -> Unit
 ) {
     val activity = (LocalContext.current as? MainActivity)
     val keyboardController = LocalSoftwareKeyboardController.current
     val stateSearchAddress by mainViewModel.stateSearchAddress
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .clip(shape = RoundedCornerShape(10.dp))
-       ) {
-           Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
-               Loader(isLoading = stateSearchAddress.isLoading)
-           }
-           stateSearchAddress.response?.let { items ->
-               if(items.isNotEmpty()) {
-                   items.forEach{
-                       AddressListItem(
-                           addressText = it.address,
-                           onItemClick = { selectedAddress ->
-                               address.value = selectedAddress
-                               keyboardController?.hide()
-                               isVisible.value = !isVisible.value
-                               focusManager.clearFocus()
-                               onclick(it)
-                           }
-                       )
-                       Divider()
-                   }
-               }
-           }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(10.dp))
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Loader(isLoading = stateSearchAddress.isLoading)
+        }
+        stateSearchAddress.response?.let { items ->
+            if (items.isNotEmpty()) {
+                items.forEach {
+                    AddressListItem(
+                        addressText = it.address,
+                        onItemClick = { selectedAddress ->
+                            address.value = selectedAddress
+                            keyboardController?.hide()
+                            isVisible.value = !isVisible.value
+                            focusManager.clearFocus()
+                            onclick(it)
+                        }
+                    )
+                    Divider()
+                }
+            }
+        }
     }
 }
+
 @Composable
-fun Loader(isLoading:Boolean){
-    if(isLoading){
+fun Loader(isLoading: Boolean) {
+    if (isLoading) {
         CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color(0xFF1E88E5))
     }
 }

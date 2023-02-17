@@ -124,7 +124,7 @@ class ProfileScreen : Screen{
                 LazyColumn(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .background(BackgroundColor)
+                        .background(MaterialTheme.colors.secondary)
                         .fillMaxSize()
                 ) {
                     item {
@@ -178,7 +178,7 @@ class ProfileScreen : Screen{
                                 onValueChange = { profileFirstName.value = it },
                                 label = { Text(text = "Имя*") },
                                 colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = BackgroundColor,
+                                    backgroundColor = MaterialTheme.colors.background,
                                     unfocusedLabelColor = FontSilver,
                                     focusedLabelColor = FontSilver,
                                     unfocusedIndicatorColor = FontSilver,
@@ -194,7 +194,7 @@ class ProfileScreen : Screen{
                                 onValueChange = { profileLastName.value = it },
                                 label = { Text(text = "Фамилия*") },
                                 colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = BackgroundColor,
+                                    backgroundColor = MaterialTheme.colors.background,
                                     unfocusedLabelColor = FontSilver,
                                     focusedLabelColor = FontSilver,
                                     unfocusedIndicatorColor = FontSilver,
@@ -210,7 +210,7 @@ class ProfileScreen : Screen{
                                 onValueChange = { profileEmail.value = it },
                                 label = { Text(text = "Email") },
                                 colors = TextFieldDefaults.textFieldColors(
-                                    backgroundColor = BackgroundColor,
+                                    backgroundColor = MaterialTheme.colors.background,
                                     unfocusedLabelColor = FontSilver,
                                     focusedLabelColor = FontSilver,
                                     unfocusedIndicatorColor = FontSilver,
@@ -267,8 +267,7 @@ class ProfileScreen : Screen{
                             ) {
                                 CustomButton(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(Color.Black)
+                                        .clip(RoundedCornerShape(16.dp))
                                         .width(363.dp)
                                         .height(55.dp)
                                         .padding(top = 0.dp),
@@ -324,7 +323,8 @@ class ProfileScreen : Screen{
                                             }
 
                                         }
-                                    }
+                                    },
+                                    color = MaterialTheme.colors.primary
                                 )
                             }
                             Spacer(modifier = Modifier.height(49.dp))

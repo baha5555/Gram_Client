@@ -4,10 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -38,7 +35,7 @@ fun orderSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(MaterialTheme.colors.background)
             .padding(bottom = 10.dp)
     ) {
         Row(
@@ -95,7 +92,7 @@ fun orderSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
-                Image(
+                Icon(
                     modifier = Modifier.size(20.dp),
                     imageVector = ImageVector.vectorResource(R.drawable.plus_icon),
                     contentDescription = "Logo"
@@ -121,10 +118,15 @@ fun orderSection(
                 modifier = Modifier
                     .clickable {
                         scope.launch {
-                            if(order.to_address.size>1){
+                            if (order.to_address.size > 1) {
                                 bottomNavigator.show(AddStopScreenOrderExcecution())
-                            }else{
-                                bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.TO_ADDRESS, inx = 0))
+                            } else {
+                                bottomNavigator.show(
+                                    SearchAddressOrderExecutionNavigator(
+                                        Constants.TO_ADDRESS,
+                                        inx = 0
+                                    )
+                                )
                             }
                         }
                     }
@@ -137,7 +139,9 @@ fun orderSection(
                     Image(
                         modifier = Modifier
                             .size(20.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.to_marker),
+                        imageVector = if (MaterialTheme.colors.isLight) ImageVector.vectorResource(R.drawable.to_marker) else ImageVector.vectorResource(
+                            R.drawable.to_marker_dark
+                        ),
                         contentDescription = "Logo"
                     )
                     Spacer(modifier = Modifier.width(20.dp))
