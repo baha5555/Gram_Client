@@ -2,23 +2,29 @@ package com.example.gramclient.presentation.screens.order.components
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.gramclient.R
 import com.example.gramclient.domain.firebase.order.Allowance
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.domain.mainScreen.Address
@@ -53,15 +59,21 @@ class CustomInfoOfActiveOrder: Screen {
             }
         }
         Scaffold(topBar = {
-            TopAppBar {
-                IconButton(onClick = { navigator.replace(OrderExecutionScreen()) }) {
-                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
-                }
-                Spacer(modifier = Modifier.width(25.dp))
-                Text(text = "Детали заказа", fontWeight = FontWeight.Bold)
-            }
+
         }) {
-            Column(modifier = Modifier.fillMaxHeight(0.95f)) {
+            Column() {
+                Row(modifier = Modifier.fillMaxWidth(0.64f).background(MaterialTheme.colors.onPrimary).padding(vertical = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                    IconButton(onClick = { navigator.pop() }) {
+                        Icon(imageVector = Icons.Default.ArrowBackIos, contentDescription = null)
+                    }
+                    Text(
+                            text = "Детали заказа", fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        fontSize = 17.sp
+                        )
+            }
                 LazyColumn() {
                     item {
                         selectRealtimeDatabaseOrder.let { order ->
@@ -69,14 +81,19 @@ class CustomInfoOfActiveOrder: Screen {
                             order.from_address?.address?.let {
                                 CustomAddressText(
                                     title = it,
-                                    point = "${symbol.toChar()}"
+                                    point = R.drawable.ic_from_address_marker
                                 )
                             }
                             order.to_address?.let { toAddress ->
                                 for (i in toAddress.indices) {
+                                    Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 50.dp)
+                                    )
                                     CustomAddressText(
                                         title = toAddress[i].address,
-                                        point = "${(symbol + i + 1).toChar()}"
+                                        point = if (i == toAddress.size - 1) R.drawable.ic_to_address_marker else R.drawable.ic_to_address_second_marker
                                     )
                                 }
                             }
@@ -85,7 +102,7 @@ class CustomInfoOfActiveOrder: Screen {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 15.dp, horizontal = 10.dp),
+                                        .padding(vertical = 15.dp, horizontal = 15.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(text = it)
@@ -97,18 +114,28 @@ class CustomInfoOfActiveOrder: Screen {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 15.dp, horizontal = 10.dp)
+                                        .padding(vertical = 15.dp, horizontal = 15.dp)
                                 ) {
-                                    Text(text = it, modifier = Modifier.padding(bottom = 15.dp))
+                                    Text(text = it)
                                 }
-                                Divider()
-                                Text(text = "${order.price} сомони")
+                                Divider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp)
+                                )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 15.dp, horizontal = 15.dp)
+                                ) {
+                                    Text(text = "${order.price} смн.")
+                                }
                             }
                             CustomInfoTitle(title = "Способ оплаты")
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 15.dp, horizontal = 10.dp),
+                                    .padding(vertical = 15.dp, horizontal = 15.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(text = "Наличные")
@@ -118,12 +145,23 @@ class CustomInfoOfActiveOrder: Screen {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 15.dp, horizontal = 10.dp),
+                                        .padding(vertical = 15.dp, horizontal = 15.dp),
                                 ) {
                                     Text(
                                         text = (performer.first_name
                                             ?: "") + " " + (performer.last_name ?: "")
                                     )
+                                }
+                                Divider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp)
+                                )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 15.dp, horizontal = 15.dp),
+                                ) {
                                     performer.transport?.let { transport ->
                                         Text(text = "${transport.color} ${transport.model}, ${transport.car_number}")
                                     }
@@ -134,11 +172,16 @@ class CustomInfoOfActiveOrder: Screen {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 15.dp, horizontal = 10.dp),
+                                        .padding(vertical = 15.dp, horizontal = 15.dp),
                                 ) {
                                     allowance.forEach {
                                         Text(text = it.name)
                                     }
+                                    Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 15.dp)
+                                    )
                                 }
                             }
                         }
@@ -150,18 +193,18 @@ class CustomInfoOfActiveOrder: Screen {
     @Composable
     fun CustomAddressText(
         title: String,
-        point: String
+        point: Int
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 15.dp, horizontal = 10.dp),
+                .padding(vertical = 15.dp, horizontal = 15.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = point, color = Color(0xFB8B8B8B))
+            Image(modifier=Modifier.size(15.dp),painter = painterResource(id = point), contentDescription = null)
             Text(
                 text = title, modifier = Modifier
-                    .padding(start = 10.dp)
+                    .padding(start = 15.dp)
                     .fillMaxWidth(0.8f)
             )
         }
@@ -172,8 +215,8 @@ class CustomInfoOfActiveOrder: Screen {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFB8B8B8))
-                .padding(vertical = 15.dp, horizontal = 10.dp)
+                .background(MaterialTheme.colors.primaryVariant)
+                .padding(vertical = 15.dp, horizontal = 15.dp)
         ) {
             Text(text = title)
         }

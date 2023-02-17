@@ -86,11 +86,11 @@ fun searchSection(
             singleLine = true,
             shape = RoundedCornerShape(15.dp),
             colors = TextFieldDefaults.textFieldColors(
-                textColor = Color.Black,
-                cursorColor = Color.Black,
+                textColor = MaterialTheme.colors.onSecondary,
+                cursorColor = MaterialTheme.colors.onSecondary,
                 leadingIconColor = Color.Black,
                 trailingIconColor = Color.Black,
-                backgroundColor = BackgroundColor,
+                backgroundColor = MaterialTheme.colors.onSecondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent

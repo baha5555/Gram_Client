@@ -60,8 +60,7 @@ fun orderSection(
                 Spacer(modifier = Modifier.width(20.dp))
                 Text(
                     text = order.from_address?.address ?: "Откуда?"/*, maxLines = 1*/,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.Black
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Image(

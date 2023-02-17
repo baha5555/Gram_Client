@@ -17,12 +17,13 @@ private val DarkColorPalette = darkColors(
     onError = OnErrorDark,
     background = BackgroundDark,
     onBackground = OnBackgroundDark,
-    surface = SurfaceDark
+    surface = SurfaceDark,
+    primaryVariant = DetailsDark
 )
 
 @SuppressLint("ConflictingOnColor")
 private val LightColorPalette = lightColors(
-    primary = PrimaryLight,
+    primary = PrimaryLight ,
     onPrimary = OnPrimaryLight,
     secondary = SecondaryLight,
     onSecondary = OnSecondaryLight,
@@ -30,7 +31,8 @@ private val LightColorPalette = lightColors(
     onError = OnErrorLight,
     background = BackgroundLight,
     onBackground = OnBackgroundLight,
-    surface = SurfaceLight
+    surface = SurfaceLight,
+    primaryVariant = DetailsLight
 )
 
 @Composable

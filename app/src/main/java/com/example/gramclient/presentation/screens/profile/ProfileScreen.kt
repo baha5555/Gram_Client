@@ -247,7 +247,6 @@ class ProfileScreen : Screen{
                             ) {
                                 Text(
                                     text = "Получение рассылки",
-                                    color = Color.Black,
                                     fontSize = 15.sp
                                 )
                                 Row(modifier = Modifier.padding(end = 5.dp), verticalAlignment = Alignment.CenterVertically) {

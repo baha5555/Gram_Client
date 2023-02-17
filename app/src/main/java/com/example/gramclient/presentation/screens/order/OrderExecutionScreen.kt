@@ -173,7 +173,7 @@ class OrderExecutionScreen : Screen {
                             orderSection(order, scope, sheetState, isSearchState)
                             Spacer(modifier = Modifier.height(10.dp))
                             optionSection(onClick = {
-                                navigator.replace(CustomInfoOfActiveOrder())
+                                navigator.push(CustomInfoOfActiveOrder())
                             })
                             actionSection(cancelOrderOnClick = {
                                 isDialogOpen.value = true

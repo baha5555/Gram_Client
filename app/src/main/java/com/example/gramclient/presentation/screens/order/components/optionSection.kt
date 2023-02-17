@@ -58,7 +58,7 @@ fun optionSection(onClick:()->Unit){
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                    Text(text = "Наличные", maxLines = 1, overflow = TextOverflow.Ellipsis, color= Color.Black, fontSize = 18.sp)
+                    Text(text = "Наличные", maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
             }
             Image(
                 modifier = Modifier.size(18.dp),
@@ -87,7 +87,7 @@ fun optionSection(onClick:()->Unit){
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                Text(text = "Детали заказа", maxLines = 1, overflow = TextOverflow.Ellipsis, color= Color.Black, fontSize = 18.sp)
+                Text(text = "Детали заказа", maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
             }
             Image(
                 modifier = Modifier.size(18.dp),
