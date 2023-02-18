@@ -23,14 +23,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
-import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.addressComponents.AddressListItem
 import com.example.gramclient.presentation.screens.main.addressComponents.Loader
+import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.utils.Constants
 import kotlinx.coroutines.launch
 
-class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Screen {
+class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int = -1) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
@@ -41,12 +41,12 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
             mutableStateOf("")
         }
         val scope = rememberCoroutineScope()
-        val mainViewModel: MainViewModel = hiltViewModel()
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val focusRequester = remember { FocusRequester() }
         val bottomNavigator = LocalBottomSheetNavigator.current
 
         LaunchedEffect(true) {
-            mainViewModel.searchAddress("")
+            orderExecutionViewModel.searchAddress("")
             //focusRequester.requestFocus()
         }
         Column(
@@ -65,13 +65,13 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                     onValueChange = { value ->
                         scope.launch {
                             searchText.value = value
-                            mainViewModel.searchAddress(value)
+                            orderExecutionViewModel.searchAddress(value)
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    textStyle = TextStyle(fontSize = 18.sp),
+                    textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
                     leadingIcon = {
                         IconButton(onClick = { /*navController.popBackStack()*/ }) {
                             Icon(
@@ -105,7 +105,6 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                     singleLine = true,
                     shape = RoundedCornerShape(15.dp),
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = MaterialTheme.colors.background,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent
@@ -151,7 +150,7 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
             )
             {
                 val keyboardController = LocalSoftwareKeyboardController.current
-                val stateSearchAddress by mainViewModel.stateSearchAddress
+                val stateSearchAddress by orderExecutionViewModel.stateSearchAddress
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -177,17 +176,10 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                                         }
                                         when (whichScreen) {
                                             Constants.TO_ADDRESS -> {
-                                                if (inx > -1) {
-                                                    mainViewModel.updateToAddress(inx, it)
-                                                }else{
-                                                    mainViewModel.addToAddress(it)
-                                                }
+                                                if(inx>=0) orderExecutionViewModel.updateToAddressInx(it, inx)
                                             }
                                             Constants.ADD_TO_ADDRESS -> {
-                                                mainViewModel.addToAddress(it)
-                                            }
-                                            Constants.FROM_ADDRESS -> {
-                                                mainViewModel.updateFromAddress(it)
+                                                orderExecutionViewModel.addToAddress(it)
                                             }
                                         }
                                     }

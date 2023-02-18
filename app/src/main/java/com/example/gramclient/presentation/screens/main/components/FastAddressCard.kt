@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,12 +31,13 @@ fun FastAddressCard(
             painter = painterResource(id = R.drawable.img_fast_address),
             contentDescription = null
         )
-        Image(
+        Icon(
             painter = painterResource(id = R.drawable.back_fast_address),
             contentDescription = null,
             modifier = Modifier.clip(RoundedCornerShape(20.dp)).clickable {
                 onClick.invoke()
-            }
+            },
+            tint = Color(if(MaterialTheme.colors.isLight) 0xEDCFF5FF else 0xE2575963)
         )
         Column(
             modifier = Modifier

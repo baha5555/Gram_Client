@@ -32,6 +32,8 @@ import com.example.gramclient.presentation.screens.map.CustomMainMap
 import com.example.gramclient.presentation.screens.order.components.*
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants
+import com.example.gramclient.utils.Constants.SOON
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.example.gramclient.utils.Values
@@ -67,8 +69,10 @@ class OrderExecutionScreen : Screen {
             mutableStateOf(0)
         }
 
-        LaunchedEffect(key1 = true) {
-            //orderExecutionViewModel.readAllOrders()
+        DisposableEffect(key1 = true ){
+            onDispose {
+                orderExecutionViewModel.clearAddresses()
+            }
         }
         if (Values.DriverLocation.value.latitude != 0.0) {
             Log.i("asdasda", "" + Values.DriverLocation.value)
@@ -111,27 +115,33 @@ class OrderExecutionScreen : Screen {
             }
 
             selectRealtimeDatabaseOrder.from_address?.let {
-                //mainViewModel.updateFromAddress(it)
+                if (it != mainViewModel.fromAddress.value) {
+                    orderExecutionViewModel.updateFromAddress(it)
+                }
                 Log.e("From_address-1", "$it")
             }
 
             selectRealtimeDatabaseOrder.to_address?.let { to_Addresses ->
-                to_Addresses.forEach { address ->
-                    //mainViewModel.updateToAddress(address)
-                    Log.e("To_address-1", "$address")
+                orderExecutionViewModel.updateToAddress(clear = true)
+                if (to_Addresses.toMutableStateList() != mainViewModel.toAddresses) {
+                    //orderExecutionViewModel.updateToAddress(to_Addresses.toMutableStateList())
+                    to_Addresses.toMutableStateList().forEach {
+                        orderExecutionViewModel.updateToAddress(it)
+                    }
                 }
+                Log.e("From_address-1", ""+to_Addresses.toMutableStateList().size)
             }
         }
-        BottomSheetScaffold(
+            BottomSheetScaffold(
             scaffoldState = sheetState,
-            sheetBackgroundColor = Color(0xFFffffff),
+            sheetBackgroundColor = MaterialTheme.colors.background,
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight(unbounded = true)
-                        .background(BackgroundColor)
+                        .background(MaterialTheme.colors.secondary)
                 ) {
                     if (!isSearchState.value) {
                         scope.launch {
@@ -162,7 +172,9 @@ class OrderExecutionScreen : Screen {
                             }
                             orderSection(order, scope, sheetState, isSearchState)
                             Spacer(modifier = Modifier.height(10.dp))
-                            optionSection()
+                            optionSection(onClick = {
+                                navigator.push(CustomInfoOfActiveOrder())
+                            })
                             actionSection(cancelOrderOnClick = {
                                 isDialogOpen.value = true
                                 orderId = order.id
@@ -197,7 +209,7 @@ class OrderExecutionScreen : Screen {
                     CustomDialog(
                         text = stateCancelOrderText,
                         okBtnClick = {
-                            if(Values.ClientOrders.value?.active_orders?.size==1){
+                            if (Values.ClientOrders.value?.active_orders?.size == 1) {
                                 navigator.replaceAll(SearchAddressScreen())
                                 return@CustomDialog
                             }
@@ -304,5 +316,4 @@ class OrderExecutionScreen : Screen {
             }
         }
     }
-
 }

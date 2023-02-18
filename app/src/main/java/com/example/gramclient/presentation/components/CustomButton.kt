@@ -3,6 +3,7 @@ package com.example.gramclient.presentation.components
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,7 +20,7 @@ fun CustomButton(
     textSize: Int,
     textBold: Boolean,
     enabled: Boolean = true,
-    color: Color = PrimaryColor,
+    color: Color = MaterialTheme.colors.primary,
     onClick: () -> Unit,
 ) {
     Button(

@@ -71,9 +71,6 @@ class MainScreen : Screen{
         val modalSheetState = rememberModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
             confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
-        val modalSheetBottomBarState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Expanded,
-            confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
         val context = LocalContext.current
         val scaffoldState = rememberScaffoldState()
 
@@ -286,7 +283,6 @@ class MainScreen : Screen{
                         )
                     }) {
                         BottomSheetScaffold(
-                            sheetBackgroundColor = Color.Transparent,
                             scaffoldState = mainBottomSheetState,
                             floatingActionButton = {
                                 Column(
@@ -297,9 +293,8 @@ class MainScreen : Screen{
                                     horizontalAlignment = Alignment.Start
                                 ) {
                                     FloatingActionButton(
-                                        modifier = Modifier
-                                            .size(50.dp),
-                                        backgroundColor = Color.White,
+                                        modifier = Modifier.size(50.dp),
+                                        backgroundColor = MaterialTheme.colors.background,
                                         onClick = {
                                             coroutineScope.launch {
                                                 navigator.replaceAll(SearchAddressScreen())
@@ -308,7 +303,7 @@ class MainScreen : Screen{
                                     ) {
                                         Icon(
                                             Icons.Filled.ArrowBack,
-                                            contentDescription = "Menu", tint = Color.Black,
+                                            contentDescription = "Menu",
                                             modifier = Modifier.size(25.dp)
                                         )
                                     }

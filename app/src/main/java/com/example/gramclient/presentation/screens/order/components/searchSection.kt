@@ -82,15 +82,15 @@ fun searchSection(
                     }
                 }
             },
-            placeholder = { Text(text = "Введите адрес для поиска") },
+            placeholder = { Text(text = "Введите адрес для поиска",modifier=Modifier.fillMaxWidth(0.9f)) },
             singleLine = true,
             shape = RoundedCornerShape(15.dp),
             colors = TextFieldDefaults.textFieldColors(
-                textColor = Color.Black,
-                cursorColor = Color.Black,
+                textColor = MaterialTheme.colors.onSecondary,
+                cursorColor = MaterialTheme.colors.onSecondary,
                 leadingIconColor = Color.Black,
                 trailingIconColor = Color.Black,
-                backgroundColor = BackgroundColor,
+                backgroundColor = MaterialTheme.colors.onSecondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent
@@ -136,7 +136,7 @@ fun searchSection(
                 bottomSheetState.bottomSheetState.collapse()
             }
             isSearchState.value=false
-            orderExecutionViewModel.editOrder(address.id)
+            //orderExecutionViewModel.editOrder(address.id)
             searchText.value = ""
         }
     }

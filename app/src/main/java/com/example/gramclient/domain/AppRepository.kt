@@ -14,6 +14,7 @@ import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.orderHistory.OrderHistoryPagingResult
 
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
 import com.example.gramclient.domain.profile.GetProfileInfoResponse
@@ -34,7 +35,7 @@ interface AppRepository {
     suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse
     suspend fun getProfileInfo(): GetProfileInfoResponse
     suspend fun getOrderHistory(): orderHistoryResponse
-    suspend fun getOrderHistoryResponse(page:Int): orderHistoryResponse
+    suspend fun getOrderHistoryResponse(page:Int): OrderHistoryPagingResult
     suspend fun connectClientWithDriver(order_id: String): connectClientWithDriverResponse
     suspend fun sendProfile(
         first_name: RequestBody,

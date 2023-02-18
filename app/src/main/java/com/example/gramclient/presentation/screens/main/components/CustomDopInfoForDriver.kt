@@ -55,7 +55,7 @@ fun CustomDopInfoForDriver(
         .fillMaxHeight(if (!stateViewOfInfo) 0.9f else 0.45f)) {
         Box(modifier = Modifier
             .fillMaxWidth()
-            .background(BackgroundColor)
+            .background(MaterialTheme.colors.secondary)
             .padding(vertical = 20.dp), contentAlignment = Alignment.Center) {
             Text(
                 text = title,

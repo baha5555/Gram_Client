@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
+
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -110,8 +110,8 @@ class SearchAddressScreen : Screen {
                                         FloatingButton(
                                             bottomSheetState = bottomSheetState,
                                             Icons.Filled.ArrowBack,
-                                            backgroundColor = Color.White,
-                                            contentColor = PrimaryColor
+                                            backgroundColor = MaterialTheme.colors.background,
+                                            contentColor = MaterialTheme.colors.onBackground
                                         ){
                                             navigator.replaceAll(SearchDriverScreen())
                                         }
@@ -125,7 +125,7 @@ class SearchAddressScreen : Screen {
                                 ) {
                                     FloatingButton(
                                         bottomSheetState = bottomSheetState,
-                                        Icons.Filled.MyLocation
+                                        ImageVector.vectorResource(id = R.drawable.btn_show_location)
                                     ){
                                         map.controller.animateTo(mLocationOverlay.myLocation)
                                         if (mLocationOverlay.myLocation != null) {
@@ -151,7 +151,7 @@ class SearchAddressScreen : Screen {
                                 }
                             },
                             drawerGesturesEnabled = false,
-                            sheetBackgroundColor = Color.White,
+                            sheetBackgroundColor = MaterialTheme.colors.background,
                             scaffoldState = bottomSheetState,
                             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                             sheetGesturesEnabled = !bottomSheetState.bottomSheetState.isCollapsed,
@@ -159,10 +159,7 @@ class SearchAddressScreen : Screen {
                                 AddressSearchBottomSheet(
                                     isSearchState = isSearchState,
                                     mainViewModel = mainViewModel,
-                                    bottomSheetState = bottomSheetState,
                                     focusRequester = focusRequester,
-                                    coroutineScope = coroutineScope,
-                                    WHICH_ADDRESS = WHICH_ADDRESS,
                                     toAddress = toAddress
                                 )
                             },

@@ -6,7 +6,9 @@ import android.os.Vibrator
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -17,9 +19,16 @@ import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.domain.firebase.GetClientOrderUseCase
 import com.example.gramclient.domain.firebase.GetOrdersUseCase
 import com.example.gramclient.domain.firebase.profile.Client
+import com.example.gramclient.domain.mainScreen.Address
+import com.example.gramclient.domain.mainScreen.SearchAddressResponse
+import com.example.gramclient.domain.mainScreen.SearchAddressUseCase
 import com.example.gramclient.presentation.screens.order.states.GetClientOrderState
 import com.example.gramclient.presentation.screens.order.states.GetOrdersState
 import com.example.gramclient.presentation.screens.main.states.CancelOrderResponseState
+import com.example.gramclient.presentation.screens.main.states.SearchAddressResponseState
+import com.example.gramclient.presentation.screens.map.MapController
+import com.example.gramclient.presentation.screens.map.map
+import com.example.gramclient.presentation.screens.map.showRoadAB
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.utils.Values
 import com.google.firebase.database.DataSnapshot
@@ -31,6 +40,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.burnoutcrew.reorderable.ItemPosition
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
@@ -43,13 +53,15 @@ class OrderExecutionViewModel  @Inject constructor(
     private val editOrderUseCase: EditOrderUseCase,
     private val getOrdersUseCase: GetOrdersUseCase,
     private val getClientOrderUseCase: GetClientOrderUseCase,
-    private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase
+    private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase,
+    private val searchAddressUseCase: SearchAddressUseCase
 ): AndroidViewModel(application) {
     val context get() = getApplication<Application>()
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    val mapController = MapController(context)
 
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
-    val stateSearchAddress: State<AddRatingResponseState> = _stateAddRating
+    val stateAddRating: State<AddRatingResponseState> = _stateAddRating
 
     private val _stateConnectClientWithDriver = mutableStateOf(ConnectClientWithDriverResponseState())
     val stateConnectClientWithDriver = _stateConnectClientWithDriver
@@ -70,6 +82,74 @@ class OrderExecutionViewModel  @Inject constructor(
 
     private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
     val selectedOrder: State<RealtimeDatabaseOrder> = _selectedOrder
+
+    private var _toAddresses = mutableStateListOf<Address>()
+    val toAddresses: SnapshotStateList<Address> = _toAddresses
+
+    private val _fromAddress = mutableStateOf(Address("", 0, "", ""))
+    val fromAddress: State<Address> = _fromAddress
+
+    private val _stateSearchAddress = mutableStateOf(SearchAddressResponseState())
+    val stateSearchAddress: State<SearchAddressResponseState> = _stateSearchAddress
+
+    fun searchAddress(addressName: String) {
+        searchAddressUseCase.invoke(addressName).onEach { result: Resource<SearchAddressResponse> ->
+            when (result) {
+                is Resource.Success -> {
+                    try {
+                        val addressResponse: SearchAddressResponse? = result.data
+                        _stateSearchAddress.value =
+                            SearchAddressResponseState(response = addressResponse?.result)
+                        Log.e(
+                            "SearchAddressResponse",
+                            "SearchAddressResponseSuccess->\n ${_stateSearchAddress.value}"
+                        )
+                    } catch (e: Exception) {
+                        Log.d("SearchAddressResponse", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("SearchAddressResponse", "TariffsResponseError->\n ${result.message}")
+                    _stateSearchAddress.value = SearchAddressResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateSearchAddress.value = SearchAddressResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun updateFromAddress(address: Address){
+        _fromAddress.value=address
+        mapController.showRoadAB(_fromAddress, _toAddresses)
+        Log.i("fromaDA", ""+_fromAddress.value)
+    }
+
+    fun updateToAddressInx(address: Address, inx: Int) {
+        _toAddresses[inx] = address
+        editOrder(_toAddresses)
+    }
+
+    fun updateToAddress(address: Address? = null, clear: Boolean = false){
+        if(clear) _toAddresses.clear()
+        if (address != null) {
+            _toAddresses.add(address)
+        }
+        mapController.showRoadAB(_fromAddress, _toAddresses)
+        Log.i("fromaDA", ""+_toAddresses.size)
+    }
+    fun clearAddresses(){
+        _fromAddress.value=Address()
+        map.overlays.clear()
+    }
+    fun addToAddress(address: Address){
+        if (_toAddresses.contains(address)) return
+        _toAddresses.add(address)
+        editOrder(_toAddresses)
+        mapController.showRoadAB(_fromAddress, _toAddresses)
+    }
 
     fun updateSelectedOrder(order: RealtimeDatabaseOrder) {
         _selectedOrder.value = order
@@ -226,17 +306,36 @@ class OrderExecutionViewModel  @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+    fun move(from: ItemPosition, to: ItemPosition) {
+        _toAddresses = _toAddresses.apply {
+            add(to.index, removeAt(from.index))
+        }
+        editOrder(_toAddresses)
+    }
 
-    fun editOrder(toAddressId: Int) {
+    fun showRoad(){
+        map.overlays.clear()
+        showRoadAB(
+            context,
+            _fromAddress,
+            _toAddresses
+        )
+    }
+
+    fun removeAddStop(address: Address?) {
+        _toAddresses.remove(address)
+        editOrder(_toAddresses)
+    }
+    fun editOrder(_toAddresses: SnapshotStateList<Address>) {
         editOrderUseCase.invoke(
             order_id = selectedOrder.value.id,
             dop_phone = null,
             from_address = selectedOrder.value.from_address?.id,
             meeting_info = null,
-            to_addresses = listOf(AddressModel(toAddressId)),
+            to_addresses = _toAddresses,
             comment = null,
             tariff_id = selectedOrder.value.tariff_id?:0,
-            allowances= if(selectedOrder.value.allowances!=null) Gson().toJson(selectedOrder.value.allowances) else null
+            allowances = if(selectedOrder.value.allowances!=null) Gson().toJson(selectedOrder.value.allowances) else null
         ).onEach { result: Resource<UpdateOrderResponse> ->
             when (result){
                 is Resource.Success -> {

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.utils.Constants
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -39,12 +41,12 @@ import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 
 
-class AddStopScreen : Screen {
+class AddStopScreenOrderExcecution : Screen {
     @SuppressLint("SuspiciousIndentation")
     @Composable
     override fun Content() {
         val bottomNavigator = LocalBottomSheetNavigator.current
-        val vm: MainViewModel = hiltViewModel()
+        val vm: OrderExecutionViewModel = hiltViewModel()
         val state = rememberReorderableLazyListState(onMove = vm::move)
         val data = vm.toAddresses
         LazyColumn(
@@ -61,7 +63,12 @@ class AddStopScreen : Screen {
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
                             .clickable {
-                                bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS, inx))
+                                bottomNavigator.show(
+                                    SearchAddressOrderExecutionNavigator(
+                                        Constants.TO_ADDRESS,
+                                        inx
+                                    )
+                                )
                             }
                     ) {
                         Row(
@@ -70,7 +77,11 @@ class AddStopScreen : Screen {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.8f)) {
-                                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(start = 10.dp).padding(vertical = 10.dp).size(30.dp).border(1.dp, MaterialTheme.colors.onBackground, RoundedCornerShape(100))) {
+                                Box(contentAlignment = Alignment.Center, modifier = Modifier
+                                    .padding(start = 10.dp)
+                                    .padding(vertical = 10.dp)
+                                    .size(30.dp)
+                                    .border(1.dp, Color.Black, RoundedCornerShape(100))) {
                                     Text(text = "" + (inx+1), fontSize = 18.sp)
                                 }
                                 Text(
@@ -84,17 +95,23 @@ class AddStopScreen : Screen {
                                     imageVector = Icons.Outlined.Close,
                                     contentDescription = "",
                                     tint = Color.Red,
-                                    modifier = Modifier.size(35.dp).padding(end = 5.dp).clickable {
-                                        vm.removeAddStop(item)
-                                        if (data.size == 1) {
-                                            bottomNavigator.hide()
+                                    modifier = Modifier
+                                        .size(35.dp)
+                                        .padding(end = 5.dp)
+                                        .clickable {
+                                            vm.removeAddStop(item)
+                                            if (data.size == 1) {
+                                                bottomNavigator.hide()
+                                            }
                                         }
-                                    }
                                 )
                                 Icon(
                                     imageVector = Icons.Outlined.Menu,
                                     contentDescription = "",
-                                    modifier = Modifier.size(35.dp).padding(end = 10.dp)
+                                    tint = Color.Black,
+                                    modifier = Modifier
+                                        .size(35.dp)
+                                        .padding(end = 10.dp)
                                 )
                             }
                         }
@@ -104,7 +121,7 @@ class AddStopScreen : Screen {
             }
             item {
                 Button(
-                    onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS, -2))},
+                    onClick = { bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.ADD_TO_ADDRESS))},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp)

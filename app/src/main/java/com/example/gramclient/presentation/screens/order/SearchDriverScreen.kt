@@ -36,13 +36,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
-import com.example.gramclient.domain.firebase.profile.Client
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.map.CustomMainMap
-import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
@@ -97,7 +95,7 @@ class SearchDriverScreen : Screen {
                 content = {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 
-                        Scaffold(backgroundColor = Color(0xFFEEEEEE), bottomBar = {
+                        Scaffold(backgroundColor = MaterialTheme.colors.background, bottomBar = {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -107,7 +105,6 @@ class SearchDriverScreen : Screen {
                                             topStart = 25.dp, topEnd = 25.dp
                                         )
                                     )
-                                    .background(Color.White)
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -115,12 +112,12 @@ class SearchDriverScreen : Screen {
                                         .padding(15.dp)
                                         .height(50.dp)
                                         .clip(RoundedCornerShape(20.dp))
-                                        .background(PrimaryColor)
+                                        .background(MaterialTheme.colors.primary)
                                         .clickable { navigator.replace(SearchAddressScreen()) },
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Row(verticalAlignment = Alignment.CenterVertically,modifier=Modifier.fillMaxWidth(0.8f)) {
                                         Image(
                                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
                                             contentDescription = "car_eco",
@@ -134,7 +131,9 @@ class SearchDriverScreen : Screen {
                                         )
                                     }
                                     Row(
-                                        modifier = Modifier.padding(end = 10.dp),
+                                        modifier = Modifier
+                                            .padding(end = 10.dp)
+                                            .fillMaxWidth(0.35f),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Divider(
@@ -153,61 +152,9 @@ class SearchDriverScreen : Screen {
                                     }
 
                                 }
-
-//                                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-//                                    repeat(5) {
-//                                        Box(
-//                                            modifier = Modifier
-//                                                .size(150.dp, 30.dp)
-//                                                .padding(start = 15.dp)
-//                                                .border(
-//                                                    width = 1.dp,
-//                                                    color = PrimaryColor,
-//                                                    shape = RoundedCornerShape(35.dp)
-//                                                )
-//                                                .clip(RoundedCornerShape(35.dp))
-//                                        ) {
-//                                            Image(
-//                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_box),
-//                                                contentDescription = "ic_box"
-//                                            )
-//                                            Text(
-//                                                text = "Доставка",
-//                                                fontSize = 12.sp,
-//                                                modifier = Modifier.align(
-//                                                    Alignment.Center
-//                                                )
-//                                            )
-//                                        }
-//                                        Box(
-//                                            modifier = Modifier
-//                                                .size(150.dp, 30.dp)
-//                                                .padding(start = 15.dp)
-//                                                .border(
-//                                                    width = 1.dp,
-//                                                    color = PrimaryColor,
-//                                                    shape = RoundedCornerShape(35.dp)
-//                                                )
-//                                                .clip(RoundedCornerShape(35.dp))
-//                                        ) {
-//                                            Image(
-//                                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car_rent),
-//                                                contentDescription = "ic_box"
-//                                            )
-//                                            Text(
-//                                                text = "Аренда авто",
-//                                                fontSize = 12.sp,
-//                                                modifier = Modifier.align(
-//                                                    Alignment.Center
-//                                                )
-//                                            )
-//                                        }
-//                                    }
-//                                }
                                 Spacer(Modifier.requiredHeight(0.dp))
                             }
                         }) {
-
                             BottomSheetScaffold(
                                 sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
                                 scaffoldState = bottomSheetScaffoldState,
@@ -226,7 +173,7 @@ class SearchDriverScreen : Screen {
                                         Modifier
                                             .fillMaxWidth()
                                             .wrapContentHeight()
-                                            .background(Color(0xFFEEEEEE))
+                                            .background(MaterialTheme.colors.secondary)
                                     ) {
                                         stateRealtimeDatabaseOrders.response?.let { response ->
                                             response.observeAsState().value?.let { orders ->
@@ -258,10 +205,7 @@ class SearchDriverScreen : Screen {
                                                                                 },
                                                                                 isOpen = isOpen,
                                                                             )
-                                                                            Spacer(
-                                                                                Modifier.height(
-                                                                                    10.dp
-                                                                                )
+                                                                            Spacer(Modifier.height(10.dp)
                                                                             )
                                                                         }
                                                                     }
@@ -269,9 +213,7 @@ class SearchDriverScreen : Screen {
                                                             }
                                                             item {
                                                                 Spacer(
-                                                                    modifier = Modifier.height(
-                                                                        120.dp
-                                                                    )
+                                                                    modifier = Modifier.height(120.dp)
                                                                 )
                                                             }
                                                         }
@@ -293,7 +235,7 @@ class SearchDriverScreen : Screen {
         }
     }
 
-    @SuppressLint("SimpleDateFormat", "CoroutineCreationDuringComposition")
+    @SuppressLint("SimpleDateFormat", "CoroutineCreationDuringComposition", "NewApi")
     @Composable
     fun orderCard(
         orderExecutionViewModel: OrderExecutionViewModel,
@@ -333,7 +275,7 @@ class SearchDriverScreen : Screen {
             .clip(RoundedCornerShape(20.dp))
             .clickable { sheetPeekHeightUpOnClick() }
             .fillMaxWidth()
-            .background(color = Color.White, shape = RoundedCornerShape(20.dp))) {
+            .background(color = MaterialTheme.colors.background, shape = RoundedCornerShape(20.dp))) {
             if (order.performer == null) {
                 Row(
                     modifier = Modifier
@@ -343,7 +285,7 @@ class SearchDriverScreen : Screen {
                         )
                 ) {
                     LinearProgressIndicator(
-                        color = PrimaryColor,
+                        color = MaterialTheme.colors.onBackground,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(shape = RoundedCornerShape(percent = 50))
@@ -362,7 +304,7 @@ class SearchDriverScreen : Screen {
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column() {
+                Column(modifier=Modifier.fillMaxWidth(0.75f)) {
                     Text(
                         text = if (order.performer == null) "Ищем ближайших водителей..."
                         else {
@@ -377,17 +319,15 @@ class SearchDriverScreen : Screen {
                                     ""
                                 }
                             }
-                        }, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black
+                        }, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colors.onBackground
                     )
                     Text(
                         text = if (order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color ?: ""} ${order.performer.transport?.model ?: ""}",
-                        fontSize = 14.sp,
-                        color = Color.Black
+                        fontSize = 14.sp
                     )
                 }
-                if (order.performer == null) {
-                    Text(text = "00:00", fontSize = 14.sp, color = Color.Black)
-                } else {
+                    if (order.performer != null)  {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = order.performer.transport?.car_number ?: "",
@@ -395,7 +335,8 @@ class SearchDriverScreen : Screen {
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .offset(0.dp, 0.dp)
-                                .background(BackgroundColor)
+                                .background(MaterialTheme.colors.secondary)
+                                .padding(2.dp)
                         )
                         Image(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
@@ -422,7 +363,7 @@ class SearchDriverScreen : Screen {
                         }
                     } else {
                         CustomCircleButton(
-                            text = "Связаться", icon = R.drawable.phone
+                            text = "Связаться", icon = ImageVector.vectorResource(id = R.drawable.phone)
                         ) {
                             connectClientWithDriverIsDialogOpen.value = true
                         }
@@ -505,5 +446,4 @@ class SearchDriverScreen : Screen {
             ) {}
         }
     }
-
 }
