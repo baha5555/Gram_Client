@@ -53,8 +53,8 @@ class AddStopScreenOrderExcecution : Screen {
             state = state.listState,
             modifier = Modifier.reorderable(state)
         ) {
-            itemsIndexed(items = data, key = {_,it-> it.id}) {inx, item ->
-                ReorderableItem(state, item.id) { dragging ->
+            itemsIndexed(items = data, key = {_,it-> it.idIncrement}) {inx, item ->
+                ReorderableItem(state, item.idIncrement) { dragging ->
                     val elevation = animateDpAsState(if (dragging) 8.dp else 0.dp)
                     Column(
                         modifier = Modifier
