@@ -1,6 +1,7 @@
 package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
@@ -380,10 +381,12 @@ class SearchDriverScreen : Screen {
             okBtnClick = {
                 cancelOrderIsDialogOpen.value = false
                 orderExecutionViewModel.cancelOrder(order.id) {
-
-                }
-                if(Values.ClientOrders.value?.active_orders?.size==1){
-                    navigator.replaceAll(SearchAddressScreen())
+                    orderExecutionViewModel.stateCancelOrder.value.response.let {
+                        if(it == null ) return@cancelOrder
+                        if(it.result[0].count==0){
+                            navigator.replaceAll(SearchAddressScreen())
+                        }
+                    }
                 }
             },
             cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
