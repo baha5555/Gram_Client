@@ -136,6 +136,7 @@ class OrderExecutionViewModel  @Inject constructor(
         if(clear) _toAddresses.clear()
         if (address != null) {
             _toAddresses.add(address)
+            _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         }
         mapController.showRoadAB(_fromAddress, _toAddresses)
         Log.i("fromaDA", ""+_toAddresses.size)
@@ -147,6 +148,7 @@ class OrderExecutionViewModel  @Inject constructor(
     fun addToAddress(address: Address){
         if (_toAddresses.contains(address)) return
         _toAddresses.add(address)
+        _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         editOrder(_toAddresses)
         mapController.showRoadAB(_fromAddress, _toAddresses)
     }

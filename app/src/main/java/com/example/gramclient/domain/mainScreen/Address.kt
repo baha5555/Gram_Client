@@ -6,6 +6,7 @@ data class Address(
     var address_lat: String="",
     var address_lng: String="",
     var city: String="",
+    var idIncrement: Int = 0
 //    val district: String,
 //    val model: String,
 //    val region: String,

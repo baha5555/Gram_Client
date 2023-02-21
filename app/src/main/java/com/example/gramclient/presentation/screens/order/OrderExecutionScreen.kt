@@ -218,7 +218,15 @@ class OrderExecutionScreen : Screen {
                                 sheetState.bottomSheetState.collapse()
                                 if (orderId != -1)
                                     orderExecutionViewModel.cancelOrder(orderId) {
-                                        navigator.pop()
+                                        orderExecutionViewModel.stateCancelOrder.value.response.let {
+                                            if(it == null ) return@cancelOrder
+                                            if(it.result[0].count==0){
+                                                navigator.replaceAll(SearchAddressScreen())
+                                            }
+                                            else{
+                                                navigator.pop()
+                                            }
+                                        }
                                     }
                             }
                         },
