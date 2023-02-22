@@ -54,7 +54,9 @@ interface AppRepository {
         comment: String?,
         tariff_id: Int,
         allowances: String?,
-        date_time:String?
+        date_time:String?,
+        from_address_point: String?,
+        check_point_start: Short
     ): OrderResponse
 
 
