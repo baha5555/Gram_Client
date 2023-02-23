@@ -22,7 +22,7 @@ class EditOrderUseCase @Inject constructor(private val repository: AppRepository
         meeting_info: String?,
         to_addresses: SnapshotStateList<Address>,
         comment: String?,
-        tariff_id: Int,
+        tariff_id : Int,
         allowances: String?,
     ): Flow<Resource<UpdateOrderResponse>> =
         flow{
