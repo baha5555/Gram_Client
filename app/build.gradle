@@ -66,6 +66,11 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
+
+    implementation "com.maxkeppeler.sheets-compose-dialogs:core:1.0.2"
+    implementation "com.maxkeppeler.sheets-compose-dialogs:calendar:1.0.2"
+    implementation "com.maxkeppeler.sheets-compose-dialogs:clock:1.0.2"
+
     //statusBar color
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
     // Compose navigation
