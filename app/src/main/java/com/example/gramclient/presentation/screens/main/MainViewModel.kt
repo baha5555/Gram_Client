@@ -357,7 +357,9 @@ class MainViewModel @Inject constructor(
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
-            date_time = if (_planTrip.value != "") _planTrip.value else null
+            date_time = if (_planTrip.value != "") _planTrip.value else null,
+            from_address_point = null,
+            check_point_start = 0
         ).onEach { result: Resource<OrderResponse> ->
             when (result) {
                 is Resource.Success -> {
