@@ -42,7 +42,7 @@ fun CustomDopInfoForDriver(
     placeholder:String,
     title:String,
     stateTextField:Boolean = false,
-    stateViewOfInfo:Boolean = false,
+    stateViewOfInfo:MutableState<Boolean> = mutableStateOf(false),
     planTripTenMinutesOnClick:()->Unit = {},
     planTripFifteenMinutesOnClick:()->Unit = {},
     selectedTime:MutableState<String> = mutableStateOf(""),
@@ -52,7 +52,7 @@ fun CustomDopInfoForDriver(
     var stateDatePickerDialog by remember{mutableStateOf(false)}
     Column(modifier = Modifier
         .fillMaxWidth()
-        .fillMaxHeight(if (!stateViewOfInfo) 0.9f else 0.45f)) {
+        .fillMaxHeight(if (!stateViewOfInfo.value) 0.9f else 0.45f)) {
         Box(modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colors.secondary)
@@ -63,7 +63,7 @@ fun CustomDopInfoForDriver(
                 modifier = Modifier.padding(end = 10.dp)
             )
         }
-        if(!stateViewOfInfo) {
+        if(!stateViewOfInfo.value) {
             TextField(
                 modifier = Modifier
                     .fillMaxWidth(0.95f)
@@ -123,22 +123,7 @@ fun CustomDopInfoForDriver(
                 Icon(imageVector = Icons.Default.ArrowForward, contentDescription = null)
             }
         }
-        if(textFieldValue!="" && !stateViewOfInfo) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                CustomButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 10.dp)
-                        .height(50.dp),
-                    text = "Сохранить", textSize = 16, onClick = onClick,
-                    textBold = false
-                )
-            }
-        }
-        else if(stateViewOfInfo){
+        if(textFieldValue!="" || stateViewOfInfo.value) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter

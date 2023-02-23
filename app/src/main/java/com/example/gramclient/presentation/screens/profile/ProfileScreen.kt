@@ -246,11 +246,11 @@ class ProfileScreen : Screen{
 
                             ) {
                                 Text(
-                                    text = "Получение рассылки",
+                                    text = "Получение рассылки$SOON",
                                     fontSize = 15.sp
                                 )
                                 Row(modifier = Modifier.padding(end = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Text(text = SOON, modifier = Modifier.padding(end = 10.dp))
+
                                     val switchON = remember {
                                         mutableStateOf(false) // Initially the switch is ON
                                     }

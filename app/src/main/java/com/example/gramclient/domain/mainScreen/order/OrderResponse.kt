@@ -1,5 +1,7 @@
 package com.example.gramclient.domain.mainScreen.order
 
+import com.example.gramclient.domain.mainScreen.order.editOrder.Result
+
 data class OrderResponse(
     val code: Int,
     val error: List<Any>,
@@ -12,6 +14,6 @@ data class UpdateOrderResponse(
     val code: Int,
     val error: List<Any>,
     val message: String,
-    val result: String,
+    val result: Result,
     val success: Boolean
 )
