@@ -39,7 +39,7 @@ fun RootScreen() {
     }
     Permissions()
     BottomSheetNavigator(sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)) {
-        Navigator(screen = MapPointScreen())
+        Navigator(screen = SplashScreen())
     }
     ReturnRequest()
     if (Constants.STATE_DRIVER_IN_SITE.value) {

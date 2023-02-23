@@ -29,12 +29,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.presentation.components.voyager.AddStopScreen
+import com.example.gramclient.presentation.components.voyager.MapPointScreen
 import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.components.*
@@ -163,6 +167,7 @@ fun AddressesContent(
 ) {
     val mainViewModel: MainViewModel = hiltViewModel()
     val toAddresses = mainViewModel.toAddresses
+    val navigator: Navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
     Column(
         modifier = Modifier
@@ -193,28 +198,38 @@ fun AddressesContent(
                 }
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 15.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                modifier = Modifier
-                    .size(20.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                contentDescription = "Logo"
-            )
-            Spacer(modifier = Modifier.width(20.dp))
-            if (address_from.address == "") {
-                Text(
-                    text = "Откуда?",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.Gray
+            Row() {
+                Image(
+                    modifier = Modifier
+                        .size(20.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                    contentDescription = "Logo"
                 )
-            } else {
-                Text(
-                    address_from.address,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis,
-                )
+                Spacer(modifier = Modifier.width(20.dp))
+                if (address_from.address == "") {
+                    Text(
+                        text = "Откуда?",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.Gray
+                    )
+                } else {
+                    Text(
+                        address_from.address,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
+            Text("Карта", modifier = Modifier
+                .clip(RoundedCornerShape(3.dp))
+                .background(Color(0xFFF0F0F0))
+                .clickable {
+                    navigator.push(MapPointScreen())
+                }
+                .padding(5.dp))
         }
         Column(
             modifier = Modifier

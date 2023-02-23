@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -36,14 +37,14 @@ import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
-
+lateinit var navigator: Navigator
 class SplashScreen : Screen {
     @Composable
     override fun Content() {
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val profileViewModel: ProfileViewModel = hiltViewModel()
 
-        val navigator = LocalNavigator.currentOrThrow
+        navigator = LocalNavigator.currentOrThrow
         val currentKey = navigator.lastItem.key
         val activeOrders = orderExecutionViewModel.stateActiveOrders.value
 
