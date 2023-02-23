@@ -37,25 +37,13 @@ class MapPointScreen : Screen {
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
                 SheetContent{
-                    val address: Address = Address("Мекта на карте")
+                    val address: Address = Address("Мекта на карте", -1, map.mapCenter.latitude.toString(), map.mapCenter.longitude.toString())
                     mainViewModel.updateFromAddress(address)
                     navigator.pop()
                 }
             },
             sheetPeekHeight = 150.dp,
             floatingActionButton = {
-
-                if (Values.ClientOrders.value != null) {
-                    Box(modifier = Modifier.offset(25.dp, (-55).dp)) {
-                        FloatingButton(
-                            Icons.Filled.ArrowBack,
-                            backgroundColor = MaterialTheme.colors.background,
-                            contentColor = MaterialTheme.colors.onBackground
-                        ) {
-                            //navigator.replaceAll(SearchDriverScreen())
-                        }
-                    }
-                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

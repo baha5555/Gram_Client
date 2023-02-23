@@ -223,13 +223,13 @@ fun AddressesContent(
                     )
                 }
             }
-            Text("Карта", modifier = Modifier
-                .clip(RoundedCornerShape(3.dp))
-                .background(Color(0xFFF0F0F0))
-                .clickable {
-                    navigator.push(MapPointScreen())
-                }
-                .padding(5.dp))
+//            Text("Карта", modifier = Modifier
+//                .clip(RoundedCornerShape(3.dp))
+//                .background(Color(0xFFF0F0F0))
+//                .clickable {
+//                    navigator.push(MapPointScreen())
+//                }
+//                .padding(5.dp))
         }
         Column(
             modifier = Modifier
