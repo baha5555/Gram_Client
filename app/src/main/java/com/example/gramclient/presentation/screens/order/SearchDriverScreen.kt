@@ -313,7 +313,7 @@ class SearchDriverScreen : Screen {
                                 "Водитель на месте" -> "Водитель на месте,\n можете выходить"
                                 "Исполняется" -> "За рулем ${order.performer?.first_name ?: "Водитель"}"
                                 "Водитель назначен" -> {
-                                    if (fillingTimeMinutes > 0) "Через $fillingTimeMinutes мин приедет"
+                                    if (fillingTimeMinutes > 0 && order.filing_time!=null) "Через $fillingTimeMinutes мин приедет"
                                     else "В ближайшее время \n приедет ${order.performer.first_name}"
                                 }
                                 else -> {
