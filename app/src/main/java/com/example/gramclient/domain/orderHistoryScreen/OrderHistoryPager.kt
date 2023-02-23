@@ -5,6 +5,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.data.remote.ApplicationApi
 import com.example.gramclient.domain.orderHistory.Data
+import com.example.gramclient.domain.orderHistory.Pagination
 import com.example.gramclient.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -41,36 +42,22 @@ class OrderHistoryUseCase @Inject constructor(
 ) {
     fun response() = Pager(
         config = PagingConfig(
-            pageSize = 20,
+            pageSize = 10,
         ),
         pagingSourceFactory = {
             OrderHistoryPager(applicationApi, prefs)
         }
     ).flow
-    operator fun invoke()
-            : Flow<Resource<Pager<Int,Data>>> =
-    flow {
-        try {
-            emit(Resource.Loading<Pager<Int,Data>>())
-            fun paging() = Pager(
-                config = PagingConfig(
-                    pageSize = 20,
-                ),
-                pagingSourceFactory = {
-                    OrderHistoryPager(applicationApi, prefs)
-                }
-            )
-            emit(Resource.Success<Pager<Int,Data>>(paging()))
-        }catch (e: HttpException) {
-            emit(
-                Resource.Error<Pager<Int,Data>>(
-                    e.localizedMessage ?: "Произошла непредвиденная ошибка"
-                )
-            )
-        } catch (e: IOException) {
-            emit(Resource.Error<Pager<Int,Data>>("Не удалось связаться с сервером. Проверьте подключение к Интернету."))
+
+    operator fun invoke(pageSize: Int): Flow<PagingData<Data>> {
+        return try {
+            Pager(
+                PagingConfig(pageSize = pageSize),
+                pagingSourceFactory = { OrderHistoryPager(applicationApi, prefs) }
+            ).flow
         } catch (e: Exception) {
-            emit(Resource.Error<Pager<Int,Data>>("${e.message}"))
+            // Обработка ошибки, например, запись в лог или отображение сообщения пользователю
+            throw Exception("Ошибка при загрузке данных: ${e.message}")
         }
     }
 }

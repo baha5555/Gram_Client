@@ -16,5 +16,5 @@ data class Data(
     val status: String,
     val tariff: String,
     val tariff_id: Int,
-    val to_addresses: List<ToAddresse>
+    val to_addresses: List<ToAddresse>?=null
 )

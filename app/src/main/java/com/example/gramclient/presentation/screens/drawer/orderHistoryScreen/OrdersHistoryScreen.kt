@@ -1,162 +1,269 @@
 package com.example.gramclient.presentation.screens.drawer.orderHistoryScreen
 
-import android.util.Log
-import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.compose.LazyPagingItems
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.orderHistory.Data
 import com.example.gramclient.domain.orderHistory.ToAddresse
-import com.example.gramclient.presentation.components.CustomTopBar
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.flow.Flow
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import java.util.*
+
 
 class OrdersHistoryScreen : Screen {
     @Composable
     override fun Content() {
         val viewModel: OrderHistoryViewModel = hiltViewModel()
-        val paging = viewModel.stateOrderHistoryPagingItems.value.response?.flow?.collectAsLazyPagingItems()
+        val pagingData: Flow<PagingData<Data>> = viewModel.paging(10)
+        val lazyPagingItems = pagingData.collectAsLazyPagingItems()
         val response = viewModel.response().collectAsLazyPagingItems()
-        LaunchedEffect(key1 = true) {
-            viewModel.paging()
-            Log.e("PAGING", "$paging")
-        }
+        val navigator = LocalNavigator.currentOrThrow
+        Scaffold(
+            topBar = {
+                Row(modifier = Modifier.fillMaxHeight(0.1f),horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically ) {
+                    TopAppBar(
+                        content = {
+                            Box(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                IconButton(modifier = Modifier, onClick = { navigator.pop() }) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_blue),
+                                        contentDescription = ""
+                                    )
+                                }
+                                Text(
+                                    text = "Мои заказы",
+                                    textAlign = TextAlign.Center,
+                                    color = Color.Black,
+                                    modifier = Modifier.align(Alignment.Center),
+                                    fontSize = 25.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
 
-        Scaffold(topBar = {
-            CustomTopBar(title = "История заказов")
-        })
+                            }
+                        },
+                        backgroundColor = Color(0xFFF4F4F2),
+                        contentColor = Color.Black,
+                        elevation = 0.dp
+                    )
+                }
+
+
+            }, backgroundColor = Color(0xFFF4F4F2)
+        )
         {
-            LazyColumn() {
-                items(response){
-                    it?.let { res->
+            LazyColumn {
+
+                items(lazyPagingItems) {
+                    it?.let { res ->
                         res.from_address?.name?.let { fromAddress ->
-                            ListHistoryItem(
-                                status = res.status,
-                                createdAt = res.created_at,
-                                fromAddress = fromAddress,
-                                toAddresse = res.to_addresses
-                            )
+                            res.to_addresses?.let { toAddress ->
+                                ListHistoryItem(
+                                    price = it.price.toString(),
+                                    status = res.status,
+                                    createdAt = res.created_at,
+                                    fromAddress = fromAddress,
+                                    toAddresse = toAddress,
+                                    tariff_id = res.tariff_id
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
+                }
+                when (val state = lazyPagingItems.loadState.refresh) { //FIRST LOAD
+                    is LoadState.Error -> {
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Text(text = "истории нет eще",color = Color.Black)
+                            }
+                        }
+                    }
+                    is LoadState.Loading -> { // Loading UI
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillParentMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(8.dp),
+                                    text = "идёт загрузка истории",
+                                    color = Color.Black
+                                )
+
+                                CircularProgressIndicator(color = Color.Black)
+                            }
+                        }
+                    }
+                    else -> {}
+                }
+
+                when (val state = lazyPagingItems.loadState.append) { // Pagination
+                    is LoadState.NotLoading -> {
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Text(text = "истории больше нет",color = Color.Black)
+                            }
+                        }
+                    }
+                    is LoadState.Error -> {
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Text(text = "истории больше нет",color = Color.Black)
+                            }
+                        }
+                    }
+                    is LoadState.Loading -> { // Pagination Loading UI
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Text(text = "идёт загрузка истории",color = Color.Black)
+
+                                CircularProgressIndicator(color = Color.Black)
+                            }
+                        }
+                    }
+                    else -> {}
                 }
             }
         }
     }
 }
+
 @Composable
 fun ListHistoryItem(
+    price: String,
     status: String,
     createdAt: String,
     fromAddress: String,
     toAddresse: List<ToAddresse>,
+    tariff_id: Int
 ) {
-    val expanded = remember { mutableStateOf(false) }
-    Box(
-        Modifier
-            .padding(top = 15.dp, start = 15.dp, end = 15.dp)
-            .fillMaxWidth(), contentAlignment = TopEnd
-    ) {
-        Column(
-            modifier = Modifier
-                .height(140.dp)
-                .fillMaxWidth()
-                .padding(end = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 35.dp)
-            ) {
-                Text(
-                    text = "$createdAt / ",
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(start = 25.dp)
-                )
-                Text(
-                    text = status,
-                    fontSize = 15.sp,
-                    color = if (status == "Выполнен") Color(0xFF46C258) else Color(
-                        0xFFFF1100
-                    )
-                )
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.fillMaxWidth(0.1f)) {
-                    Image(
-                        modifier = Modifier.size(25.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                        contentDescription = "Logo"
-                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .padding(start = 10.dp)
-                ) {
-                    Text(
-                        text = fromAddress, fontWeight = FontWeight.Bold
-                    )
-//                        Text(text = "Максудчони Танбури улица")
-                }
-            }
-            toAddresse.forEach {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.fillMaxWidth(0.1f)) {
-                        Image(
-                            modifier = Modifier.size(25.dp),
-                            imageVector = ImageVector.vectorResource(R.drawable.to_marker),
-                            contentDescription = "Logo"
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .padding(10.dp)
-                    ) {
+    val dateTimeString = createdAt
+    val dateTime = remember {
+        LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    }
+    val formattedDate = remember {
+        dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+    }
 
+    val formattedHour = remember {
+        dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+    }
+    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.ENGLISH)
+    val date = LocalDate.parse(formattedDate, formatter)
+    val outputFormat = DateTimeFormatter.ofPattern("dd MMMM, EEEE", Locale("ru"))
+
+    Text(
+        modifier = Modifier.padding(start = 24.dp),
+        text = date.format(outputFormat),
+        fontSize = 20.sp,
+        color = Color(0xFF999997),
+        fontWeight = FontWeight.SemiBold
+
+    )
+    Card(
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(22),
+        elevation = 0.dp
+    )
+    {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.padding(10.dp)) {
+
+                Row(modifier = Modifier.fillMaxWidth(0.75f)) {
+                    Text(
+                        text = "$price с, ",
+                        fontSize = 15.sp,
+                        maxLines = 1,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = " $fromAddress,",
+                        fontSize = 15.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    toAddresse.forEach {
                         Text(
-                            text = it.name, fontWeight = FontWeight.Bold
+                            text = " ${it.name}",
+                            fontSize = 15.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = FontWeight.SemiBold
                         )
-//                        Text(text = "Максудчони Танбури улица")
                     }
                 }
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = if (status == "Отменен") "Отменено " else "поездка в $formattedHour",
+                    color = if (status == "Отменен") Color.Red else Color.Black, fontSize = 14.sp
+                )
             }
-        }
-        Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_menu_blue),
-            contentDescription = ""
-        )
-        DropdownMenu(expanded = expanded.value,
-            onDismissRequest = { expanded.value = false }) {
-            DropdownMenuItem(onClick = {}) {
-                Text("Удалить")
-            }
-            DropdownMenuItem(onClick = {}) {
-                Text("Повторить")
-            }
-            DropdownMenuItem(onClick = {}) {
-                Text("Обратный маршрут")
-            }
+            Icon(
+                modifier = Modifier
+                    .size(75.dp),
+                painter = painterResource(id = if (tariff_id == 2) R.drawable.car_comfort_icon else R.drawable.car_econom_icon),
+                contentDescription = "car_econom_icon",
+                tint = Color.Unspecified
+
+            )
         }
     }
 }
