@@ -7,6 +7,7 @@ import android.os.Build
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -41,6 +42,8 @@ import com.example.gramclient.presentation.screens.main.components.CustomDopInfo
 import com.example.gramclient.presentation.screens.map.CustomMainMap
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.presentation.screens.profile.ProfileViewModel
+import com.example.gramclient.utils.Constants
+import com.example.gramclient.utils.Constants.SOON
 import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -81,7 +84,9 @@ class MainScreen : Screen{
 
         var initialApiCalled by rememberSaveable { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
-
+        BackHandler(enabled = modalSheetState.isVisible) {
+            coroutineScope.launch { modalSheetState.animateTo(ModalBottomSheetValue.Hidden) }
+        }
         val prefs = CustomPreference(LocalContext.current)
         if (!initialApiCalled) {
             LaunchedEffect(Unit) {
@@ -175,7 +180,7 @@ class MainScreen : Screen{
                         onValueChange = {},
                         placeholder = "",
                         title = "Запланировать поездку",
-                        stateViewOfInfo = true,
+                        stateViewOfInfo = mutableStateOf(true),
                         planTripTenMinutesOnClick = {
                             val currentTime = LocalDateTime.now()
                             val newTime = currentTime.plusMinutes(10)
@@ -240,7 +245,7 @@ class MainScreen : Screen{
                                             contentDescription = "Logo"
                                         )
                                         Spacer(modifier = Modifier.width(19.dp))
-                                        Text(text = item)
+                                        Text(text = item+SOON)
                                     }
                                     CustomCheckBox(size = 25.dp,
                                         isChecked = paymentState.value == item,
