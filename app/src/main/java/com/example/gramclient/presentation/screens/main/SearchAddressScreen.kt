@@ -107,7 +107,6 @@ class SearchAddressScreen : Screen {
                                 if(Values.ClientOrders.value!=null){
                                     Box(modifier = Modifier.offset(25.dp, (-55).dp)){
                                         FloatingButton(
-                                            bottomSheetState = bottomSheetState,
                                             Icons.Filled.ArrowBack,
                                             backgroundColor = MaterialTheme.colors.background,
                                             contentColor = MaterialTheme.colors.onBackground
@@ -123,7 +122,6 @@ class SearchAddressScreen : Screen {
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     FloatingButton(
-                                        bottomSheetState = bottomSheetState,
                                         ImageVector.vectorResource(id = R.drawable.btn_show_location)
                                     ){
                                         map.controller.animateTo(mLocationOverlay.myLocation)
@@ -140,7 +138,6 @@ class SearchAddressScreen : Screen {
                                         }
                                     }
                                     FloatingButton(
-                                        bottomSheetState = bottomSheetState,
                                         Icons.Filled.Menu
                                     ){
                                         scope.launch {

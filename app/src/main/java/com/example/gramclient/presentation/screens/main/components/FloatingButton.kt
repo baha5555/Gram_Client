@@ -15,7 +15,6 @@ import com.example.gramclient.ui.theme.PrimaryColor
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FloatingButton(
-    bottomSheetState: BottomSheetScaffoldState,
     icon: ImageVector,
     backgroundColor: Color = PrimaryColor,
     contentColor: Color = Color.White,
@@ -24,7 +23,7 @@ fun FloatingButton(
     FloatingActionButton(
         modifier = Modifier
             .size(50.dp)
-            .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
+            .offset(y = (-35).dp),
         backgroundColor = backgroundColor,
         onClick = {
             onClick.invoke()
