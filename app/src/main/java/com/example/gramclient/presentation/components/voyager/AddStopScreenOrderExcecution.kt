@@ -121,14 +121,18 @@ class AddStopScreenOrderExcecution : Screen {
             }
             item {
                 Button(
-                    onClick = { bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.ADD_TO_ADDRESS))},
+                    onClick = {
+                        //bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.ADD_TO_ADDRESS))
+                        vm.editOrder()
+                        bottomNavigator.hide()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp)
                         .height(50.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Добавить остановку", color = Color.White, fontSize = 16.sp)
+                    Text("Готово", color = Color.White, fontSize = 16.sp)
                 }
             }
         }

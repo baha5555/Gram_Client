@@ -398,7 +398,7 @@ class MainViewModel @Inject constructor(
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
-            from_address = if (fromAddress.value.id != 0) fromAddress.value.id else null,
+            from_address = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null
         ).onEach { result: Resource<CalculateResponse> ->
             when (result) {

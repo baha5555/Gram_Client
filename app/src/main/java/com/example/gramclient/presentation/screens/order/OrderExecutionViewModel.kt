@@ -129,7 +129,7 @@ class OrderExecutionViewModel  @Inject constructor(
 
     fun updateToAddressInx(address: Address, inx: Int) {
         _toAddresses[inx] = address
-        editOrder(_toAddresses)
+        editOrder()
     }
 
     fun updateToAddress(address: Address? = null, clear: Boolean = false){
@@ -149,7 +149,7 @@ class OrderExecutionViewModel  @Inject constructor(
         if (_toAddresses.contains(address)) return
         _toAddresses.add(address)
         _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
-        editOrder(_toAddresses)
+        editOrder()
         mapController.showRoadAB(_fromAddress, _toAddresses)
     }
 
@@ -312,7 +312,7 @@ class OrderExecutionViewModel  @Inject constructor(
         _toAddresses = _toAddresses.apply {
             add(to.index, removeAt(from.index))
         }
-        editOrder(_toAddresses)
+        //editOrder(_toAddresses)
     }
 
     fun showRoad(){
@@ -326,9 +326,9 @@ class OrderExecutionViewModel  @Inject constructor(
 
     fun removeAddStop(address: Address?) {
         _toAddresses.remove(address)
-        editOrder(_toAddresses)
+        editOrder()
     }
-    fun editOrder(_toAddresses: SnapshotStateList<Address>) {
+    fun editOrder() {
         editOrderUseCase.invoke(
             order_id = selectedOrder.value.id,
             dop_phone = null,
