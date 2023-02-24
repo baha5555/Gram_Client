@@ -26,10 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.main.components.FromAddressField
@@ -66,6 +68,8 @@ class SearchAddressScreen : Screen {
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
+        val bottomNavigator = LocalBottomSheetNavigator.current
+
         val focusRequester = remember { FocusRequester() }
 
         CustomBackHandle(drawerState.isClosed)
@@ -172,11 +176,7 @@ class SearchAddressScreen : Screen {
                                     WHICH_ADDRESS = WHICH_ADDRESS
                                 )
                                 FromAddressField(fromAddress) {
-                                    coroutineScope.launch {
-                                        bottomSheetState.bottomSheetState.expand()
-                                    }
-                                    isSearchState.value = true
-                                    WHICH_ADDRESS.value = Constants.FROM_ADDRESS
+                                    bottomNavigator.show(SearchAddressNavigator(Constants.FROM_ADDRESS))
                                 }
                             }
                         }
