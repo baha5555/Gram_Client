@@ -11,7 +11,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Resource
@@ -398,8 +397,9 @@ class MainViewModel @Inject constructor(
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
-            from_address = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
-            to_addresses = if (toAddresses.size != 0) toAddresses else null
+            search_address_id = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
+            to_addresses = if (toAddresses.size != 0) toAddresses else null,
+            from_address = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
         ).onEach { result: Resource<CalculateResponse> ->
             when (result) {
                 is Resource.Success -> {

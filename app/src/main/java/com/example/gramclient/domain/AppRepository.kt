@@ -63,8 +63,9 @@ interface AppRepository {
     suspend fun getPrice(
         tariff_id: Int,
         allowances: String?,
-        from_address: Int?,
+        search_address_id: Int?,
         to_addresses: String?,
+        from_address: String?
     ): CalculateResponse
 
     suspend fun cancelOrder(order_id: Int): CancelOrderResponse
