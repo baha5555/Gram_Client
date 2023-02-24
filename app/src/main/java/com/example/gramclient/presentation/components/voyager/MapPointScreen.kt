@@ -1,11 +1,14 @@
 package com.example.gramclient.presentation.components.voyager
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -26,23 +29,30 @@ import com.example.gramclient.presentation.screens.map.mLocationOverlay
 import com.example.gramclient.presentation.screens.map.map
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Values
+import com.valentinilk.shimmer.shimmer
 
 class MapPointScreen : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
         val mainViewModel: MainViewModel = hiltViewModel()
+        val statePoint = mainViewModel.stateAddressPoint.value
         val navigator = LocalNavigator.currentOrThrow
         BottomSheetScaffold(
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
                 SheetContent{
-                    val address: Address = Address("Мекта на карте", -1, map.mapCenter.latitude.toString(), map.mapCenter.longitude.toString())
-                    mainViewModel.updateFromAddress(address)
+                    statePoint.response.let {
+                        if(it==null){
+                            mainViewModel.updateFromAddress(Address("Мекта на карте", -1, map.mapCenter.latitude.toString(), map.mapCenter.longitude.toString()))
+                        }else{
+                            mainViewModel.updateFromAddress(Address(address = it.name, id=it.id, address_lat = it.lat, address_lng = it.lng))
+                        }
+                    }
                     navigator.pop()
                 }
             },
-            sheetPeekHeight = 150.dp,
+            sheetPeekHeight = 200.dp,
             floatingActionButton = {
                 Row(
                     modifier = Modifier
@@ -70,9 +80,11 @@ class MapPointScreen : Screen {
 
     @Composable
     fun SheetContent(onClick: () -> Unit) {
+        val mainViewModel: MainViewModel = hiltViewModel()
+        val statePoint = mainViewModel.stateAddressPoint.value
         Column(
             modifier = Modifier
-                .height(150.dp)
+                .height(200.dp)
                 .padding(20.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -84,10 +96,21 @@ class MapPointScreen : Screen {
                 )
                 Divider(modifier = Modifier.padding(vertical = 10.dp))
             }
-//                    Row(verticalAlignment = Alignment.CenterVertically) {
-//                        Image(imageVector = ImageVector.vectorResource(id = R.drawable.from_marker), contentDescription = "")
-//                        Text(text = "Метка на карте", fontSize = 18.sp, modifier = Modifier.padding(start = 10.dp))
-//                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            modifier = Modifier
+                                .size(20.dp),
+                            imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                            contentDescription = "Logo"
+                        )
+                        if(statePoint.isLoading){
+                            Box(modifier = Modifier.shimmer().padding(start = 10.dp)){
+                                Box(modifier = Modifier.size(150.dp,20.dp).background(Color.Gray))
+                            }
+                        }else{
+                            Text(text = ""+ (statePoint.response?.name ?: "Метка на карте"), fontSize = 18.sp, modifier = Modifier.padding(start = 10.dp))
+                        }
+                    }
             Button(
                 onClick = {
                     onClick.invoke()

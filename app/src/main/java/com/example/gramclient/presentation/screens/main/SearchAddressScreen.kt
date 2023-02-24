@@ -136,7 +136,7 @@ class SearchAddressScreen : Screen {
                                                     mainViewModel.getAddressFromMap(
                                                         mLocationOverlay.myLocation.longitude,
                                                         mLocationOverlay.myLocation.latitude,
-                                                        WHICH_ADDRESS
+                                                        WHICH_ADDRESS.value
                                                     )
                                                 }
                                             }
