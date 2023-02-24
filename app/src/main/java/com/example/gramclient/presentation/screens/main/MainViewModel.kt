@@ -350,7 +350,7 @@ class MainViewModel @Inject constructor(
     fun createOrder(orderExecutionViewModel: OrderExecutionViewModel) {
         createOrderUseCase.invoke(
             dop_phone = if (_dopPhone.value != "") _dopPhone.value else null,
-            from_address = if (fromAddress.value.id != 0) fromAddress.value.id else null,
+            from_address = if (fromAddress.value.id != 0 && fromAddress.value.id!=-1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
             comment = if (_commentToOrder.value != "") _commentToOrder.value else null,
             tariff_id = selectedTariff?.value?.id ?: 1,
@@ -358,8 +358,8 @@ class MainViewModel @Inject constructor(
                 selectedAllowances.value
             ) else null,
             date_time = if (_planTrip.value != "") _planTrip.value else null,
-            from_address_point = null,
-            check_point_start = 0
+            from_address_point = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null,
+            check_point_start = if(fromAddress.value.id==-1) 1 else 0
         ).onEach { result: Resource<OrderResponse> ->
             when (result) {
                 is Resource.Success -> {

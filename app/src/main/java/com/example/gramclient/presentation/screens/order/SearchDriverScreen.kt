@@ -161,7 +161,6 @@ class SearchDriverScreen : Screen {
                                 scaffoldState = bottomSheetScaffoldState,
                                 floatingActionButton = {
                                     FloatingButton(
-                                        bottomSheetState = bottomSheetState,
                                         icon = Icons.Filled.Menu
                                     ){
                                         scope.launch {

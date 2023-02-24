@@ -6,5 +6,5 @@ data class Address(
     var address_lat: String="",
     var address_lng: String="",
     var city: String="",
-    var idIncrement: Int = 0
+    var idIncrement: Int = 0,
 )

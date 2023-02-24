@@ -77,6 +77,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
         }
     }
 }
+
 @Composable
 fun ArrowBack() {
     val navigator = LocalNavigator.currentOrThrow
