@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,13 +24,17 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.map.CustomMainMap
+import com.example.gramclient.presentation.screens.map.currentRoute
 import com.example.gramclient.presentation.screens.map.mLocationOverlay
 import com.example.gramclient.presentation.screens.map.map
 import com.example.gramclient.ui.theme.PrimaryColor
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Values
 import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.launch
 
 class MapPointScreen : Screen {
     @OptIn(ExperimentalMaterialApi::class)
@@ -71,6 +76,13 @@ class MapPointScreen : Screen {
                         ImageVector.vectorResource(id = R.drawable.btn_show_location)
                     ) {
                         map.controller.animateTo(mLocationOverlay.myLocation)
+                        if (mLocationOverlay.myLocation != null) {
+                            mainViewModel.getAddressFromMap(
+                                mLocationOverlay.myLocation.longitude,
+                                mLocationOverlay.myLocation.latitude,
+                                Constants.TO_ADDRESS
+                            )
+                        }
                     }
                 }
             }) {
@@ -104,8 +116,12 @@ class MapPointScreen : Screen {
                             contentDescription = "Logo"
                         )
                         if(statePoint.isLoading){
-                            Box(modifier = Modifier.shimmer().padding(start = 10.dp)){
-                                Box(modifier = Modifier.size(150.dp,20.dp).background(Color.Gray))
+                            Box(modifier = Modifier
+                                .shimmer()
+                                .padding(start = 10.dp)){
+                                Box(modifier = Modifier
+                                    .size(150.dp, 20.dp)
+                                    .background(Color.Gray))
                             }
                         }else{
                             Text(text = ""+ (statePoint.response?.name ?: "Метка на карте"), fontSize = 18.sp, modifier = Modifier.padding(start = 10.dp))
