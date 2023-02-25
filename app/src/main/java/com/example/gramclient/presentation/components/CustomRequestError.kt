@@ -33,7 +33,7 @@ fun CustomRequestError(onClick: () -> Unit) {
         ) {
             Text(
                 text = "Не удалось отправить запрос.\n" +
-                        "Проверте соединение с интернетом.",
+                        "Проверьте соединение с интернетом.",
                 fontSize = 16.sp,
                 modifier = Modifier.weight(0.7f))
             Text(

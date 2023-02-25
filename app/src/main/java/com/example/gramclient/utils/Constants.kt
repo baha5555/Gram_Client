@@ -15,7 +15,6 @@ object Constants {
     const val ADD_TO_ADDRESS="ADD_TO_ADDRESS"
     const val SOON = "(Скоро)"
     var stateOfDopInfoForDriver = mutableStateOf("")
-    val STATE_ARROW_BACK_IN_ADDRESS_SEARCH_SCREEN = mutableStateOf(false)
     var STATE_RAITING: MutableState<Boolean> = mutableStateOf(false)
     var STATE_RAITING_ORDER_ID: MutableState<Int> = mutableStateOf(-1)
     var STATE_ASSIGNED_ORDER:MutableState<Boolean> = mutableStateOf(false)
@@ -24,7 +23,6 @@ object Constants {
 
     var STATE_ASSIGNED_ORDER_ID:MutableState<Int> = mutableStateOf(-1)
     var KONFIG_URL = "https://gram.tj/legal"
-    val isDialogState = mutableStateOf(false)
 }
 
 object PreferencesName {

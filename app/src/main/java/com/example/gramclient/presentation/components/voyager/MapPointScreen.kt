@@ -49,7 +49,7 @@ class MapPointScreen : Screen {
                 SheetContent{
                     statePoint.response.let {
                         if(it==null){
-                            mainViewModel.updateFromAddress(Address("Мекта на карте", -1, map.mapCenter.latitude.toString(), map.mapCenter.longitude.toString()))
+                            mainViewModel.updateFromAddress(Address("Метка на карте", -1, map.mapCenter.latitude.toString(), map.mapCenter.longitude.toString()))
                         }else{
                             mainViewModel.updateFromAddress(Address(address = it.name, id=it.id, address_lat = it.lat, address_lng = it.lng))
                         }

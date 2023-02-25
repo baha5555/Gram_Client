@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,10 +23,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
-import com.example.gramclient.domain.firebase.order.Allowance
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
-import com.example.gramclient.domain.mainScreen.Address
-import com.example.gramclient.presentation.screens.order.OrderExecutionScreen
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import kotlinx.coroutines.launch
 
@@ -97,7 +92,7 @@ class CustomInfoOfActiveOrder: Screen {
                                     )
                                 }
                             }
-                            order.created_at?.let {
+                            order.create_order?.let {
                                 CustomInfoTitle(title = "Время")
                                 Row(
                                     modifier = Modifier
@@ -172,16 +167,18 @@ class CustomInfoOfActiveOrder: Screen {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 15.dp, horizontal = 15.dp),
+                                        .padding( horizontal = 15.dp),
                                 ) {
                                     allowance.forEach {
-                                        Text(text = it.name)
-                                    }
-                                    Divider(
-                                        modifier = Modifier
+                                        Text(text = it.name,modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(start = 15.dp)
-                                    )
+                                            .padding(vertical = 15.dp))
+                                        Divider(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(start = 15.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
