@@ -209,10 +209,6 @@ class OrderExecutionScreen : Screen {
                     CustomDialog(
                         text = stateCancelOrderText,
                         okBtnClick = {
-                            if (Values.ClientOrders.value?.active_orders?.size == 1) {
-                                navigator.replaceAll(SearchAddressScreen())
-                                return@CustomDialog
-                            }
                             coroutineScope.launch {
                                 isDialogOpen.value = false
                                 sheetState.bottomSheetState.collapse()
