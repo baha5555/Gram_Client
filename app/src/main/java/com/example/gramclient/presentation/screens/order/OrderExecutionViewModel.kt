@@ -254,14 +254,15 @@ class OrderExecutionViewModel  @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getActiveOrders(){
+    fun getActiveOrders(onSuccess:()->Unit = {}){
         getActiveOrdersUseCase.invoke().onEach { result: Resource<ActiveOrdersResponse> ->
             when (result){
                 is Resource.Success -> {
                     try {
                         val response: ActiveOrdersResponse? = result.data
-                        _stateActiveOrders.value = ActiveOrdersResponseState(response = response?.result, success = true)
+                        _stateActiveOrders.value = ActiveOrdersResponseState(response = response?.result, success = true, code = response?.code)
                         Log.e("ActiveOrdersResponse", "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}")
+                        onSuccess()
                     }catch (e: Exception) {
                         Log.d("ActiveOrdersResponse", "${e.message} Exception")
                     }
