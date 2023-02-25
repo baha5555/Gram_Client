@@ -251,8 +251,7 @@ class MainViewModel @Inject constructor(
                     is Resource.Success -> {
                         try {
                             val addressResponse: AddressByPointResponse? = result.data
-                            _stateAddressPoint.value =
-                                AddressByPointResponseState(response = addressResponse?.result)
+                            _stateAddressPoint.value = AddressByPointResponseState(response = addressResponse?.result)
                             Log.e(
                                 "AddressByPointResponse",
                                 "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
@@ -307,7 +306,7 @@ class MainViewModel @Inject constructor(
         }
 
         task.addOnSuccessListener {
-            if (it != null) {
+            if (it != null && fromAddress.value.address=="") {
                 getAddressByPoint(it.longitude, it.latitude)
                 Log.e("ActualLocation", "Location - > ${it.longitude}  + ${it.latitude}")
             } else {
@@ -431,7 +430,7 @@ class MainViewModel @Inject constructor(
     fun getAddressFromMap(
         lng: Double,
         lat: Double,
-        WHICH_ADDRESS: MutableState<String>
+        WHICH_ADDRESS: String
     ) {
         getAddressByPointUseCase.invoke(lng, lat)
             .onEach { result: Resource<AddressByPointResponse> ->
@@ -445,9 +444,9 @@ class MainViewModel @Inject constructor(
                                 "AddressByPointResponse",
                                 "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
                             )
-                            when (WHICH_ADDRESS.value) {
+                            when (WHICH_ADDRESS) {
                                 Constants.FROM_ADDRESS -> {
-
+                                   // Log.i("")
                                 }
                                 Constants.TO_ADDRESS -> {
                                     clearToAddress()
