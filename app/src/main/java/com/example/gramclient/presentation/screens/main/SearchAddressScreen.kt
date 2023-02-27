@@ -60,7 +60,7 @@ class SearchAddressScreen : Screen {
         val isSearchState = remember { mutableStateOf(false) }
         var sheetPeekHeight = remember { mutableStateOf(280) }
 
-        var WHICH_ADDRESS = remember { mutableStateOf(Constants.TO_ADDRESS) }
+        var WHICH_ADDRESS = remember { mutableStateOf(Constants.FROM_ADDRESS) }
 
         val bottomSheetState = rememberBottomSheetScaffoldState(
             bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)

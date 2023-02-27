@@ -46,6 +46,7 @@ import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Constants.SOON
 import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -170,9 +171,18 @@ class MainScreen : Screen{
                     CustomDopInfoForDriver(
                         onClick = {
                             if (selectedTime.value != "" && selectedDate.value != "") {
-                                mainViewModel.updatePlanTrip("${selectedDate.value} ${selectedTime.value}")
-                                coroutineScope.launch {
-                                    modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                                val dateFormatParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
+                                val time = dateFormatParse.parse("${selectedDate.value} ${selectedTime.value}").time
+                                val local = System.currentTimeMillis()
+                                Log.e("DATETIME","--->$time \n $local")
+                                if(time <= local){
+                                    Toast.makeText(context,"Пожалуйста выберите дату и время выше нынешнего времени",Toast.LENGTH_LONG).show()
+                                }
+                                else {
+                                    mainViewModel.updatePlanTrip("${selectedDate.value} ${selectedTime.value}")
+                                    coroutineScope.launch {
+                                        modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                                    }
                                 }
                             }
                         },

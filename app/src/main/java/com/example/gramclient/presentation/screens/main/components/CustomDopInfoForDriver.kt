@@ -226,6 +226,7 @@ fun showTime(
             monthSelection = true,
             yearSelection = true,
             style = CalendarStyle.MONTH,
+            minYear = LocalDate.now().year
         ),
         selection = CalendarSelection.Date { date ->
             Log.e("SelectedDate", "$date")

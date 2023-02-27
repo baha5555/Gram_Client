@@ -368,7 +368,7 @@ fun CustomMainMap(
                                                     mainViewModel.getAddressFromMap(
                                                         map.mapCenter.longitude,
                                                         map.mapCenter.latitude,
-                                                        Constants.FROM_ADDRESS
+                                                        WHICH_ADDRESS?.value ?: Constants.FROM_ADDRESS
                                                     )
                                                     Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
