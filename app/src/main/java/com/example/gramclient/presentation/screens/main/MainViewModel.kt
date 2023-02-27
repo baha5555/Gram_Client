@@ -122,6 +122,7 @@ class MainViewModel @Inject constructor(
         else {
             if (address != null) {
                 _toAddresses[inx] = address
+                //_toAddresses[inx].idIncrement = inx
                 showRoad()
             }
         }
@@ -129,7 +130,6 @@ class MainViewModel @Inject constructor(
 
     fun addToAddress(address: Address?) {
         if (address != null) {
-            if (_toAddresses.contains(address)) return
             _toAddresses.add(address)
             _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
             showRoad()

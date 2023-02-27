@@ -146,7 +146,6 @@ class OrderExecutionViewModel  @Inject constructor(
         map.overlays.clear()
     }
     fun addToAddress(address: Address){
-        if (_toAddresses.contains(address)) return
         _toAddresses.add(address)
         _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         editOrder()
