@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components.voyager
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -117,18 +118,15 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                         .align(Alignment.CenterEnd)
                         .padding(end = 20.dp)
                         .clickable {
-                            when(whichScreen){
-                                Constants.FROM_ADDRESS->{
+                            Log.e("WHICHSCREEN" ,"$whichScreen")
+                            when(whichScreen) {
+                                Constants.FROM_ADDRESS -> {
                                     bottomNavigator.hide()
-                                    navigator.push(MapPointScreen())
+                                    navigator.push(MapPointScreen(whichScreen))
                                 }
-                                else ->{
-                                    if (bottomNavigator
-                                            .pop()
-                                            .not()
-                                    ) {
-                                        bottomNavigator.hide()
-                                    }
+                                else -> {
+                                    bottomNavigator.hide()
+                                    navigator.push(MapPointScreen(whichScreen))
                                 }
                             }
                         },

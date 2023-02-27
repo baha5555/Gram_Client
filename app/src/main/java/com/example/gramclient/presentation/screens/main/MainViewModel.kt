@@ -446,7 +446,14 @@ class MainViewModel @Inject constructor(
                             )
                             when (WHICH_ADDRESS) {
                                 Constants.FROM_ADDRESS -> {
-                                   // Log.i("")
+                                   updateFromAddress(
+                                       Address(
+                                           _stateAddressPoint.value.response!!.name,
+                                           _stateAddressPoint.value.response!!.id,
+                                           _stateAddressPoint.value.response!!.lat,
+                                           _stateAddressPoint.value.response!!.lng
+                                   )
+                                   )
                                 }
                                 Constants.TO_ADDRESS -> {
                                     clearToAddress()

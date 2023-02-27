@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components.voyager
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,22 +39,68 @@ import com.example.gramclient.utils.Values
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 
-class MapPointScreen : Screen {
+class MapPointScreen(val whichScreen: String? = null) : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
+        val WHICH_SCREEN = remember{
+            mutableStateOf(whichScreen ?: "")
+        }
         val mainViewModel: MainViewModel = hiltViewModel()
         val statePoint = mainViewModel.stateAddressPoint.value
         val navigator = LocalNavigator.currentOrThrow
         BottomSheetScaffold(
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
-                SheetContent{
+                SheetContent(whichScreen){
                     statePoint.response.let {
-                        if(it==null){
-                            mainViewModel.updateFromAddress(Address("Метка на карте", -1, map.mapCenter.latitude.toString(), map.mapCenter.longitude.toString()))
-                        }else{
-                            mainViewModel.updateFromAddress(Address(address = it.name, id=it.id, address_lat = it.lat, address_lng = it.lng))
+                        when(whichScreen) {
+                            Constants.FROM_ADDRESS-> {
+                                Log.e("which","$whichScreen")
+                                if (it == null) {
+                                    mainViewModel.updateFromAddress(
+                                        Address(
+                                            "Метка на карте",
+                                            -1,
+                                            map.mapCenter.latitude.toString(),
+                                            map.mapCenter.longitude.toString()
+                                        )
+                                    )
+                                } else {
+                                    mainViewModel.updateFromAddress(
+                                        Address(
+                                            address = it.name,
+                                            id = it.id,
+                                            address_lat = it.lat,
+                                            address_lng = it.lng
+                                        )
+                                    )
+                                }
+                            }
+                            Constants.TO_ADDRESS-> {
+                                Log.e("which","->$whichScreen")
+                                if (it == null) {
+                                    mainViewModel.updateToAddress(
+                                        0,
+                                        Address(
+                                            "Метка на карте",
+                                            -1,
+                                            map.mapCenter.latitude.toString(),
+                                            map.mapCenter.longitude.toString()
+                                        )
+                                    )
+                                } else {
+                                    mainViewModel.updateToAddress(
+                                        0,
+                                        Address(
+                                            address = it.name,
+                                            id = it.id,
+                                            address_lat = it.lat,
+                                            address_lng = it.lng
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
                     navigator.pop()
@@ -86,12 +135,12 @@ class MapPointScreen : Screen {
                     }
                 }
             }) {
-            CustomMainMap(mainViewModel = mainViewModel)
+            CustomMainMap(WHICH_ADDRESS = WHICH_SCREEN ,mainViewModel = mainViewModel)
         }
     }
 
     @Composable
-    fun SheetContent(onClick: () -> Unit) {
+    fun SheetContent(whichScreen: String?,onClick: () -> Unit) {
         val mainViewModel: MainViewModel = hiltViewModel()
         val statePoint = mainViewModel.stateAddressPoint.value
         Column(
@@ -102,7 +151,7 @@ class MapPointScreen : Screen {
         ) {
             Column() {
                 Text(
-                    text = "Точка отправления",
+                    text = if(whichScreen == Constants.FROM_ADDRESS)"Точка назначения" else "Точка отправления",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -112,7 +161,7 @@ class MapPointScreen : Screen {
                         Image(
                             modifier = Modifier
                                 .size(20.dp),
-                            imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                            imageVector = ImageVector.vectorResource(if(whichScreen == Constants.FROM_ADDRESS) R.drawable.from_marker else R.drawable.ic_to_address_marker),
                             contentDescription = "Logo"
                         )
                         if(statePoint.isLoading){
