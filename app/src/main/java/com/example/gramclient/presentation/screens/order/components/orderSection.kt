@@ -28,8 +28,6 @@ import kotlinx.coroutines.launch
 fun orderSection(
     order: RealtimeDatabaseOrder,
     scope: CoroutineScope,
-    bottomSheetState: BottomSheetScaffoldState,
-    isSearchState: MutableState<Boolean>
 ) {
     val bottomNavigator = LocalBottomSheetNavigator.current
     Column(
@@ -41,6 +39,9 @@ fun orderSection(
         Row(
             modifier = Modifier
                 .clickable {
+                    if(order.status=="Поступило" || order.status=="Не оформлен"){
+                        bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.FROM_ADDRESS))
+                    }
                 }
                 .fillMaxWidth()
                 .padding(15.dp),
@@ -59,7 +60,7 @@ fun orderSection(
                 )
                 Spacer(modifier = Modifier.width(20.dp))
                 Text(
-                    text = order.from_address?.address ?: "Откуда?"/*, maxLines = 1*/,
+                    text = if(order.from_address?.address=="No name")"Метка на карте" else order.from_address?.address ?: "Откуда?"/*, maxLines = 1*/,
                     overflow = TextOverflow.Ellipsis
                 )
             }

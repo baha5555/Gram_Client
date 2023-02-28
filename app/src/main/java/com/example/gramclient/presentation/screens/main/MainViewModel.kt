@@ -102,6 +102,7 @@ class MainViewModel @Inject constructor(
     fun updateFromAddress(address: Address) {
         _fromAddress.value = address
         showRoad()
+        getPrice()
         Log.i("addresses", "From-" + address)
     }
 
@@ -118,20 +119,26 @@ class MainViewModel @Inject constructor(
     }
 
     fun updateToAddress(inx: Int, address: Address?) {
-        if (_toAddresses.size == 0) addToAddress(address)
+        if (_toAddresses.size == 0) {
+            addToAddress(address)
+            getPrice()
+        }
         else {
             if (address != null) {
                 _toAddresses[inx] = address
                 //_toAddresses[inx].idIncrement = inx
+                getPrice()
                 showRoad()
             }
         }
+        getPrice()
     }
 
     fun addToAddress(address: Address?) {
         if (address != null) {
             _toAddresses.add(address)
             _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
+            getPrice()
             showRoad()
         }
     }
@@ -478,6 +485,16 @@ class MainViewModel @Inject constructor(
                             "AddressByPointResponse",
                             "AddressByPointResponseError->\n ${result.message}"
                         )
+                        if(result.message == "HTTP 404 Not Found"){
+                            updateFromAddress(
+                                Address(
+                                    "Метка на карте",
+                                    -1,
+                                    map.mapCenter.latitude.toString(),
+                                    map.mapCenter.longitude.toString()
+                                )
+                            )
+                        }
                         _stateAddressPoint.value = AddressByPointResponseState(
                             error = "${result.message}"
                         )
