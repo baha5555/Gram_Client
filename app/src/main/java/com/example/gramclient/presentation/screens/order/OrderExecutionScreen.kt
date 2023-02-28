@@ -22,10 +22,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
+import com.example.gramclient.presentation.components.voyager.SearchAddressOrderExecutionNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.map.CustomMainMap
@@ -33,6 +36,7 @@ import com.example.gramclient.presentation.screens.order.components.*
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants
+import com.example.gramclient.utils.Constants.FROM_ADDRESS
 import com.example.gramclient.utils.Constants.SOON
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
@@ -81,6 +85,7 @@ class OrderExecutionScreen : Screen {
         var selectRealtimeDatabaseOrder: RealtimeDatabaseOrder by remember {
             mutableStateOf(RealtimeDatabaseOrder())
         }
+        val bottomNavigator = LocalBottomSheetNavigator.current
         // searchState dependencies ->
         var WHICH_ADDRESS = remember { mutableStateOf("") }
         val isAddressList = remember { mutableStateOf(true) }
@@ -170,7 +175,7 @@ class OrderExecutionScreen : Screen {
                                 stateCancelOrderText =
                                     "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
                             }
-                            orderSection(order, scope, sheetState, isSearchState)
+                            orderSection(order, scope)
                             Spacer(modifier = Modifier.height(10.dp))
                             optionSection(onClick = {
                                 navigator.push(CustomInfoOfActiveOrder())

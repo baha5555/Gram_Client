@@ -25,6 +25,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.example.gramclient.presentation.screens.main.addressComponents.AddressListItem
 import com.example.gramclient.presentation.screens.main.addressComponents.Loader
+import com.example.gramclient.presentation.screens.navigator
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.utils.Constants
@@ -120,6 +121,7 @@ class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int
                                     .not()
                             ) {
                                 bottomNavigator.hide()
+                                navigator.push(OrderExecutionMapPointScreen(whichScreen))
                             }
                         },
                     contentAlignment = Alignment.Center
@@ -180,6 +182,10 @@ class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int
                                             }
                                             Constants.ADD_TO_ADDRESS -> {
                                                 orderExecutionViewModel.addToAddress(it)
+                                            }
+                                            Constants.FROM_ADDRESS->{
+                                                orderExecutionViewModel.updateFromAddress(it)
+                                                orderExecutionViewModel.editOrder()
                                             }
                                         }
                                     }

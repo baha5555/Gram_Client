@@ -19,9 +19,8 @@ import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.domain.firebase.GetClientOrderUseCase
 import com.example.gramclient.domain.firebase.GetOrdersUseCase
 import com.example.gramclient.domain.firebase.profile.Client
-import com.example.gramclient.domain.mainScreen.Address
-import com.example.gramclient.domain.mainScreen.SearchAddressResponse
-import com.example.gramclient.domain.mainScreen.SearchAddressUseCase
+import com.example.gramclient.domain.mainScreen.*
+import com.example.gramclient.presentation.screens.main.states.AddressByPointResponseState
 import com.example.gramclient.presentation.screens.order.states.GetClientOrderState
 import com.example.gramclient.presentation.screens.order.states.GetOrdersState
 import com.example.gramclient.presentation.screens.main.states.CancelOrderResponseState
@@ -29,6 +28,7 @@ import com.example.gramclient.presentation.screens.main.states.SearchAddressResp
 import com.example.gramclient.presentation.screens.map.MapController
 import com.example.gramclient.presentation.screens.map.map
 import com.example.gramclient.presentation.screens.map.showRoadAB
+import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.utils.Values
 import com.google.firebase.database.DataSnapshot
@@ -54,8 +54,10 @@ class OrderExecutionViewModel  @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
     private val getClientOrderUseCase: GetClientOrderUseCase,
     private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase,
-    private val searchAddressUseCase: SearchAddressUseCase
-): AndroidViewModel(application) {
+    private val searchAddressUseCase: SearchAddressUseCase,
+    private val getAddressByPointUseCase: GetAddressByPointUseCase,
+
+    ): AndroidViewModel(application) {
     val context get() = getApplication<Application>()
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     val mapController = MapController(context)
@@ -79,6 +81,9 @@ class OrderExecutionViewModel  @Inject constructor(
 
     private val _stateEditOrder = mutableStateOf(EditOrderResponseState())
     val stateEditOrder: State<EditOrderResponseState> = _stateEditOrder
+
+    private val _stateAddressPoint = mutableStateOf(AddressByPointResponseState())
+    val stateAddressPoint: State<AddressByPointResponseState> = _stateAddressPoint
 
     private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
     val selectedOrder: State<RealtimeDatabaseOrder> = _selectedOrder
@@ -324,15 +329,91 @@ class OrderExecutionViewModel  @Inject constructor(
         )
     }
 
+    fun clearToAddress() {
+        _toAddresses.clear()
+    }
+
     fun removeAddStop(address: Address?) {
         _toAddresses.remove(address)
         editOrder()
     }
+    fun getAddressFromMap(
+        lng: Double,
+        lat: Double,
+        WHICH_ADDRESS: String
+    ) {
+        getAddressByPointUseCase.invoke(lng, lat)
+            .onEach { result: Resource<AddressByPointResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val addressResponse: AddressByPointResponse? = result.data
+                            _stateAddressPoint.value =
+                                AddressByPointResponseState(response = addressResponse?.result)
+                            Log.e(
+                                "AddressByPointResponse",
+                                "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
+                            )
+                            when (WHICH_ADDRESS) {
+                                Constants.FROM_ADDRESS -> {
+                                    updateFromAddress(
+                                        Address(
+                                            _stateAddressPoint.value.response!!.name,
+                                            _stateAddressPoint.value.response!!.id,
+                                            _stateAddressPoint.value.response!!.lat,
+                                            _stateAddressPoint.value.response!!.lng
+                                        )
+                                    )
+                                }
+                                Constants.TO_ADDRESS -> {
+                                    clearToAddress()
+                                    addToAddress(
+                                        Address(
+                                            _stateAddressPoint.value.response!!.name,
+                                            _stateAddressPoint.value.response!!.id,
+                                            _stateAddressPoint.value.response!!.lat,
+                                            _stateAddressPoint.value.response!!.lng
+                                        )
+                                    )
+                                }
+                            }
+                            Log.e("singleTapConfirmedHelper", "${toAddresses.size}")
+
+                        } catch (e: Exception) {
+                            Log.d("AddressByPointResponse", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
+                        Log.e(
+                            "AddressByPointResponse",
+                            "AddressByPointResponseError->\n ${result.message}"
+                        )
+                        if(result.message == "HTTP 404 Not Found"){
+                            updateFromAddress(
+                                Address(
+                                    "Метка на карте",
+                                    -1,
+                                    map.mapCenter.latitude.toString(),
+                                    map.mapCenter.longitude.toString()
+                                )
+                            )
+                        }
+                        _stateAddressPoint.value = AddressByPointResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
+
     fun editOrder() {
         editOrderUseCase.invoke(
             order_id = selectedOrder.value.id,
             dop_phone = null,
-            from_address = selectedOrder.value.from_address?.id,
+            from_address = _fromAddress.value.id,
             meeting_info = null,
             to_addresses = _toAddresses,
             comment = null,

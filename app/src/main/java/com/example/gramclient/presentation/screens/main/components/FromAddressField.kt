@@ -63,17 +63,17 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                     tint = Color.White
                 )
             }
-            if (fromAddress.address == "") {
-                Text(
-                    text = "Откуда?", color = Color.Gray, fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
-                )
-            } else {
-                Text(
-                    text = fromAddress.address ?: "", color = Color.White, fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
-                )
-            }
+                if (fromAddress.address == "") {
+                    Text(
+                        text = "Откуда?", color = Color.Gray, fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
+                    )
+                } else {
+                    Text(
+                        text = fromAddress.address ?: "", color = Color.White, fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
+                    )
+                }
         }
     }
 }
