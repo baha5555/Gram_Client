@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -108,9 +109,12 @@ class CardOrderHistory : Screen {
             }, backgroundColor = Color.White
 
         ) {
+
+
             Column {
                 Box(
-                    modifier = Modifier.padding(5.dp)
+                    modifier = Modifier
+                        .padding(5.dp)
                         .fillMaxWidth()
                         .height(250.dp)
                 ) {
@@ -118,141 +122,194 @@ class CardOrderHistory : Screen {
                         mainViewModel = mainViewModel
                     )
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 25.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                    Column {
-                        Text(text = "Статус поездки", fontSize = 20.sp, fontWeight = FontWeight.Medium)
-                        Text(
-                            text = "${viewModel.selectedOrder.value.status}",
-                            color = if (order.status == "Выполнен") Color.Green else Color.Red, fontSize = 15.sp
-                        )
-                    }
-                    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = viewModel.selectedOrder.value.performer?.first_name ?: " ",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp,
-                            modifier = Modifier
-                                .background(shape = RoundedCornerShape(3.dp), color = Color(0xFFF4B91D))
-                        )
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
-                            contentDescription = "car_eco",
-                            modifier = Modifier.offset(y = (-10).dp).size(65.dp)
-                        )
-                    }
-                }
-                Divider()
-
-                Row(modifier = Modifier.fillMaxWidth().padding(18.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
-                        Image(
-                            painter = painterResource(id = R.drawable.avatar),
-                            "",
-                            modifier = Modifier.size(55.dp)
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = "${viewModel.selectedOrder.value.performer?.first_name}",
-                            color = FontSilver,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                Spacer(modifier = Modifier.width(20.dp))
-                CustomCircleButton(
-                    text = "Связаться \n" +
-                            "с водителем",
-                    icon = ImageVector.vectorResource(id = R.drawable.phone)
-                ) {
-                    connectClientWithDriverIsDialogOpen.value = true
-                }
-                Spacer(modifier = Modifier.width(20.dp))
-                CustomCircleButton(
-                    text = "Помощь\n" +
-                            "с заказом",
-                    icon = ImageVector.vectorResource(id = R.drawable.ic_help)
-                ) {
-                    connectClientWithDriverIsDialogOpen.value = true
-                }
-            }
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider()
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colors.background)
-                        .padding(bottom = 10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(15.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(0.9f)
-                        ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(20.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.from_marker),
-                                contentDescription = "Logo"
-                            )
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Text(
-                                text = viewModel.selectedOrder.value.from_address?.name
-                                    ?: "Откуда?",
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 55.dp, end = 15.dp)
-                    ) {
-                        Divider()
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 55.dp, end = 15.dp)
-                    ) {
-                        Divider()
-                    }
-                    viewModel.selectedOrder.value.to_addresses?.let { address ->
+                LazyColumn {
+                    item {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp),
+                                .padding(horizontal = 25.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Row() {
-                                Image(
-                                    modifier = Modifier
-                                        .size(20.dp),
-                                    imageVector = if (MaterialTheme.colors.isLight) ImageVector.vectorResource(
-                                        R.drawable.to_marker
-                                    ) else ImageVector.vectorResource(
-                                        R.drawable.to_marker_dark
-                                    ),
-                                    contentDescription = "Logo"
+                            Column {
+                                Text(
+                                    text = "Статус поездки",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Medium
                                 )
-                                Spacer(modifier = Modifier.width(20.dp))
-                                address.forEach {
+                                Text(
+                                    text = "${viewModel.selectedOrder.value.status}",
+                                    color = if (order.status == "Выполнен") Color.Green else Color.Red,
+                                    fontSize = 15.sp
+                                )
+                            }
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = viewModel.selectedOrder.value.performer?.first_name
+                                        ?: "   ",
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier
+                                        .background(
+                                            shape = RoundedCornerShape(3.dp),
+                                            color = Color(0xFFF4B91D)
+                                        )
+                                )
+                                Image(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                                    contentDescription = "car_eco",
+                                    modifier = Modifier
+                                        .offset(y = (-10).dp)
+                                        .size(65.dp)
+                                )
+                            }
+                        }
+                        Divider()
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(18.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.avatar),
+                                    "",
+                                    modifier = Modifier.size(55.dp)
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = if (order.performer == null) " " else "${order.performer.first_name}",
+                                    color = FontSilver,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(20.dp))
+                            CustomCircleButton(
+                                text = "Связаться \n" +
+                                        "с водителем",
+                                icon = ImageVector.vectorResource(id = R.drawable.phone)
+                            ) {
+                                connectClientWithDriverIsDialogOpen.value = true
+                            }
+                            Spacer(modifier = Modifier.width(20.dp))
+                            CustomCircleButton(
+                                text = "Помощь\n" +
+                                        "с заказом",
+                                icon = ImageVector.vectorResource(id = R.drawable.ic_help)
+                            ) {
+                                connectClientWithDriverIsDialogOpen.value = true
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Divider()
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(15.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.9f)
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .size(20.dp),
+                                        imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                                        contentDescription = "Logo"
+                                    )
+                                    Spacer(modifier = Modifier.width(20.dp))
                                     Text(
-                                        it.name,
-                                        maxLines = 1,
+                                        text = viewModel.selectedOrder.value.from_address?.name
+                                            ?: "Откуда?",
                                         overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 55.dp, end = 15.dp)
+                            ) {
+                                Divider()
+                            }
+                            order.to_addresses?.forEach { address ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(15.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.9f)
+                                    ) {
+                                        Image(
+                                            modifier = Modifier
+                                                .size(20.dp),
+                                            imageVector = if (MaterialTheme.colors.isLight) ImageVector.vectorResource(
+                                                R.drawable.to_marker
+                                            ) else ImageVector.vectorResource(
+                                                R.drawable.to_marker_dark
+                                            ),
+                                            contentDescription = "Logo"
+                                        )
+                                        Spacer(modifier = Modifier.width(20.dp))
+                                        Text(
+                                            text = address.name,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+
+                                }
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 55.dp, end = 15.dp)
+                                ) {
+                                    Divider()
+                                }
+
+                            }
+                            Column {
+                                Row(modifier = Modifier.fillMaxWidth().padding(20.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text(text = "Общая стоимость", fontSize = 16.sp )
+                                    Text(text = "${order.price} смн", fontSize = 16.sp)
+                                }
+                                Divider()
+                                Row(modifier = Modifier.fillMaxWidth().padding(20.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                    Column {
+                                        Text(text = "Поездка", fontSize = 16.sp)
+                                        Text(text = "Повышенный спрос", fontSize = 12.sp, color = Color(0xff9C9C9C))
+                                    }
+                                    Text(text = "${order.price} смн", fontSize = 16.sp, color = Color(0xff9C9C9C))
+                                }
+                                Divider()
+                                Row(modifier = Modifier.fillMaxWidth().padding(20.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween){
+                                    Text(text = "Наличные", maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
+                                    Image(
+                                        modifier = Modifier.size(20.dp),
+                                        imageVector = ImageVector.vectorResource(R.drawable.wallet_icon),
+                                        contentDescription = "Logo"
                                     )
                                 }
                             }
@@ -260,13 +317,11 @@ class CardOrderHistory : Screen {
 
                     }
                 }
-
             }
+
 
         }
 
     }
 }
-
-
 
