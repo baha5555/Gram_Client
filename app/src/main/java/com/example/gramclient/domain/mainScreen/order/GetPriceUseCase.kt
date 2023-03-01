@@ -1,11 +1,9 @@
 package com.example.gramclient.domain.mainScreen.order
 
-import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.domain.AppRepository
 import com.example.gramclient.domain.mainScreen.Address
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -18,8 +16,9 @@ class GetPriceUseCase @Inject constructor(private val repository: AppRepository)
     operator fun invoke(
         tariff_id: Int,
         allowances: String?,
-        from_address: Int?,
-        to_addresses: SnapshotStateList<Address>?
+        search_address_id: Int?,
+        to_addresses: SnapshotStateList<Address>?,
+        from_address: String?
     ): Flow<Resource<CalculateResponse>> =
         flow{
             try {
@@ -28,7 +27,7 @@ class GetPriceUseCase @Inject constructor(private val repository: AppRepository)
                 to_addresses?.forEach{
                     toAddressesList.add("{\"search_address_id\":${it.id}}")
                 }
-                val response: CalculateResponse = repository.getPrice(tariff_id, allowances, from_address, toAddressesList.toString())
+                val response: CalculateResponse = repository.getPrice(tariff_id, allowances, search_address_id, toAddressesList.toString(), from_address)
                 emit(Resource.Success(response))
             }catch (e: HttpException) {
                 emit(

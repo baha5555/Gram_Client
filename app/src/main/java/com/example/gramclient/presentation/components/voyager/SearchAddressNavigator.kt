@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components.voyager
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,6 +27,7 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.addressComponents.AddressListItem
 import com.example.gramclient.presentation.screens.main.addressComponents.Loader
+import com.example.gramclient.presentation.screens.navigator
 import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.utils.Constants
 import kotlinx.coroutines.launch
@@ -116,11 +118,16 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                         .align(Alignment.CenterEnd)
                         .padding(end = 20.dp)
                         .clickable {
-                            if (bottomNavigator
-                                    .pop()
-                                    .not()
-                            ) {
-                                bottomNavigator.hide()
+                            Log.e("WHICHSCREEN" ,"$whichScreen")
+                            when(whichScreen) {
+                                Constants.FROM_ADDRESS -> {
+                                    bottomNavigator.hide()
+                                    navigator.push(MapPointScreen(whichScreen))
+                                }
+                                else -> {
+                                    bottomNavigator.hide()
+                                    navigator.push(MapPointScreen(whichScreen))
+                                }
                             }
                         },
                     contentAlignment = Alignment.Center

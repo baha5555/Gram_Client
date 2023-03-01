@@ -97,9 +97,10 @@ class AppRepositoryImpl(
     override suspend fun getPrice(
         tariff_id: Int,
         allowances: String?,
-        from_address: Int?,
-        to_addresses: String?
-    ): CalculateResponse = api.getPrice(tariff_id, allowances, from_address, to_addresses)
+        search_address_id: Int?,
+        to_addresses: String?,
+        from_addresses: String?
+    ): CalculateResponse = api.getPrice(tariff_id, allowances, search_address_id, to_addresses, from_addresses)
 
     override suspend fun cancelOrder(order_id: Int): CancelOrderResponse =
         api.cancelOrder(prefs.getAccessToken(), order_id)

@@ -107,8 +107,9 @@ interface ApplicationApi {
     suspend fun getPrice(
         @Query("tariff_id") tariff_id : Int,
         @Field("allowances") allowances: String?,
-        @Field("search_address_id") from_address: Int?,
+        @Field("search_address_id") search_address_id: Int?,
         @Field("to_addresses") to_addresses: String?,
+        @Field("from_address") from_address: String?,
     ): CalculateResponse
 
     @POST("/api/orders/cancel")

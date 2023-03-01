@@ -12,7 +12,7 @@ data class RealtimeDatabaseOrder(
     @ColumnInfo
     var allowances: List<Allowance>? = null,
     @ColumnInfo
-    val created_at: String?=null,
+    val create_order: String?=null,
     @ColumnInfo
     val from_address: Address?=null,
     @ColumnInfo

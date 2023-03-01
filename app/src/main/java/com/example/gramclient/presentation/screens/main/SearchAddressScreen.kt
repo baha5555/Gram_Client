@@ -26,10 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.main.components.FromAddressField
@@ -58,7 +60,7 @@ class SearchAddressScreen : Screen {
         val isSearchState = remember { mutableStateOf(false) }
         var sheetPeekHeight = remember { mutableStateOf(280) }
 
-        var WHICH_ADDRESS = remember { mutableStateOf(Constants.TO_ADDRESS) }
+        var WHICH_ADDRESS = remember { mutableStateOf(Constants.FROM_ADDRESS) }
 
         val bottomSheetState = rememberBottomSheetScaffoldState(
             bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
@@ -66,6 +68,8 @@ class SearchAddressScreen : Screen {
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
+        val bottomNavigator = LocalBottomSheetNavigator.current
+
         val focusRequester = remember { FocusRequester() }
 
         CustomBackHandle(drawerState.isClosed)
@@ -108,7 +112,6 @@ class SearchAddressScreen : Screen {
                                 if(Values.ClientOrders.value!=null){
                                     Box(modifier = Modifier.offset(25.dp, (-55).dp)){
                                         FloatingButton(
-                                            bottomSheetState = bottomSheetState,
                                             Icons.Filled.ArrowBack,
                                             backgroundColor = MaterialTheme.colors.background,
                                             contentColor = MaterialTheme.colors.onBackground
@@ -124,7 +127,6 @@ class SearchAddressScreen : Screen {
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     FloatingButton(
-                                        bottomSheetState = bottomSheetState,
                                         ImageVector.vectorResource(id = R.drawable.btn_show_location)
                                     ){
                                         map.controller.animateTo(mLocationOverlay.myLocation)
@@ -134,14 +136,13 @@ class SearchAddressScreen : Screen {
                                                     mainViewModel.getAddressFromMap(
                                                         mLocationOverlay.myLocation.longitude,
                                                         mLocationOverlay.myLocation.latitude,
-                                                        WHICH_ADDRESS
+                                                        WHICH_ADDRESS.value
                                                     )
                                                 }
                                             }
                                         }
                                     }
                                     FloatingButton(
-                                        bottomSheetState = bottomSheetState,
                                         Icons.Filled.Menu
                                     ){
                                         scope.launch {
@@ -175,11 +176,7 @@ class SearchAddressScreen : Screen {
                                     WHICH_ADDRESS = WHICH_ADDRESS
                                 )
                                 FromAddressField(fromAddress) {
-                                    coroutineScope.launch {
-                                        bottomSheetState.bottomSheetState.expand()
-                                    }
-                                    isSearchState.value = true
-                                    WHICH_ADDRESS.value = Constants.FROM_ADDRESS
+                                    bottomNavigator.show(SearchAddressNavigator(Constants.FROM_ADDRESS))
                                 }
                             }
                         }

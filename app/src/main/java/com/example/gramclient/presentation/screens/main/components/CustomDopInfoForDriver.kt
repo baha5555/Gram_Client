@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +29,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.gramclient.presentation.components.CustomButton
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.ui.theme.BackgroundColor
+import com.maxkeppeker.sheets.core.icons.LibIcons
+import com.maxkeppeker.sheets.core.models.base.Header
+import com.maxkeppeker.sheets.core.models.base.SheetState
+import com.maxkeppeker.sheets.core.models.base.rememberSheetState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarConfig
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import com.maxkeppeler.sheets.clock.ClockDialog
+import com.maxkeppeler.sheets.clock.models.ClockConfig
+import com.maxkeppeler.sheets.clock.models.ClockSelection
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -49,7 +61,8 @@ fun CustomDopInfoForDriver(
     selectedDate:MutableState<String> = mutableStateOf(""),
 ) {
     var stateTimeDialog by remember{mutableStateOf(false)}
-    var stateDatePickerDialog by remember{mutableStateOf(false)}
+    var stateDatePickerDialog = remember{mutableStateOf(false)}
+    val calendarState = rememberSheetState()
     Column(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight(if (!stateViewOfInfo.value) 0.9f else 0.45f)) {
@@ -86,35 +99,32 @@ fun CustomDopInfoForDriver(
             )
         }
         else {
-            Text(text = "Через 10 минут", modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 20.dp)
-                .clickable { planTripTenMinutesOnClick() })
-            Text(text = "Через 15 минут", modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 20.dp)
-                .clickable { planTripFifteenMinutesOnClick() })
+            CustomLastTimeItem(onClick = planTripTenMinutesOnClick, minutes = 10)
+            CustomLastTimeItem(onClick = planTripFifteenMinutesOnClick, minutes = 15)
             Divider(modifier = Modifier.padding(horizontal = 10.dp))
-            DatePicker(value = selectedDate.value, onValueChange = {
-                selectedDate.value = it
-                if(it!="")
-                {
-                    stateDatePickerDialog =false
-                    stateTimeDialog = true
-                }
-            }, stateDatePickerDialog = stateDatePickerDialog)
-            CustomTimePicker(value = selectedTime.value, onValueChange = {
-                selectedTime.value = it
-                if(it!="")
-                {
-                    stateTimeDialog =false
-                }
-            }, stateTimeDialog = stateTimeDialog)
+            showTime(calendarState, selectedTime =  selectedTime, selectedDate = selectedDate)
+//            DatePicker(value = selectedDate.value, onValueChange = {
+//                selectedDate.value = it
+//                if(it!="")
+//                {
+//                    stateDatePickerDialog.value =false
+//                    stateTimeDialog = true
+//                }
+//            }, stateDatePickerDialog = stateDatePickerDialog)
+//            CustomTimePicker(value = selectedTime.value, onValueChange = {
+//                selectedTime.value = it
+//                if(it!="")
+//                {
+//                    stateTimeDialog =false
+//                }
+//            }, stateTimeDialog = stateTimeDialog)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp, vertical = 20.dp)
                     .clickable {
-                               stateDatePickerDialog = true
-                },
+                        calendarState.show()
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -169,22 +179,70 @@ fun DatePicker(
     value: String,
     onValueChange: (String) -> Unit = {},
     pattern: String = "yyyy-MM-dd",
-    stateDatePickerDialog: Boolean
+    stateDatePickerDialog: MutableState<Boolean>
 ) {
     val formatter = DateTimeFormatter.ofPattern(pattern)
     val sts = ""
     val date = if (value.isNotBlank()) LocalDate.parse(value, formatter) else LocalDate.now()
     val dialog = DatePickerDialog(
         LocalContext.current,
-        { _, year, month, dayOfMonth ->
+        { it, year, month, dayOfMonth ->
+            Log.e("DATETIME","$it")
             onValueChange(LocalDate.of(year, month + 1, dayOfMonth).toString())
         },
         date.year,
         date.monthValue - 1,
         date.dayOfMonth,
     )
-    if(stateDatePickerDialog)
+    if(stateDatePickerDialog.value)
         dialog.show()
 }
-
+@Composable
+fun CustomLastTimeItem(
+    onClick: () -> Unit,
+    minutes: Int
+){
+    Column(modifier= Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 10.dp)
+        .clickable { onClick() }
+    ) {
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = "Через $minutes минут")
+        Spacer(modifier = Modifier.height(20.dp))
+    }
+}
+@SuppressLint("NewApi")
+@Composable
+fun showTime(
+    calendarState: SheetState = rememberSheetState(),
+    clockState: SheetState = rememberSheetState(),
+    selectedDate: MutableState<String>,
+    selectedTime: MutableState<String>
+    ) {
+    CalendarDialog(
+        state = calendarState,
+        config = CalendarConfig(
+            monthSelection = true,
+            yearSelection = true,
+            style = CalendarStyle.MONTH,
+            minYear = LocalDate.now().year
+        ),
+        selection = CalendarSelection.Date { date ->
+            Log.e("SelectedDate", "$date")
+            selectedDate.value = "$date"
+            clockState.show()
+        }
+    )
+    ClockDialog(
+        state = clockState,
+        config= ClockConfig(
+            defaultTime = LocalTime.now(),
+            is24HourFormat = true,
+            icons = LibIcons.Rounded
+        ),
+        selection = ClockSelection.HoursMinutes { hours, minutes ->
+        selectedTime.value = "${if(hours<=9) "0" else ""}$hours:${if(minutes<=9) "0" else ""}$minutes"
+    })
+}
 

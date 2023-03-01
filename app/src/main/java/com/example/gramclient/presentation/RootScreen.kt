@@ -16,6 +16,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.CustomRequestError
+import com.example.gramclient.presentation.components.voyager.MapPointScreen
 import com.example.gramclient.presentation.screens.SplashScreen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel

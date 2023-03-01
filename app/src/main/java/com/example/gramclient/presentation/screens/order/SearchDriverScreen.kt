@@ -46,12 +46,15 @@ import com.example.gramclient.ui.theme.PrimaryColor
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.example.gramclient.utils.Values
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
 val orderCount = mutableStateOf(-1)
 
 class SearchDriverScreen : Screen {
+    @SuppressLint("CoroutineCreationDuringComposition")
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
@@ -75,7 +78,19 @@ class SearchDriverScreen : Screen {
         }
         val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
         val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
-
+        val stateActiveOrder = remember{orderExecutionViewModel.stateActiveOrders}
+        val stateClientOrderId = stateRealtimeClientOrderIdDatabase.response?.observeAsState()?.value
+        scope.launch {
+            if (stateClientOrderId == null) {
+                delay(1000)
+                orderExecutionViewModel.getActiveOrders() {
+                    Log.e("RESPONSEEEE","${stateActiveOrder.value.response} \n ${stateActiveOrder.value.code} \n ${stateActiveOrder.value.success}")
+                    if (stateActiveOrder.value.response?.isEmpty() == true && stateActiveOrder.value.code == 200) {
+                        navigator.replaceAll(SearchAddressScreen())
+                    }
+                }
+            }
+        }
         CustomBackHandle(drawerState.isClosed)
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -161,7 +176,6 @@ class SearchDriverScreen : Screen {
                                 scaffoldState = bottomSheetScaffoldState,
                                 floatingActionButton = {
                                     FloatingButton(
-                                        bottomSheetState = bottomSheetState,
                                         icon = Icons.Filled.Menu
                                     ){
                                         scope.launch {

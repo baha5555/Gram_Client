@@ -11,7 +11,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Resource
@@ -103,6 +102,7 @@ class MainViewModel @Inject constructor(
     fun updateFromAddress(address: Address) {
         _fromAddress.value = address
         showRoad()
+        getPrice()
         Log.i("addresses", "From-" + address)
     }
 
@@ -119,20 +119,26 @@ class MainViewModel @Inject constructor(
     }
 
     fun updateToAddress(inx: Int, address: Address?) {
-        if (_toAddresses.size == 0) addToAddress(address)
+        if (_toAddresses.size == 0) {
+            addToAddress(address)
+            getPrice()
+        }
         else {
             if (address != null) {
                 _toAddresses[inx] = address
+                //_toAddresses[inx].idIncrement = inx
+                getPrice()
                 showRoad()
             }
         }
+        getPrice()
     }
 
     fun addToAddress(address: Address?) {
         if (address != null) {
-            if (_toAddresses.contains(address)) return
             _toAddresses.add(address)
             _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
+            getPrice()
             showRoad()
         }
     }
@@ -252,8 +258,7 @@ class MainViewModel @Inject constructor(
                     is Resource.Success -> {
                         try {
                             val addressResponse: AddressByPointResponse? = result.data
-                            _stateAddressPoint.value =
-                                AddressByPointResponseState(response = addressResponse?.result)
+                            _stateAddressPoint.value = AddressByPointResponseState(response = addressResponse?.result)
                             Log.e(
                                 "AddressByPointResponse",
                                 "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
@@ -308,7 +313,7 @@ class MainViewModel @Inject constructor(
         }
 
         task.addOnSuccessListener {
-            if (it != null) {
+            if (it != null && fromAddress.value.address=="") {
                 getAddressByPoint(it.longitude, it.latitude)
                 Log.e("ActualLocation", "Location - > ${it.longitude}  + ${it.latitude}")
             } else {
@@ -350,7 +355,7 @@ class MainViewModel @Inject constructor(
     fun createOrder(orderExecutionViewModel: OrderExecutionViewModel) {
         createOrderUseCase.invoke(
             dop_phone = if (_dopPhone.value != "") _dopPhone.value else null,
-            from_address = if (fromAddress.value.id != 0) fromAddress.value.id else null,
+            from_address = if (fromAddress.value.id != 0 && fromAddress.value.id!=-1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
             comment = if (_commentToOrder.value != "") _commentToOrder.value else null,
             tariff_id = selectedTariff?.value?.id ?: 1,
@@ -358,8 +363,8 @@ class MainViewModel @Inject constructor(
                 selectedAllowances.value
             ) else null,
             date_time = if (_planTrip.value != "") _planTrip.value else null,
-            from_address_point = null,
-            check_point_start = 0
+            from_address_point = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null,
+            check_point_start = if(fromAddress.value.id==-1) 1 else 0
         ).onEach { result: Resource<OrderResponse> ->
             when (result) {
                 is Resource.Success -> {
@@ -398,8 +403,9 @@ class MainViewModel @Inject constructor(
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
-            from_address = if (fromAddress.value.id != 0) fromAddress.value.id else null,
-            to_addresses = if (toAddresses.size != 0) toAddresses else null
+            search_address_id = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
+            to_addresses = if (toAddresses.size != 0) toAddresses else null,
+            from_address = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
         ).onEach { result: Resource<CalculateResponse> ->
             when (result) {
                 is Resource.Success -> {
@@ -431,7 +437,7 @@ class MainViewModel @Inject constructor(
     fun getAddressFromMap(
         lng: Double,
         lat: Double,
-        WHICH_ADDRESS: MutableState<String>
+        WHICH_ADDRESS: String
     ) {
         getAddressByPointUseCase.invoke(lng, lat)
             .onEach { result: Resource<AddressByPointResponse> ->
@@ -445,9 +451,16 @@ class MainViewModel @Inject constructor(
                                 "AddressByPointResponse",
                                 "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
                             )
-                            when (WHICH_ADDRESS.value) {
+                            when (WHICH_ADDRESS) {
                                 Constants.FROM_ADDRESS -> {
-
+                                   updateFromAddress(
+                                       Address(
+                                           _stateAddressPoint.value.response!!.name,
+                                           _stateAddressPoint.value.response!!.id,
+                                           _stateAddressPoint.value.response!!.lat,
+                                           _stateAddressPoint.value.response!!.lng
+                                   )
+                                   )
                                 }
                                 Constants.TO_ADDRESS -> {
                                     clearToAddress()
@@ -472,6 +485,16 @@ class MainViewModel @Inject constructor(
                             "AddressByPointResponse",
                             "AddressByPointResponseError->\n ${result.message}"
                         )
+                        if(result.message == "HTTP 404 Not Found"){
+                            updateFromAddress(
+                                Address(
+                                    "Метка на карте",
+                                    -1,
+                                    map.mapCenter.latitude.toString(),
+                                    map.mapCenter.longitude.toString()
+                                )
+                            )
+                        }
                         _stateAddressPoint.value = AddressByPointResponseState(
                             error = "${result.message}"
                         )
