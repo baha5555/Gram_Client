@@ -1,12 +1,14 @@
 package com.example.gramclient.presentation.screens.drawer.orderHistoryScreen
 
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.orderExecutionScreen.EditOrderResponseState
 import com.example.gramclient.domain.orderHistory.Data
@@ -25,6 +27,8 @@ import kotlin.coroutines.coroutineContext
 class OrderHistoryViewModel @Inject constructor(
     private val orderHistoryUseCase: OrderHistoryUseCase,
 ) : ViewModel() {
+    private val _selectedOrder = mutableStateOf(Data())
+    val selectedOrder: State<Data> = _selectedOrder
     private val _stateOrderHistoryPagingItems = mutableStateOf(OrderHistoryPagingResponseState())
     val stateOrderHistoryPagingItems = _stateOrderHistoryPagingItems
     fun response() = orderHistoryUseCase.response()
@@ -38,6 +42,10 @@ class OrderHistoryViewModel @Inject constructor(
             throw Exception("Ошибка при загрузке данных: ${e.message}")
         }
     }
+    fun updateSelectedOrder(order: Data) {
+        _selectedOrder.value = order
+    }
+
 }
 
 
