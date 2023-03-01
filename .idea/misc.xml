@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/bahri/AndroidStudioProjects/client_gram_android/app/src/main/res/drawable/business.xml" value="0.1" />
+        <entry key="..\:/Users/bahri/AndroidStudioProjects/client_gram_android/app/src/main/res/drawable/cancel_icon.xml" value="0.1" />
+        <entry key="..\:/Users/bahri/AndroidStudioProjects/client_gram_android/app/src/main/res/drawable/car_business_icon.xml" value="0.1" />
+        <entry key="..\:/Users/bahri/AndroidStudioProjects/client_gram_android/app/src/main/res/drawable/car_business_icon2.xml" value="0.1" />
+        <entry key="..\:/Users/bahri/AndroidStudioProjects/client_gram_android/app/src/main/res/drawable/ic_help.xml" value="0.1" />
         <entry key="..\:/Users/bahri/AndroidStudioProjects/client_gram_android/app/src/main/res/drawable/ic_navigation.xml" value="0.1" />
         <entry key="..\:/Users/bahri/AndroidStudioProjects/client_gram_android/app/src/main/res/drawable/location_icon.xml" value="0.1" />
         <entry key="..\:/Users/user/Desktop/Gram projects/client_gram_android/app/src/main/res/drawable/avatar.xml" value="0.245" />

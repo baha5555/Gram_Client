@@ -34,7 +34,7 @@ interface AppRepository {
     suspend fun getTariffs(): TariffsResponse
     suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse
     suspend fun getProfileInfo(): GetProfileInfoResponse
-    suspend fun getOrderHistory(): orderHistoryResponse
+    suspend fun getOrderHistory(): OrderHistoryPagingResult
     suspend fun getOrderHistoryResponse(page:Int): OrderHistoryPagingResult
     suspend fun connectClientWithDriver(order_id: String): connectClientWithDriverResponse
     suspend fun sendProfile(

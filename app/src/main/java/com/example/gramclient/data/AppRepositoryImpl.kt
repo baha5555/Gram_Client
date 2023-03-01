@@ -44,7 +44,7 @@ class AppRepositoryImpl(
     override suspend fun getProfileInfo(): GetProfileInfoResponse =
         api.getProfileInfo(prefs.getAccessToken())
 
-    override suspend fun getOrderHistory(): orderHistoryResponse =
+    override suspend fun getOrderHistory(): OrderHistoryPagingResult =
         api.getOrderHistory(prefs.getAccessToken())
 
     override suspend fun getOrderHistoryResponse(page: Int): OrderHistoryPagingResult =
