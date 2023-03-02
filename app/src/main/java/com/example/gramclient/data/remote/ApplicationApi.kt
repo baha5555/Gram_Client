@@ -48,7 +48,7 @@ interface ApplicationApi {
     suspend fun getProfileInfo(@Header("Authorization") token: String): GetProfileInfoResponse
 
     @GET("/api/orders")
-    suspend fun getOrderHistory(@Header("Authorization") token: String): orderHistoryResponse
+    suspend fun getOrderHistory(@Header("Authorization") token: String): OrderHistoryPagingResult
 
     @GET("/api/orders")
     suspend fun getOrderHistoryResponse(
