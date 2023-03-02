@@ -17,6 +17,7 @@ import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.orderExecutionScreen.reason.GetReasonsResponse
 import com.example.gramclient.domain.orderHistory.OrderHistoryPagingResult
 
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
@@ -100,8 +101,8 @@ class AppRepositoryImpl(
         from_addresses: String?
     ): CalculateResponse = api.getPrice(tariff_id, allowances, search_address_id, to_addresses, from_addresses)
 
-    override suspend fun cancelOrder(order_id: Int): CancelOrderResponse =
-        api.cancelOrder(prefs.getAccessToken(), order_id)
+    override suspend fun cancelOrder(order_id: Int, reason_cancel_order: String): CancelOrderResponse =
+        api.cancelOrder(prefs.getAccessToken(), order_id, reason_cancel_order)
 
     override suspend fun getActiveOrders(): ActiveOrdersResponse =
         api.getActiveOrders(prefs.getAccessToken())
@@ -130,4 +131,6 @@ class AppRepositoryImpl(
     )
 
     override suspend fun getFastAddresses() : FastAddressesResponse = api.getFastAddresses(prefs.getAccessToken())
+
+    override suspend fun getReasons() : GetReasonsResponse = api.getReasons(prefs.getAccessToken())
 }

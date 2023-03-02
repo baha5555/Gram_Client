@@ -102,7 +102,6 @@ class OrderExecutionScreen : Screen {
 
         LaunchedEffect(key1 = true) {
             Log.e("ActiveOrdersResponse", selectedOrder.toString())
-
         }
 
         var stateCancelOrderText by remember {
@@ -218,7 +217,7 @@ class OrderExecutionScreen : Screen {
                                 isDialogOpen.value = false
                                 sheetState.bottomSheetState.collapse()
                                 if (orderId != -1)
-                                    orderExecutionViewModel.cancelOrder(orderId) {
+                                    orderExecutionViewModel.cancelOrder(orderId, "2") {
                                         orderExecutionViewModel.stateCancelOrder.value.response.let {
                                             if(it == null ) return@cancelOrder
                                             if(it.result[0].count==0){

@@ -20,6 +20,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.gramclient.R
+import com.example.gramclient.ui.theme.PrimaryColor
 
 @Composable
 fun CustomCheckBox(
@@ -31,7 +32,7 @@ fun CustomCheckBox(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .clip(shape = CircleShape)
-            .background(if (isChecked) Color(0xFF2264D1) else Transparent,)
+            .background(if (isChecked) PrimaryColor else Transparent,)
             .clickable { onChecked() }.border(width = 1.dp, shape = CircleShape, color = if (isChecked) Transparent else Color(
                 0xFF9C9C9C
             )
