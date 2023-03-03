@@ -5,8 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,9 +57,16 @@ fun orderSection(
                     imageVector = ImageVector.vectorResource(R.drawable.from_marker),
                     contentDescription = "Logo"
                 )
+                var text by remember{ mutableStateOf("")}
                 Spacer(modifier = Modifier.width(20.dp))
+                order.from_address.let {
+                    text = it?.address ?: "Откуда?"
+                    if(order.meeting_info!=null){
+                        text+=", подъезд ${order.meeting_info}"
+                    }
+                }
                 Text(
-                    text = if(order.from_address?.address=="No name")"Метка на карте" else order.from_address?.address ?: "Откуда?"/*, maxLines = 1*/,
+                    text =  text /*, maxLines = 1*/,
                     overflow = TextOverflow.Ellipsis
                 )
             }

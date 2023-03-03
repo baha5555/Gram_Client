@@ -23,7 +23,7 @@
         android:icon="@drawable/ic_logo_gram"
         android:label="@string/app_name"
         android:usesCleartextTraffic="true"
-        android:roundIcon="@drawable/ic_logo_gram"
+        android:roundIcon="@drawable/ic_logo_gram_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GramClient"
         tools:targetApi="31">
