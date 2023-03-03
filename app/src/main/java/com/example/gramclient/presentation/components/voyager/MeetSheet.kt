@@ -1,4 +1,4 @@
-package com.example.gramclient.presentation.components
+package com.example.gramclient.presentation.components.voyager
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

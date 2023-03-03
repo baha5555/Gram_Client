@@ -30,6 +30,7 @@ import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.components.voyager.SearchAddressOrderExecutionNavigator
+import com.example.gramclient.presentation.components.voyager.reason.Reason1Screen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.map.CustomMainMap
@@ -184,7 +185,7 @@ class OrderExecutionScreen : Screen {
                                 navigator.push(CustomInfoOfActiveOrder())
                             })
                             actionSection(cancelOrderOnClick = {
-                                isDialogOpen.value = true
+                                bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
                                 orderId = order.id
                                 if (order.status == "Исполняется") {
                                     stateCancelOrderText =

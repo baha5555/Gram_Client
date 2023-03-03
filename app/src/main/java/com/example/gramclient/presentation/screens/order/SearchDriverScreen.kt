@@ -34,11 +34,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
+import com.example.gramclient.presentation.components.voyager.reason.Reason1Screen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
@@ -269,6 +271,8 @@ class SearchDriverScreen : Screen {
         isOpen: MutableState<Boolean>,
     ) {
         val navigator = LocalNavigator.currentOrThrow
+        val bottomNavigator = LocalBottomSheetNavigator.current
+
         val context = LocalContext.current
 
         val dateFormatParse = SimpleDateFormat("yyyy-MM-dd HH:mm")
@@ -393,7 +397,7 @@ class SearchDriverScreen : Screen {
                         CustomCircleButton(
                             text = "Отменить\nзаказ", icon = Icons.Default.Close
                         ) {
-                            cancelOrderIsDialogOpen.value = true
+                            bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
                         }
                     } else {
                         CustomCircleButton(
@@ -411,42 +415,7 @@ class SearchDriverScreen : Screen {
                 }
             }
         }
-        if (cancelOrderIsDialogOpen.value) {
-            Dialog(onDismissRequest = { cancelOrderIsDialogOpen.value = false }) {
-                Column(modifier = Modifier.background(Color.White)) {
-                    Text(text = "Подтверждение")
-                    Column() {
-                        stateReasonsResponse?.forEach {
-                            Row(verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { reasonsCheck.value = it.id.toString() }
-                                    .padding(vertical = 5.dp, horizontal = 10.dp)) {
-                                CustomCheckBox(
-                                    isChecked = reasonsCheck.value == it.id.toString(),
-                                    onChecked = { reasonsCheck.value = it.id.toString() })
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text("" + it.name)
-                            }
-                        }
-                        Button(onClick = {
-                            cancelOrderIsDialogOpen.value = false
-                            orderExecutionViewModel.cancelOrder(order.id, reasonsCheck.value) {
-                                orderExecutionViewModel.stateCancelOrder.value.response.let {
-                                    if (it == null) return@cancelOrder
-                                    if (it.result[0].count == 0) {
-                                        navigator.replaceAll(SearchAddressScreen())
-                                    }
-                                }
-                            }
 
-                        }, enabled = reasonsCheck.value != "") {
-                            Text("Отменить заказ")
-                        }
-                    }
-                }
-            }
-        }
         CustomDialog(
             text = "Позвонить водителю?",
             okBtnClick = {

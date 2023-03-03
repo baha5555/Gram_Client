@@ -39,6 +39,7 @@ import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.presentation.components.voyager.AddStopScreen
 import com.example.gramclient.presentation.components.voyager.MapPointScreen
+import com.example.gramclient.presentation.components.voyager.MeetSheet
 import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.components.*
