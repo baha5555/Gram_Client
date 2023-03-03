@@ -1,10 +1,8 @@
 package com.example.gramclient.presentation.screens.drawer.orderHistoryScreen
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,32 +15,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
-import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
-import com.example.gramclient.domain.orderHistory.Data
-import com.example.gramclient.domain.orderHistory.Result
-import com.example.gramclient.presentation.components.CustomCircleButton
-import com.example.gramclient.presentation.components.CustomDialog
+import com.example.gramclient.domain.orderHistory.CustomMainMapHistory
 import com.example.gramclient.presentation.screens.main.MainViewModel
-import com.example.gramclient.presentation.screens.map.CustomMainMap
-import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
-import com.example.gramclient.ui.theme.FontSilver
-import kotlinx.coroutines.flow.forEach
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
+import com.example.gramclient.utils.Constants
 import java.text.SimpleDateFormat
 
 class CardOrderHistory : Screen {
@@ -51,13 +37,9 @@ class CardOrderHistory : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: OrderHistoryViewModel = hiltViewModel()
         val mainViewModel: MainViewModel = hiltViewModel()
-        val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
-        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
-        val performer: RealtimeDatabaseOrder
-        val context = LocalContext.current
         val order = viewModel.selectedOrder.value
-
-
+        val context = LocalContext.current
+        var WHICH_ADDRESS = remember { mutableStateOf(Constants.FROM_ADDRESS) }
 
         Scaffold(
             topBar = {
@@ -107,10 +89,7 @@ class CardOrderHistory : Screen {
                     )
                 }
             }, backgroundColor = Color.White
-
         ) {
-
-
             Column {
                 Box(
                     modifier = Modifier
@@ -118,8 +97,8 @@ class CardOrderHistory : Screen {
                         .fillMaxWidth()
                         .height(250.dp)
                 ) {
-                    CustomMainMap(
-                        mainViewModel = mainViewModel
+                    CustomMainMapHistory(
+                        selectedOrder = viewModel.selectedOrder.value,
                     )
                 }
                 LazyColumn {
@@ -166,9 +145,8 @@ class CardOrderHistory : Screen {
                                         .size(65.dp)
                                 )
                             }
-                        }
+                        }/*
                         Divider()
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -186,7 +164,7 @@ class CardOrderHistory : Screen {
                                 )
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
-                                    text = if (order.performer == null) " " else "${order.performer.first_name}",
+                                    text = if (order.performer == null) "  " else "${order.performer.first_name}",
                                     color = FontSilver,
                                     textAlign = TextAlign.Center
                                 )
@@ -197,7 +175,11 @@ class CardOrderHistory : Screen {
                                         "с водителем",
                                 icon = ImageVector.vectorResource(id = R.drawable.phone)
                             ) {
-                                connectClientWithDriverIsDialogOpen.value = true
+                                Toast.makeText(
+                                    context,
+                                    "Эти страницы на стадии разработки",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                             Spacer(modifier = Modifier.width(20.dp))
                             CustomCircleButton(
@@ -205,10 +187,14 @@ class CardOrderHistory : Screen {
                                         "с заказом",
                                 icon = ImageVector.vectorResource(id = R.drawable.ic_help)
                             ) {
-                                connectClientWithDriverIsDialogOpen.value = true
+                                Toast.makeText(
+                                    context,
+                                    "Эти страницы на стадии разработки",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(10.dp))*/
                         Divider()
                         Column(
                             modifier = Modifier
@@ -239,7 +225,6 @@ class CardOrderHistory : Screen {
                                         overflow = TextOverflow.Ellipsis
                                     )
                                 }
-
                             }
                             Column(
                                 modifier = Modifier
@@ -276,7 +261,6 @@ class CardOrderHistory : Screen {
                                             overflow = TextOverflow.Ellipsis
                                         )
                                     }
-
                                 }
                                 Column(
                                     modifier = Modifier
@@ -285,27 +269,52 @@ class CardOrderHistory : Screen {
                                 ) {
                                     Divider()
                                 }
-
                             }
                             Column {
-                                Row(modifier = Modifier.fillMaxWidth().padding(20.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Text(text = "Общая стоимость", fontSize = 16.sp )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(text = "Общая стоимость", fontSize = 16.sp)
                                     Text(text = "${order.price} смн", fontSize = 16.sp)
                                 }
                                 Divider()
-                                Row(modifier = Modifier.fillMaxWidth().padding(20.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     Column {
                                         Text(text = "Поездка", fontSize = 16.sp)
-                                        Text(text = "Повышенный спрос", fontSize = 12.sp, color = Color(0xff9C9C9C))
+                                        Text(
+                                            text = "Повышенный спрос",
+                                            fontSize = 12.sp,
+                                            color = Color(0xff9C9C9C)
+                                        )
                                     }
-                                    Text(text = "${order.price} смн", fontSize = 16.sp, color = Color(0xff9C9C9C))
+                                    Text(
+                                        text = "${order.price} смн",
+                                        fontSize = 16.sp,
+                                        color = Color(0xff9C9C9C)
+                                    )
                                 }
                                 Divider()
-                                Row(modifier = Modifier.fillMaxWidth().padding(20.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween){
-                                    Text(text = "Наличные", maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "Наличные",
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontSize = 18.sp
+                                    )
                                     Image(
                                         modifier = Modifier.size(20.dp),
                                         imageVector = ImageVector.vectorResource(R.drawable.wallet_icon),
@@ -314,14 +323,10 @@ class CardOrderHistory : Screen {
                                 }
                             }
                         }
-
                     }
                 }
             }
-
-
         }
-
     }
 }
 
