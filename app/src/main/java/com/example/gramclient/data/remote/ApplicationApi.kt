@@ -14,6 +14,7 @@ import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.orderExecutionScreen.reason.GetReasonsResponse
 import com.example.gramclient.domain.orderHistory.OrderHistoryPagingResult
 
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
@@ -98,9 +99,7 @@ interface ApplicationApi {
         @Query("tariff_id") tariff_id : Int,
         @Field("allowances") allowances: String?,
         @Field("date_time")date_time:String?,
-        @Field("from_address") from_address_point:String?,
-        @Field("check_point_start") check_point_start: Short
-    ): OrderResponse
+        @Field("from_address") from_address_point:String?): OrderResponse
 
     @FormUrlEncoded
     @POST("/api/orders/calculate")
@@ -116,6 +115,7 @@ interface ApplicationApi {
     suspend fun cancelOrder(
         @Header("Authorization") token: String,
         @Query("order_id") order_id: Int,
+        @Query("reason_cancel_order") reason_cancel_order: String,
     ): CancelOrderResponse
 
     @GET("/api/orders/active")
@@ -146,5 +146,10 @@ interface ApplicationApi {
     suspend fun getFastAddresses(
         @Header("Authorization") token: String,
     ) : FastAddressesResponse
+
+    @GET("/api/orders/reason")
+    suspend fun getReasons(
+        @Header("Authorization") token: String,
+    ) : GetReasonsResponse
 
 }

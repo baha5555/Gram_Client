@@ -126,7 +126,7 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                                 }
                                 else -> {
                                     bottomNavigator.hide()
-                                    navigator.push(MapPointScreen(whichScreen))
+                                    //navigator.push(MapPointScreen(whichScreen))
                                 }
                             }
                         },

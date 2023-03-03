@@ -14,6 +14,7 @@ import com.example.gramclient.domain.mainScreen.order.UpdateOrderResponse
 import com.example.gramclient.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.example.gramclient.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.example.gramclient.domain.orderExecutionScreen.AddRatingResponse
+import com.example.gramclient.domain.orderExecutionScreen.reason.GetReasonsResponse
 import com.example.gramclient.domain.orderHistory.OrderHistoryPagingResult
 
 import com.example.gramclient.domain.orderHistoryScreen.orderHistoryResponse
@@ -55,8 +56,7 @@ interface AppRepository {
         tariff_id: Int,
         allowances: String?,
         date_time:String?,
-        from_address_point: String?,
-        check_point_start: Short
+        from_address_point: String?
     ): OrderResponse
 
 
@@ -68,7 +68,7 @@ interface AppRepository {
         from_address: String?
     ): CalculateResponse
 
-    suspend fun cancelOrder(order_id: Int): CancelOrderResponse
+    suspend fun cancelOrder(order_id: Int, reason_cancel_order: String): CancelOrderResponse
 
     suspend fun getActiveOrders(): ActiveOrdersResponse
 
@@ -84,5 +84,7 @@ interface AppRepository {
     ): UpdateOrderResponse
 
     suspend fun getFastAddresses(): FastAddressesResponse
+
+    suspend fun getReasons(): GetReasonsResponse
 }
 

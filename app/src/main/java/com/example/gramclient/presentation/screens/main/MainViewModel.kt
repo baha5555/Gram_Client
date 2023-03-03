@@ -363,8 +363,7 @@ class MainViewModel @Inject constructor(
                 selectedAllowances.value
             ) else null,
             date_time = if (_planTrip.value != "") _planTrip.value else null,
-            from_address_point = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null,
-            check_point_start = if(fromAddress.value.id==-1) 1 else 0
+            from_address_point = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result) {
                 is Resource.Success -> {

@@ -20,14 +20,18 @@ import com.example.gramclient.domain.firebase.GetClientOrderUseCase
 import com.example.gramclient.domain.firebase.GetOrdersUseCase
 import com.example.gramclient.domain.firebase.profile.Client
 import com.example.gramclient.domain.mainScreen.*
+import com.example.gramclient.domain.orderExecutionScreen.reason.GetReasonsResponse
+import com.example.gramclient.domain.orderExecutionScreen.reason.GetReasonsUseCase
 import com.example.gramclient.presentation.screens.main.states.AddressByPointResponseState
 import com.example.gramclient.presentation.screens.order.states.GetClientOrderState
 import com.example.gramclient.presentation.screens.order.states.GetOrdersState
 import com.example.gramclient.presentation.screens.main.states.CancelOrderResponseState
 import com.example.gramclient.presentation.screens.main.states.SearchAddressResponseState
+import com.example.gramclient.presentation.screens.main.states.TariffsResponseState
 import com.example.gramclient.presentation.screens.map.MapController
 import com.example.gramclient.presentation.screens.map.map
 import com.example.gramclient.presentation.screens.map.showRoadAB
+import com.example.gramclient.presentation.screens.order.states.GetReasonsResponseState
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Resource
 import com.example.gramclient.utils.Values
@@ -45,7 +49,7 @@ import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 @HiltViewModel
-class OrderExecutionViewModel  @Inject constructor(
+class OrderExecutionViewModel @Inject constructor(
     application: Application,
     private val sendAddRatingUseCase: SendAddRatingUseCase,
     private val getActiveOrdersUseCase: GetActiveOrdersUseCase,
@@ -56,8 +60,9 @@ class OrderExecutionViewModel  @Inject constructor(
     private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase,
     private val searchAddressUseCase: SearchAddressUseCase,
     private val getAddressByPointUseCase: GetAddressByPointUseCase,
+    private val getReasonsUseCase: GetReasonsUseCase,
 
-    ): AndroidViewModel(application) {
+    ) : AndroidViewModel(application) {
     val context get() = getApplication<Application>()
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     val mapController = MapController(context)
@@ -65,13 +70,15 @@ class OrderExecutionViewModel  @Inject constructor(
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateAddRating: State<AddRatingResponseState> = _stateAddRating
 
-    private val _stateConnectClientWithDriver = mutableStateOf(ConnectClientWithDriverResponseState())
+    private val _stateConnectClientWithDriver =
+        mutableStateOf(ConnectClientWithDriverResponseState())
     val stateConnectClientWithDriver = _stateConnectClientWithDriver
     private val _stateRealtimeOrdersDatabase = mutableStateOf(GetOrdersState())
     val stateRealtimeOrdersDatabase: State<GetOrdersState> = _stateRealtimeOrdersDatabase
 
     private val _stateRealtimeClientOrderIdDatabase = mutableStateOf(GetClientOrderState())
-    val stateRealtimeClientOrderIdDatabase: State<GetClientOrderState> = _stateRealtimeClientOrderIdDatabase
+    val stateRealtimeClientOrderIdDatabase: State<GetClientOrderState> =
+        _stateRealtimeClientOrderIdDatabase
 
     private val _stateActiveOrders = mutableStateOf(ActiveOrdersResponseState())
     val stateActiveOrders: State<ActiveOrdersResponseState> = _stateActiveOrders
@@ -126,10 +133,10 @@ class OrderExecutionViewModel  @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun updateFromAddress(address: Address){
-        _fromAddress.value=address
+    fun updateFromAddress(address: Address) {
+        _fromAddress.value = address
         mapController.showRoadAB(_fromAddress, _toAddresses)
-        Log.i("fromaDA", ""+_fromAddress.value)
+        Log.i("fromaDA", "" + _fromAddress.value)
     }
 
     fun updateToAddressInx(address: Address, inx: Int) {
@@ -137,20 +144,22 @@ class OrderExecutionViewModel  @Inject constructor(
         editOrder()
     }
 
-    fun updateToAddress(address: Address? = null, clear: Boolean = false){
-        if(clear) _toAddresses.clear()
+    fun updateToAddress(address: Address? = null, clear: Boolean = false) {
+        if (clear) _toAddresses.clear()
         if (address != null) {
             _toAddresses.add(address)
             _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         }
         mapController.showRoadAB(_fromAddress, _toAddresses)
-        Log.i("fromaDA", ""+_toAddresses.size)
+        Log.i("fromaDA", "" + _toAddresses.size)
     }
-    fun clearAddresses(){
-        _fromAddress.value=Address()
+
+    fun clearAddresses() {
+        _fromAddress.value = Address()
         map.overlays.clear()
     }
-    fun addToAddress(address: Address){
+
+    fun addToAddress(address: Address) {
         _toAddresses.add(address)
         _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         editOrder()
@@ -162,16 +171,21 @@ class OrderExecutionViewModel  @Inject constructor(
     }
 
     fun readAllOrders() {
-            getOrdersUseCase.invoke().onEach { result: Resource<LiveData<List<RealtimeDatabaseOrder>>> ->
-                when (result){
+        getOrdersUseCase.invoke()
+            .onEach { result: Resource<LiveData<List<RealtimeDatabaseOrder>>> ->
+                when (result) {
                     is Resource.Success -> {
                         try {
-                            val addressResponse: LiveData<List<RealtimeDatabaseOrder>>? = result.data
+                            val addressResponse: LiveData<List<RealtimeDatabaseOrder>>? =
+                                result.data
 
-                                _stateRealtimeOrdersDatabase.value =
-                                    GetOrdersState(response = addressResponse)
-                            Log.e("readAllOrdersFromRealtimeResponse", "Success->\n ${_stateRealtimeOrdersDatabase.value.response?.value}")
-                        }catch (e: Exception) {
+                            _stateRealtimeOrdersDatabase.value =
+                                GetOrdersState(response = addressResponse)
+                            Log.e(
+                                "readAllOrdersFromRealtimeResponse",
+                                "Success->\n ${_stateRealtimeOrdersDatabase.value.response?.value}"
+                            )
+                        } catch (e: Exception) {
                             Log.d("readAllOrdersFromRealtimeResponse", "${e.message} Exception")
                         }
                     }
@@ -179,19 +193,24 @@ class OrderExecutionViewModel  @Inject constructor(
                 }
             }.launchIn(viewModelScope)
     }
-    fun readAllClient(client:String) {
-        if(client=="")return
+
+    fun readAllClient(client: String) {
+        if (client == "") return
         getClientOrderUseCase.invoke(client).onEach { result: Resource<LiveData<Client>> ->
-            when (result){
+            when (result) {
                 is Resource.Success -> {
                     try {
-                        val realtimeClientOrderIdDatabaseResponseResponse: LiveData<Client>? = result.data
+                        val realtimeClientOrderIdDatabaseResponseResponse: LiveData<Client>? =
+                            result.data
 
                         _stateRealtimeClientOrderIdDatabase.value =
                             GetClientOrderState(response = realtimeClientOrderIdDatabaseResponseResponse)
 
-                        Log.e("RealtimeClientOrderIdDatabaseResponse", "Success->\n ${_stateRealtimeClientOrderIdDatabase.value.response?.value }")
-                    }catch (e: Exception) {
+                        Log.e(
+                            "RealtimeClientOrderIdDatabaseResponse",
+                            "Success->\n ${_stateRealtimeClientOrderIdDatabase.value.response?.value}"
+                        )
+                    } catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
@@ -201,73 +220,94 @@ class OrderExecutionViewModel  @Inject constructor(
     }
 
     fun sendRating2(
-      order_id: Int,
-      add_rating: Int){
-        sendAddRatingUseCase.invoke(order_id, add_rating).onEach { result: Resource<AddRatingResponse> ->
-            when (result){
-                is Resource.Success -> {
-                    try {
-                        val addressResponse: AddRatingResponse? = result.data
-                        _stateAddRating.value =
-                            AddRatingResponseState(response = addressResponse?.result)
-                        Log.e("AddRatingResponse", "AddRatingResponseSuccess->\n ${_stateAddRating.value}")
-                    }catch (e: Exception) {
-                        Log.d("AddRatingResponse", "${e.message} Exception")
+        order_id: Int,
+        add_rating: Int
+    ) {
+        sendAddRatingUseCase.invoke(order_id, add_rating)
+            .onEach { result: Resource<AddRatingResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val addressResponse: AddRatingResponse? = result.data
+                            _stateAddRating.value =
+                                AddRatingResponseState(response = addressResponse?.result)
+                            Log.e(
+                                "AddRatingResponse",
+                                "AddRatingResponseSuccess->\n ${_stateAddRating.value}"
+                            )
+                        } catch (e: Exception) {
+                            Log.d("AddRatingResponse", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
+                        Log.e("AddRatingResponse", "AddRatingResponseError->\n ${result.message}")
+                        _stateAddRating.value = AddRatingResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateAddRating.value = AddRatingResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("AddRatingResponse", "AddRatingResponseError->\n ${result.message}")
-                    _stateAddRating.value = AddRatingResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateAddRating.value = AddRatingResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun connectClientWithDriver(
         order_id: String,
         onSuccess: () -> Unit
-    ){
-        connectClientWithDriverUseCase.invoke(order_id).onEach { result: Resource<connectClientWithDriverResponse> ->
-            when (result){
-                is Resource.Success -> {
-                    try {
-                        val connectClientWithDriverResponse: connectClientWithDriverResponse? = result.data
+    ) {
+        connectClientWithDriverUseCase.invoke(order_id)
+            .onEach { result: Resource<connectClientWithDriverResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val connectClientWithDriverResponse: connectClientWithDriverResponse? =
+                                result.data
+                            _stateConnectClientWithDriver.value =
+                                ConnectClientWithDriverResponseState(response = connectClientWithDriverResponse)
+                            onSuccess()
+                            Log.e(
+                                "ConnectClientWithDriverResponseSuccess",
+                                "ConnectClientWithDriverResponseSuccess->\n ${_stateConnectClientWithDriver.value.response}"
+                            )
+                        } catch (e: Exception) {
+                            Log.d("Exception", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
+                        Log.e(
+                            "ConnectClientWithDriverResponse",
+                            "ConnectClientWithDriverResponseError->\n ${result.message}"
+                        )
+                        _stateConnectClientWithDriver.value = ConnectClientWithDriverResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
                         _stateConnectClientWithDriver.value =
-                            ConnectClientWithDriverResponseState(response = connectClientWithDriverResponse)
-                        onSuccess()
-                        Log.e("ConnectClientWithDriverResponseSuccess", "ConnectClientWithDriverResponseSuccess->\n ${_stateConnectClientWithDriver.value.response}")
-                    }catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                            ConnectClientWithDriverResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("ConnectClientWithDriverResponse", "ConnectClientWithDriverResponseError->\n ${result.message}")
-                    _stateConnectClientWithDriver.value = ConnectClientWithDriverResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateConnectClientWithDriver.value = ConnectClientWithDriverResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
-    fun getActiveOrders(onSuccess:()->Unit = {}){
+    fun getActiveOrders(onSuccess: () -> Unit = {}) {
         getActiveOrdersUseCase.invoke().onEach { result: Resource<ActiveOrdersResponse> ->
-            when (result){
+            when (result) {
                 is Resource.Success -> {
                     try {
                         val response: ActiveOrdersResponse? = result.data
-                        _stateActiveOrders.value = ActiveOrdersResponseState(response = response?.result, success = true, code = response?.code)
-                        Log.e("ActiveOrdersResponse", "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}")
+                        _stateActiveOrders.value = ActiveOrdersResponseState(
+                            response = response?.result,
+                            success = true,
+                            code = response?.code
+                        )
+                        Log.e(
+                            "ActiveOrdersResponse",
+                            "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}"
+                        )
                         onSuccess()
-                    }catch (e: Exception) {
+                    } catch (e: Exception) {
                         Log.d("ActiveOrdersResponse", "${e.message} Exception")
                     }
                 }
@@ -284,9 +324,9 @@ class OrderExecutionViewModel  @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun cancelOrder(order_id: Int, onSuccess:()->Unit){
-        cancelOrderUseCase.invoke(order_id).onEach { result: Resource<CancelOrderResponse> ->
-            when (result){
+    fun cancelOrder(order_id: Int, reason_cancel_order: String, onSuccess: () -> Unit) {
+        cancelOrderUseCase.invoke(order_id, reason_cancel_order).onEach { result: Resource<CancelOrderResponse> ->
+            when (result) {
                 is Resource.Success -> {
                     try {
                         Toast.makeText(context, "Заказ успешно отменен", Toast.LENGTH_LONG).show()
@@ -296,8 +336,11 @@ class OrderExecutionViewModel  @Inject constructor(
                             CancelOrderResponseState(response = response)
                         onSuccess()
                         getActiveOrders()
-                        Log.e("CancelOrderResponse", "CancelOrderResponseSuccess->\n ${_stateCancelOrder.value}")
-                    }catch (e: Exception) {
+                        Log.e(
+                            "CancelOrderResponse",
+                            "CancelOrderResponseSuccess->\n ${_stateCancelOrder.value}"
+                        )
+                    } catch (e: Exception) {
                         Log.d("CancelOrderResponse", "${e.message} Exception")
                     }
                 }
@@ -313,6 +356,7 @@ class OrderExecutionViewModel  @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
     fun move(from: ItemPosition, to: ItemPosition) {
         _toAddresses = _toAddresses.apply {
             add(to.index, removeAt(from.index))
@@ -320,7 +364,7 @@ class OrderExecutionViewModel  @Inject constructor(
         //editOrder(_toAddresses)
     }
 
-    fun showRoad(){
+    fun showRoad() {
         map.overlays.clear()
         showRoadAB(
             context,
@@ -337,6 +381,7 @@ class OrderExecutionViewModel  @Inject constructor(
         _toAddresses.remove(address)
         editOrder()
     }
+
     fun getAddressFromMap(
         lng: Double,
         lat: Double,
@@ -388,7 +433,7 @@ class OrderExecutionViewModel  @Inject constructor(
                             "AddressByPointResponse",
                             "AddressByPointResponseError->\n ${result.message}"
                         )
-                        if(result.message == "HTTP 404 Not Found"){
+                        if (result.message == "HTTP 404 Not Found") {
                             updateFromAddress(
                                 Address(
                                     "Метка на карте",
@@ -417,18 +462,21 @@ class OrderExecutionViewModel  @Inject constructor(
             meeting_info = null,
             to_addresses = _toAddresses,
             comment = null,
-            tariff_id = selectedOrder.value.tariff_id?:0,
-            allowances = if(selectedOrder.value.allowances!=null) Gson().toJson(selectedOrder.value.allowances) else null
+            tariff_id = selectedOrder.value.tariff_id ?: 0,
+            allowances = if (selectedOrder.value.allowances != null) Gson().toJson(selectedOrder.value.allowances) else null
         ).onEach { result: Resource<UpdateOrderResponse> ->
-            when (result){
+            when (result) {
                 is Resource.Success -> {
                     try {
                         val response: UpdateOrderResponse? = result.data
                         _stateEditOrder.value =
                             EditOrderResponseState(response = response)
                         //readAllOrders()
-                        Log.e("EditOrderResponse", "EditOrderResponseSuccess->\n ${_stateEditOrder.value}")
-                    }catch (e: Exception) {
+                        Log.e(
+                            "EditOrderResponse",
+                            "EditOrderResponseSuccess->\n ${_stateEditOrder.value}"
+                        )
+                    } catch (e: Exception) {
                         Log.d("EditOrderResponse", "${e.message} Exception")
                     }
                 }
@@ -445,22 +493,56 @@ class OrderExecutionViewModel  @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getDriverLocation(orderId:Int){
+    fun getDriverLocation(orderId: Int) {
         val postReference = Firebase.database.reference
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 try {
                     val geoPoint = GeoPoint(0.0, 0.0)
-                    geoPoint.latitude = dataSnapshot.child("performer_locations/$orderId/lat").value.toString().toDouble()
-                    geoPoint.longitude = dataSnapshot.child("performer_locations/$orderId/lng").value.toString().toDouble()
-                    Values.DriverLocation.value=geoPoint
-                    Log.i("adafas", "change = "+Values.DriverLocation.value)
+                    geoPoint.latitude =
+                        dataSnapshot.child("performer_locations/$orderId/lat").value.toString()
+                            .toDouble()
+                    geoPoint.longitude =
+                        dataSnapshot.child("performer_locations/$orderId/lng").value.toString()
+                            .toDouble()
+                    Values.DriverLocation.value = geoPoint
+                    Log.i("adafas", "change = " + Values.DriverLocation.value)
                 } catch (e: Exception) {
                     Values.DriverLocation.value = GeoPoint(0.0, 0.0)
                 }
             }
+
             override fun onCancelled(databaseError: DatabaseError) {}
         }
         postReference.addValueEventListener(postListener)
+    }
+
+    private val _stateGetReasons = mutableStateOf(GetReasonsResponseState())
+    val stateGetReasons: State<GetReasonsResponseState> = _stateGetReasons
+
+    fun getReasons() {
+        getReasonsUseCase.invoke().onEach { result: Resource<GetReasonsResponse> ->
+            when (result) {
+                is Resource.Success -> {
+                    try {
+                        val tariffsResponse: GetReasonsResponse? = result.data
+                        _stateGetReasons.value =
+                            GetReasonsResponseState(response = tariffsResponse)
+                        Log.e("GetReasonsResponse", "GetReasonsResponseSuccess->\n${result.data}")
+                    } catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("GetReasonsResponse", "GetReasonsResponseError->\n ${result.message}")
+                    _stateGetReasons.value = GetReasonsResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateGetReasons.value = GetReasonsResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 }

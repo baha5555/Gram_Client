@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -78,19 +79,24 @@ class SearchDriverScreen : Screen {
         }
         val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
         val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
-        val stateActiveOrder = remember{orderExecutionViewModel.stateActiveOrders}
-        val stateClientOrderId = stateRealtimeClientOrderIdDatabase.response?.observeAsState()?.value
+        val stateActiveOrder = remember { orderExecutionViewModel.stateActiveOrders }
+        val stateClientOrderId =
+            stateRealtimeClientOrderIdDatabase.response?.observeAsState()?.value
         scope.launch {
             if (stateClientOrderId == null) {
                 delay(1000)
                 orderExecutionViewModel.getActiveOrders() {
-                    Log.e("RESPONSEEEE","${stateActiveOrder.value.response} \n ${stateActiveOrder.value.code} \n ${stateActiveOrder.value.success}")
+                    Log.e(
+                        "RESPONSEEEE",
+                        "${stateActiveOrder.value.response} \n ${stateActiveOrder.value.code} \n ${stateActiveOrder.value.success}"
+                    )
                     if (stateActiveOrder.value.response?.isEmpty() == true && stateActiveOrder.value.code == 200) {
                         navigator.replaceAll(SearchAddressScreen())
                     }
                 }
             }
         }
+
         CustomBackHandle(drawerState.isClosed)
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -133,7 +139,10 @@ class SearchDriverScreen : Screen {
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically,modifier=Modifier.fillMaxWidth(0.8f)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.fillMaxWidth(0.8f)
+                                    ) {
                                         Image(
                                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
                                             contentDescription = "car_eco",
@@ -177,7 +186,7 @@ class SearchDriverScreen : Screen {
                                 floatingActionButton = {
                                     FloatingButton(
                                         icon = Icons.Filled.Menu
-                                    ){
+                                    ) {
                                         scope.launch {
                                             drawerState.open()
                                         }
@@ -220,7 +229,8 @@ class SearchDriverScreen : Screen {
                                                                                 },
                                                                                 isOpen = isOpen,
                                                                             )
-                                                                            Spacer(Modifier.height(10.dp)
+                                                                            Spacer(
+                                                                                Modifier.height(10.dp)
                                                                             )
                                                                         }
                                                                     }
@@ -273,6 +283,12 @@ class SearchDriverScreen : Screen {
             mutableStateOf(0)
         }
         val scope = rememberCoroutineScope()
+
+        val stateReasonsResponse = orderExecutionViewModel.stateGetReasons.value.response
+        LaunchedEffect(key1 = true) {
+            orderExecutionViewModel.getReasons()
+        }
+        val reasonsCheck = remember { mutableStateOf("") }
         scope.launch {
             if (STATE_RAITING_ORDER_ID.value != order.id) {
                 STATE_RAITING.value = false
@@ -290,7 +306,10 @@ class SearchDriverScreen : Screen {
             .clip(RoundedCornerShape(20.dp))
             .clickable { sheetPeekHeightUpOnClick() }
             .fillMaxWidth()
-            .background(color = MaterialTheme.colors.background, shape = RoundedCornerShape(20.dp))) {
+            .background(
+                color = MaterialTheme.colors.background,
+                shape = RoundedCornerShape(20.dp)
+            )) {
             if (order.performer == null) {
                 Row(
                     modifier = Modifier
@@ -319,7 +338,7 @@ class SearchDriverScreen : Screen {
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(modifier=Modifier.fillMaxWidth(0.75f)) {
+                Column(modifier = Modifier.fillMaxWidth(0.75f)) {
                     Text(
                         text = if (order.performer == null) "Ищем ближайших водителей..."
                         else {
@@ -327,7 +346,7 @@ class SearchDriverScreen : Screen {
                                 "Водитель на месте" -> "Водитель на месте,\n можете выходить"
                                 "Исполняется" -> "За рулем ${order.performer?.first_name ?: "Водитель"}"
                                 "Водитель назначен" -> {
-                                    if (fillingTimeMinutes > 0 && order.filing_time!=null) "Через $fillingTimeMinutes мин приедет"
+                                    if (fillingTimeMinutes > 0 && order.filing_time != null) "Через $fillingTimeMinutes мин приедет"
                                     else "В ближайшее время \n приедет ${order.performer.first_name}"
                                 }
                                 else -> {
@@ -342,7 +361,7 @@ class SearchDriverScreen : Screen {
                         fontSize = 14.sp
                     )
                 }
-                    if (order.performer != null)  {
+                if (order.performer != null) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = order.performer.transport?.car_number ?: "",
@@ -378,7 +397,8 @@ class SearchDriverScreen : Screen {
                         }
                     } else {
                         CustomCircleButton(
-                            text = "Связаться", icon = ImageVector.vectorResource(id = R.drawable.phone)
+                            text = "Связаться",
+                            icon = ImageVector.vectorResource(id = R.drawable.phone)
                         ) {
                             connectClientWithDriverIsDialogOpen.value = true
                         }
@@ -391,22 +411,60 @@ class SearchDriverScreen : Screen {
                 }
             }
         }
-        CustomDialog(text = "Вы уверены что хотите отменить заказ?",
-            okBtnClick = {
-                cancelOrderIsDialogOpen.value = false
-                orderExecutionViewModel.cancelOrder(order.id) {
-                    orderExecutionViewModel.stateCancelOrder.value.response.let {
-                        if(it == null ) return@cancelOrder
-                        if(it.result[0].count==0){
-                            navigator.replaceAll(SearchAddressScreen())
+        if (cancelOrderIsDialogOpen.value) {
+            Dialog(onDismissRequest = { cancelOrderIsDialogOpen.value = false }) {
+                Column(modifier = Modifier.background(Color.White)) {
+                    Text(text = "Подтверждение")
+                    Column() {
+                        stateReasonsResponse?.forEach {
+                            Row(verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { reasonsCheck.value = it.id.toString() }
+                                    .padding(vertical = 5.dp, horizontal = 10.dp)) {
+                                CustomCheckBox(
+                                    isChecked = reasonsCheck.value == it.id.toString(),
+                                    onChecked = { reasonsCheck.value = it.id.toString() })
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text("" + it.name)
+                            }
+                        }
+                        Button(onClick = {
+                            cancelOrderIsDialogOpen.value = false
+                            orderExecutionViewModel.cancelOrder(order.id, reasonsCheck.value) {
+                                orderExecutionViewModel.stateCancelOrder.value.response.let {
+                                    if (it == null) return@cancelOrder
+                                    if (it.result[0].count == 0) {
+                                        navigator.replaceAll(SearchAddressScreen())
+                                    }
+                                }
+                            }
+
+                        }, enabled = reasonsCheck.value != "") {
+                            Text("Отменить заказ")
                         }
                     }
                 }
-            },
-            cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
-            isDialogOpen = cancelOrderIsDialogOpen.value
-        )
-        CustomDialog(text = "Позвонить водителю?",
+            }
+        }
+//        CustomDialog(
+//            text = "Вы уверены что хотите отменить заказ?",
+//            okBtnClick = {
+//                cancelOrderIsDialogOpen.value = false
+//                orderExecutionViewModel.cancelOrder(order.id) {
+//                    orderExecutionViewModel.stateCancelOrder.value.response.let {
+//                        if (it == null) return@cancelOrder
+//                        if (it.result[0].count == 0) {
+//                            navigator.replaceAll(SearchAddressScreen())
+//                        }
+//                    }
+//                }
+//            },
+//            cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
+//            isDialogOpen = cancelOrderIsDialogOpen.value
+//        )
+        CustomDialog(
+            text = "Позвонить водителю?",
             okBtnClick = {
                 connectClientWithDriverIsDialogOpen.value = false
                 orderExecutionViewModel.connectClientWithDriver(

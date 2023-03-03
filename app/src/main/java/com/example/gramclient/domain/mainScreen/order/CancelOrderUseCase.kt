@@ -9,11 +9,11 @@ import java.io.IOException
 import javax.inject.Inject
 
 class CancelOrderUseCase @Inject constructor(private val repository: AppRepository) {
-    operator fun invoke(order_id: Int): Flow<Resource<CancelOrderResponse>> =
+    operator fun invoke(order_id: Int, reason_cancel_order: String): Flow<Resource<CancelOrderResponse>> =
         flow{
             try {
                 emit(Resource.Loading<CancelOrderResponse>())
-                val response: CancelOrderResponse = repository.cancelOrder(order_id)
+                val response: CancelOrderResponse = repository.cancelOrder(order_id, reason_cancel_order)
                 emit(Resource.Success<CancelOrderResponse>(response))
             }catch (e: HttpException) {
                 emit(
