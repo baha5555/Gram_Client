@@ -23,7 +23,8 @@ class CreateOrderUseCase @Inject constructor(private val repository: AppReposito
         tariff_id: Int,
         allowances: String?,
         date_time:String?,
-        from_address_point: String?
+        from_address_point: String?,
+        meeting_info: String?,
     ): Flow<Resource<OrderResponse>> =
         flow{
             try {
@@ -32,7 +33,7 @@ class CreateOrderUseCase @Inject constructor(private val repository: AppReposito
                 to_addresses?.forEach{
                     toAddressesList.add("{\"search_address_id\":${it.id}}")
                 }
-                val response: OrderResponse = repository.createOrder(dop_phone, from_address, toAddressesList.toString(), comment, tariff_id, allowances,date_time, from_address_point)
+                val response: OrderResponse = repository.createOrder(dop_phone, from_address, toAddressesList.toString(), comment, tariff_id, allowances,date_time, from_address_point, meeting_info)
                 emit(Resource.Success<OrderResponse>(response))
             }catch (e: HttpException) {
                 emit(

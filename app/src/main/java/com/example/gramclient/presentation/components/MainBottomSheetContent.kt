@@ -169,6 +169,8 @@ fun AddressesContent(
     val toAddresses = mainViewModel.toAddresses
     val navigator: Navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
+    val meeting = mainViewModel.stateMeetingInfo.value
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -201,7 +203,7 @@ fun AddressesContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row() {
+            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     modifier = Modifier
                         .size(20.dp),
@@ -218,18 +220,23 @@ fun AddressesContent(
                     )
                 } else {
                     Text(
-                        address_from.address,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        if(meeting=="")address_from.address else address_from.address+", подъезд "+meeting,
+                        maxLines = 2, overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
-//            Text("Карта", modifier = Modifier
-//                .clip(RoundedCornerShape(3.dp))
-//                .background(Color(0xFFF0F0F0))
-//                .clickable {
-//                    navigator.push(MapPointScreen())
-//                }
-//                .padding(5.dp))
+            if(mainViewModel.fromAddress.value.id != 0){
+                Text("Подъезд", modifier = Modifier
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0xFF1A1A1A))
+                    .clickable {
+                        bottomNavigator.show(MeetSheet())
+                    }
+                    .padding(7.dp),
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+            }
         }
         Column(
             modifier = Modifier

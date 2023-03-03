@@ -352,6 +352,11 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    private val _stateMeetingInfo = mutableStateOf("")
+    val stateMeetingInfo : State<String> = _stateMeetingInfo
+    fun updateMeetingInfo(text: String){
+        _stateMeetingInfo.value = text
+    }
     fun createOrder(orderExecutionViewModel: OrderExecutionViewModel) {
         createOrderUseCase.invoke(
             dop_phone = if (_dopPhone.value != "") _dopPhone.value else null,
@@ -363,7 +368,8 @@ class MainViewModel @Inject constructor(
                 selectedAllowances.value
             ) else null,
             date_time = if (_planTrip.value != "") _planTrip.value else null,
-            from_address_point = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
+            from_address_point = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null,
+            meeting_info = if(stateMeetingInfo.value!="") stateMeetingInfo.value else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result) {
                 is Resource.Success -> {
