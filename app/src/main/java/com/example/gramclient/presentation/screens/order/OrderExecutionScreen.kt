@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -64,6 +65,9 @@ class OrderExecutionScreen : Screen {
 
         val stateRealtimeDatabaseOrders =
             orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
+
+        val stateReasonsResponse = orderExecutionViewModel.stateGetReasons.value.response
+        val reasonsCheck = remember { mutableStateOf("") }
 
         val isDialogOpen = remember { mutableStateOf(false) }
 
@@ -210,29 +214,48 @@ class OrderExecutionScreen : Screen {
                     mainViewModel = mainViewModel
                 )
                 if (stateCancelOrderText != "Вы не можете отменить активный заказ.\nЭто может сделать только оператор") {
-                    CustomDialog(
-                        text = stateCancelOrderText,
-                        okBtnClick = {
-                            coroutineScope.launch {
-                                isDialogOpen.value = false
-                                sheetState.bottomSheetState.collapse()
-                                if (orderId != -1)
-                                    orderExecutionViewModel.cancelOrder(orderId, "2") {
-                                        orderExecutionViewModel.stateCancelOrder.value.response.let {
-                                            if(it == null ) return@cancelOrder
-                                            if(it.result[0].count==0){
-                                                navigator.replaceAll(SearchAddressScreen())
-                                            }
-                                            else{
-                                                navigator.pop()
-                                            }
+                    if (isDialogOpen.value) {
+                        Dialog(onDismissRequest = { isDialogOpen.value = false }) {
+                            Column(modifier = Modifier.background(Color.White)) {
+                                Text(text = "Подтверждение")
+                                Column() {
+                                    stateReasonsResponse?.forEach {
+                                        Row(verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable { reasonsCheck.value = it.id.toString() }
+                                                .padding(vertical = 5.dp, horizontal = 10.dp)) {
+                                            CustomCheckBox(
+                                                isChecked = reasonsCheck.value == it.id.toString(),
+                                                onChecked = { reasonsCheck.value = it.id.toString() })
+                                            Spacer(modifier = Modifier.width(10.dp))
+                                            Text("" + it.name)
                                         }
                                     }
+                                    Button(onClick = {
+                                        coroutineScope.launch {
+                                            isDialogOpen.value = false
+                                            sheetState.bottomSheetState.collapse()
+                                            if (orderId != -1)
+                                                orderExecutionViewModel.cancelOrder(orderId, reasonsCheck.value) {
+                                                    orderExecutionViewModel.stateCancelOrder.value.response.let {
+                                                        if(it == null ) return@cancelOrder
+                                                        if(it.result[0].count==0){
+                                                            navigator.replaceAll(SearchAddressScreen())
+                                                        }
+                                                        else{
+                                                            navigator.pop()
+                                                        }
+                                                    }
+                                                }
+                                        }
+                                    }, enabled = reasonsCheck.value != "") {
+                                        Text("Отменить заказ")
+                                    }
+                                }
                             }
-                        },
-                        cancelBtnClick = { isDialogOpen.value = false },
-                        isDialogOpen = isDialogOpen.value
-                    )
+                        }
+                    }
                 } else {
                     CustomCancelDialog(
                         text = stateCancelOrderText,

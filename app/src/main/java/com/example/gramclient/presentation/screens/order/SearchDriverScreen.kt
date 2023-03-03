@@ -447,22 +447,6 @@ class SearchDriverScreen : Screen {
                 }
             }
         }
-//        CustomDialog(
-//            text = "Вы уверены что хотите отменить заказ?",
-//            okBtnClick = {
-//                cancelOrderIsDialogOpen.value = false
-//                orderExecutionViewModel.cancelOrder(order.id) {
-//                    orderExecutionViewModel.stateCancelOrder.value.response.let {
-//                        if (it == null) return@cancelOrder
-//                        if (it.result[0].count == 0) {
-//                            navigator.replaceAll(SearchAddressScreen())
-//                        }
-//                    }
-//                }
-//            },
-//            cancelBtnClick = { cancelOrderIsDialogOpen.value = false },
-//            isDialogOpen = cancelOrderIsDialogOpen.value
-//        )
         CustomDialog(
             text = "Позвонить водителю?",
             okBtnClick = {
