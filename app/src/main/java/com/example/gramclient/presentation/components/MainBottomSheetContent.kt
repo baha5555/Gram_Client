@@ -16,15 +16,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +34,6 @@ import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.presentation.components.voyager.AddStopScreen
-import com.example.gramclient.presentation.components.voyager.MapPointScreen
 import com.example.gramclient.presentation.components.voyager.MeetSheet
 import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
@@ -46,12 +41,8 @@ import com.example.gramclient.presentation.screens.main.components.*
 import com.example.gramclient.presentation.screens.main.states.AllowancesResponseState
 import com.example.gramclient.presentation.screens.main.states.CalculateResponseState
 import com.example.gramclient.presentation.screens.main.states.TariffsResponseState
-import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import currentFraction
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
