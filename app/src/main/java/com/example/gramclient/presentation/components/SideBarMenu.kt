@@ -28,6 +28,7 @@ import com.example.gramclient.presentation.MainActivity
 import com.example.gramclient.presentation.screens.authorization.AuthScreen
 import com.example.gramclient.presentation.screens.drawer.AboutScreen
 import com.example.gramclient.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
+import com.example.gramclient.presentation.screens.drawer.setting_screens.SettingScreen
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
 import com.example.gramclient.presentation.screens.profile.ProfileScreen
@@ -66,7 +67,7 @@ fun SideBarMenu() {
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .padding(if(Values.ImageUrl.value == "")5.dp else 0.dp),
+                        .padding(if (Values.ImageUrl.value == "") 5.dp else 0.dp),
                     contentDescription = "",
                 )
             }
@@ -152,13 +153,9 @@ fun ShowItems(
             .fillMaxWidth()
             .clickable {
                 when (text) {
-                    "Параметры" -> Toast
-                        .makeText(
-                            context,
-                            "Эта страница на стадии разработки",
-                            Toast.LENGTH_LONG
-                        )
-                        .show() /*navController.navigate(RoutesName.SETTING_SCREEN)*/
+                    "Параметры" -> {
+                        navigator.replace(SettingScreen())
+                    }
                     "Мои адреса" -> Toast
                         .makeText(
                             context,
