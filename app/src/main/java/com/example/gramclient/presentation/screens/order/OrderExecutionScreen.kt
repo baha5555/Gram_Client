@@ -2,6 +2,7 @@ package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -29,6 +31,7 @@ import com.example.gramclient.R
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.components.voyager.reason.Reason1Screen
+import com.example.gramclient.presentation.components.voyager.reason.Reason2Screen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.map.CustomMainMap
@@ -170,20 +173,24 @@ class OrderExecutionScreen : Screen {
 
                             if (order.performer != null) {
                                 performerSection(performer = order, orderExecutionViewModel)
-                                stateCancelOrderText =
-                                    "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
+                                stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
                             }
                             orderSection(order, scope)
                             Spacer(modifier = Modifier.height(10.dp))
                             optionSection(onClick = {
                                 navigator.push(CustomInfoOfActiveOrder())
                             })
+                            val context = LocalContext.current
                             actionSection(cancelOrderOnClick = {
-                                bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
                                 orderId = order.id
-                                if (order.status == "Исполняется") {
-                                    stateCancelOrderText =
-                                        "Вы не можете отменить активный заказ.\nЭто может сделать только оператор"
+                                if (order.status == "Исполняется" || order.status == "Водитель на месте") {
+                                   Toast.makeText(context, "Вы не можете отменить активный заказ.\nЭто может сделать только оператор", Toast.LENGTH_LONG).show()
+                                    return@actionSection
+                                }
+                                if (order.performer != null) {
+                                    bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
+                                }else{
+                                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order))
                                 }
                             })
                         }

@@ -217,7 +217,7 @@ fun AddressesContent(
                     )
                 }
             }
-            if(mainViewModel.fromAddress.value.id != 0){
+            if(mainViewModel.fromAddress.value.address != ""){
                 Text("Подъезд", modifier = Modifier
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFF1A1A1A))

@@ -17,4 +17,6 @@ object Values {
     val DriverLocation = mutableStateOf(GeoPoint(0.0, 0.0))
     //Orders
     val ClientOrders: MutableState<Client?> = mutableStateOf(null)
+    //Coment
+    val ComentReasons = mutableStateOf("")
 }

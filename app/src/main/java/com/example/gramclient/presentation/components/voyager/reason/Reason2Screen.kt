@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.components.voyager.reason
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,7 +21,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.CustomCheckBox
+import com.example.gramclient.presentation.components.voyager.ComentSheet
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
+import com.example.gramclient.utils.Values
 
 class Reason2Screen(
     val orderExecutionViewModel: OrderExecutionViewModel,
@@ -45,24 +50,40 @@ class Reason2Screen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { reasonsCheck.value = it.id.toString() }
+                        .clickable { reasonsCheck.value = it.name }
                         .padding(vertical = 10.dp)) {
                     Text("" + it.name, fontSize = 18.sp)
                     Spacer(modifier = Modifier.width(10.dp))
                     CustomCheckBox(
-                        isChecked = reasonsCheck.value == it.id.toString(),
-                        onChecked = { reasonsCheck.value = it.id.toString() })
+                        isChecked = reasonsCheck.value == it.name,
+                        onChecked = { reasonsCheck.value = it.name })
                 }
             }
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(57.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0xFFF7F7F7))
+                    .clickable {
+                        bottomNavigator.push(ComentSheet("Ваш коментарий..."))
+                    },
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(text = if(Values.ComentReasons.value=="") "Ваш коментарий..." else Values.ComentReasons.value, fontSize = 18.sp, color = if(Values.ComentReasons.value=="") Color(0xFFBEBEB5) else Color.Black, modifier = Modifier.padding(15.dp))
+            }
+            Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = {
+                    reasonsCheck.value+="\n"+Values.ComentReasons.value
                     bottomNavigator.hide()
                     orderExecutionViewModel.cancelOrder(order.id, reasonsCheck.value) {
                         orderExecutionViewModel.stateCancelOrder.value.response.let {}
                     }
+                    Values.ComentReasons.value=""
                 },
-                enabled = reasonsCheck.value != "",
+                enabled = reasonsCheck.value != "" || Values.ComentReasons.value!="",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(57.dp),

@@ -40,6 +40,7 @@ import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.components.voyager.reason.Reason1Screen
+import com.example.gramclient.presentation.components.voyager.reason.Reason2Screen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
@@ -393,7 +394,7 @@ class SearchDriverScreen : Screen {
                         CustomCircleButton(
                             text = "Отменить\nзаказ", icon = Icons.Default.Close
                         ) {
-                            bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
+                            bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order))
                         }
                     } else {
                         CustomCircleButton(
