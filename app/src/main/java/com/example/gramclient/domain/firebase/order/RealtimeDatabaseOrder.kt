@@ -28,6 +28,8 @@ data class RealtimeDatabaseOrder(
     @ColumnInfo
     val tariff: String?=null,
     @ColumnInfo
+    val meeting_info: String?=null,
+    @ColumnInfo
     val tariff_id: Int?=null,
     @ColumnInfo
     val to_address: List<Address>? = null,

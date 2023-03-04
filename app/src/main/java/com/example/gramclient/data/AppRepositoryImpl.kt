@@ -80,7 +80,8 @@ class AppRepositoryImpl(
         tariff_id: Int,
         allowances: String?,
         date_time: String?,
-        from_address_point: String?
+        from_address_point: String?,
+        meeting_info: String?
     ): OrderResponse = api.createOrder(
         prefs.getAccessToken(),
         dop_phone,
@@ -90,7 +91,8 @@ class AppRepositoryImpl(
         tariff_id,
         allowances,
         date_time,
-        from_address_point
+        from_address_point,
+        meeting_info
     )
 
     override suspend fun getPrice(

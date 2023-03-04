@@ -2,6 +2,7 @@ package com.example.gramclient.presentation.screens.order
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -15,10 +16,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -27,17 +30,13 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.firebase.order.RealtimeDatabaseOrder
 import com.example.gramclient.presentation.components.*
-import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
-import com.example.gramclient.presentation.components.voyager.SearchAddressOrderExecutionNavigator
+import com.example.gramclient.presentation.components.voyager.reason.Reason1Screen
+import com.example.gramclient.presentation.components.voyager.reason.Reason2Screen
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.map.CustomMainMap
 import com.example.gramclient.presentation.screens.order.components.*
-import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.ui.theme.PrimaryColor
-import com.example.gramclient.utils.Constants
-import com.example.gramclient.utils.Constants.FROM_ADDRESS
-import com.example.gramclient.utils.Constants.SOON
 import com.example.gramclient.utils.Constants.STATE_RAITING
 import com.example.gramclient.utils.Constants.STATE_RAITING_ORDER_ID
 import com.example.gramclient.utils.Values
@@ -64,6 +63,9 @@ class OrderExecutionScreen : Screen {
 
         val stateRealtimeDatabaseOrders =
             orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
+
+        val stateReasonsResponse = orderExecutionViewModel.stateGetReasons.value.response
+        val reasonsCheck = remember { mutableStateOf("") }
 
         val isDialogOpen = remember { mutableStateOf(false) }
 
@@ -171,20 +173,24 @@ class OrderExecutionScreen : Screen {
 
                             if (order.performer != null) {
                                 performerSection(performer = order, orderExecutionViewModel)
-                                stateCancelOrderText =
-                                    "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
+                                stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
                             }
                             orderSection(order, scope)
                             Spacer(modifier = Modifier.height(10.dp))
                             optionSection(onClick = {
                                 navigator.push(CustomInfoOfActiveOrder())
                             })
+                            val context = LocalContext.current
                             actionSection(cancelOrderOnClick = {
-                                isDialogOpen.value = true
                                 orderId = order.id
-                                if (order.status == "Исполняется") {
-                                    stateCancelOrderText =
-                                        "Вы не можете отменить активный заказ.\nЭто может сделать только оператор"
+                                if (order.status == "Исполняется" || order.status == "Водитель на месте") {
+                                   Toast.makeText(context, "Вы не можете отменить активный заказ.\nЭто может сделать только оператор", Toast.LENGTH_LONG).show()
+                                    return@actionSection
+                                }
+                                if (order.performer != null) {
+                                    bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
+                                }else{
+                                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order))
                                 }
                             })
                         }
@@ -210,29 +216,48 @@ class OrderExecutionScreen : Screen {
                     mainViewModel = mainViewModel
                 )
                 if (stateCancelOrderText != "Вы не можете отменить активный заказ.\nЭто может сделать только оператор") {
-                    CustomDialog(
-                        text = stateCancelOrderText,
-                        okBtnClick = {
-                            coroutineScope.launch {
-                                isDialogOpen.value = false
-                                sheetState.bottomSheetState.collapse()
-                                if (orderId != -1)
-                                    orderExecutionViewModel.cancelOrder(orderId, "2") {
-                                        orderExecutionViewModel.stateCancelOrder.value.response.let {
-                                            if(it == null ) return@cancelOrder
-                                            if(it.result[0].count==0){
-                                                navigator.replaceAll(SearchAddressScreen())
-                                            }
-                                            else{
-                                                navigator.pop()
-                                            }
+                    if (isDialogOpen.value) {
+                        Dialog(onDismissRequest = { isDialogOpen.value = false }) {
+                            Column(modifier = Modifier.background(Color.White)) {
+                                Text(text = "Подтверждение")
+                                Column() {
+                                    stateReasonsResponse?.forEach {
+                                        Row(verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable { reasonsCheck.value = it.id.toString() }
+                                                .padding(vertical = 5.dp, horizontal = 10.dp)) {
+                                            CustomCheckBox(
+                                                isChecked = reasonsCheck.value == it.id.toString(),
+                                                onChecked = { reasonsCheck.value = it.id.toString() })
+                                            Spacer(modifier = Modifier.width(10.dp))
+                                            Text("" + it.name)
                                         }
                                     }
+                                    Button(onClick = {
+                                        coroutineScope.launch {
+                                            isDialogOpen.value = false
+                                            sheetState.bottomSheetState.collapse()
+                                            if (orderId != -1)
+                                                orderExecutionViewModel.cancelOrder(orderId, reasonsCheck.value) {
+                                                    orderExecutionViewModel.stateCancelOrder.value.response.let {
+                                                        if(it == null ) return@cancelOrder
+                                                        if(it.result[0].count==0){
+                                                            navigator.replaceAll(SearchAddressScreen())
+                                                        }
+                                                        else{
+                                                            navigator.pop()
+                                                        }
+                                                    }
+                                                }
+                                        }
+                                    }, enabled = reasonsCheck.value != "") {
+                                        Text("Отменить заказ")
+                                    }
+                                }
                             }
-                        },
-                        cancelBtnClick = { isDialogOpen.value = false },
-                        isDialogOpen = isDialogOpen.value
-                    )
+                        }
+                    }
                 } else {
                     CustomCancelDialog(
                         text = stateCancelOrderText,

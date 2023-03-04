@@ -16,15 +16,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,19 +34,15 @@ import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.presentation.components.voyager.AddStopScreen
-import com.example.gramclient.presentation.components.voyager.MapPointScreen
+import com.example.gramclient.presentation.components.voyager.MeetSheet
 import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.components.*
 import com.example.gramclient.presentation.screens.main.states.AllowancesResponseState
 import com.example.gramclient.presentation.screens.main.states.CalculateResponseState
 import com.example.gramclient.presentation.screens.main.states.TariffsResponseState
-import com.example.gramclient.ui.theme.BackgroundColor
 import com.example.gramclient.utils.Constants.stateOfDopInfoForDriver
 import currentFraction
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
@@ -169,6 +161,8 @@ fun AddressesContent(
     val toAddresses = mainViewModel.toAddresses
     val navigator: Navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
+    val meeting = mainViewModel.stateMeetingInfo.value
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -201,7 +195,7 @@ fun AddressesContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row() {
+            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     modifier = Modifier
                         .size(20.dp),
@@ -218,18 +212,23 @@ fun AddressesContent(
                     )
                 } else {
                     Text(
-                        address_from.address,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        if(meeting=="")address_from.address else address_from.address+", подъезд "+meeting,
+                        maxLines = 2, overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
-//            Text("Карта", modifier = Modifier
-//                .clip(RoundedCornerShape(3.dp))
-//                .background(Color(0xFFF0F0F0))
-//                .clickable {
-//                    navigator.push(MapPointScreen())
-//                }
-//                .padding(5.dp))
+            if(mainViewModel.fromAddress.value.address != ""){
+                Text("Подъезд", modifier = Modifier
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0xFF1A1A1A))
+                    .clickable {
+                        bottomNavigator.show(MeetSheet())
+                    }
+                    .padding(7.dp),
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+            }
         }
         Column(
             modifier = Modifier

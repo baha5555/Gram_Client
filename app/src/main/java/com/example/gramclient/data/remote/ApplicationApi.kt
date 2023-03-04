@@ -99,7 +99,8 @@ interface ApplicationApi {
         @Query("tariff_id") tariff_id : Int,
         @Field("allowances") allowances: String?,
         @Field("date_time")date_time:String?,
-        @Field("from_address") from_address_point:String?): OrderResponse
+        @Field("from_address") from_address_point:String?,
+        @Field("meeting_info") meeting_info:String?): OrderResponse
 
     @FormUrlEncoded
     @POST("/api/orders/calculate")
