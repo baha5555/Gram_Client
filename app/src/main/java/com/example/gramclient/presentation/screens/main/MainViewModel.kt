@@ -324,7 +324,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun searchAddress(addressName: String) {
-        searchAddressUseCase.invoke(addressName).onEach { result: Resource<SearchAddressResponse> ->
+        searchAddressUseCase.invoke(if(addressName=="") null else addressName).onEach { result: Resource<SearchAddressResponse> ->
             when (result) {
                 is Resource.Success -> {
                     try {

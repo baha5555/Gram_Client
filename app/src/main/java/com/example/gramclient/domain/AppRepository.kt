@@ -47,7 +47,7 @@ interface AppRepository {
 
     suspend fun getAddressByPoint(lng: Double, lat: Double): AddressByPointResponse
     suspend fun sendRating(order_id: Int, add_rating: Int): AddRatingResponse
-    suspend fun searchAddress(addressName: String): SearchAddressResponse
+    suspend fun searchAddress(addressName: String?): SearchAddressResponse
     suspend fun createOrder(
         dop_phone: String?,
         from_address: Int?,

@@ -9,7 +9,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class SearchAddressUseCase @Inject constructor(private val repository: AppRepository) {
-    operator fun invoke(addressName: String): Flow<Resource<SearchAddressResponse>> =
+    operator fun invoke(addressName: String?): Flow<Resource<SearchAddressResponse>> =
         flow{
             try {
                 emit(Resource.Loading<SearchAddressResponse>())

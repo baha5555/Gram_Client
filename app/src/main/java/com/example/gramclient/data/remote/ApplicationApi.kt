@@ -85,7 +85,7 @@ interface ApplicationApi {
     @FormUrlEncoded
     @POST("/api/mob-app/orders/search-addresses")
     suspend fun searchAddress(
-        @Field("search") addressName: String,
+        @Field("search") addressName: String?,
     ): SearchAddressResponse
 
     @FormUrlEncoded
