@@ -118,20 +118,9 @@ class MainViewModel @Inject constructor(
         _commentToOrder.value = comment
     }
 
-    fun updateToAddress(inx: Int, address: Address?) {
-        if (_toAddresses.size == 0) {
-            addToAddress(address)
-            getPrice()
-        }
-        else {
-            if (address != null) {
-                _toAddresses[inx] = address
-                //_toAddresses[inx].idIncrement = inx
-                getPrice()
-                showRoad()
-            }
-        }
-        getPrice()
+    fun updateToAddress(address: Address?) {
+        clearToAddress()
+        addToAddress(address)
     }
 
     fun addToAddress(address: Address?) {
@@ -385,6 +374,9 @@ class MainViewModel @Inject constructor(
                             "OrderResponseSuccess->\n ${_stateCreateOrder.value}\n -> ${_planTrip.value}"
                         )
                         orderExecutionViewModel.getActiveOrders()
+                        _stateMeetingInfo.value=""
+                        _toAddresses.clear()
+                        _fromAddress.value=Address()
                     } catch (e: Exception) {
                         Log.d("OrderResponse", "${e.message} Exception")
                     }

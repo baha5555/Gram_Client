@@ -1,8 +1,6 @@
 package com.example.gramclient.presentation.components.voyager
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -28,11 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
 import com.example.gramclient.presentation.screens.main.MainViewModel
+import com.example.gramclient.presentation.screens.navigator
 import com.example.gramclient.utils.Constants
+import com.valentinilk.shimmer.shimmer
 
 class SearchAddresses(val withScreen: String) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
@@ -51,7 +53,7 @@ class SearchAddresses(val withScreen: String) : Screen {
         val fromText = remember {
             mutableStateOf(
                 TextFieldValue(
-                    ""+mainViewModel.fromAddress.value.address,
+                    "" + mainViewModel.fromAddress.value.address,
                     selection = TextRange(mainViewModel.fromAddress.value.address.length)
                 )
             )
@@ -64,9 +66,6 @@ class SearchAddresses(val withScreen: String) : Screen {
                 )
             )
         }
-//        if(mainViewModel.toAddresses.size>0){
-//            toText.value=mainViewModel.toAddresses[0].address
-//        }
         val fromIsFocused = remember {
             mutableStateOf(true)
         }
@@ -78,18 +77,26 @@ class SearchAddresses(val withScreen: String) : Screen {
         }
 
         LaunchedEffect(key1 = true) {
-            when(withScreen){
-                Constants.FROM_ADDRESS->{
+            if (mainViewModel.toAddresses.isNotEmpty()) {
+                toText.value = TextFieldValue(
+                    mainViewModel.toAddresses[0].address,
+                    TextRange(mainViewModel.toAddresses[0].address.length)
+                )
+            }
+            when (withScreen) {
+                Constants.FROM_ADDRESS -> {
                     focusRequester.requestFocus()
                 }
-                Constants.TO_ADDRESS->{
+                Constants.TO_ADDRESS -> {
                     focusRequesterTo.requestFocus()
                 }
             }
             mainViewModel.searchAddress("")
         }
         Column(
-            modifier = Modifier.padding(20.dp).fillMaxHeight(0.9f),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxHeight(0.93f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(
@@ -105,7 +112,7 @@ class SearchAddresses(val withScreen: String) : Screen {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
-                        imageVector = ImageVector.vectorResource(if (fromIsFocused.value) R.drawable.ic_serach_address else R.drawable.ic_serach_address_from),
+                        imageVector = ImageVector.vectorResource(if (fromIsFocused.value) R.drawable.ic_serach_address_f else R.drawable.ic_serach_address_from),
                         contentDescription = "",
                         modifier = Modifier.padding(start = 15.dp)
                     )
@@ -135,7 +142,9 @@ class SearchAddresses(val withScreen: String) : Screen {
                     if (fromIsFocused.value) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (fromText.value.text != "") {
-                                ClearText(fromText)
+                                ClearText(fromText) {
+                                    mainViewModel.updateFromAddress(Address())
+                                }
                             }
                             Divider(
                                 modifier = Modifier
@@ -146,7 +155,8 @@ class SearchAddresses(val withScreen: String) : Screen {
                                 modifier = Modifier
                                     .padding(start = 10.dp, end = 15.dp)
                                     .clickable {
-
+                                        bottomNavigator.hide()
+                                        navigator.push(MapPointScreen(Constants.FROM_ADDRESS))
                                     })
                         }
                     }
@@ -160,7 +170,10 @@ class SearchAddresses(val withScreen: String) : Screen {
                     )
                     TextField(
                         value = toText.value,
-                        onValueChange = { toText.value = it },
+                        onValueChange = {
+                            toText.value = it
+                            mainViewModel.searchAddress(it.text)
+                        },
                         colors = TextFieldDefaults.textFieldColors(
                             textColor = Color.Black,
                             disabledTextColor = Color.Transparent,
@@ -181,7 +194,9 @@ class SearchAddresses(val withScreen: String) : Screen {
                     if (toIsFocused.value) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (toText.value.text != "") {
-                                ClearText(toText)
+                                ClearText(toText) {
+                                    mainViewModel.clearToAddress()
+                                }
                             }
                             Divider(
                                 modifier = Modifier
@@ -192,64 +207,96 @@ class SearchAddresses(val withScreen: String) : Screen {
                                 modifier = Modifier
                                     .padding(start = 10.dp, end = 15.dp)
                                     .clickable {
-
+                                        bottomNavigator.hide()
+                                        navigator.push(MapPointScreen(Constants.TO_ADDRESS))
                                     })
                         }
                     }
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-            if (searchState.isLoading) {
-                CircularProgressIndicator()
-            } else {
-                searchState.response?.forEach {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                if (fromIsFocused.value) {
-                                    mainViewModel.updateFromAddress(
-                                        Address(
-                                            address = it.address,
-                                            id = it.id,
-                                            address_lat = it.address_lat,
-                                            address_lng = it.address_lng
-                                        )
-                                    )
-                                    fromText.value = TextFieldValue(it.address)
-                                    focusRequesterTo.requestFocus()
-                                } else if (toIsFocused.value) {
-                                    mainViewModel.updateToAddress(
-                                        0,
-                                        Address(
-                                            address = it.address,
-                                            id = it.id,
-                                            address_lat = it.address_lat,
-                                            address_lng = it.address_lng
-                                        )
-                                    )
-                                    toText.value = TextFieldValue(it.address)
-                                    bottomNavigator.hide()
-                                }
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                if (searchState.isLoading) {
+                    repeat(2) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .shimmer(), verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(15.dp)
+                                    .size(20.dp)
+                                    .clip(RoundedCornerShape(100))
+                                    .background(Color.Gray)
+                            )
+                            Column {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                                        .height(18.dp)
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(100))
+                                        .background(Color(0xFFAAAAAA))
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                                        .height(12.dp)
+                                        .fillMaxWidth(0.8f)
+                                        .clip(RoundedCornerShape(100))
+                                        .background(Color(0xFFAAAAAA))
+                                )
                             }
-                            .padding(start = 45.dp)) {
-                        Text(
-                            text = "" + it.address,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(vertical = 10.dp),
-                            maxLines = 1
-                        )
-                        Divider()
+                        }
+                        Divider(Modifier.padding(vertical = 10.dp))
                     }
+                } else {
+                    searchState.response?.forEach {
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (fromIsFocused.value) {
+                                        mainViewModel.updateFromAddress(
+                                            Address(
+                                                address = it.address,
+                                                id = it.id,
+                                                address_lat = it.address_lat,
+                                                address_lng = it.address_lng
+                                            )
+                                        )
+                                        fromText.value = TextFieldValue(it.address)
+                                        focusRequesterTo.requestFocus()
+                                    } else if (toIsFocused.value) {
+                                        mainViewModel.clearToAddress()
+                                        mainViewModel.addToAddress( Address(address = it.address, id = it.id, address_lat = it.address_lat, address_lng = it.address_lng) )
+                                        toText.value = TextFieldValue(it.address)
+                                        keyboard?.hide()
+                                        bottomNavigator.hide()
+                                    }
+                                }
+                                .padding(start = 45.dp)) {
+                            Text(
+                                text = "" + it.address,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(vertical = 10.dp),
+                                maxLines = 1
+                            )
+                            Divider()
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(300.dp))
                 }
             }
         }
     }
 
     @Composable
-    fun ClearText(text: MutableState<TextFieldValue>) {
+    fun ClearText(text: MutableState<TextFieldValue>, function: () -> Unit) {
         IconButton(onClick = {
             text.value = TextFieldValue("")
+            function.invoke()
         }) {
             Icon(
                 Icons.Default.Close, contentDescription = ""

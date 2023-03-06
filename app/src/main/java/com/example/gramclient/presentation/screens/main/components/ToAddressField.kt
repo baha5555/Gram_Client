@@ -47,8 +47,6 @@ fun ToAddressField(
             .height(50.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable {
-                mainViewModel.clearToAddress()
-                //bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS))
                 bottomNavigator.show(SearchAddresses(Constants.TO_ADDRESS))
             }
             .background(PrimaryColor)
