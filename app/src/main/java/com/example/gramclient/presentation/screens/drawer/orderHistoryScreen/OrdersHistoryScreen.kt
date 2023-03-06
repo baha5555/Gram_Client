@@ -129,8 +129,7 @@ class OrdersHistoryScreen : Screen {
                                             ){
                                                 viewModel.updateSelectedOrder(it)
                                                 Log.e("created_at","${res.created_at}")
-                                                navigator.replace(CardOrderHistory())
-
+                                                navigator.push(CardOrderHistory())
                                             }
                                         }
                                     }
