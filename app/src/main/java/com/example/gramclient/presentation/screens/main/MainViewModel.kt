@@ -19,8 +19,8 @@ import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesRespon
 import com.example.gramclient.domain.mainScreen.fast_address.FastAddressesUseCase
 import com.example.gramclient.domain.mainScreen.order.*
 import com.example.gramclient.presentation.screens.main.states.*
+import com.example.gramclient.presentation.screens.map.MapController
 import com.example.gramclient.presentation.screens.map.map
-import com.example.gramclient.presentation.screens.map.showRoadAB
 import com.example.gramclient.presentation.screens.order.OrderExecutionViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
@@ -42,6 +42,7 @@ class MainViewModel @Inject constructor(
     private val fastAddressesUseCase: FastAddressesUseCase
 ) : AndroidViewModel(application) {
     val context get() = getApplication<Application>()
+    val mapController = MapController(context)
 
     private val _stateTariffs = mutableStateOf(TariffsResponseState())
     val stateTariffs: State<TariffsResponseState> = _stateTariffs
@@ -122,6 +123,13 @@ class MainViewModel @Inject constructor(
         clearToAddress()
         addToAddress(address)
     }
+    fun updateToAddressInx(address: Address?, inx: Int) {
+        if(address==null) return
+        _toAddresses[inx].address = address.address
+        _toAddresses[inx].id = address.id
+        _toAddresses[inx].address_lat = address.address_lat
+        _toAddresses[inx].address_lng = address.address_lng
+    }
 
     fun addToAddress(address: Address?) {
         if (address != null) {
@@ -133,8 +141,7 @@ class MainViewModel @Inject constructor(
     }
     fun showRoad(){
         map.overlays.clear()
-        showRoadAB(
-            context,
+        mapController.showRoadAB(
             _fromAddress,
             _toAddresses
         )

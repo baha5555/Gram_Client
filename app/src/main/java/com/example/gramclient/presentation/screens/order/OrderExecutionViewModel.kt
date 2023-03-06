@@ -27,10 +27,8 @@ import com.example.gramclient.presentation.screens.order.states.GetClientOrderSt
 import com.example.gramclient.presentation.screens.order.states.GetOrdersState
 import com.example.gramclient.presentation.screens.main.states.CancelOrderResponseState
 import com.example.gramclient.presentation.screens.main.states.SearchAddressResponseState
-import com.example.gramclient.presentation.screens.main.states.TariffsResponseState
 import com.example.gramclient.presentation.screens.map.MapController
 import com.example.gramclient.presentation.screens.map.map
-import com.example.gramclient.presentation.screens.map.showRoadAB
 import com.example.gramclient.presentation.screens.order.states.GetReasonsResponseState
 import com.example.gramclient.utils.Constants
 import com.example.gramclient.utils.Resource
@@ -65,7 +63,7 @@ class OrderExecutionViewModel @Inject constructor(
     ) : AndroidViewModel(application) {
     val context get() = getApplication<Application>()
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    val mapController = MapController(context)
+    private val mapController = MapController(context)
 
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateAddRating: State<AddRatingResponseState> = _stateAddRating
@@ -135,7 +133,7 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun updateFromAddress(address: Address) {
         _fromAddress.value = address
-        mapController.showRoadAB(_fromAddress, _toAddresses)
+        showRoad()
         Log.i("fromaDA", "" + _fromAddress.value)
     }
 
@@ -150,7 +148,7 @@ class OrderExecutionViewModel @Inject constructor(
             _toAddresses.add(address)
             _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         }
-        mapController.showRoadAB(_fromAddress, _toAddresses)
+        showRoad()
         Log.i("fromaDA", "" + _toAddresses.size)
     }
 
@@ -163,7 +161,7 @@ class OrderExecutionViewModel @Inject constructor(
         _toAddresses.add(address)
         _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         editOrder()
-        mapController.showRoadAB(_fromAddress, _toAddresses)
+        showRoad()
     }
 
     fun updateSelectedOrder(order: RealtimeDatabaseOrder) {
@@ -366,8 +364,7 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun showRoad() {
         map.overlays.clear()
-        showRoadAB(
-            context,
+        mapController.showRoadAB(
             _fromAddress,
             _toAddresses
         )
