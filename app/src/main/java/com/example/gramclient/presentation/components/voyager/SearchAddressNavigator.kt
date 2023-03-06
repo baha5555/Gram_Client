@@ -184,11 +184,7 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                                         }
                                         when (whichScreen) {
                                             Constants.TO_ADDRESS -> {
-                                                if (inx > -1) {
-                                                    mainViewModel.updateToAddress(inx, it)
-                                                }else{
-                                                    mainViewModel.addToAddress(it)
-                                                }
+                                                mainViewModel.updateToAddressInx(it, inx)
                                             }
                                             Constants.ADD_TO_ADDRESS -> {
                                                 mainViewModel.addToAddress(it)

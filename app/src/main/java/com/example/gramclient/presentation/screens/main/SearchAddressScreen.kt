@@ -32,6 +32,7 @@ import com.example.gramclient.R
 import com.example.gramclient.app.preference.CustomPreference
 import com.example.gramclient.presentation.components.*
 import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
+import com.example.gramclient.presentation.components.voyager.SearchAddresses
 import com.example.gramclient.presentation.screens.main.components.AddressSearchBottomSheet
 import com.example.gramclient.presentation.screens.main.components.FloatingButton
 import com.example.gramclient.presentation.screens.main.components.FromAddressField
@@ -176,7 +177,7 @@ class SearchAddressScreen : Screen {
                                     WHICH_ADDRESS = WHICH_ADDRESS
                                 )
                                 FromAddressField(fromAddress) {
-                                    bottomNavigator.show(SearchAddressNavigator(Constants.FROM_ADDRESS))
+                                    bottomNavigator.show(SearchAddresses(Constants.FROM_ADDRESS))
                                 }
                             }
                         }

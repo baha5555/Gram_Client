@@ -20,17 +20,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.gramclient.R
 import com.example.gramclient.domain.mainScreen.Address
+import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.SearchAddressScreen
 import com.example.gramclient.presentation.screens.order.SearchDriverScreen
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
+    val mainViewModel: MainViewModel = hiltViewModel()
+    val statePoint = mainViewModel.stateAddressPoint.value
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -63,6 +68,11 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                     tint = Color.White
                 )
             }
+            if (statePoint.isLoading) {
+                Box(modifier = Modifier.shimmer()){
+                    Box(modifier = Modifier.size(100.dp, 15.dp).background(Color(0xFFD8D8D8)))
+                }
+            } else {
                 if (fromAddress.address == "") {
                     Text(
                         text = "Откуда?", color = Color.Gray, fontSize = 11.sp,
@@ -74,6 +84,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                         fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
                     )
                 }
+            }
         }
     }
 }

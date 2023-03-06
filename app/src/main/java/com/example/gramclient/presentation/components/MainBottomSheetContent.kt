@@ -36,6 +36,7 @@ import com.example.gramclient.domain.mainScreen.TariffsResult
 import com.example.gramclient.presentation.components.voyager.AddStopScreen
 import com.example.gramclient.presentation.components.voyager.MeetSheet
 import com.example.gramclient.presentation.components.voyager.SearchAddressNavigator
+import com.example.gramclient.presentation.components.voyager.SearchAddresses
 import com.example.gramclient.presentation.screens.main.MainViewModel
 import com.example.gramclient.presentation.screens.main.components.*
 import com.example.gramclient.presentation.screens.main.states.AllowancesResponseState
@@ -188,7 +189,7 @@ fun AddressesContent(
         Row(
             modifier = Modifier
                 .clickable {
-                    bottomNavigator.show(SearchAddressNavigator(Constants.FROM_ADDRESS))
+                    bottomNavigator.show(SearchAddresses(Constants.FROM_ADDRESS))
                 }
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 15.dp),
@@ -244,7 +245,7 @@ fun AddressesContent(
             modifier = Modifier
                 .clickable {
                     if (toAddresses.size <= 1) {
-                        bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS, inx = 0))
+                        bottomNavigator.show(SearchAddresses(Constants.TO_ADDRESS))
                     } else {
                         bottomNavigator.show(AddStopScreen())
                     }

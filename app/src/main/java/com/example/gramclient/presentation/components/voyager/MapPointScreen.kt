@@ -81,18 +81,17 @@ class MapPointScreen(val whichScreen: String? = null) : Screen {
                             Constants.TO_ADDRESS-> {
                                 Log.e("which","->$whichScreen")
                                 if (it == null) {
-                                    mainViewModel.updateToAddress(
-                                        0,
-                                        Address(
-                                            "Метка на карте",
-                                            -1,
-                                            map.mapCenter.latitude.toString(),
-                                            map.mapCenter.longitude.toString()
-                                        )
-                                    )
+//                                    mainViewModel.updateToAddress(
+//                                        Address(
+//                                            "Метка на карте",
+//                                            -1,
+//                                            map.mapCenter.latitude.toString(),
+//                                            map.mapCenter.longitude.toString()
+//                                        )
+//                                    )
+                                    mainViewModel.clearToAddress()
                                 } else {
                                     mainViewModel.updateToAddress(
-                                        0,
                                         Address(
                                             address = it.name,
                                             id = it.id,

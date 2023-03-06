@@ -70,7 +70,7 @@ class AppRepositoryImpl(
     override suspend fun sendRating(order_id: Int, add_rating: Int): AddRatingResponse =
         api.sendRating(prefs.getAccessToken(), order_id, add_rating)
 
-    override suspend fun searchAddress(addressName: String): SearchAddressResponse = api.searchAddress(addressName)
+    override suspend fun searchAddress(addressName: String?): SearchAddressResponse = api.searchAddress(addressName)
 
     override suspend fun createOrder(
         dop_phone: String?,
