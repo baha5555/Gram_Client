@@ -153,7 +153,7 @@ fun ShowItems(
             .clickable {
                 when (text) {
                     "Параметры" -> {
-                        navigator.replace(SettingScreen())
+                        navigator.push(SettingScreen())
                     }
                     "Мои адреса" -> Toast
                         .makeText(

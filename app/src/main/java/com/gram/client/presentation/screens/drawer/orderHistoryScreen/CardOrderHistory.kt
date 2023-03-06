@@ -55,7 +55,7 @@ class CardOrderHistory : Screen {
                             ) {
                                 IconButton(
                                     modifier = Modifier,
-                                    onClick = { navigator.replace(OrdersHistoryScreen()) }) {
+                                    onClick = { navigator.pop() }) {
                                     Icon(
                                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_blue),
                                         contentDescription = ""
