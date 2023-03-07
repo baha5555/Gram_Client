@@ -112,7 +112,7 @@ class SettingScreen : Screen {
                     Divider(modifier = Modifier.fillMaxWidth().padding(horizontal = 25.dp))
 
                 }
-                Column(Modifier.clickable {}) {
+                Column(Modifier.clickable {navigator.push(DecorScreen())}) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

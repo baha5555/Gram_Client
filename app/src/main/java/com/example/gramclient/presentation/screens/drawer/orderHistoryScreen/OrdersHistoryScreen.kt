@@ -128,7 +128,6 @@ class OrdersHistoryScreen : Screen {
                                                 tariff_id = it1,
                                             ){
                                                 viewModel.updateSelectedOrder(it)
-                                                Log.e("created_at","${res.created_at}")
                                                 navigator.push(CardOrderHistory())
                                             }
                                         }
