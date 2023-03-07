@@ -8,38 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:127008143878:android:d3b09ea98d2a36a7d42187",
+        "mobilesdk_app_id": "1:127008143878:android:5a11c036ea240b9fd42187",
         "android_client_info": {
-          "package_name": "com.example.firebaserealtimedatabase"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "127008143878-f2digacm4o8djh39j20d177gca09vr1t.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDMOX07fmKe3pN_y7aFvR8ctN9qgDUCj3I"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "127008143878-f2digacm4o8djh39j20d177gca09vr1t.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:127008143878:android:05905c50e14ea007d42187",
-        "android_client_info": {
-          "package_name": "com.example.noteapp"
+          "package_name": "com.gram.client"
         }
       },
       "oauth_client": [
