@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.gramclient.presentation.screens.drawer.setting_screens.DecorScreen
 import com.gram.client.R
 import com.gram.client.presentation.components.CustomSwitch
 
@@ -111,7 +112,7 @@ class SettingScreen : Screen {
                     Divider(modifier = Modifier.fillMaxWidth().padding(horizontal = 25.dp))
 
                 }
-                Column(Modifier.clickable {}) {
+                Column(Modifier.clickable {navigator.push(DecorScreen())}) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
