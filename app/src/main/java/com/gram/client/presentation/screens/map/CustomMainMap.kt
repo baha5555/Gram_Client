@@ -605,7 +605,7 @@ private fun printoutDebugInfo(
     l1: Location?,
 ) {
     val location: Location? = l1 ?: mLocationOverlay.lastFix
-    Log.i("myLocation", "" + location)
+    //Log.i("myLocation", "" + location)
     if (location != null) {
         myLocationPoint.value.latitude = location.latitude
         myLocationPoint.value.longitude = location.longitude
