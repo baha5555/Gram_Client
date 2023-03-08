@@ -18,8 +18,10 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -38,7 +40,7 @@ class ComentSheet(val label: String) : Screen {
         val focusRequester = remember { FocusRequester() }
         val keyboard = LocalSoftwareKeyboardController.current
         val text = remember {
-            mutableStateOf(Values.ComentReasons.value)
+            mutableStateOf(TextFieldValue(text = Values.ComentReasons.value, selection = TextRange(Values.ComentReasons.value.length)))
         }
         val view = LocalView.current
         DisposableEffect(view) {
@@ -88,10 +90,10 @@ class ComentSheet(val label: String) : Screen {
             }
             Button(
                 onClick = {
-                    Values.ComentReasons.value =text.value
+                    Values.ComentReasons.value =text.value.text
                     bottomNavigator.pop()
                 },
-                enabled = text.value != "",
+                enabled = text.value.text != "",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(57.dp)

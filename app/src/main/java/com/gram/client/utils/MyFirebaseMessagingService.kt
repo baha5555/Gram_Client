@@ -54,7 +54,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         }
     }
     fun getRemoteView(title: String, body:String): RemoteViews {
-        val remoteView= RemoteViews("com.gram.gramclient", R.layout.notification)
+        val remoteView= RemoteViews("com.gram.client", R.layout.notification)
         remoteView.setTextViewText(R.id.title, title)
         remoteView.setTextViewText(R.id.message, body)
         remoteView.setImageViewResource(R.id.app_logo, R.drawable.notification_logo_gram)

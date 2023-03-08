@@ -40,7 +40,7 @@ class MeetSheet : Screen {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                 Text(
-                    text = if(text.value=="")"Закрыть" else "Готово",
+                    text = if (text.value == "") "Закрыть" else "Готово",
                     fontSize = 18.sp,
                     modifier = Modifier
                         .clickable {
@@ -67,7 +67,16 @@ class MeetSheet : Screen {
                         if (it.isFocused) {
                             keyboard?.show()
                         }
-                    },
+                    }
+                    .fillMaxWidth(),
+                placeholder = {
+                    Text(
+                        "Укажите номер подъезда",
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             )
         }
     }

@@ -7,9 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,10 +27,11 @@ class Reason2Screen(
     val orderExecutionViewModel: OrderExecutionViewModel,
     val order: RealtimeDatabaseOrder
 ) : Screen {
+    private var reasonsCheck: MutableState<String> = mutableStateOf("")
+
     @Composable
     override fun Content() {
         val stateReasonsResponse = orderExecutionViewModel.stateGetReasons.value.response
-        val reasonsCheck = remember { mutableStateOf("") }
         val bottomNavigator = LocalBottomSheetNavigator.current
         Column(
             modifier = Modifier
@@ -82,6 +81,7 @@ class Reason2Screen(
                         orderExecutionViewModel.stateCancelOrder.value.response.let {}
                     }
                     Values.ComentReasons.value=""
+                    reasonsCheck.value=""
                 },
                 enabled = reasonsCheck.value != "" || Values.ComentReasons.value!="",
                 modifier = Modifier
