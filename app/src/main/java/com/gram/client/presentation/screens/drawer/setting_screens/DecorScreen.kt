@@ -1,16 +1,13 @@
 package com.example.gramclient.presentation.screens.drawer.setting_screens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -23,28 +20,16 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
-import com.gram.client.presentation.components.CustomButton
-import com.gram.client.presentation.components.CustomCheckBox
-import com.gram.client.presentation.components.voyager.reason.Reason2Screen
 import com.gram.client.presentation.screens.drawer.setting_screens.DecorScreenItem
-import com.gram.client.utils.Constants
-import kotlinx.coroutines.launch
 
 class DecorScreen : Screen {
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        var modalBottomSheetValue: ModalBottomSheetState
-
-        val modalSheetState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-            confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded })
         val navigator = LocalNavigator.currentOrThrow
-        val coroutineScope = rememberCoroutineScope()
         val bottomNavigator = LocalBottomSheetNavigator.current
-
-
-
+        var selectedOption by remember { mutableStateOf(0) }
+        var selected by remember { mutableStateOf(false) }
+        val options = listOf("Option 1", "Option 2", "Option 3")
         Scaffold(
             topBar = {
                 Row(
@@ -88,31 +73,18 @@ class DecorScreen : Screen {
                     fontSize = 18.sp
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    Box(
-                        modifier = Modifier
-                            .size(45.dp)
-                            .background(Color.Black, shape = RoundedCornerShape(50))
-                            .clickable { }
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .size(45.dp)
-                            .background(Color.Blue, shape = RoundedCornerShape(50))
-                            .clickable { }
-                    )
-                    Box(
-                        modifier = Modifier
-                            .size(45.dp)
-                            .background(Color.Yellow, shape = RoundedCornerShape(50))
-                            .clickable { }
-                    )
-                    Box(
-                        modifier = Modifier
-                            .size(45.dp)
-                            .background(Color.Red, shape = RoundedCornerShape(50))
-                            .clickable { }
-                    )
+                    RadioButtonExample(selected = selectedOption == 0, color = Color.Black) {
+                        selectedOption = 0
+                    }
+                    RadioButtonExample(selected = selectedOption == 1, color = Color.Blue) {
+                        selectedOption = 1
+                    }
+                    RadioButtonExample(selected = selectedOption == 2, color = Color.Yellow) {
+                        selectedOption = 2
+                    }
+                    RadioButtonExample(selected = selectedOption == 3, color = Color.Red) {
+                        selectedOption = 3
+                    }
                 }
                 Spacer(modifier = Modifier.height(15.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -158,8 +130,82 @@ class DecorScreen : Screen {
                         }
                     }
                 }
+
             }
 
+
+
+
+
+
+        }
+    }
+}
+@Composable
+fun RadioButtonExample(
+    selected: Boolean,
+    color: Color = Color.Black,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(45.dp)
+            .background(color, shape = RoundedCornerShape(50))
+            .clickable(onClick = onClick)
+            .border(
+                width = 2.dp,
+                color = if (selected) Color.Blue else Color.Transparent,
+                shape = RoundedCornerShape(50)
+            )
+    ) {
+        if (selected) {
+            Icon(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                imageVector = ImageVector.vectorResource(id = R.drawable.selectedicon),
+                contentDescription = "",
+                tint = Color.Unspecified
+            )
+        }
+    }
+}
+
+
+
+
+@Composable
+fun RadioButtonGroup(
+    options: List<String>,
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit,
+) {
+    Column {
+        options.forEach { text ->
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .selectable(
+                        selected = (text == selectedOption),
+                        onClick = { onOptionSelected(text) }
+                    )
+                    .padding(horizontal = 16.dp)
+            ) {
+                RadioButton(
+                    selected = (text == selectedOption),
+                    onClick = { onOptionSelected(text) },
+                    colors = RadioButtonDefaults.colors(selectedColor = Color.Magenta),
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Icon(imageVector = ImageVector.vectorResource(id = R.drawable.selectedicon), contentDescription ="" , tint = Color.Unspecified)
+                Text(
+                    text = text,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+            Divider(
+                color = Color.LightGray,
+                thickness = 1.dp,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
         }
     }
 }
