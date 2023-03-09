@@ -31,7 +31,7 @@ import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.presentation.screens.order.components.*
-import com.gram.client.utils.Constants.STATE_RAITING
+import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Constants.STATE_RAITING_ORDER_ID
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
@@ -69,6 +69,7 @@ class OrderExecutionScreen : Screen {
         }
 
         DisposableEffect(key1 = true ){
+            orderExecutionViewModel.getRatingReasons()
             onDispose {
                 orderExecutionViewModel.clearAddresses()
             }
@@ -262,11 +263,11 @@ class OrderExecutionScreen : Screen {
                         isDialogOpen = isDialogOpen.value
                     )
                 }
-                if (STATE_RAITING.value) {
-                    bottomNavigator.show(RatingScreen(STATE_RAITING_ORDER_ID.value){
+                if (STATE_RATING.value) {
+                    bottomNavigator.show(RatingScreen(STATE_RAITING_ORDER_ID.value, selectRealtimeDatabaseOrder.price){
                         navigator.replaceAll(SearchAddressScreen())
                     })
-                    STATE_RAITING.value=false
+                    STATE_RATING.value=false
                 }
             }
         }

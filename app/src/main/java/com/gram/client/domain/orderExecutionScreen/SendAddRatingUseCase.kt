@@ -10,13 +10,14 @@ import javax.inject.Inject
 
 class SendAddRatingUseCase @Inject constructor(private val repository: AppRepository) {
     operator fun invoke(
-       order_id: Int, add_rating: Int
+        order_id: Int, add_rating: Int,
+        rating_reason: String?
     ): Flow<Resource<AddRatingResponse>> =
         flow {
             try {
                 emit(Resource.Loading<AddRatingResponse>())
                 val response: AddRatingResponse =
-                    repository.sendRating(order_id, add_rating)
+                    repository.sendRating(order_id, add_rating, rating_reason)
                 emit(Resource.Success<AddRatingResponse>(response))
             } catch (e: HttpException) {
                 emit(

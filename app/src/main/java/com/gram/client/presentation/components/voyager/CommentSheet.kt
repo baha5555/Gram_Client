@@ -29,7 +29,7 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
 
-class ComentSheet(val label: String) : Screen {
+class CommentSheet(val label: String, val withComment: String) : Screen {
 
     @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
     @Composable
@@ -40,7 +40,10 @@ class ComentSheet(val label: String) : Screen {
         val focusRequester = remember { FocusRequester() }
         val keyboard = LocalSoftwareKeyboardController.current
         val text = remember {
-            mutableStateOf(TextFieldValue(text = Values.ComentReasons.value, selection = TextRange(Values.ComentReasons.value.length)))
+            when(withComment){
+                "cancel"->mutableStateOf(TextFieldValue(text = Values.CommentCancelReasons.value, selection = TextRange(Values.CommentCancelReasons.value.length)))
+                else -> mutableStateOf(TextFieldValue(text = Values.CommentRatingReasons.value, selection = TextRange(Values.CommentRatingReasons.value.length)))
+            }
         }
         val view = LocalView.current
         DisposableEffect(view) {
@@ -90,7 +93,10 @@ class ComentSheet(val label: String) : Screen {
             }
             Button(
                 onClick = {
-                    Values.ComentReasons.value =text.value.text
+                    when(withComment){
+                        "cancel"->Values.CommentCancelReasons.value =text.value.text
+                        else -> Values.CommentRatingReasons.value =text.value.text
+                    }
                     bottomNavigator.pop()
                 },
                 enabled = text.value.text != "",

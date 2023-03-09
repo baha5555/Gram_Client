@@ -16,7 +16,7 @@ object Constants {
     const val ADD_TO_ADDRESS="ADD_TO_ADDRESS"
     const val SOON = "(Скоро)"
     var stateOfDopInfoForDriver = mutableStateOf("")
-    var STATE_RAITING: MutableState<Boolean> = mutableStateOf(false)
+    var STATE_RATING: MutableState<Boolean> = mutableStateOf(false)
     var STATE_RAITING_ORDER_ID: MutableState<Int> = mutableStateOf(-1)
     var STATE_ASSIGNED_ORDER:MutableState<Boolean> = mutableStateOf(false)
     var STATE_DRIVER_IN_SITE:MutableState<Boolean> = mutableStateOf(false)

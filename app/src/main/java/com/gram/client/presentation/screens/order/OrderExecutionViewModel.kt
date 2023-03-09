@@ -39,6 +39,9 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
+import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
+import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsUseCase
+import com.gram.client.presentation.screens.order.states.GetRatingReasonsResponseState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,7 +62,7 @@ class OrderExecutionViewModel @Inject constructor(
     private val searchAddressUseCase: SearchAddressUseCase,
     private val getAddressByPointUseCase: GetAddressByPointUseCase,
     private val getReasonsUseCase: GetReasonsUseCase,
-
+    private val getRatingReasonsUseCase: GetRatingReasonsUseCase,
     ) : AndroidViewModel(application) {
     val context get() = getApplication<Application>()
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -219,9 +222,10 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun sendRating2(
         order_id: Int,
-        add_rating: Int
+        add_rating: Int,
+        rating_reason: String
     ) {
-        sendAddRatingUseCase.invoke(order_id, add_rating)
+        sendAddRatingUseCase.invoke(order_id, add_rating, if(rating_reason=="") null else rating_reason)
             .onEach { result: Resource<AddRatingResponse> ->
                 when (result) {
                     is Resource.Success -> {
@@ -538,6 +542,35 @@ class OrderExecutionViewModel @Inject constructor(
                 }
                 is Resource.Loading -> {
                     _stateGetReasons.value = GetReasonsResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private val _stateGetRatingReasons = mutableStateOf(GetRatingReasonsResponseState())
+    val stateGetRatingReasons: State<GetRatingReasonsResponseState> = _stateGetRatingReasons
+
+    fun getRatingReasons() {
+        getRatingReasonsUseCase.invoke().onEach { result: Resource<GetRatingReasonsResponse> ->
+            when (result) {
+                is Resource.Success -> {
+                    try {
+                        val tariffsResponse: GetRatingReasonsResponse? = result.data
+                        _stateGetRatingReasons.value =
+                            GetRatingReasonsResponseState(response = tariffsResponse)
+                        Log.e("GetRatingReasonsResponseState", "GetRatingReasonsResponseStateSuccess->\n${result.data}")
+                    } catch (e: Exception) {
+                        Log.d("Exception", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("GetRatingReasonsResponseState", "GetRatingReasonsResponseStateError->\n ${result.message}")
+                    _stateGetRatingReasons.value = GetRatingReasonsResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateGetRatingReasons.value = GetRatingReasonsResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

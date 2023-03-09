@@ -19,7 +19,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.CustomCheckBox
-import com.gram.client.presentation.components.voyager.ComentSheet
+import com.gram.client.presentation.components.voyager.CommentSheet
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.utils.Values
 
@@ -66,24 +66,24 @@ class Reason2Screen(
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFF7F7F7))
                     .clickable {
-                        bottomNavigator.push(ComentSheet("Ваш коментарий..."))
+                        bottomNavigator.push(CommentSheet("Ваш коментарий...", "cancel"))
                     },
                 contentAlignment = Alignment.CenterStart
             ) {
-                Text(text = if(Values.ComentReasons.value=="") "Ваш коментарий..." else Values.ComentReasons.value, fontSize = 18.sp, color = if(Values.ComentReasons.value=="") Color(0xFFBEBEB5) else Color.Black, modifier = Modifier.padding(15.dp))
+                Text(text = if(Values.CommentCancelReasons.value=="") "Ваш коментарий..." else Values.CommentCancelReasons.value, fontSize = 18.sp, color = if(Values.CommentCancelReasons.value=="") Color(0xFFBEBEB5) else Color.Black, modifier = Modifier.padding(15.dp))
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = {
-                    reasonsCheck.value+="\n"+Values.ComentReasons.value
+                    reasonsCheck.value+="\n"+Values.CommentCancelReasons.value
                     bottomNavigator.hide()
                     orderExecutionViewModel.cancelOrder(order.id, reasonsCheck.value) {
                         orderExecutionViewModel.stateCancelOrder.value.response.let {}
                     }
-                    Values.ComentReasons.value=""
+                    Values.CommentCancelReasons.value=""
                     reasonsCheck.value=""
                 },
-                enabled = reasonsCheck.value != "" || Values.ComentReasons.value!="",
+                enabled = reasonsCheck.value != "" || Values.CommentCancelReasons.value!="",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(57.dp),

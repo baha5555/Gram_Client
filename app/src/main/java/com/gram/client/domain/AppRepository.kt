@@ -14,6 +14,7 @@ import com.gram.client.domain.mainScreen.order.UpdateOrderResponse
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
+import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetReasonsResponse
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
@@ -45,7 +46,7 @@ interface AppRepository {
     ): ProfileResponse
 
     suspend fun getAddressByPoint(lng: Double, lat: Double): AddressByPointResponse
-    suspend fun sendRating(order_id: Int, add_rating: Int): AddRatingResponse
+    suspend fun sendRating(order_id: Int, add_rating: Int,rating_reason:String?): AddRatingResponse
     suspend fun searchAddress(addressName: String?): SearchAddressResponse
     suspend fun createOrder(
         dop_phone: String?,
@@ -86,5 +87,8 @@ interface AppRepository {
     suspend fun getFastAddresses(): FastAddressesResponse
 
     suspend fun getReasons(): GetReasonsResponse
+
+    suspend fun getRatingReasons(): GetRatingReasonsResponse
+
 }
 

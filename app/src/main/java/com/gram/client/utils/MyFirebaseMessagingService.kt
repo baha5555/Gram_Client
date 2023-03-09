@@ -20,7 +20,7 @@ import com.gram.client.utils.Constants.STATE_ASSIGNED_ORDER
 import com.gram.client.utils.Constants.STATE_ASSIGNED_ORDER_ID
 import com.gram.client.utils.Constants.STATE_DRIVER_IN_SITE
 import com.gram.client.utils.Constants.STATE_DRIVER_IN_SITE_ORDER_ID
-import com.gram.client.utils.Constants.STATE_RAITING
+import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Constants.STATE_RAITING_ORDER_ID
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -42,7 +42,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
                         STATE_DRIVER_IN_SITE_ORDER_ID.value = remoteMessage.data["order_id"]?.toInt()?:-1
                     }
                     "2" -> {
-                        STATE_RAITING.value = remoteMessage.notification!!.title != ""
+                        STATE_RATING.value = remoteMessage.notification!!.title != ""
                         STATE_RAITING_ORDER_ID.value = remoteMessage.data["order_id"]?.toInt() ?: -1
                     }
                 }

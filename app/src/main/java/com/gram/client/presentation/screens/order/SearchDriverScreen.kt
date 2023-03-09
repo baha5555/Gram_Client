@@ -44,7 +44,7 @@ import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.main.components.FloatingButton
 import com.gram.client.presentation.screens.map.CustomMainMap
-import com.gram.client.utils.Constants.STATE_RAITING
+import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Constants.STATE_RAITING_ORDER_ID
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -291,7 +291,7 @@ class SearchDriverScreen : Screen {
         val reasonsCheck = remember { mutableStateOf("") }
         scope.launch {
             if (STATE_RAITING_ORDER_ID.value != order.id) {
-                STATE_RAITING.value = false
+                STATE_RATING.value = false
             }
             order.filing_time?.let {
                 fillingTimeDateParse = dateFormatParse.parse(it).time

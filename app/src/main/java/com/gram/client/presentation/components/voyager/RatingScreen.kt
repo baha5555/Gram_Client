@@ -1,5 +1,6 @@
 package com.gram.client.presentation.components.voyager
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,26 +24,35 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.R
-import com.gram.client.presentation.screens.main.SearchAddressScreen
-import com.gram.client.presentation.screens.navigator
+import com.gram.client.presentation.components.CustomCheckBox
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.utils.Values
 
-class RatingScreen(val orderId: Int, val function: () -> Unit) : Screen {
+class RatingScreen(
+    private val orderId: Int,
+    private val price: Int?,
+    private val function: () -> Unit
+) : Screen {
+    private var reasonsCheck: MutableState<String> = mutableStateOf("")
+    private val ratingState = mutableStateOf(0)
+
     @Composable
     override fun Content() {
         val bottomNavigator = LocalBottomSheetNavigator.current
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
-        val ratingState = remember {
-            mutableStateOf(0)
-        }
-        val text = remember {
-            mutableStateOf("")
-        }
-        when(ratingState.value){
-            0 -> { text.value="Оцените водителя" }
-            5 -> { text.value="Отлично" }
-            else -> { text.value="Спасибо за ваш отзыв" }
+        val stateGetRatingReasons = orderExecutionViewModel.stateGetRatingReasons.value
+        val text = remember { mutableStateOf("") }
+
+        when (ratingState.value) {
+            0 -> {
+                text.value = "Оцените водителя"
+            }
+            5 -> {
+                text.value = "Отлично"
+            }
+            else -> {
+                text.value = "Спасибо за ваш отзыв"
+            }
         }
         Column(
             modifier = Modifier
@@ -50,11 +60,18 @@ class RatingScreen(val orderId: Int, val function: () -> Unit) : Screen {
                 .padding(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("12 cомон", fontWeight = FontWeight.Bold, fontSize = 26.sp, modifier = Modifier.padding(vertical = 10.dp))
+            Text(
+                "$price cомон",
+                fontWeight = FontWeight.Bold,
+                fontSize = 26.sp,
+                modifier = Modifier.padding(vertical = 10.dp)
+            )
             Text(text = text.value, fontSize = 18.sp)
-            Row(modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .padding(vertical = 20.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .padding(vertical = 20.dp), horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
                 repeat(5) {
                     Image(
                         imageVector = ImageVector.vectorResource(id = if (it < ratingState.value) R.drawable.ic_star else R.drawable.ic_star_border),
@@ -66,6 +83,26 @@ class RatingScreen(val orderId: Int, val function: () -> Unit) : Screen {
                     )
                 }
             }
+            AnimatedVisibility(
+                visible = text.value == "Спасибо за ваш отзыв"
+            ) {
+                Column() {
+                    stateGetRatingReasons.response?.result?.forEach {
+                        Row(verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { reasonsCheck.value = it.name }
+                                .padding(vertical = 10.dp)) {
+                            Text("" + it.name, fontSize = 18.sp)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            CustomCheckBox(
+                                isChecked = reasonsCheck.value == it.name,
+                                onChecked = { reasonsCheck.value = it.name })
+                        }
+                    }
+                }
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -73,14 +110,14 @@ class RatingScreen(val orderId: Int, val function: () -> Unit) : Screen {
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFF7F7F7))
                     .clickable {
-                        //bottomNavigator.push(ComentSheet("Ваш коментарий..."))
+                        bottomNavigator.push(CommentSheet("Ваш коментарий...", "rating"))
                     },
                 contentAlignment = Alignment.CenterStart
             ) {
                 Text(
-                    text = if (Values.ComentReasons.value == "") "Ваш коментарий..." else Values.ComentReasons.value,
+                    text = if (Values.CommentRatingReasons.value == "") "Ваш коментарий..." else Values.CommentRatingReasons.value,
                     fontSize = 18.sp,
-                    color = if (Values.ComentReasons.value == "") Color(0xFFBEBEB5) else Color.Black,
+                    color = if (Values.CommentRatingReasons.value == "") Color(0xFFBEBEB5) else Color.Black,
                     modifier = Modifier.padding(15.dp)
                 )
             }
@@ -88,13 +125,15 @@ class RatingScreen(val orderId: Int, val function: () -> Unit) : Screen {
             Button(
                 onClick = {
                     bottomNavigator.hide()
-                    if(Values.ClientOrders.value==null){
+                    if (Values.ClientOrders.value == null) {
                         function.invoke()
                     }
                     orderExecutionViewModel.sendRating2(
                         orderId,
-                        ratingState.value*10
+                        ratingState.value * 10,
+                        "" + if (reasonsCheck.value != "") reasonsCheck.value else "" + if (Values.CommentRatingReasons.value != "") "\n" + Values.CommentRatingReasons.value else ""
                     )
+                    Values.CommentRatingReasons.value = ""
                 },
                 modifier = Modifier
                     .fillMaxWidth()

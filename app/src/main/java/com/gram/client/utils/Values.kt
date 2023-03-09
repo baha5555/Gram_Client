@@ -17,5 +17,7 @@ object Values {
     //Orders
     val ClientOrders: MutableState<Client?> = mutableStateOf(null)
     //Coment
-    val ComentReasons = mutableStateOf("")
+    val CommentCancelReasons = mutableStateOf("")
+    val CommentRatingReasons = mutableStateOf("")
+
 }

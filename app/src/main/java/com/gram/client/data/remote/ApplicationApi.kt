@@ -14,6 +14,7 @@ import com.gram.client.domain.mainScreen.order.UpdateOrderResponse
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
+import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetReasonsResponse
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
@@ -79,6 +80,7 @@ interface ApplicationApi {
         @Header("Authorization") token: String,
         @Query("order_id") order_id: Int,
         @Field("add_rating") add_rating: Int,
+        @Query("rating_reason") rating_reason: String?,
     ): AddRatingResponse
 
     @FormUrlEncoded
@@ -151,5 +153,10 @@ interface ApplicationApi {
     suspend fun getReasons(
         @Header("Authorization") token: String,
     ) : GetReasonsResponse
+
+    @GET("/api/orders/rating-reason-list")
+    suspend fun getRatingReasons(
+        @Header("Authorization") token: String,
+    ) : GetRatingReasonsResponse
 
 }

@@ -17,6 +17,7 @@ import com.gram.client.domain.mainScreen.order.UpdateOrderResponse
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
+import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetReasonsResponse
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
@@ -48,7 +49,7 @@ class AppRepositoryImpl(
         api.getOrderHistory(prefs.getAccessToken())
 
     override suspend fun getOrderHistoryResponse(page: Int): OrderHistoryPagingResult =
-        api.getOrderHistoryResponse(prefs.getAccessToken(),page)
+        api.getOrderHistoryResponse(prefs.getAccessToken(), page)
 
     override suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse =
         api.getAllowancesByTariffId(tariff_id)
@@ -66,10 +67,15 @@ class AppRepositoryImpl(
         lat: Double
     ): AddressByPointResponse = api.getAddressByPoint(lng, lat)
 
-    override suspend fun sendRating(order_id: Int, add_rating: Int): AddRatingResponse =
-        api.sendRating(prefs.getAccessToken(), order_id, add_rating)
+    override suspend fun sendRating(
+        order_id: Int,
+        add_rating: Int,
+        rating_reason: String?
+    ): AddRatingResponse =
+        api.sendRating(prefs.getAccessToken(), order_id, add_rating, rating_reason)
 
-    override suspend fun searchAddress(addressName: String?): SearchAddressResponse = api.searchAddress(addressName)
+    override suspend fun searchAddress(addressName: String?): SearchAddressResponse =
+        api.searchAddress(addressName)
 
     override suspend fun createOrder(
         dop_phone: String?,
@@ -100,9 +106,13 @@ class AppRepositoryImpl(
         search_address_id: Int?,
         to_addresses: String?,
         from_addresses: String?
-    ): CalculateResponse = api.getPrice(tariff_id, allowances, search_address_id, to_addresses, from_addresses)
+    ): CalculateResponse =
+        api.getPrice(tariff_id, allowances, search_address_id, to_addresses, from_addresses)
 
-    override suspend fun cancelOrder(order_id: Int, reason_cancel_order: String): CancelOrderResponse =
+    override suspend fun cancelOrder(
+        order_id: Int,
+        reason_cancel_order: String
+    ): CancelOrderResponse =
         api.cancelOrder(prefs.getAccessToken(), order_id, reason_cancel_order)
 
     override suspend fun getActiveOrders(): ActiveOrdersResponse =
@@ -110,6 +120,7 @@ class AppRepositoryImpl(
 
     override suspend fun connectClientWithDriver(order_id: String): connectClientWithDriverResponse =
         api.connectClientWithDriver(prefs.getAccessToken(), order_id)
+
     override suspend fun editOrder(
         order_id: Int,
         dop_phone: String?,
@@ -131,7 +142,12 @@ class AppRepositoryImpl(
         allowances
     )
 
-    override suspend fun getFastAddresses() : FastAddressesResponse = api.getFastAddresses(prefs.getAccessToken())
+    override suspend fun getFastAddresses(): FastAddressesResponse =
+        api.getFastAddresses(prefs.getAccessToken())
 
-    override suspend fun getReasons() : GetReasonsResponse = api.getReasons(prefs.getAccessToken())
+    override suspend fun getReasons(): GetReasonsResponse = api.getReasons(prefs.getAccessToken())
+
+    override suspend fun getRatingReasons(): GetRatingReasonsResponse =
+        api.getRatingReasons(prefs.getAccessToken())
+
 }
