@@ -8,6 +8,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -28,8 +30,6 @@ class DecorScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val bottomNavigator = LocalBottomSheetNavigator.current
         var selectedOption by remember { mutableStateOf(0) }
-        var selected by remember { mutableStateOf(false) }
-        val options = listOf("Option 1", "Option 2", "Option 3")
         Scaffold(
             topBar = {
                 Row(
@@ -73,16 +73,16 @@ class DecorScreen : Screen {
                     fontSize = 18.sp
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    RadioButtonExample(selected = selectedOption == 0, color = Color.Black) {
+                    RadioButtonExample(selected = selectedOption == 0, color1 =Color(0xFF707070), color2 =  Color(0xFF1C1C1C)) {
                         selectedOption = 0
                     }
-                    RadioButtonExample(selected = selectedOption == 1, color = Color.Blue) {
+                    RadioButtonExample(selected = selectedOption == 1, color1 = Color(0xFF759BFF), color2 = Color(0xFF1152FD)) {
                         selectedOption = 1
                     }
-                    RadioButtonExample(selected = selectedOption == 2, color = Color.Yellow) {
+                    RadioButtonExample(selected = selectedOption == 2,color1 = Color(0xFFFFF179), color2 = Color(0xFFF9DF00)) {
                         selectedOption = 2
                     }
-                    RadioButtonExample(selected = selectedOption == 3, color = Color.Red) {
+                    RadioButtonExample(selected = selectedOption == 3, color1 =Color(0xFFFF7466) , color2 = Color(0xFFF93E2B)) {
                         selectedOption = 3
                     }
                 }
@@ -121,11 +121,11 @@ class DecorScreen : Screen {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "Системная")
                         IconButton(onClick = {}) {
+
                             Image(
                                 modifier = Modifier.size(25.dp),
                                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_forward_blue),
                                 contentDescription = "theme_icon",
-
                                 )
                         }
                     }
@@ -144,17 +144,20 @@ class DecorScreen : Screen {
 @Composable
 fun RadioButtonExample(
     selected: Boolean,
-    color: Color = Color.Black,
+    color1: Color = Color.Black,
+    color2: Color = Color.Black,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .size(45.dp)
-            .background(color, shape = RoundedCornerShape(50))
+            .background(brush = Brush.linearGradient(
+                colors = listOf(color1, color2),
+            ), shape = RoundedCornerShape(50))
             .clickable(onClick = onClick)
             .border(
                 width = 2.dp,
-                color = if (selected) Color.Blue else Color.Transparent,
+                color = if (selected) Color(0xFF00D1FF) else Color.Transparent,
                 shape = RoundedCornerShape(50)
             )
     ) {
