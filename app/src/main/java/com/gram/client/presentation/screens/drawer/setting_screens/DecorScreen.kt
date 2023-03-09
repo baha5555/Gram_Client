@@ -1,5 +1,6 @@
 package com.example.gramclient.presentation.screens.drawer.setting_screens
 
+import android.graphics.drawable.shapes.Shape
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -8,10 +9,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.textInputServiceFactory
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -73,16 +77,32 @@ class DecorScreen : Screen {
                     fontSize = 18.sp
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    RadioButtonExample(selected = selectedOption == 0, color1 =Color(0xFF707070), color2 =  Color(0xFF1C1C1C)) {
+                    RadioButtonExample(
+                        selected = selectedOption == 0,
+                        color1 = Color(0xFF707070),
+                        color2 = Color(0xFF1C1C1C)
+                    ) {
                         selectedOption = 0
                     }
-                    RadioButtonExample(selected = selectedOption == 1, color1 = Color(0xFF759BFF), color2 = Color(0xFF1152FD)) {
+                    RadioButtonExample(
+                        selected = selectedOption == 1,
+                        color1 = Color(0xFF759BFF),
+                        color2 = Color(0xFF1152FD)
+                    ) {
                         selectedOption = 1
                     }
-                    RadioButtonExample(selected = selectedOption == 2,color1 = Color(0xFFFFF179), color2 = Color(0xFFF9DF00)) {
+                    RadioButtonExample(
+                        selected = selectedOption == 2,
+                        color1 = Color(0xFFFFF179),
+                        color2 = Color(0xFFF9DF00)
+                    ) {
                         selectedOption = 2
                     }
-                    RadioButtonExample(selected = selectedOption == 3, color1 =Color(0xFFFF7466) , color2 = Color(0xFFF93E2B)) {
+                    RadioButtonExample(
+                        selected = selectedOption == 3,
+                        color1 = Color(0xFFFF7466),
+                        color2 = Color(0xFFF93E2B)
+                    ) {
                         selectedOption = 3
                     }
                 }
@@ -126,7 +146,7 @@ class DecorScreen : Screen {
                                 modifier = Modifier.size(25.dp),
                                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_back_forward_blue),
                                 contentDescription = "theme_icon",
-                                )
+                            )
                         }
                     }
                 }
@@ -134,13 +154,10 @@ class DecorScreen : Screen {
             }
 
 
-
-
-
-
         }
     }
 }
+
 @Composable
 fun RadioButtonExample(
     selected: Boolean,
@@ -151,14 +168,22 @@ fun RadioButtonExample(
     Box(
         modifier = Modifier
             .size(45.dp)
-            .background(brush = Brush.linearGradient(
-                colors = listOf(color1, color2),
-            ), shape = RoundedCornerShape(50))
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(color1, color2),
+                ), shape = RoundedCornerShape(50)
+            )
             .clickable(onClick = onClick)
             .border(
                 width = 2.dp,
                 color = if (selected) Color(0xFF00D1FF) else Color.Transparent,
-                shape = RoundedCornerShape(50)
+                shape = RoundedCornerShape(50),
+                )
+            .shadow(
+                clip = false,
+                elevation = 25.dp,
+                spotColor = if (selected) Color(0xFF00D1FF) else Color.Transparent,
+                shape = RoundedCornerShape(50),
             )
     ) {
         if (selected) {
@@ -167,47 +192,6 @@ fun RadioButtonExample(
                 imageVector = ImageVector.vectorResource(id = R.drawable.selectedicon),
                 contentDescription = "",
                 tint = Color.Unspecified
-            )
-        }
-    }
-}
-
-
-
-
-@Composable
-fun RadioButtonGroup(
-    options: List<String>,
-    selectedOption: String?,
-    onOptionSelected: (String) -> Unit,
-) {
-    Column {
-        options.forEach { text ->
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .selectable(
-                        selected = (text == selectedOption),
-                        onClick = { onOptionSelected(text) }
-                    )
-                    .padding(horizontal = 16.dp)
-            ) {
-                RadioButton(
-                    selected = (text == selectedOption),
-                    onClick = { onOptionSelected(text) },
-                    colors = RadioButtonDefaults.colors(selectedColor = Color.Magenta),
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-                Icon(imageVector = ImageVector.vectorResource(id = R.drawable.selectedicon), contentDescription ="" , tint = Color.Unspecified)
-                Text(
-                    text = text,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-            }
-            Divider(
-                color = Color.LightGray,
-                thickness = 1.dp,
-                modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
     }
