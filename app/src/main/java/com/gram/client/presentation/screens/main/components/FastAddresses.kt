@@ -43,7 +43,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
     } else
         LazyRow(modifier = Modifier.fillMaxWidth()) {
             stateFastAddresses.response?.forEach {
-                val toAddress = Address(it.address, it.id)
+                val toAddress = Address(it.address, it.id, it.address_lat, it.address_lng)
                 item {
                     FastAddressCard(title = "" + it.address){
                         mainViewModel.clearToAddress()
