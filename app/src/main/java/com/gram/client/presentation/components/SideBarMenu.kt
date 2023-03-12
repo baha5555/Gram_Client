@@ -146,6 +146,7 @@ fun ShowItems(
     isDialogOpen: MutableState<Boolean>
 ) {
     val context = LocalContext.current
+    val prefs = CustomPreference(context)
     val navigator = LocalNavigator.currentOrThrow
     Row(
         modifier = Modifier
@@ -174,7 +175,8 @@ fun ShowItems(
                         isDialogOpen.value = true
                     }
                     "История заказов" -> {
-                        navigator.push(OrdersHistoryScreen())
+                        if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
+                        else navigator.push(OrdersHistoryScreen())
                     }
                     "Промокоды" -> {
                         Toast
