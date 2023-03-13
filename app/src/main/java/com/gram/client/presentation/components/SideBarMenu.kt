@@ -28,6 +28,7 @@ import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.screens.authorization.AuthScreen
 import com.gram.client.presentation.screens.drawer.AboutScreen
 import com.gram.client.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
+import com.gram.client.presentation.screens.drawer.setting_screens.PromocodScreen
 import com.gram.client.presentation.screens.drawer.setting_screens.SettingScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.profile.ProfileScreen
@@ -177,14 +178,7 @@ fun ShowItems(
                         navigator.push(OrdersHistoryScreen())
                     }
                     "Промокоды" -> {
-                        Toast
-                            .makeText(
-                                context,
-                                "Эта страница на стадии разработки",
-                                Toast.LENGTH_LONG
-                            )
-                            .show()
-//                        navController.navigate(RoutesName.PROMO_CODE_SCREEN)
+                        navigator.push(PromocodScreen())
                     }
                     "Позвонить оператору" -> {
                         val callIntent: Intent = Uri
