@@ -38,6 +38,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -47,10 +48,12 @@ import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.components.voyager.MapPointScreen
+import com.gram.client.presentation.components.voyager.OrderExecutionMapPointScreen
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.order.OrderExecutionScreen
+import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.ui.theme.BackgroundColor
 import com.gram.client.ui.theme.PrimaryColor
@@ -89,6 +92,7 @@ val myLocationPoint = mutableStateOf(GeoPoint(0.0, 0.0))
 fun CustomMainMap(
     mainViewModel: MainViewModel
 ) {
+    val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
     val WHICH_ADDRESS=Values.WhichAddress
     val isGet = remember {
         mutableStateOf(false)
@@ -428,6 +432,94 @@ fun CustomMainMap(
                                             map.mapCenter.longitude,
                                             map.mapCenter.latitude)
                                     }
+                                    return true
+                                }
+
+                                override fun longPressHelper(p: GeoPoint): Boolean {
+                                    return false
+                                }
+                            })
+                        )
+                        addOverlays()
+                    }
+                    OrderExecutionMapPointScreen().key -> {
+                        map.overlays.clear()
+                        userTouchSurface.setCallback(
+                            TwoFingerDrag(
+                                context,
+                                object : TwoFingerDrag.Listener {
+                                    override fun onOneFinger(event: MotionEvent?) {
+                                        map.dispatchTouchEvent(event)
+                                        if (event != null) {
+                                            when (event.action) {
+                                                MotionEvent.ACTION_UP -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was UP"
+                                                    )
+                                                    orderExecutionViewModel.getAddressFromMap(
+                                                        map.mapCenter.longitude,
+                                                        map.mapCenter.latitude
+                                                    )
+                                                    Log.e("singleTapConfirmedHelper", "")
+                                                    map.postInvalidate()
+                                                }
+                                                else -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "ACTION_CANCEL"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    override fun onTwoFingers(event: MotionEvent?) {
+                                        map.dispatchTouchEvent(event)
+                                        if (event != null) {
+                                            when (event.action) {
+                                                MotionEvent.ACTION_MOVE -> {
+                                                    //                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
+                                                }
+                                                MotionEvent.ACTION_POINTER_2_DOWN -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was ACTION_POINTER_2_DOWN"
+                                                    )
+                                                }
+                                                MotionEvent.TOOL_TYPE_FINGER -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was TOOL_TYPE_FINGER"
+                                                    )
+                                                }
+                                                MotionEvent.ACTION_POINTER_2_UP -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "Action was UP"
+                                                    )
+                                                    orderExecutionViewModel.getAddressFromMap(
+                                                        map.mapCenter.longitude,
+                                                        map.mapCenter.latitude)
+                                                    Log.e("singleTapConfirmedHelper", "")
+                                                    map.postInvalidate()
+                                                }
+                                                else -> {
+                                                    Log.e(
+                                                        "singleTapConfirmedHelper",
+                                                        "ACTION_CANCEL"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                })
+                        )
+                        map.overlays.add(
+                            MapEventsOverlay(object : MapEventsReceiver {
+                                override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                                    map.postInvalidate()
+                                    mainViewModel.getAddressFromMap(map.mapCenter.longitude, map.mapCenter.latitude)
                                     return true
                                 }
 

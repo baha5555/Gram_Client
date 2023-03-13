@@ -42,10 +42,10 @@ fun orderSection(
         Row(
             modifier = Modifier
                 .clickable {
+                    Values.WhichAddress.value=Constants.FROM_ADDRESS
                     if(order.status=="Поступило" || order.status=="Не оформлен"){
                         bottomNavigator.show(SearchAddressOrderExecutionNavigator(){
                             navigator.push(OrderExecutionMapPointScreen())
-                            Values.WhichAddress.value=Constants.FROM_ADDRESS
                         })
                     }
                 }
@@ -95,10 +95,10 @@ fun orderSection(
         Row(
             modifier = Modifier
                 .clickable {
+                    Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
                     scope.launch {
                         bottomNavigator.show(SearchAddressOrderExecutionNavigator(){
                             navigator.push(OrderExecutionMapPointScreen())
-                            Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
                         })
                     }
                 }
@@ -135,12 +135,13 @@ fun orderSection(
                     .clickable {
                         scope.launch {
                             if (order.to_address.size > 1) {
+                                Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
                                 bottomNavigator.show(AddStopScreenOrderExcecution())
                             } else {
+                                Values.WhichAddress.value=Constants.TO_ADDRESS
                                 bottomNavigator.show(
                                     SearchAddressOrderExecutionNavigator(inx = 0){
                                         navigator.push(OrderExecutionMapPointScreen())
-                                        Values.WhichAddress.value=Constants.TO_ADDRESS
                                     }
                                 )
                             }

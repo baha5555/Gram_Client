@@ -143,63 +143,50 @@ class OrderExecutionScreen : Screen {
                         .wrapContentHeight(unbounded = true)
                         .background(MaterialTheme.colors.secondary)
                 ) {
-                    if (!isSearchState.value) {
-                        scope.launch {
-                            if (searchText.value != "")
-                                searchText.value = ""
-                        }
-                        selectRealtimeDatabaseOrder.let { order ->
-                            Log.i("orderAddresses", "" + order.from_address)
-                            if (order.id != -1) orderExecutionViewModel.getDriverLocation(order.id)
-                            if (isGet.value) {
-                                order.from_address.let {
-                                    if (it != null) {
-                                        isGet.value = false
-                                        //mainViewModel.updateFromAddress(it)
-                                    }
-                                }
-                                order.to_address.let {
-                                    it?.forEach { it2 ->
-                                        //mainViewModel.updateToAddress(it2)
-                                    }
-                                }
-                            }
 
-                            if (order.performer != null) {
-                                performerSection(performer = order, orderExecutionViewModel)
-                                stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
+                    scope.launch {
+                        if (searchText.value != "")
+                            searchText.value = ""
+                    }
+                    selectRealtimeDatabaseOrder.let { order ->
+                        Log.i("orderAddresses", "" + order.from_address)
+                        if (order.id != -1) orderExecutionViewModel.getDriverLocation(order.id)
+                        if (isGet.value) {
+                            order.from_address.let {
+                                if (it != null) {
+                                    isGet.value = false
+                                    //mainViewModel.updateFromAddress(it)
+                                }
                             }
-                            orderSection(order, scope)
-                            Spacer(modifier = Modifier.height(10.dp))
-                            optionSection(onClick = {
-                                navigator.push(CustomInfoOfActiveOrder())
-                            })
-                            val context = LocalContext.current
-                            actionSection(cancelOrderOnClick = {
-                                orderId = order.id
-                                if (order.status == "Исполняется" || order.status == "Водитель на месте") {
-                                   Toast.makeText(context, "Вы не можете отменить активный заказ.\nЭто может сделать только оператор", Toast.LENGTH_LONG).show()
-                                    return@actionSection
+                            order.to_address.let {
+                                it?.forEach { it2 ->
+                                    //mainViewModel.updateToAddress(it2)
                                 }
-                                if (order.performer != null) {
-                                    bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
-                                }else{
-                                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order))
-                                }
-                            })
+                            }
                         }
-                    } else {
-                        searchSection(
-                            searchText,
-                            focusRequester,
-                            isSearchState,
-                            sheetState,
-                            scope,
-                            orderExecutionViewModel,
-                            isAddressList,
-                            focusManager,
-                            mainViewModel
-                        )
+
+                        if (order.performer != null) {
+                            performerSection(performer = order, orderExecutionViewModel)
+                            stateCancelOrderText = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
+                        }
+                        orderSection(order, scope)
+                        Spacer(modifier = Modifier.height(10.dp))
+                        optionSection(onClick = {
+                            navigator.push(CustomInfoOfActiveOrder())
+                        })
+                        val context = LocalContext.current
+                        actionSection(cancelOrderOnClick = {
+                            orderId = order.id
+                            if (order.status == "Исполняется" || order.status == "Водитель на месте") {
+                                Toast.makeText(context, "Вы не можете отменить активный заказ.\nЭто может сделать только оператор", Toast.LENGTH_LONG).show()
+                                return@actionSection
+                            }
+                            if (order.performer != null) {
+                                bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
+                            }else{
+                                bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order))
+                            }
+                        })
                     }
                 }
             },

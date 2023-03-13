@@ -8,6 +8,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.components.voyager.MapPointScreen
+import com.gram.client.presentation.components.voyager.OrderExecutionMapPointScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ class MapController(val context: Context) {
         fromAddress: State<Address>,
         toAddress: SnapshotStateList<Address>,
     ) {
-        if(currentRoute==SearchAddressScreen().key || currentRoute==MapPointScreen().key) return
+        if(currentRoute==SearchAddressScreen().key || currentRoute==MapPointScreen().key || currentRoute==OrderExecutionMapPointScreen().key) return
         val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
         GlobalScope.launch {
             try {

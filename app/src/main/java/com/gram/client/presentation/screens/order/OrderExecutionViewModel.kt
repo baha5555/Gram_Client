@@ -38,7 +38,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsUseCase
 import com.gram.client.presentation.screens.order.states.GetRatingReasonsResponseState
@@ -458,12 +457,13 @@ class OrderExecutionViewModel @Inject constructor(
         editOrderUseCase.invoke(
             order_id = selectedOrder.value.id,
             dop_phone = null,
-            from_address = _fromAddress.value.id,
+            search_address_id = if (_fromAddress.value.id!=-1) _fromAddress.value.id else null,
             meeting_info = null,
             to_addresses = _toAddresses,
             comment = null,
             tariff_id = selectedOrder.value.tariff_id ?: 0,
-            allowances = if (selectedOrder.value.allowances != null) Gson().toJson(selectedOrder.value.allowances) else null
+            allowances = null,
+            from_address = if (_fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
         ).onEach { result: Resource<UpdateOrderResponse> ->
             when (result) {
                 is Resource.Success -> {

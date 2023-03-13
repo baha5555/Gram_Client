@@ -79,12 +79,13 @@ interface AppRepository {
     suspend fun editOrder(
         order_id: Int,
         dop_phone: String?,
-        from_address: Int?,
+        search_address_id: Int?,
         meeting_info: String?,
         to_addresses: String?,
         comment: String?,
         tariff_id: Int,
         allowances: String?,
+        from_address: String?,
     ): UpdateOrderResponse
 
     suspend fun getFastAddresses(): FastAddressesResponse

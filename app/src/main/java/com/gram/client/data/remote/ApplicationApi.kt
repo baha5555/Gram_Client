@@ -21,7 +21,6 @@ import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.GetPromocodResponse
-import com.gram.client.domain.promocod.Message
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -142,12 +141,13 @@ interface ApplicationApi {
         @Header("Authorization") token: String,
         @Path("order_id") order_id: Int,
         @Query("dop_phone") dop_phone: String?,
-        @Query("search_address_id") from_address: Int?,
+        @Query("search_address_id") search_address_id: Int?,
         @Query("meeting_info") meeting_info: String?,
         @Query("to_addresses") to_addresses: String?,
         @Query("comment") comment: String?,
         @Query("tariff_id") tariff_id : Int,
         @Query("allowances") allowances: String?,
+        @Query("from_address") from_address: String?,
     ): UpdateOrderResponse
 
     @GET("/api/mob-app/popular-addresses")

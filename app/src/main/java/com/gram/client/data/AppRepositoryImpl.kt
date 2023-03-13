@@ -24,7 +24,6 @@ import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.GetPromocodResponse
-import com.gram.client.domain.promocod.Message
 import com.gram.client.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -130,22 +129,24 @@ class AppRepositoryImpl(
     override suspend fun editOrder(
         order_id: Int,
         dop_phone: String?,
-        from_address: Int?,
+        search_address_id: Int?,
         meeting_info: String?,
         to_addresses: String?,
         comment: String?,
         tariff_id: Int,
-        allowances: String?
+        allowances: String?,
+        from_address: String?,
     ): UpdateOrderResponse = api.editOrder(
         prefs.getAccessToken(),
         order_id,
         dop_phone,
-        from_address,
+        search_address_id,
         meeting_info,
         to_addresses,
         comment,
         tariff_id,
-        allowances
+        allowances,
+        from_address
     )
 
     override suspend fun getFastAddresses(): FastAddressesResponse =
