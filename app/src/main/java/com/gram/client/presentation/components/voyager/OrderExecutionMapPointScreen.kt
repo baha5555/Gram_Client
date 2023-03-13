@@ -33,15 +33,13 @@ import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Values
 
-class OrderExecutionMapPointScreen (val whichScreen: String? = null) : Screen {
+class OrderExecutionMapPointScreen () : Screen {
     @SuppressLint("UnrememberedMutableState")
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val WHICH_SCREEN = remember {
-            mutableStateOf(whichScreen ?: "")
-        }
         val mainViewModel: MainViewModel = hiltViewModel()
         val orderExecutionViewModel:OrderExecutionViewModel = hiltViewModel()
         val statePoint = orderExecutionViewModel.stateAddressPoint
@@ -49,11 +47,10 @@ class OrderExecutionMapPointScreen (val whichScreen: String? = null) : Screen {
         BottomSheetScaffold(
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
-                SheetContent(whichScreen, stateViews = true) {
+                SheetContent(Values.WhichAddress.value, stateViews = true) {
                     statePoint.value.response.let {
-                        when (whichScreen) {
+                        when (Values.WhichAddress.value) {
                             Constants.FROM_ADDRESS -> {
-                                Log.e("which", "$whichScreen")
                                 if (it == null) {
                                     orderExecutionViewModel.updateFromAddress(
                                         Address(
@@ -75,7 +72,6 @@ class OrderExecutionMapPointScreen (val whichScreen: String? = null) : Screen {
                                 }
                             }
                             Constants.TO_ADDRESS -> {
-                                Log.e("which", "->$whichScreen")
                                 if (it == null) {
                                     orderExecutionViewModel.updateToAddress(
                                         Address(
@@ -124,14 +120,13 @@ class OrderExecutionMapPointScreen (val whichScreen: String? = null) : Screen {
                         if (mLocationOverlay.myLocation != null) {
                             orderExecutionViewModel.getAddressFromMap(
                                 mLocationOverlay.myLocation.longitude,
-                                mLocationOverlay.myLocation.latitude,
-                                WHICH_SCREEN.value
+                                mLocationOverlay.myLocation.latitude
                             )
                         }
                     }
                 }
             }) {
-            CustomMainMap(WHICH_ADDRESS = WHICH_SCREEN, mainViewModel = mainViewModel)
+            CustomMainMap(mainViewModel = mainViewModel)
         }
     }
 }

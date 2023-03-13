@@ -24,6 +24,7 @@ import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
+import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -443,8 +444,7 @@ class MainViewModel @Inject constructor(
 
     fun getAddressFromMap(
         lng: Double,
-        lat: Double,
-        WHICH_ADDRESS: String
+        lat: Double
     ) {
         getAddressByPointUseCase.invoke(lng, lat)
             .onEach { result: Resource<AddressByPointResponse> ->
@@ -458,7 +458,7 @@ class MainViewModel @Inject constructor(
                                 "AddressByPointResponse",
                                 "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
                             )
-                            when (WHICH_ADDRESS) {
+                            when (Values.WhichAddress.value) {
                                 Constants.FROM_ADDRESS -> {
                                    updateFromAddress(
                                        Address(

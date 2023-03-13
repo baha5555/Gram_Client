@@ -12,12 +12,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.voyager.AddStopScreenOrderExcecution
+import com.gram.client.presentation.components.voyager.OrderExecutionMapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddressOrderExecutionNavigator
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Values
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -27,6 +31,7 @@ fun orderSection(
     order: RealtimeDatabaseOrder,
     scope: CoroutineScope,
 ) {
+    val navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
     Column(
         modifier = Modifier
@@ -38,7 +43,10 @@ fun orderSection(
             modifier = Modifier
                 .clickable {
                     if(order.status=="Поступило" || order.status=="Не оформлен"){
-                        bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.FROM_ADDRESS))
+                        bottomNavigator.show(SearchAddressOrderExecutionNavigator(){
+                            navigator.push(OrderExecutionMapPointScreen())
+                            Values.WhichAddress.value=Constants.FROM_ADDRESS
+                        })
                     }
                 }
                 .fillMaxWidth()
@@ -88,7 +96,10 @@ fun orderSection(
             modifier = Modifier
                 .clickable {
                     scope.launch {
-                        bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.ADD_TO_ADDRESS))
+                        bottomNavigator.show(SearchAddressOrderExecutionNavigator(){
+                            navigator.push(OrderExecutionMapPointScreen())
+                            Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
+                        })
                     }
                 }
                 .fillMaxWidth()
@@ -127,10 +138,10 @@ fun orderSection(
                                 bottomNavigator.show(AddStopScreenOrderExcecution())
                             } else {
                                 bottomNavigator.show(
-                                    SearchAddressOrderExecutionNavigator(
-                                        Constants.TO_ADDRESS,
-                                        inx = 0
-                                    )
+                                    SearchAddressOrderExecutionNavigator(inx = 0){
+                                        navigator.push(OrderExecutionMapPointScreen())
+                                        Values.WhichAddress.value=Constants.TO_ADDRESS
+                                    }
                                 )
                             }
                         }

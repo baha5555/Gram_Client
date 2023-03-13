@@ -27,11 +27,10 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.addressComponents.AddressListItem
 import com.gram.client.presentation.screens.main.addressComponents.Loader
-import com.gram.client.presentation.screens.navigator
 import com.gram.client.utils.Constants
 import kotlinx.coroutines.launch
 
-class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Screen {
+class SearchAddressNavigator(val whichScreen: String, val inx: Int= -1, val function: () -> Unit ) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
@@ -121,7 +120,7 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                             when(whichScreen) {
                                 Constants.FROM_ADDRESS -> {
                                     bottomNavigator.hide()
-                                    navigator.push(MapPointScreen(whichScreen))
+                                    function.invoke()
                                 }
                                 else -> {
                                     bottomNavigator.hide()
@@ -176,7 +175,9 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int = -1) : Scree
                                     addressText = it.address,
                                     onItemClick = { selectedAddress ->
                                         address.value = selectedAddress
-                                        if (inx == -2) bottomNavigator.replaceAll(AddStopScreen())
+                                        if (inx == -2) bottomNavigator.replaceAll(AddStopScreen {
+                                            function.invoke()
+                                        })
                                         else bottomNavigator.hide()
                                         if (keyboardController != null) {
                                             keyboardController.hide()

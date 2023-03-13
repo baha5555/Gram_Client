@@ -87,9 +87,9 @@ val myLocationPoint = mutableStateOf(GeoPoint(0.0, 0.0))
 
 @Composable
 fun CustomMainMap(
-    mainViewModel: MainViewModel,
-    WHICH_ADDRESS: MutableState<String>? = null
+    mainViewModel: MainViewModel
 ) {
+    val WHICH_ADDRESS=Values.WhichAddress
     val isGet = remember {
         mutableStateOf(false)
     }
@@ -252,8 +252,7 @@ fun CustomMainMap(
                                                     if (WHICH_ADDRESS != null) {
                                                         mainViewModel.getAddressFromMap(
                                                             map.mapCenter.longitude,
-                                                            map.mapCenter.latitude,
-                                                            WHICH_ADDRESS.value
+                                                            map.mapCenter.latitude
                                                         )
                                                     }
                                                     Log.e("singleTapConfirmedHelper", "")
@@ -310,9 +309,7 @@ fun CustomMainMap(
                                                     if (WHICH_ADDRESS != null) {
                                                         mainViewModel.getAddressFromMap(
                                                             map.mapCenter.longitude,
-                                                            map.mapCenter.latitude,
-                                                            WHICH_ADDRESS.value
-                                                        )
+                                                            map.mapCenter.latitude)
                                                     }
                                                     Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
@@ -335,9 +332,7 @@ fun CustomMainMap(
                                     if (WHICH_ADDRESS != null) {
                                         mainViewModel.getAddressFromMap(
                                             map.mapCenter.longitude,
-                                            map.mapCenter.latitude,
-                                            WHICH_ADDRESS.value
-                                        )
+                                            map.mapCenter.latitude)
                                     }
                                     return true
                                 }
@@ -366,8 +361,7 @@ fun CustomMainMap(
                                                     )
                                                     mainViewModel.getAddressFromMap(
                                                         map.mapCenter.longitude,
-                                                        map.mapCenter.latitude,
-                                                        WHICH_ADDRESS?.value ?: Constants.FROM_ADDRESS
+                                                        map.mapCenter.latitude
                                                     )
                                                     Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
@@ -409,9 +403,7 @@ fun CustomMainMap(
                                                     if (WHICH_ADDRESS != null) {
                                                         mainViewModel.getAddressFromMap(
                                                             map.mapCenter.longitude,
-                                                            map.mapCenter.latitude,
-                                                            WHICH_ADDRESS.value
-                                                        )
+                                                            map.mapCenter.latitude)
                                                     }
                                                     Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
@@ -434,9 +426,7 @@ fun CustomMainMap(
                                     if (WHICH_ADDRESS != null) {
                                         mainViewModel.getAddressFromMap(
                                             map.mapCenter.longitude,
-                                            map.mapCenter.latitude,
-                                            WHICH_ADDRESS.value
-                                        )
+                                            map.mapCenter.latitude)
                                     }
                                     return true
                                 }

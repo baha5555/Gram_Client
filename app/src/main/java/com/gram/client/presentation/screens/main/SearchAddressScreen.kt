@@ -26,6 +26,7 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.presentation.components.*
+import com.gram.client.presentation.components.voyager.MapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddresses
 import com.gram.client.presentation.screens.main.components.AddressSearchBottomSheet
 import com.gram.client.presentation.screens.main.components.FloatingButton
@@ -128,8 +129,7 @@ class SearchAddressScreen : Screen {
                                                 if (currentRoute == SearchAddressScreen().key) {
                                                     mainViewModel.getAddressFromMap(
                                                         mLocationOverlay.myLocation.longitude,
-                                                        mLocationOverlay.myLocation.latitude,
-                                                        WHICH_ADDRESS.value
+                                                        mLocationOverlay.myLocation.latitude
                                                     )
                                                 }
                                             }
@@ -165,11 +165,12 @@ class SearchAddressScreen : Screen {
                             )
                             {
                                 CustomMainMap(
-                                    mainViewModel = mainViewModel,
-                                    WHICH_ADDRESS = WHICH_ADDRESS
+                                    mainViewModel = mainViewModel
                                 )
                                 FromAddressField(fromAddress) {
-                                    bottomNavigator.show(SearchAddresses(Constants.FROM_ADDRESS))
+                                    bottomNavigator.show(SearchAddresses{
+                                        navigator.push(MapPointScreen())
+                                    })
                                 }
                             }
                         }

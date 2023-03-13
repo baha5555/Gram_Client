@@ -31,7 +31,7 @@ import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 
 
-class AddStopScreen : Screen {
+class AddStopScreen(val function: () -> Unit) : Screen {
     @SuppressLint("SuspiciousIndentation")
     @Composable
     override fun Content() {
@@ -53,7 +53,9 @@ class AddStopScreen : Screen {
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
                             .clickable {
-                                bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS, inx))
+                                bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS, inx){
+
+                                })
                             }
                     ) {
                         Row(
@@ -96,7 +98,9 @@ class AddStopScreen : Screen {
             }
             item {
                 Button(
-                    onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS, -2))},
+                    onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS, -2){
+                        function.invoke()
+                    })},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp)

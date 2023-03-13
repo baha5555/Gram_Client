@@ -386,7 +386,6 @@ class OrderExecutionViewModel @Inject constructor(
     fun getAddressFromMap(
         lng: Double,
         lat: Double,
-        WHICH_ADDRESS: String
     ) {
         getAddressByPointUseCase.invoke(lng, lat)
             .onEach { result: Resource<AddressByPointResponse> ->
@@ -400,7 +399,7 @@ class OrderExecutionViewModel @Inject constructor(
                                 "AddressByPointResponse",
                                 "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
                             )
-                            when (WHICH_ADDRESS) {
+                            when (Values.WhichAddress.value) {
                                 Constants.FROM_ADDRESS -> {
                                     updateFromAddress(
                                         Address(

@@ -29,6 +29,8 @@ import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 import com.gram.client.R
+import com.gram.client.utils.Constants
+import com.gram.client.utils.Values
 
 @Composable
 fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
@@ -47,6 +49,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                 .clip(shape = RoundedCornerShape(percent = 50))
                 .clickable {
                     onClick()
+                    Values.WhichAddress.value = Constants.FROM_ADDRESS
                 }
                 .background(
                     Color.Black,

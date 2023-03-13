@@ -1,6 +1,5 @@
 package com.gram.client.presentation.components.voyager
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,8 +8,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,26 +30,23 @@ import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Values
 import com.valentinilk.shimmer.shimmer
 
-class MapPointScreen(val whichScreen: String? = null) : Screen {
+class MapPointScreen() : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val WHICH_SCREEN = remember{
-            mutableStateOf(whichScreen ?: "")
-        }
         val mainViewModel: MainViewModel = hiltViewModel()
         val statePoint = mainViewModel.stateAddressPoint.value
         val navigator = LocalNavigator.currentOrThrow
         BottomSheetScaffold(
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
-                SheetContent(whichScreen){
+                SheetContent(Values.WhichAddress.value){
                     statePoint.response.let {
-                        when(whichScreen) {
+                        when(Values.WhichAddress.value) {
                             Constants.FROM_ADDRESS-> {
-                                Log.e("which","$whichScreen")
                                 if (it == null) {
                                     mainViewModel.updateFromAddress(
                                         Address(
@@ -74,7 +68,6 @@ class MapPointScreen(val whichScreen: String? = null) : Screen {
                                 }
                             }
                             Constants.TO_ADDRESS-> {
-                                Log.e("which","->$whichScreen")
                                 if (it == null) {
 //                                    mainViewModel.updateToAddress(
 //                                        Address(
@@ -123,14 +116,13 @@ class MapPointScreen(val whichScreen: String? = null) : Screen {
                         if (mLocationOverlay.myLocation != null) {
                             mainViewModel.getAddressFromMap(
                                 mLocationOverlay.myLocation.longitude,
-                                mLocationOverlay.myLocation.latitude,
-                                Constants.TO_ADDRESS
+                                mLocationOverlay.myLocation.latitude
                             )
                         }
                     }
                 }
             }) {
-            CustomMainMap(WHICH_ADDRESS = WHICH_SCREEN ,mainViewModel = mainViewModel)
+            CustomMainMap(mainViewModel = mainViewModel)
         }
     }
 }

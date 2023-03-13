@@ -26,11 +26,13 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
+import com.gram.client.presentation.components.voyager.MapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddresses
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Values
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -47,7 +49,10 @@ fun ToAddressField(
             .height(50.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable {
-                bottomNavigator.show(SearchAddresses(Constants.TO_ADDRESS))
+                Values.WhichAddress.value = Constants.TO_ADDRESS
+                bottomNavigator.show(SearchAddresses {
+                    navigator.push(MapPointScreen())
+                })
             }
             .background(PrimaryColor)
             .padding(horizontal = 5.dp)

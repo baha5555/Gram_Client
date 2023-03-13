@@ -33,16 +33,14 @@ import com.gram.client.utils.Constants
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.domain.mainScreen.TariffsResult
-import com.gram.client.presentation.components.voyager.AddStopScreen
-import com.gram.client.presentation.components.voyager.MeetSheet
-import com.gram.client.presentation.components.voyager.SearchAddressNavigator
-import com.gram.client.presentation.components.voyager.SearchAddresses
+import com.gram.client.presentation.components.voyager.*
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.components.*
 import com.gram.client.presentation.screens.main.states.AllowancesResponseState
 import com.gram.client.presentation.screens.main.states.CalculateResponseState
 import com.gram.client.presentation.screens.main.states.TariffsResponseState
 import com.gram.client.utils.Constants.stateOfDopInfoForDriver
+import com.gram.client.utils.Values
 import currentFraction
 
 @SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
@@ -189,7 +187,10 @@ fun AddressesContent(
         Row(
             modifier = Modifier
                 .clickable {
-                    bottomNavigator.show(SearchAddresses(Constants.FROM_ADDRESS))
+                    bottomNavigator.show(SearchAddresses{
+                        navigator.push(MapPointScreen())
+                    })
+                    Values.WhichAddress.value = Constants.FROM_ADDRESS
                 }
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 15.dp),
@@ -245,9 +246,15 @@ fun AddressesContent(
             modifier = Modifier
                 .clickable {
                     if (toAddresses.size <= 1) {
-                        bottomNavigator.show(SearchAddresses(Constants.TO_ADDRESS))
+                        Values.WhichAddress.value = Constants.TO_ADDRESS
+                        bottomNavigator.show(SearchAddresses{
+                            navigator.push(MapPointScreen())
+                        })
                     } else {
-                        bottomNavigator.show(AddStopScreen())
+                        Values.WhichAddress.value = Constants.ADD_TO_ADDRESS
+                        bottomNavigator.show(AddStopScreen{
+                            navigator.push(MapPointScreen())
+                        })
                     }
                 }
                 .fillMaxWidth()
@@ -293,7 +300,10 @@ fun AddressesContent(
             Icon(imageVector = Icons.Default.Add, "", modifier = Modifier
                 .size(35.dp)
                 .clickable {
-                    bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS))
+                    bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS){
+                        navigator.push(MapPointScreen())
+                        Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
+                    })
                 })
 
         }

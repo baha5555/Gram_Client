@@ -36,14 +36,13 @@ import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.presentation.screens.profile.ProfileViewModel
 
-lateinit var navigator: Navigator
 class SplashScreen : Screen {
     @Composable
     override fun Content() {
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val profileViewModel: ProfileViewModel = hiltViewModel()
 
-        navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalNavigator.currentOrThrow
         val currentKey = navigator.lastItem.key
         val activeOrders = orderExecutionViewModel.stateActiveOrders.value
 

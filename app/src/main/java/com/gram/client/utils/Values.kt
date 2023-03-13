@@ -20,4 +20,6 @@ object Values {
     val CommentCancelReasons = mutableStateOf("")
     val CommentRatingReasons = mutableStateOf("")
 
+    val WhichAddress = mutableStateOf("")
+
 }

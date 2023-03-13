@@ -30,11 +30,11 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.screens.main.MainViewModel
-import com.gram.client.presentation.screens.navigator
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Values
 import com.valentinilk.shimmer.shimmer
 
-class SearchAddresses(val withScreen: String) : Screen {
+class SearchAddresses(val function: () -> Unit) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
@@ -81,7 +81,7 @@ class SearchAddresses(val withScreen: String) : Screen {
                     TextRange(mainViewModel.toAddresses[0].address.length)
                 )
             }
-            when (withScreen) {
+            when (Values.WhichAddress.value) {
                 Constants.FROM_ADDRESS -> {
                     focusRequester.requestFocus()
                 }
@@ -154,7 +154,8 @@ class SearchAddresses(val withScreen: String) : Screen {
                                     .padding(start = 10.dp, end = 15.dp)
                                     .clickable {
                                         bottomNavigator.hide()
-                                        navigator.push(MapPointScreen(Constants.FROM_ADDRESS))
+                                        Values.WhichAddress.value=Constants.FROM_ADDRESS
+                                        function.invoke()
                                     })
                         }
                     }
@@ -206,7 +207,8 @@ class SearchAddresses(val withScreen: String) : Screen {
                                     .padding(start = 10.dp, end = 15.dp)
                                     .clickable {
                                         bottomNavigator.hide()
-                                        navigator.push(MapPointScreen(Constants.TO_ADDRESS))
+                                        Values.WhichAddress.value=Constants.TO_ADDRESS
+                                        function.invoke()
                                     })
                         }
                     }

@@ -25,12 +25,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.presentation.screens.main.addressComponents.AddressListItem
 import com.gram.client.presentation.screens.main.addressComponents.Loader
-import com.gram.client.presentation.screens.navigator
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
 
-class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int = -1) : Screen {
+class SearchAddressOrderExecutionNavigator(val inx: Int = -1,  val function: () -> Unit) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
@@ -120,7 +120,7 @@ class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int
                                     .not()
                             ) {
                                 bottomNavigator.hide()
-                                navigator.push(OrderExecutionMapPointScreen(whichScreen))
+                                function.invoke()
                             }
                         },
                     contentAlignment = Alignment.Center
@@ -170,12 +170,14 @@ class SearchAddressOrderExecutionNavigator(val whichScreen: String, val inx: Int
                                     addressText = it.address,
                                     onItemClick = { selectedAddress ->
                                         address.value = selectedAddress
-                                        if (inx == -2) bottomNavigator.replaceAll(AddStopScreen())
+                                        if (inx == -2) bottomNavigator.replaceAll(AddStopScreen {
+                                            function.invoke()
+                                        })
                                         else bottomNavigator.hide()
                                         if (keyboardController != null) {
                                             keyboardController.hide()
                                         }
-                                        when (whichScreen) {
+                                        when (Values.WhichAddress.value) {
                                             Constants.TO_ADDRESS -> {
                                                 if(inx>=0) orderExecutionViewModel.updateToAddressInx(it, inx)
                                             }
