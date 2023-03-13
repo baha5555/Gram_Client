@@ -4,6 +4,6 @@ data class CalculateResponse(
     val code: Int,
     val error: List<Any>,
     val message: String,
-    val result: PriceResult,
+    val result: List<PriceResult>,
     val success: Boolean
 )

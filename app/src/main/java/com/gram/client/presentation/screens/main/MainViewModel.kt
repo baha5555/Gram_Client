@@ -402,8 +402,10 @@ class MainViewModel @Inject constructor(
     }
 
     fun getPrice() {
+        val tariffIdsList = arrayListOf<String>()
+        _stateTariffs.value.response?.forEach{ tariffIdsList.add("{\"tariff_id\":${it.id}}") }
         getPriceUseCase.invoke(
-            tariff_ids = "[{\"tariff_id\":1},{\"tariff_id\":2},{\"tariff_id\":4}]",
+            tariff_ids = tariffIdsList.toString(),
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
