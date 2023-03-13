@@ -402,11 +402,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun getPrice() {
+        val tariffIdsList = arrayListOf<String>()
+        _stateTariffs.value.response?.forEach{ tariffIdsList.add("{\"tariff_id\":${it.id}}") }
         getPriceUseCase.invoke(
-            tariff_id = selectedTariff?.value?.id ?: 1,
+            tariff_ids = tariffIdsList.toString(),
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
+            value_allowances = null,
             search_address_id = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
             from_address = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null

@@ -1,0 +1,127 @@
+{
+  "project_info": {
+    "project_number": "983959047756",
+    "firebase_url": "https://taxi-mob-app-prod-default-rtdb.firebaseio.com",
+    "project_id": "taxi-mob-app-prod",
+    "storage_bucket": "taxi-mob-app-prod.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983959047756:android:0e38fb43fac2877a92eee9",
+        "android_client_info": {
+          "package_name": "com.gram.client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "983959047756-1q4rlhtmufo4fg9ef9s5lc419kkqbmga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHXY2gFNiwN_B1KK8CYzUPs_QSXNZAFzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "983959047756-1q4rlhtmufo4fg9ef9s5lc419kkqbmga.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983959047756:android:e1df8e1bbdf021d492eee9",
+        "android_client_info": {
+          "package_name": "com.gram.gramclient"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "983959047756-1q4rlhtmufo4fg9ef9s5lc419kkqbmga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHXY2gFNiwN_B1KK8CYzUPs_QSXNZAFzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "983959047756-1q4rlhtmufo4fg9ef9s5lc419kkqbmga.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983959047756:android:6db4e851c61b6f4992eee9",
+        "android_client_info": {
+          "package_name": "com.gram.traffic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "983959047756-1q4rlhtmufo4fg9ef9s5lc419kkqbmga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHXY2gFNiwN_B1KK8CYzUPs_QSXNZAFzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "983959047756-1q4rlhtmufo4fg9ef9s5lc419kkqbmga.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983959047756:android:7329724c4ccba64492eee9",
+        "android_client_info": {
+          "package_name": "com.iogram.traffic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "983959047756-1q4rlhtmufo4fg9ef9s5lc419kkqbmga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHXY2gFNiwN_B1KK8CYzUPs_QSXNZAFzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "983959047756-1q4rlhtmufo4fg9ef9s5lc419kkqbmga.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

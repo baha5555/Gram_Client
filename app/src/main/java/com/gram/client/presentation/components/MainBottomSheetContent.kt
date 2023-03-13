@@ -213,12 +213,12 @@ fun AddressesContent(
                     )
                 } else {
                     Text(
-                        if(meeting=="")address_from.address else address_from.address+", подъезд "+meeting,
+                        if (meeting == "") address_from.address else address_from.address + ", подъезд " + meeting,
                         maxLines = 2, overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
-            if(mainViewModel.fromAddress.value.address != ""){
+            if (mainViewModel.fromAddress.value.address != "") {
                 Text("Подъезд", modifier = Modifier
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFF1A1A1A))
@@ -319,6 +319,7 @@ fun TariffsContent(
     mainViewModel: MainViewModel,
     tariffIcons: Array<Int>
 ) {
+    val stateCalculate = mainViewModel.stateCalculate.value
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -342,11 +343,16 @@ fun TariffsContent(
                 fontSize = 25.sp,
                 color = MaterialTheme.colors.onBackground
             )
-            stateCalculate.response?.let {
-                Text(
-                    text = if (address_to.isEmpty()) "от ${it.result.amount} c" else "${it.result.amount} c",
-                    fontSize = 25.sp
-                )
+            stateCalculate.response?.let { it ->
+                it.result.forEach {
+                    if (selected_tariff.value == null) return
+                    if (it.tariff_id == selected_tariff.value!!.id) {
+                        Text(
+                            text = if (address_to.isEmpty()) "от ${it.amount} c" else "${it.amount} c",
+                            fontSize = 25.sp
+                        )
+                    }
+                }
             }
             if (stateCalculate.response == null || stateCalculate.error != "") {
                 CustomPulseLoader(isLoading = true)
@@ -389,6 +395,12 @@ fun TariffsContent(
                         .fillMaxWidth()
                 ) {
                     items(items = tariffs, itemContent = { tariff ->
+                        val price = remember {
+                            mutableStateOf(0)
+                        }
+                        stateCalculate.response?.result?.forEach {
+                            if (it.tariff_id == tariff.id) price.value = it.amount
+                        }
                         TariffItem(
                             icon = when (tariff.id) {
                                 1 -> tariffListIcons[0]
@@ -398,7 +410,8 @@ fun TariffsContent(
                                 else -> tariffListIcons[4]
                             },
                             name = tariff.name,
-                            price = tariff.min_price,
+                            price = if (price.value == 0) tariff.min_price else price.value,
+                            stateCalculate = stateCalculate,
                             isSelected = selected_tariff?.value == tariff,
                             onSelected = {
                                 mainViewModel.getAllowancesByTariffId(tariff.id)
@@ -546,7 +559,14 @@ fun AllowancesContent(
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = " (${allowance.price}c)",
+                                text = " (${allowance.price}" + when (allowance.type) {
+                                    "fix" -> "c"
+                                    "percent" -> "%"
+                                    "minute" -> "мин"
+                                    else -> {
+                                        ""
+                                    }
+                                } + ")",
                                 fontSize = 16.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.padding(end = 18.dp)
@@ -556,13 +576,14 @@ fun AllowancesContent(
                             }
                         }
                     }
-                    Divider()
                 }
+                Divider()
             }
         }
-        if (stateAllowances.response == null || stateAllowances.error != "") {
-            CustomLinearShimmer(enabled = true)
-        }
+    }
+    if (stateAllowances.response == null || stateAllowances.error != "") {
+        CustomLinearShimmer(enabled = true)
     }
 }
+
 

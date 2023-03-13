@@ -106,8 +106,9 @@ interface ApplicationApi {
     @FormUrlEncoded
     @POST("/api/orders/calculate")
     suspend fun getPrice(
-        @Query("tariff_id") tariff_id : Int,
+        @Query("tariff_ids") tariff_ids : String,
         @Field("allowances") allowances: String?,
+        @Field("value_allowances") value_allowances: String?,
         @Field("search_address_id") search_address_id: Int?,
         @Field("to_addresses") to_addresses: String?,
         @Field("from_address") from_address: String?,

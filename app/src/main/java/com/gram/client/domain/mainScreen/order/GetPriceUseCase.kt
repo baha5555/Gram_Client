@@ -14,8 +14,9 @@ import javax.inject.Inject
 class GetPriceUseCase @Inject constructor(private val repository: AppRepository) {
 
     operator fun invoke(
-        tariff_id: Int,
+        tariff_ids: String,
         allowances: String?,
+        value_allowances: String?,
         search_address_id: Int?,
         to_addresses: SnapshotStateList<Address>?,
         from_address: String?
@@ -27,7 +28,7 @@ class GetPriceUseCase @Inject constructor(private val repository: AppRepository)
                 to_addresses?.forEach{
                     toAddressesList.add("{\"search_address_id\":${it.id}}")
                 }
-                val response: CalculateResponse = repository.getPrice(tariff_id, allowances, search_address_id, toAddressesList.toString(), from_address)
+                val response: CalculateResponse = repository.getPrice(tariff_ids, allowances, value_allowances, search_address_id, toAddressesList.toString(), from_address)
                 emit(Resource.Success(response))
             }catch (e: HttpException) {
                 emit(

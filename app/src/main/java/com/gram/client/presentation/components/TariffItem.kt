@@ -2,6 +2,7 @@
 
 package com.gram.client.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +16,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
+import com.gram.client.presentation.screens.main.states.CalculateResponseState
+import com.gram.client.presentation.screens.main.states.TariffsResponseState
+import com.valentinilk.shimmer.shimmer
 
 @Composable
 fun TariffItem(
@@ -23,14 +26,15 @@ fun TariffItem(
     price: Int,
     name: String,
     isSelected: Boolean,
-    onSelected: () -> Unit = {}
+    onSelected: () -> Unit = {},
+    stateCalculate: CalculateResponseState
 ) {
 
-    ConstraintLayout(
+    Column(
         modifier = Modifier
             .width(85.dp)
             .height(95.dp)
-            .border(border= BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(20.dp))
+            .border(border = BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 onSelected()
@@ -40,29 +44,32 @@ fun TariffItem(
 
 
     ) {
-        val (icn, prc, txt) = createRefs()
-
 
         Image(
-            modifier = Modifier.offset(0.dp, if(name=="Эконом")(-10).dp else 0.dp)
-                .constrainAs(icn) {
-                    start.linkTo(parent.start)
-                },
+            modifier = Modifier
+                .offset(0.dp, if (name == "Эконом") (-10).dp else 0.dp)
+                .weight(1f),
             painter = painterResource(icon),
             contentDescription = "icon"
         )
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(text = name, fontSize = 13.sp,
-            modifier = Modifier.constrainAs(txt) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(prc.top)
-            }, color = if (isSelected) Color.White else Color.Black)
-        Text(text = "$price c", fontSize = 13.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.constrainAs(prc) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(parent.bottom)
-            }.padding(end = 20.dp), color = if (isSelected) Color.White else Color.Black)
+        Text(text = name, fontSize = 13.sp, color = if (isSelected) Color.White else Color.Black, maxLines = 1)
+        if(stateCalculate.isLoading){
+            AnimatedVisibility(visible = true) {
+                Box(modifier = Modifier.shimmer()){
+                    Box(modifier = Modifier
+                        .size(40.dp, 15.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(Color.Gray))
+                }
+            }
+        }
+        else{
+            AnimatedVisibility(visible = true) {
+                Box(modifier = Modifier.height(15.dp)){
+                    Text(text = "$price c", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (isSelected) Color.White else Color.Black)
+                }
+            }
+        }
+
     }
 }
