@@ -1,37 +1,35 @@
-package com.gram.client.presentation.screens.drawer.setting_screens
+package com.gram.client.presentation.screens.promocod
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
+import com.gram.client.domain.promocod.GetPromocodResponseState
 import com.gram.client.presentation.components.CustomButton
+import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.ui.theme.PrimaryColor
 
 class PromocodScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val promocodViewModel: PromocodViewModel = hiltViewModel()
+        val promocod = promocodViewModel.statepromocod.value.response?.promo_code
+
         Scaffold(
             topBar = {
                 Row(
@@ -51,7 +49,7 @@ class PromocodScreen : Screen {
                                     )
                                 }
                                 Text(
-                                    text = "Оформление",
+                                    text = "Промокоды",
                                     textAlign = TextAlign.Center,
                                     color = Color.Black,
                                     modifier = Modifier.align(Alignment.Center),
@@ -72,29 +70,6 @@ class PromocodScreen : Screen {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.7f)
-                        .background(PrimaryColor),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    GiftAnimation()
-                    Text(
-                        "Приглашай друзей и\nполучай премиальные!",
-                        textAlign = TextAlign.Center,
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        "Получай по 15 премиальных смн. за\nкаждого друга который установит\nприложение и совершит три\nпоездки.",
-                        textAlign = TextAlign.Center,
-                        color = Color.White,
-                        fontSize = 18.sp
-                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
                         .fillMaxHeight()
                         .padding(20.dp)
                 ) {
@@ -108,6 +83,7 @@ class PromocodScreen : Screen {
                         onValueChange = {
                             search.value = it
                         },
+                        placeholder = { Text(text = "Ввести промокод") },
                         trailingIcon = {
                             if (search.value.isNotEmpty())
                                 IconButton(
@@ -116,7 +92,7 @@ class PromocodScreen : Screen {
                                     },
                                 ) {
                                     Icon(
-                                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_share_blue),
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.arrow_right),
                                         contentDescription = "",
                                         tint = PrimaryColor,
                                         modifier = Modifier.size(28.dp)
@@ -140,7 +116,7 @@ class PromocodScreen : Screen {
                     Spacer(modifier = Modifier.height(30.dp))
                     CustomButton(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Поделиться: ${search.value}",
+                        text = "Поделиться: ${promocod }",
                         textSize = 18,
                         textBold = false
                     ) {
@@ -152,38 +128,5 @@ class PromocodScreen : Screen {
 
 
         }
-    }
-}
-
-@Composable
-fun GiftAnimation() {
-    val animatedValue = remember { Animatable(0f) }
-    val infiniteTransition = rememberInfiniteTransition()
-    val animationSpec = TweenSpec<Float>(durationMillis = 500)
-
-    LaunchedEffect(true) {
-        while (true) {
-            animatedValue.animateTo(
-                targetValue = 1f,
-                animationSpec = animationSpec
-            )
-            animatedValue.animateTo(
-                targetValue = 0f,
-                animationSpec = animationSpec
-            )
-        }
-    }
-
-    Box {
-        Image(
-            painter = painterResource(id = R.drawable.img_promo),
-            contentDescription = "Gift",
-            modifier = Modifier
-                .size(width = 450.dp, height = 350.dp)
-                .offset(
-                    x = animatedValue.value.dp,
-                    y = animatedValue.value.dp
-                )
-        )
     }
 }
