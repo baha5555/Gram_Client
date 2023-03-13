@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import com.gram.client.BuildConfig
 import com.gram.client.presentation.components.CustomTopBar
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants.KONFIG_URL
@@ -47,7 +48,7 @@ class AboutScreen() : Screen {
                     fontWeight = FontWeight.Bold,
                     lineHeight = 24.sp
                 )
-                Text(text = "версия 1.1", fontSize = 20.sp)
+                Text(text = "версия ${BuildConfig.VERSION_NAME}", fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(30.dp))
                 Text(
                     text = "Приложение предназначено для создания заказа автотранспорта, услуг и информирования заказчика о его исполнении.",
