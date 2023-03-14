@@ -63,8 +63,7 @@ class MainViewModel @Inject constructor(
     private val _stateCreateOrder = mutableStateOf(OrderResponseState())
     val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
-    val selectedTariff: MutableLiveData<TariffsResult>? =
-        MutableLiveData<TariffsResult>(TariffsResult(1, "Эконом", 12))
+    val selectedTariff: MutableLiveData<TariffsResult> = MutableLiveData<TariffsResult>(TariffsResult(1,"", 0))
 
     private var _selectedAllowances: MutableList<AllowanceRequest> =
         mutableListOf<AllowanceRequest>()
@@ -195,8 +194,10 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     try {
                         val tariffsResponse: TariffsResponse? = result.data
-                        _stateTariffs.value =
-                            TariffsResponseState(response = tariffsResponse?.result)
+                        _stateTariffs.value = TariffsResponseState(response = tariffsResponse?.result)
+                        selectedTariff.value= _stateTariffs.value.response?.get(0)?.let {
+                            TariffsResult(it.id, it.name, it.min_price )
+                        }
                         Log.e(
                             "TariffsResponse",
                             "TariffsResponseSuccess->\n ${_stateTariffs.value}"
