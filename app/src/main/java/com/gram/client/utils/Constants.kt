@@ -38,4 +38,5 @@ object Comments {
     const val RATING = "RATING"
     const val CANCEL = "CANCEL"
     const val DRIVER = "DRIVER"
+    const val TO_ANOTHER_HUMAN = "TO_ANOTHER_HUMAN"
 }

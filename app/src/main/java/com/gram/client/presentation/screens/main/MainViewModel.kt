@@ -200,6 +200,7 @@ class MainViewModel @Inject constructor(
                         selectedTariff.value= _stateTariffs.value.response?.get(0)?.let {
                             TariffsResult(it.id, it.name, it.min_price )
                         }
+                        getPrice()
                         Log.e(
                             "TariffsResponse",
                             "TariffsResponseSuccess->\n ${_stateTariffs.value}"
@@ -359,7 +360,7 @@ class MainViewModel @Inject constructor(
     }
     fun createOrder(orderExecutionViewModel: OrderExecutionViewModel) {
         createOrderUseCase.invoke(
-            dop_phone = if (_dopPhone.value != "") _dopPhone.value else null,
+            dop_phone = if (Values.CommentToAnotherHuman.value.length==12) Values.CommentToAnotherHuman.value else null,
             from_address = if (fromAddress.value.id != 0 && fromAddress.value.id!=-1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
             comment = if (Values.CommentDriver.value!= "") Values.CommentDriver.value else null,
@@ -389,6 +390,7 @@ class MainViewModel @Inject constructor(
                         _toAddresses.clear()
                         _fromAddress.value=Address()
                         Values.CommentDriver.value=""
+                        Values.CommentToAnotherHuman.value=""
                     } catch (e: Exception) {
                         Log.d("OrderResponse", "${e.message} Exception")
                     }

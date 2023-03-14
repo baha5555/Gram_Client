@@ -359,7 +359,7 @@ fun TariffsContent(
                     if (selected_tariff.value == null) return
                     if (it.tariff_id == selected_tariff.value!!.id) {
                         Text(
-                            text = if (address_to.isEmpty()) "от ${it.amount} c" else "${it.amount} c",
+                            text = "${it.amount} c",
                             fontSize = 25.sp
                         )
                     }
@@ -489,12 +489,9 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                    if (mainViewModel.dopPhone.value != "")
-                        mainViewModel.updateDopPhone("")
-                    else {
-                        stateOfDopInfoForDriver.value = "TO_ANOTHER_HUMAN"
-                        dopPhone()
-                    }
+                   bottomNavigator.show(CommentSheet("Кто поедет на такси?", Comments.TO_ANOTHER_HUMAN))
+                    //stateOfDopInfoForDriver.value = "TO_ANOTHER_HUMAN"
+                    //dopPhone()
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

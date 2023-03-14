@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,10 +43,31 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
         val focusRequester = remember { FocusRequester() }
         val keyboard = LocalSoftwareKeyboardController.current
         val text = remember {
-            when(withComment){
-                Comments.CANCEL->mutableStateOf(TextFieldValue(text = Values.CommentCancelReasons.value, selection = TextRange(Values.CommentCancelReasons.value.length)))
-                Comments.RATING -> mutableStateOf(TextFieldValue(text = Values.CommentRatingReasons.value, selection = TextRange(Values.CommentRatingReasons.value.length)))
-                else -> mutableStateOf(TextFieldValue(text = Values.CommentDriver.value, selection = TextRange(Values.CommentDriver.value.length)))
+            when (withComment) {
+                Comments.CANCEL -> mutableStateOf(
+                    TextFieldValue(
+                        text = Values.CommentCancelReasons.value,
+                        selection = TextRange(Values.CommentCancelReasons.value.length)
+                    )
+                )
+                Comments.RATING -> mutableStateOf(
+                    TextFieldValue(
+                        text = Values.CommentRatingReasons.value,
+                        selection = TextRange(Values.CommentRatingReasons.value.length)
+                    )
+                )
+                Comments.DRIVER -> mutableStateOf(
+                    TextFieldValue(
+                        text = Values.CommentDriver.value,
+                        selection = TextRange(Values.CommentDriver.value.length)
+                    )
+                )
+                else -> mutableStateOf(
+                    TextFieldValue(
+                        text = Values.CommentToAnotherHuman.value,
+                        selection = TextRange(Values.CommentToAnotherHuman.value.length)
+                    )
+                )
             }
         }
         val view = LocalView.current
@@ -61,11 +84,13 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
                 }
             }
         }
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.55f)
-            .bringIntoViewRequester(bringIntoViewRequester),
-        verticalArrangement = Arrangement.SpaceBetween) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.55f)
+                .bringIntoViewRequester(bringIntoViewRequester),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
             Column() {
                 Box(
                     modifier = Modifier
@@ -78,8 +103,14 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
                 }
                 TextField(
                     value = text.value,
-                    onValueChange = { text.value = it },
-                    label = { Text(text = label)},
+                    onValueChange = {
+                        if (withComment == Comments.TO_ANOTHER_HUMAN) {
+                            text.value = it
+                        } else {
+                            text.value = it
+                        }
+                    },
+                    label = { Text(text = label) },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = Color.Black,
                         disabledTextColor = Color.Transparent,
@@ -96,31 +127,35 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
                                 keyboard?.show()
                             }
                         },
-                )
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = if (withComment==Comments.TO_ANOTHER_HUMAN) KeyboardType.Number else KeyboardType.Text),                 )
             }
             Button(
                 onClick = {
                     if (keyboard != null) {
                         keyboard.hide()
                     }
-                    when(withComment){
-                        Comments.CANCEL->Values.CommentCancelReasons.value =text.value.text
-                        Comments.RATING -> Values.CommentRatingReasons.value =text.value.text
-                        else -> {
+                    when (withComment) {
+                        Comments.CANCEL -> Values.CommentCancelReasons.value = text.value.text
+                        Comments.RATING -> Values.CommentRatingReasons.value = text.value.text
+                        Comments.DRIVER -> {
                             Values.CommentDriver.value = text.value.text
+                            bottomNavigator.hide()
+                            return@Button
+                        }
+                        else -> {
+                            Values.CommentToAnotherHuman.value = text.value.text
                             bottomNavigator.hide()
                             return@Button
                         }
                     }
                     bottomNavigator.pop()
                 },
-                enabled = text.value.text != "",
+                enabled = if(withComment!=Comments.TO_ANOTHER_HUMAN) text.value.text != "" else text.value.text.length==12,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(57.dp)
                     .padding(horizontal = 15.dp)
-                    .offset(0.dp, -15.dp)
-                    ,
+                    .offset(0.dp, -15.dp),
                 shape = RoundedCornerShape(15.dp),
                 elevation = ButtonDefaults.elevation(0.dp)
             ) {
