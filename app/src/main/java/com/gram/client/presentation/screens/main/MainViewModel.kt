@@ -63,7 +63,9 @@ class MainViewModel @Inject constructor(
     private val _stateCreateOrder = mutableStateOf(OrderResponseState())
     val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
-    val selectedTariff: MutableLiveData<TariffsResult> = MutableLiveData<TariffsResult>(TariffsResult(1,"", 0))
+    val selectedTariff: MutableLiveData<TariffsResult> = MutableLiveData<TariffsResult>(
+        TariffsResult(1,"", 0)
+    )
 
     private var _selectedAllowances: MutableList<AllowanceRequest> =
         mutableListOf<AllowanceRequest>()
@@ -360,7 +362,7 @@ class MainViewModel @Inject constructor(
             dop_phone = if (_dopPhone.value != "") _dopPhone.value else null,
             from_address = if (fromAddress.value.id != 0 && fromAddress.value.id!=-1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
-            comment = if (_commentToOrder.value != "") _commentToOrder.value else null,
+            comment = if (Values.CommentDriver.value!= "") Values.CommentDriver.value else null,
             tariff_id = selectedTariff?.value?.id ?: 1,
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
@@ -386,6 +388,7 @@ class MainViewModel @Inject constructor(
                         _stateMeetingInfo.value=""
                         _toAddresses.clear()
                         _fromAddress.value=Address()
+                        Values.CommentDriver.value=""
                     } catch (e: Exception) {
                         Log.d("OrderResponse", "${e.message} Exception")
                     }

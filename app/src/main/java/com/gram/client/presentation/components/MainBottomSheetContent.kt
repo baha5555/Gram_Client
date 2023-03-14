@@ -39,6 +39,7 @@ import com.gram.client.presentation.screens.main.components.*
 import com.gram.client.presentation.screens.main.states.AllowancesResponseState
 import com.gram.client.presentation.screens.main.states.CalculateResponseState
 import com.gram.client.presentation.screens.main.states.TariffsResponseState
+import com.gram.client.utils.Comments
 import com.gram.client.utils.Constants.stateOfDopInfoForDriver
 import com.gram.client.utils.Values
 import currentFraction
@@ -451,14 +452,15 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
             )
             .padding(horizontal = 20.dp, vertical = 0.dp)
     ) {
-
+        val bottomNavigator = LocalBottomSheetNavigator.current
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                    stateOfDopInfoForDriver.value = "COMMENT_TO_ORDER"
-                    dopPhone()
+                      bottomNavigator.show(CommentSheet("Комментарий водителю", Comments.DRIVER))
+//                    stateOfDopInfoForDriver.value = "COMMENT_TO_ORDER"
+//                    dopPhone()
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

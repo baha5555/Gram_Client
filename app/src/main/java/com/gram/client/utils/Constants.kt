@@ -33,3 +33,9 @@ object PreferencesName {
     const val  CLIENT_REGISTER_ID="CLIENT_REGISTER_ID"
     const val FCM_TOKEN="FCM_TOKEN"
 }
+
+object Comments {
+    const val RATING = "RATING"
+    const val CANCEL = "CANCEL"
+    const val DRIVER = "DRIVER"
+}

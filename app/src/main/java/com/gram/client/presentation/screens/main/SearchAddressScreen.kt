@@ -168,9 +168,11 @@ class SearchAddressScreen : Screen {
                                     mainViewModel = mainViewModel
                                 )
                                 FromAddressField(fromAddress) {
-                                    bottomNavigator.show(SearchAddresses{
-                                        navigator.push(MapPointScreen())
-                                    })
+                                    bottomNavigator.show(
+                                        SearchAddresses{
+                                            navigator.push(MapPointScreen())
+                                        }
+                                    )
                                 }
                             }
                         }

@@ -33,15 +33,18 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.components.*
+import com.gram.client.presentation.components.voyager.CommentSheet
 import com.gram.client.presentation.screens.main.components.CustomDopInfoForDriver
 import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.profile.ProfileViewModel
+import com.gram.client.utils.Comments
 import com.gram.client.utils.Constants.SOON
 import com.gram.client.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
@@ -119,6 +122,7 @@ class MainScreen : Screen{
         val stateAllowances by mainViewModel.stateAllowances
 
         val stateCalculate by mainViewModel.stateCalculate
+
         ModalBottomSheetLayout(
             sheetState = modalSheetState,
             sheetContent = {
@@ -150,22 +154,23 @@ class MainScreen : Screen{
                         title = "Кто поедет на такси?",
                         stateTextField = true
                     )
-                else if(stateOfDopInfoForDriver.value == "COMMENT_TO_ORDER")
-                        CustomDopInfoForDriver(
-                            onClick = {
-                                hideKeyboard(activity = activity)
-                                mainViewModel.updateCommentToOrder(commentToOrderState)
-                                coroutineScope.launch {
-                                    modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
-                                }
-                            },
-                            textFieldValue = commentToOrderState,
-                            onValueChange = {
-                                mainViewModel.updateCommentToOrder(it)
-                            },
-                            placeholder = "Комментарий водителю",
-                            title = "Комментарий водителю"
-                        )
+                else if(stateOfDopInfoForDriver.value == "COMMENT_TO_ORDER") {
+//                    CustomDopInfoForDriver(
+//                        onClick = {
+//                            hideKeyboard(activity = activity)
+//                            mainViewModel.updateCommentToOrder(commentToOrderState)
+//                            coroutineScope.launch {
+//                                modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+//                            }
+//                        },
+//                        textFieldValue = commentToOrderState,
+//                        onValueChange = {
+//                            mainViewModel.updateCommentToOrder(it)
+//                        },
+//                        placeholder = "Комментарий водителю",
+//                        title = "Комментарий водителю"
+//                    )
+                }
                 else if(stateOfDopInfoForDriver.value == "PLAN_TRIP"){
                     CustomDopInfoForDriver(
                         onClick = {

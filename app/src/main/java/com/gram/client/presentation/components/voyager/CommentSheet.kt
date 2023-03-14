@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
+import com.gram.client.utils.Comments
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
 
@@ -41,8 +42,9 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
         val keyboard = LocalSoftwareKeyboardController.current
         val text = remember {
             when(withComment){
-                "cancel"->mutableStateOf(TextFieldValue(text = Values.CommentCancelReasons.value, selection = TextRange(Values.CommentCancelReasons.value.length)))
-                else -> mutableStateOf(TextFieldValue(text = Values.CommentRatingReasons.value, selection = TextRange(Values.CommentRatingReasons.value.length)))
+                Comments.CANCEL->mutableStateOf(TextFieldValue(text = Values.CommentCancelReasons.value, selection = TextRange(Values.CommentCancelReasons.value.length)))
+                Comments.RATING -> mutableStateOf(TextFieldValue(text = Values.CommentRatingReasons.value, selection = TextRange(Values.CommentRatingReasons.value.length)))
+                else -> mutableStateOf(TextFieldValue(text = Values.CommentDriver.value, selection = TextRange(Values.CommentDriver.value.length)))
             }
         }
         val view = LocalView.current
@@ -52,7 +54,12 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
                 scope.launch { bringIntoViewRequester.bringIntoView() }
             }
             view.viewTreeObserver.addOnGlobalLayoutListener(listener)
-            onDispose { view.viewTreeObserver.removeOnGlobalLayoutListener(listener) }
+            onDispose {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+                if (keyboard != null) {
+                    keyboard.hide()
+                }
+            }
         }
         Column(modifier = Modifier
             .fillMaxWidth()
@@ -93,9 +100,17 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
             }
             Button(
                 onClick = {
+                    if (keyboard != null) {
+                        keyboard.hide()
+                    }
                     when(withComment){
-                        "cancel"->Values.CommentCancelReasons.value =text.value.text
-                        else -> Values.CommentRatingReasons.value =text.value.text
+                        Comments.CANCEL->Values.CommentCancelReasons.value =text.value.text
+                        Comments.RATING -> Values.CommentRatingReasons.value =text.value.text
+                        else -> {
+                            Values.CommentDriver.value = text.value.text
+                            bottomNavigator.hide()
+                            return@Button
+                        }
                     }
                     bottomNavigator.pop()
                 },

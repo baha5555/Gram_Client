@@ -36,6 +36,7 @@ import com.gram.client.utils.Values
 fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
     val mainViewModel: MainViewModel = hiltViewModel()
     val statePoint = mainViewModel.stateAddressPoint.value
+    val addressName =mainViewModel.fromAddress.value.address
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,7 +53,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                     Values.WhichAddress.value = Constants.FROM_ADDRESS
                 }
                 .background(
-                    Color.Black,
+                    if(addressName=="")Color.Black else Color(0xFF00ACC1),
                     shape = RoundedCornerShape(percent = 50)
                 )
                 .padding(horizontal = 15.dp),

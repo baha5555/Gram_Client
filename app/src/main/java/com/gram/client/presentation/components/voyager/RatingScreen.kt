@@ -26,6 +26,7 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.R
 import com.gram.client.presentation.components.CustomCheckBox
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
+import com.gram.client.utils.Comments
 import com.gram.client.utils.Values
 
 class RatingScreen(
@@ -110,7 +111,7 @@ class RatingScreen(
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFF7F7F7))
                     .clickable {
-                        bottomNavigator.push(CommentSheet("Ваш коментарий...", "rating"))
+                        bottomNavigator.push(CommentSheet("Ваш коментарий...", Comments.RATING))
                     },
                 contentAlignment = Alignment.CenterStart
             ) {

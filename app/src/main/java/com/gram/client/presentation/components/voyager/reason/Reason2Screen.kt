@@ -21,6 +21,7 @@ import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.CustomCheckBox
 import com.gram.client.presentation.components.voyager.CommentSheet
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
+import com.gram.client.utils.Comments
 import com.gram.client.utils.Values
 
 class Reason2Screen(
@@ -66,7 +67,7 @@ class Reason2Screen(
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFF7F7F7))
                     .clickable {
-                        bottomNavigator.push(CommentSheet("Ваш коментарий...", "cancel"))
+                        bottomNavigator.push(CommentSheet("Ваш коментарий...", Comments.CANCEL))
                     },
                 contentAlignment = Alignment.CenterStart
             ) {
