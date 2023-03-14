@@ -2,19 +2,14 @@ package com.gram.client.presentation.screens.promocod
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gram.client.domain.mainScreen.TariffsResponse
-import com.gram.client.domain.profile.*
 import com.gram.client.domain.promocod.GetPromocodResponse
 import com.gram.client.domain.promocod.GetPromocodResponseState
 import com.gram.client.domain.promocod.GetPromocodUseCase
 import com.gram.client.domain.promocod.Promocod
-import com.gram.client.presentation.screens.main.states.TariffsResponseState
 import com.gram.client.utils.Resource
-import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,11 +24,11 @@ class PromocodViewModel @Inject constructor(
 
 
     fun getPromocod() {
-        getPromocodUseCase.invoke().onEach { result: Resource<GetPromocodResponse> ->
+        getPromocodUseCase.invoke().onEach { result: Resource<Promocod> ->
             when (result) {
                 is Resource.Success -> {
                     try {
-                        val promocodResponse: GetPromocodResponse? = result.data
+                        val promocodResponse: Promocod? = result.data
                         _statepromocod.value =
                             GetPromocodResponseState(response = promocodResponse?.result)
                         Log.e(

@@ -21,6 +21,7 @@ import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.GetPromocodResponse
+import com.gram.client.domain.promocod.Promocod
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -50,7 +51,7 @@ interface ApplicationApi {
     suspend fun getProfileInfo(@Header("Authorization") token: String): GetProfileInfoResponse
 
     @GET("/api/edit")
-    suspend fun getPromocod(@Header("Authorization") token: String): GetPromocodResponse
+    suspend fun getPromocod(@Header("Authorization") token: String): Promocod
 
     @GET("/api/orders")
     suspend fun getOrderHistory(@Header("Authorization") token: String): OrderHistoryPagingResult

@@ -1,5 +1,6 @@
 package com.gram.client.presentation.screens.promocod
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -18,9 +19,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
-import com.gram.client.domain.promocod.GetPromocodResponseState
 import com.gram.client.presentation.components.CustomButton
-import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.ui.theme.PrimaryColor
 
 class PromocodScreen : Screen {
@@ -28,8 +27,12 @@ class PromocodScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val promocodViewModel: PromocodViewModel = hiltViewModel()
-        val promocod = promocodViewModel.statepromocod.value.response?.promo_code
-
+        LaunchedEffect(key1 = true)
+        {
+            promocodViewModel.getPromocod()
+        }
+        val promocod = promocodViewModel.statepromocod.value.response
+        Log.e(promocod.toString(), "${promocod?.promo_code}")
         Scaffold(
             topBar = {
                 Row(
@@ -78,7 +81,7 @@ class PromocodScreen : Screen {
                         mutableStateOf("Y045KG")
                     }
                     TextField(
-                        enabled = false,
+                        enabled = true,
                         value = search.value,
                         onValueChange = {
                             search.value = it
@@ -114,9 +117,10 @@ class PromocodScreen : Screen {
                         ),
                     )
                     Spacer(modifier = Modifier.height(30.dp))
+
                     CustomButton(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Поделиться: ${promocod }",
+                        text = "Поделиться: ${promocod?.promo_code}",
                         textSize = 18,
                         textBold = false
                     ) {

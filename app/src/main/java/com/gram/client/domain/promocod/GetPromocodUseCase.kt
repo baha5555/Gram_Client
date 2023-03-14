@@ -13,22 +13,22 @@ class GetPromocodUseCase @Inject constructor(
     private val repository: AppRepository
 ) {
 
-    operator fun invoke(): Flow<Resource<GetPromocodResponse>> =
+    operator fun invoke(): Flow<Resource<Promocod>> =
         flow{
             try {
-                emit(Resource.Loading<GetPromocodResponse>())
-                val response: GetPromocodResponse = repository.getPromocod()
-                emit(Resource.Success<GetPromocodResponse>(response))
+                emit(Resource.Loading<Promocod>())
+                val response: Promocod = repository.getPromocod()
+                emit(Resource.Success<Promocod>(response))
             }catch (e: HttpException) {
                 emit(
-                    Resource.Error<GetPromocodResponse>(
+                    Resource.Error<Promocod>(
                         e.localizedMessage ?: "Произошла непредвиденная ошибка"
                     )
                 )
             } catch (e: IOException) {
-                emit(Resource.Error<GetPromocodResponse>("Не удалось связаться с сервером. Проверьте подключение к Интернету."))
+                emit(Resource.Error<Promocod>("Не удалось связаться с сервером. Проверьте подключение к Интернету."))
             } catch (e: Exception) {
-                emit(Resource.Error<GetPromocodResponse>("${e.message}"))
+                emit(Resource.Error<Promocod>("${e.message}"))
             }
         }
 }

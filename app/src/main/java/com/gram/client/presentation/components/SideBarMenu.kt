@@ -31,6 +31,7 @@ import com.gram.client.presentation.screens.drawer.AboutScreen
 import com.gram.client.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.profile.ProfileScreen
+import com.gram.client.presentation.screens.promocod.PromocodScreen
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
@@ -165,7 +166,7 @@ fun ShowItems(
                         else navigator.push(OrdersHistoryScreen())
                     }
                     "Промокоды" -> {
-                        devToast(context)
+                        navigator.push(PromocodScreen())
                     }
                     "Позвонить оператору" -> {
                         val callIntent: Intent = Uri

@@ -1,6 +1,6 @@
 package com.gram.client.domain.promocod
 
-data class Message(
+data class Result(
     val id: Int,
     val promo_code: String
 )

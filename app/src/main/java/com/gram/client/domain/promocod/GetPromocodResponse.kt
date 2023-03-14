@@ -4,6 +4,6 @@ package com.gram.client.domain.promocod
     val code: Int,
     val error: List<Any>,
     val message: String,
-    val result: Message,
+    val result: Result,
     val success: Boolean
 )
