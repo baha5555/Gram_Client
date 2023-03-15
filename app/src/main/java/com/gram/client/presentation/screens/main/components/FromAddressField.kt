@@ -53,7 +53,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                     Values.WhichAddress.value = Constants.FROM_ADDRESS
                 }
                 .background(
-                    if(addressName=="")Color.Black else Color(0xFF00ACC1),
+                    if(addressName=="")Color.Black else Color(0xAE4CAF50),
                     shape = RoundedCornerShape(percent = 50)
                 )
                 .padding(horizontal = 15.dp),

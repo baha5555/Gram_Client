@@ -20,7 +20,10 @@ object Values {
     val CommentCancelReasons = mutableStateOf("")
     val CommentRatingReasons = mutableStateOf("")
     val CommentDriver = mutableStateOf("")
+    val CommentToAnotherHuman = mutableStateOf("992")
 
     val WhichAddress = mutableStateOf("")
+
+    val AdjustResize = mutableStateOf(false)
 
 }
