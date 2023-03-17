@@ -30,7 +30,7 @@ class ShareScreen : Screen {
         val promocodViewModel: PromocodViewModel = hiltViewModel()
         LaunchedEffect(key1 = true)
         {
-            promocodViewModel.getPromocod()
+            promocodViewModel.getPromoCode()
         }
         val promocod = promocodViewModel.statepromocod.value.response
         val launcher =

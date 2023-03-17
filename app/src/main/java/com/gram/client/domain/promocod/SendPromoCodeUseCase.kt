@@ -8,15 +8,13 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class GetPromocodUseCase @Inject constructor(
-    private val repository: AppRepository
-) {
 
-    operator fun invoke(): Flow<Resource<PromoCode>> =
+class SendPromoCodeUseCase @Inject constructor(private val repository: AppRepository) {
+    operator fun invoke(promocod: String?): Flow<Resource<PromoCode>> =
         flow{
             try {
                 emit(Resource.Loading<PromoCode>())
-                val response: PromoCode = repository.getPromocod()
+                val response: PromoCode = repository.sendPromoCode(promocod)
                 emit(Resource.Success<PromoCode>(response))
             }catch (e: HttpException) {
                 emit(

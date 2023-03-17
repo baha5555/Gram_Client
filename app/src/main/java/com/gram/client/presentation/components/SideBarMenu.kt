@@ -29,6 +29,7 @@ import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.screens.authorization.AuthScreen
 import com.gram.client.presentation.screens.drawer.AboutScreen
 import com.gram.client.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
+import com.gram.client.presentation.screens.drawer.setting_screens.SettingScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.profile.ProfileScreen
 import com.gram.client.presentation.screens.promocod.PromocodScreen
@@ -154,6 +155,7 @@ fun ShowItems(
                 when (text) {
                     "Параметры" -> {
                         devToast(context)
+                        navigator.push(SettingScreen())
                     }
                     "Мои адреса" -> devToast(context)
                     /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
@@ -169,11 +171,9 @@ fun ShowItems(
                     }
                     "Промокоды" -> {
                         devToast(context)
-/*
-if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
+                        if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
                         else navigator.push(PromocodScreen())
                         navigator.push(PromocodScreen())
-*/
                     }
                     "Позвонить оператору" -> {
                         val callIntent: Intent = Uri
