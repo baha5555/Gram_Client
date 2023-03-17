@@ -6,15 +6,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gram.client.domain.mainScreen.TariffsResponse
-import com.gram.client.domain.profile.*
-import com.gram.client.domain.promocod.GetPromocodResponse
-import com.gram.client.domain.promocod.GetPromocodResponseState
-import com.gram.client.domain.promocod.GetPromocodUseCase
-import com.gram.client.domain.promocod.Promocod
-import com.gram.client.presentation.screens.main.states.TariffsResponseState
+import com.gram.client.domain.promocod.*
 import com.gram.client.utils.Resource
-import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -22,18 +15,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PromocodViewModel @Inject constructor(
-    private val getPromocodUseCase: GetPromocodUseCase
+    private val getPromoCodeUseCase: GetPromocodUseCase,
+    private val sendPromoCodeUseCase: SendPromoCodeUseCase
 ) : ViewModel() {
     private val _statepromocod = mutableStateOf(GetPromocodResponseState())
     val statepromocod: MutableState<GetPromocodResponseState> = _statepromocod
 
+    private val _stateSendPromoCode = mutableStateOf(GetPromocodResponseState())
+    val stateSendPromocod: State<GetPromocodResponseState> = _stateSendPromoCode
 
-    fun getPromocod() {
-        getPromocodUseCase.invoke().onEach { result: Resource<GetPromocodResponse> ->
+
+    fun getPromoCode() {
+        getPromoCodeUseCase.invoke().onEach { result: Resource<PromoCode> ->
             when (result) {
                 is Resource.Success -> {
                     try {
-                        val promocodResponse: GetPromocodResponse? = result.data
+                        val promocodResponse: PromoCode? = result.data
                         _statepromocod.value =
                             GetPromocodResponseState(response = promocodResponse?.result)
                         Log.e(
@@ -52,6 +49,35 @@ class PromocodViewModel @Inject constructor(
                 }
                 is Resource.Loading -> {
                     _statepromocod.value = GetPromocodResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun sendPromoCode(promoCode: String) {
+         sendPromoCodeUseCase.invoke(if(promoCode=="") null else promoCode).onEach { result: Resource<PromoCode> ->
+            when (result) {
+                is Resource.Success -> {
+                    try {
+                        val sendPromoCodeResponse: PromoCode? = result.data
+                        _stateSendPromoCode.value =
+                            GetPromocodResponseState(response = sendPromoCodeResponse?.result)
+                        Log.e(
+                            "sendPromocodResponse",
+                            "sendPromocodResponseSuccess->\n ${_stateSendPromoCode.value}"
+                        )
+                    } catch (e: Exception) {
+                        Log.d("sendPromocodResponse", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("sendPromocodResponse", "sendPromocodResponseError->\n ${result.message}")
+                    _stateSendPromoCode.value = GetPromocodResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateSendPromoCode.value = GetPromocodResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)
