@@ -2,15 +2,20 @@ package com.gram.client.presentation.screens.promocod
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -34,23 +39,27 @@ class SendPromoCodeScreen() : Screen {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp)
+
         ) {
             Text(
                 "Промокод",
-                fontSize = 28.sp,
-                modifier = Modifier.padding(vertical = 10.dp),
+                fontSize = 20.sp,
+                modifier = Modifier.align(CenterHorizontally).padding(20.dp),
                 fontWeight = FontWeight.Medium
             )
+            Divider(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color(0xFF97ADB6)))
             TextField(
-                value = sendPromocod.value, onValueChange = { sendPromocod.value = it },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp),
+                value = sendPromocod.value,
+                onValueChange = { sendPromocod.value = it },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent
                 ),
                 placeholder = {
                     Text(
-                        "Напишите сообщение",
+                        text = "Напишите сообщение",
                         fontSize = 20.sp,
+                        color = Color.Gray,
                     )
                 }
             )
@@ -78,7 +87,7 @@ class SendPromoCodeScreen() : Screen {
                     )
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().padding(8.dp)
                     .height(57.dp),
                 shape = RoundedCornerShape(15.dp),
                 elevation = ButtonDefaults.elevation(0.dp)

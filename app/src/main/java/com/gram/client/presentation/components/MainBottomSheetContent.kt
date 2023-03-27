@@ -188,7 +188,7 @@ fun AddressesContent(
         Row(
             modifier = Modifier
                 .clickable {
-                    bottomNavigator.show(SearchAddresses{
+                    bottomNavigator.show(SearchAddresses {
                         navigator.push(MapPointScreen())
                     })
                     Values.WhichAddress.value = Constants.FROM_ADDRESS
@@ -248,12 +248,12 @@ fun AddressesContent(
                 .clickable {
                     if (toAddresses.size <= 1) {
                         Values.WhichAddress.value = Constants.TO_ADDRESS
-                        bottomNavigator.show(SearchAddresses{
+                        bottomNavigator.show(SearchAddresses {
                             navigator.push(MapPointScreen())
                         })
                     } else {
                         Values.WhichAddress.value = Constants.ADD_TO_ADDRESS
-                        bottomNavigator.show(AddStopScreen{
+                        bottomNavigator.show(AddStopScreen {
                             navigator.push(MapPointScreen())
                         })
                     }
@@ -298,14 +298,17 @@ fun AddressesContent(
                     }
                 }
             }
-            Icon(imageVector = Icons.Default.Add, "", modifier = Modifier
-                .size(35.dp)
-                .clickable {
-                    bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS){
-                        navigator.push(MapPointScreen())
-                        Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
+            if (toAddresses.size != 0) {
+                Icon(imageVector = Icons.Default.Add, "", modifier = Modifier
+                    .size(35.dp)
+                    .clickable {
+                        bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS) {
+                            navigator.push(MapPointScreen())
+                            Values.WhichAddress.value = Constants.ADD_TO_ADDRESS
+                        })
                     })
-                })
+            }
+
 
         }
         Column(
@@ -458,7 +461,7 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                      bottomNavigator.show(CommentSheet("Комментарий водителю", Comments.DRIVER))
+                    bottomNavigator.show(CommentSheet("Комментарий водителю", Comments.DRIVER))
 //                    stateOfDopInfoForDriver.value = "COMMENT_TO_ORDER"
 //                    dopPhone()
                 },
@@ -489,7 +492,12 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                   bottomNavigator.show(CommentSheet("Кто поедет на такси?", Comments.TO_ANOTHER_HUMAN))
+                    bottomNavigator.show(
+                        CommentSheet(
+                            "Кто поедет на такси?",
+                            Comments.TO_ANOTHER_HUMAN
+                        )
+                    )
                     //stateOfDopInfoForDriver.value = "TO_ANOTHER_HUMAN"
                     //dopPhone()
                 },
