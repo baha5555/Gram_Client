@@ -28,8 +28,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -106,6 +108,8 @@ fun CustomMainMapHistory(
     }
 
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    var textfieldSize by remember { mutableStateOf(Size.Zero) }
+
     DisposableEffect(lifecycleOwner) {
         if (currentRoute == OrderExecutionScreen().key) {
             Log.i("showRoad", "run")
@@ -223,7 +227,7 @@ fun CustomMainMapHistory(
             Column(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
+                    .width(with(LocalDensity.current) { textfieldSize.width.toDp() })
                     .background(Color.White)
                     .padding(20.dp)
             ) {
