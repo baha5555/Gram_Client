@@ -20,7 +20,7 @@ import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
 import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileResponse
-import com.gram.client.domain.promocod.GetPromocodResponse
+import com.gram.client.domain.promocod.PromoCode
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -50,7 +50,9 @@ interface ApplicationApi {
     suspend fun getProfileInfo(@Header("Authorization") token: String): GetProfileInfoResponse
 
     @GET("/api/edit")
-    suspend fun getPromocod(@Header("Authorization") token: String): GetPromocodResponse
+    suspend fun getPromocod(@Header("Authorization") token: String): PromoCode
+
+
 
     @GET("/api/orders")
     suspend fun getOrderHistory(@Header("Authorization") token: String): OrderHistoryPagingResult
@@ -90,8 +92,15 @@ interface ApplicationApi {
     @FormUrlEncoded
     @POST("/api/mob-app/orders/search-addresses")
     suspend fun searchAddress(
-        @Field("search") addressName: String?,
+        @Field("search") promocod: String?,
     ): SearchAddressResponse
+
+    @FormUrlEncoded
+    @POST("/api/active-promocode")
+    suspend fun sendPromoCode(
+        @Header("Authorization") token: String,
+        @Field("promocode") promocode: String?,
+    ): PromoCode
 
     @FormUrlEncoded
     @POST("/api/orders")

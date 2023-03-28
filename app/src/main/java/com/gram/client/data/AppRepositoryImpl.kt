@@ -23,7 +23,7 @@ import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
 import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileResponse
-import com.gram.client.domain.promocod.GetPromocodResponse
+import com.gram.client.domain.promocod.PromoCode
 import com.gram.client.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -46,7 +46,7 @@ class AppRepositoryImpl(
     override suspend fun getProfileInfo(): GetProfileInfoResponse =
         api.getProfileInfo(prefs.getAccessToken())
 
-    override suspend fun getPromocod(): GetPromocodResponse =
+    override suspend fun getPromocod(): PromoCode =
         api.getPromocod(prefs.getAccessToken())
 
     override suspend fun getOrderHistory(): OrderHistoryPagingResult =
@@ -80,6 +80,9 @@ class AppRepositoryImpl(
 
     override suspend fun searchAddress(addressName: String?): SearchAddressResponse =
         api.searchAddress(addressName)
+
+    override suspend fun sendPromoCode(promocod: String?): PromoCode =
+        api.sendPromoCode(prefs.getAccessToken(),promocod)
 
     override suspend fun createOrder(
         dop_phone: String?,

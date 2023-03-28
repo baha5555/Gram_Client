@@ -44,7 +44,6 @@ fun GramClientTheme(darkTheme: Boolean = false, content: @Composable () -> Unit)
 
     MaterialTheme(
         colors = colors,
-        typography = Typography,
         shapes = Shapes,
         content = content
     )

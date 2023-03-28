@@ -29,8 +29,10 @@ import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.screens.authorization.AuthScreen
 import com.gram.client.presentation.screens.drawer.AboutScreen
 import com.gram.client.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
+import com.gram.client.presentation.screens.drawer.setting_screens.SettingScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.profile.ProfileScreen
+import com.gram.client.presentation.screens.promocod.PromocodScreen
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
@@ -78,21 +80,19 @@ fun SideBarMenu() {
                             else navigator.push(ProfileScreen())
                         }
                     },
-                    text =if(Values.FirstName.value!="" && Values.LastName.value!="" && Values.FirstName.value!=null && Values.LastName.value!=null) Values.FirstName.value+" "+Values.LastName.value else "Выбрать Имя...",
-                fontSize = 22.sp,
+                    text = if (Values.FirstName.value != "" && Values.LastName.value != "" && Values.FirstName.value != null && Values.LastName.value != null) Values.FirstName.value + " " + Values.LastName.value else "Выбрать Имя...",
+                    fontSize = 22.sp,
                     color = Color.White
                 )
                 Text(
                     modifier = Modifier.clickable {
-                        if (prefs.getAccessToken() == "")
-                        {
-                            if(currentScreen==SearchAddressScreen().key)
+                        if (prefs.getAccessToken() == "") {
+                            if (currentScreen == SearchAddressScreen().key)
                                 Constants.IDENTIFY_TO_SCREEN = "SearchAddressScreen"
                             navigator.plusAssign(AuthScreen())
-                        }
-                        else navigator.push(ProfileScreen())
+                        } else navigator.push(ProfileScreen())
                     },
-                    text = if (Values.Email.value!="") Values.Email.value else "Выбрать Почту...",
+                    text = if (Values.Email.value != "") Values.Email.value else "Выбрать Почту...",
                     fontSize = 18.sp,
                     color = Color.White
                 )
@@ -153,19 +153,27 @@ fun ShowItems(
             .fillMaxWidth()
             .clickable {
                 when (text) {
-                    "Параметры" -> { devToast(context) }
+                    "Параметры" -> {
+                        devToast(context)
+                        navigator.push(SettingScreen())
+                    }
                     "Мои адреса" -> devToast(context)
                     /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
                     "Поддержка" -> devToast(context)
                     /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
                     "О приложении" -> navigator.push(AboutScreen())
-                    "Выход" -> { isDialogOpen.value = true }
+                    "Выход" -> {
+                        isDialogOpen.value = true
+                    }
                     "История заказов" -> {
                         if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
                         else navigator.push(OrdersHistoryScreen())
                     }
                     "Промокоды" -> {
                         devToast(context)
+                        if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
+                        else navigator.push(PromocodScreen())
+                        navigator.push(PromocodScreen())
                     }
                     "Позвонить оператору" -> {
                         val callIntent: Intent = Uri
@@ -192,7 +200,7 @@ fun ShowItems(
 
 }
 
-fun devToast(context: Context){
+fun devToast(context: Context) {
     Toast
         .makeText(
             context,

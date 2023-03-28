@@ -20,7 +20,7 @@ import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
 import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileResponse
-import com.gram.client.domain.promocod.GetPromocodResponse
+import com.gram.client.domain.promocod.PromoCode
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -36,7 +36,7 @@ interface AppRepository {
     suspend fun getTariffs(): TariffsResponse
     suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse
     suspend fun getProfileInfo(): GetProfileInfoResponse
-    suspend fun getPromocod(): GetPromocodResponse
+    suspend fun getPromocod(): PromoCode
     suspend fun getOrderHistory(): OrderHistoryPagingResult
     suspend fun getOrderHistoryResponse(page:Int): OrderHistoryPagingResult
     suspend fun connectClientWithDriver(order_id: String): connectClientWithDriverResponse
@@ -50,6 +50,7 @@ interface AppRepository {
     suspend fun getAddressByPoint(lng: Double, lat: Double): AddressByPointResponse
     suspend fun sendRating(order_id: Int, add_rating: Int,rating_reason:String?): AddRatingResponse
     suspend fun searchAddress(addressName: String?): SearchAddressResponse
+    suspend fun sendPromoCode(promocod: String?): PromoCode
     suspend fun createOrder(
         dop_phone: String?,
         from_address: Int?,
