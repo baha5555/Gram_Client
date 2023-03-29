@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -85,12 +86,13 @@ class ShareScreen : Screen {
                 Box(modifier = Modifier.fillMaxSize(),contentAlignment = Alignment.BottomCenter) {
                     Button(modifier = Modifier
                         .fillMaxWidth(0.9f)
+                        .height(69.dp)
                         .padding(bottom = 15.dp),onClick = {
                         val text =
                             "Воспользуйтесь моим щедрым подарком и получите 70 премиальных смн на поездки в такси.Просто скачай приложение «Gram» и введи промокод\"${promocod?.promo_code}\""
                         shareText(text = text, launcher = launcher)
                     }, shape = RoundedCornerShape(30)) {
-                        Text("Поделиться: ${promocod?.promo_code}")
+                        Text("Поделиться: ${promocod?.promo_code}", fontSize = 16.sp, fontWeight = FontWeight.Medium)
                     }
                 }
             }

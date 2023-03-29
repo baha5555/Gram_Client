@@ -155,7 +155,9 @@ fun ShowItems(
                 when (text) {
                     "Параметры" -> {
                         devToast(context)
+/*
                         navigator.push(SettingScreen())
+*/
                     }
                     "Мои адреса" -> devToast(context)
                     /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
@@ -171,9 +173,8 @@ fun ShowItems(
                     }
                     "Промокоды" -> {
                         devToast(context)
-                        if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
-                        else navigator.push(PromocodScreen())
-                        navigator.push(PromocodScreen())
+                       /* if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
+                        else navigator.push(PromocodScreen())*/
                     }
                     "Позвонить оператору" -> {
                         val callIntent: Intent = Uri
