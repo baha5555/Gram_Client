@@ -200,9 +200,8 @@ fun AddressesContent(
         ) {
             Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.from_marker),
+                    modifier = Modifier,
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_serach_address_from),
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
@@ -270,9 +269,8 @@ fun AddressesContent(
                     .fillMaxWidth(0.8f)
             ) {
                 Image(
-                    modifier = Modifier
-                        .size(20.dp),
-                    imageVector = if (MaterialTheme.colors.isLight) ImageVector.vectorResource(R.drawable.to_marker)
+                    modifier = Modifier,
+                    imageVector = if (MaterialTheme.colors.isLight) ImageVector.vectorResource(R.drawable.ic_serach_address_to)
                     else ImageVector.vectorResource(R.drawable.to_marker_dark),
                     contentDescription = "Logo"
                 )

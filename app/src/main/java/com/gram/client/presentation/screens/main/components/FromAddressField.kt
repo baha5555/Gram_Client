@@ -36,11 +36,18 @@ import com.gram.client.utils.Values
 fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
     val mainViewModel: MainViewModel = hiltViewModel()
     val statePoint = mainViewModel.stateAddressPoint.value
-    val addressName =mainViewModel.fromAddress.value.address
+    val addressName = mainViewModel.fromAddress.value.address
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 22.dp),
+        modifier = if (statePoint.isLoading) {
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 22.dp)
+                .shimmer()
+        } else {
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 22.dp)
+        },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
@@ -53,7 +60,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                     Values.WhichAddress.value = Constants.FROM_ADDRESS
                 }
                 .background(
-                    if(addressName=="")Color.Black else Color(0xAE4CAF50),
+                    if(statePoint.isLoading || addressName == "") Color.Black else Color(0xAE4CAF50),
                     shape = RoundedCornerShape(percent = 50)
                 )
                 .padding(horizontal = 15.dp),
@@ -70,22 +77,22 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                     tint = Color.White
                 )
             }
-            if (statePoint.isLoading) {
-                Box(modifier = Modifier.shimmer()){
-                    Box(modifier = Modifier.size(100.dp, 15.dp).background(Color(0xFFD8D8D8)))
-                }
+            if(statePoint.isLoading){
+                Text(
+                    text = "Поиск", color = Color.Gray, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
+                )
+            }
+            else if (fromAddress.address == "") {
+                Text(
+                    text = "Откуда?", color = Color.Gray, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
+                )
             } else {
-                if (fromAddress.address == "") {
-                    Text(
-                        text = "Откуда?", color = Color.Gray, fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
-                    )
-                } else {
-                    Text(
-                        text = fromAddress.address ?: "", color = Color.White, fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
-                    )
-                }
+                Text(
+                    text = fromAddress.address ?: "", color = Color.White, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }
