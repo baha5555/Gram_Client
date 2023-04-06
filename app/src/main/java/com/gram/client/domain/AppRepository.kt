@@ -15,7 +15,7 @@ import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectCl
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
-import com.gram.client.domain.orderExecutionScreen.reason.GetReasonsResponse
+import com.gram.client.domain.orderExecutionScreen.reason.Reasons
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
 import com.gram.client.domain.profile.GetProfileInfoResponse
@@ -91,7 +91,7 @@ interface AppRepository {
 
     suspend fun getFastAddresses(): FastAddressesResponse
 
-    suspend fun getReasons(): GetReasonsResponse
+    suspend fun getReasons(): Reasons
 
     suspend fun getRatingReasons(): GetRatingReasonsResponse
 

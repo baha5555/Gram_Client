@@ -10,11 +10,11 @@ import javax.inject.Inject
 
 class GetReasonsUseCase @Inject constructor(private val repository: AppRepository) {
 
-    operator fun invoke(): Flow<Resource<GetReasonsResponse>> =
+    operator fun invoke(): Flow<Resource<Reasons>> =
         flow{
             try {
                 emit(Resource.Loading())
-                val response: GetReasonsResponse = repository.getReasons()
+                val response: Reasons = repository.getReasons()
                 emit(Resource.Success(response))
             }catch (e: HttpException) {
                 emit(

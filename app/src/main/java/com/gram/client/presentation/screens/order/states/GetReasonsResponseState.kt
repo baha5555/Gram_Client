@@ -1,9 +1,9 @@
 package com.gram.client.presentation.screens.order.states
 
-import com.gram.client.domain.orderExecutionScreen.reason.GetReasonsResponse
+import com.gram.client.domain.orderExecutionScreen.reason.Reasons
 
 data class GetReasonsResponseState(
     val isLoading: Boolean = false,
-    var response: GetReasonsResponse? = null,
+    var response: Reasons? = null,
     val error: String = ""
 )
