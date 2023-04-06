@@ -45,7 +45,7 @@ class Reason2Screen(
                 modifier = Modifier.padding(vertical = 10.dp),
                 fontWeight = FontWeight.Medium
             )
-            stateReasonsResponse?.forEach {
+            stateReasonsResponse?.result?.forEach {
                 Row(verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier

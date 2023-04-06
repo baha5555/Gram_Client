@@ -202,7 +202,7 @@ class OrderExecutionScreen : Screen {
                             Column(modifier = Modifier.background(Color.White)) {
                                 Text(text = "Подтверждение")
                                 Column() {
-                                    stateReasonsResponse?.forEach {
+                                    stateReasonsResponse?.result?.forEach {
                                         Row(verticalAlignment = Alignment.CenterVertically,
                                             modifier = Modifier
                                                 .fillMaxWidth()

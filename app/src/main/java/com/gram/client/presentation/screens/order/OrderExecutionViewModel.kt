@@ -20,8 +20,6 @@ import com.gram.client.domain.firebase.GetClientOrderUseCase
 import com.gram.client.domain.firebase.GetOrdersUseCase
 import com.gram.client.domain.firebase.profile.Client
 import com.gram.client.domain.mainScreen.*
-import com.gram.client.domain.orderExecutionScreen.reason.GetReasonsResponse
-import com.gram.client.domain.orderExecutionScreen.reason.GetReasonsUseCase
 import com.gram.client.presentation.screens.main.states.AddressByPointResponseState
 import com.gram.client.presentation.screens.order.states.GetClientOrderState
 import com.gram.client.presentation.screens.order.states.GetOrdersState
@@ -38,8 +36,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
-import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsUseCase
+import com.gram.client.domain.orderExecutionScreen.reason.*
 import com.gram.client.presentation.screens.order.states.GetRatingReasonsResponseState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -521,11 +518,11 @@ class OrderExecutionViewModel @Inject constructor(
     val stateGetReasons: State<GetReasonsResponseState> = _stateGetReasons
 
     fun getReasons() {
-        getReasonsUseCase.invoke().onEach { result: Resource<GetReasonsResponse> ->
+        getReasonsUseCase.invoke().onEach { result: Resource<Reasons> ->
             when (result) {
                 is Resource.Success -> {
                     try {
-                        val tariffsResponse: GetReasonsResponse? = result.data
+                        val tariffsResponse: Reasons? = result.data
                         _stateGetReasons.value =
                             GetReasonsResponseState(response = tariffsResponse)
                         Log.e("GetReasonsResponse", "GetReasonsResponseSuccess->\n${result.data}")

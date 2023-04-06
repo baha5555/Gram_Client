@@ -15,7 +15,7 @@ import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectCl
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
-import com.gram.client.domain.orderExecutionScreen.reason.GetReasonsResponse
+import com.gram.client.domain.orderExecutionScreen.reason.Reasons
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
 import com.gram.client.domain.profile.GetProfileInfoResponse
@@ -167,7 +167,7 @@ interface ApplicationApi {
     @GET("/api/orders/reason")
     suspend fun getReasons(
         @Header("Authorization") token: String,
-    ) : GetReasonsResponse
+    ) : Reasons
 
     @GET("/api/orders/rating-reason-list")
     suspend fun getRatingReasons(
