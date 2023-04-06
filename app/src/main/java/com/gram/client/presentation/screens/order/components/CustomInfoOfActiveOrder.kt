@@ -2,10 +2,10 @@ package com.gram.client.presentation.screens.order.components
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIos
@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -24,10 +25,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
+import com.gram.client.presentation.components.CustomSwitch
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import kotlinx.coroutines.launch
 
-class CustomInfoOfActiveOrder: Screen {
+class CustomInfoOfActiveOrder : Screen {
     @SuppressLint("CoroutineCreationDuringComposition")
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
@@ -57,18 +59,23 @@ class CustomInfoOfActiveOrder: Screen {
 
         }) {
             Column() {
-                Row(modifier = Modifier.fillMaxWidth(0.64f).background(MaterialTheme.colors.onPrimary).padding(vertical = 20.dp),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.64f)
+                        .background(MaterialTheme.colors.onPrimary)
+                        .padding(vertical = 20.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween) {
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     IconButton(onClick = { navigator.pop() }) {
                         Icon(imageVector = Icons.Default.ArrowBackIos, contentDescription = null)
                     }
                     Text(
-                            text = "Детали заказа", fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
+                        text = "Детали заказа", fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
                         fontSize = 17.sp
-                        )
-            }
+                    )
+                }
                 LazyColumn() {
                     item {
                         selectRealtimeDatabaseOrder.let { order ->
@@ -164,15 +171,59 @@ class CustomInfoOfActiveOrder: Screen {
                             }
                             order.allowances?.let { allowance ->
                                 CustomInfoTitle(title = "Надбавки")
+                                CustomSelectAllowances(
+                                    title = "Увеличить",
+                                    text1 = "1 c",
+                                    text2 = "2 c",
+                                    text3 = "3 c",
+                                    text4 = "4 c"
+                                )
+                                Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 15.dp)
+                                        )
+                                CustomSelectAllowances(
+                                    title = "С детьми",
+                                    text1 = "1",
+                                    text2 = "2",
+                                    text3 = "3",
+                                    text4 = "4"
+                                )
+                                Divider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp)
+                                )
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding( horizontal = 15.dp),
+                                        .padding(horizontal = 15.dp),
                                 ) {
                                     allowance.forEach {
-                                        Text(text = it.name,modifier = Modifier
+                                        Row(modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = 15.dp))
+                                            .padding(end = 10.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Text(
+                                                text = it.name, modifier = Modifier
+                                                    .padding(vertical = 25.dp)
+                                            )
+                                            Row(modifier = Modifier,
+                                            verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = "+ ${it.price} c", modifier = Modifier
+                                                        .padding(vertical = 25.dp).padding(end = 15.dp)
+                                                )
+                                                val switchON = remember {
+                                                    mutableStateOf(false) // Initially the switch is ON
+                                                }
+                                                CustomSwitch(switchON = switchON) {}
+                                            }
+
+                                        }
+
                                         Divider(
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -180,6 +231,25 @@ class CustomInfoOfActiveOrder: Screen {
                                         )
                                     }
                                 }
+                                CustomSelectAllowances(
+                                    title = "Сдача с",
+                                    text1 = "50 c",
+                                    text2 = "100 c",
+                                    text3 = "300 c",
+                                    text4 = "500 c"
+                                )
+                                Divider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp)
+                                )
+                                CustomSelectAllowances(
+                                    title = "Чаевые",
+                                    text1 = "1 c",
+                                    text2 = "2 c",
+                                    text3 = "3 c",
+                                    text4 = "4 c"
+                                )
                             }
                         }
                     }
@@ -187,6 +257,7 @@ class CustomInfoOfActiveOrder: Screen {
             }
         }
     }
+
     @Composable
     fun CustomAddressText(
         title: String,
@@ -198,7 +269,11 @@ class CustomInfoOfActiveOrder: Screen {
                 .padding(vertical = 15.dp, horizontal = 15.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(modifier=Modifier.size(15.dp),painter = painterResource(id = point), contentDescription = null)
+            Image(
+                modifier = Modifier.size(15.dp),
+                painter = painterResource(id = point),
+                contentDescription = null
+            )
             Text(
                 text = title, modifier = Modifier
                     .padding(start = 15.dp)
@@ -216,6 +291,84 @@ class CustomInfoOfActiveOrder: Screen {
                 .padding(vertical = 15.dp, horizontal = 15.dp)
         ) {
             Text(text = title)
+        }
+    }
+
+    @Composable
+    fun CustomSelectAllowances(
+        title: String,
+        text1: String,
+        text2: String,
+        text3: String,
+        text4: String,
+    ) {
+        var selectedButton by remember { mutableStateOf(0) }
+
+        val switchON = remember {
+            mutableStateOf(false) // Initially the switch is ON
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 25.dp, end = 25.dp, bottom = 20.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = title, modifier = Modifier
+                        .padding(start = 15.dp)
+                )
+                CustomSwitch(switchON = switchON) {}
+            }
+            if(switchON.value){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                ) {
+                    for (i in 0 until 4) {
+                        Row(Modifier.padding(start = 10.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(2.dp)
+                                    .size(width = 45.dp, height = 30.dp)
+                                    .wrapContentWidth()
+                                    .background(
+                                        if (selectedButton == i) Color.Black else Color.White,
+                                        shape = RoundedCornerShape(20)
+                                    )
+                                    .clickable { selectedButton = i }
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.Gray,
+                                        shape = RoundedCornerShape(20)
+                                    )
+                            ) {
+                                Text(
+                                    text = when (i) {
+                                        0 -> text1
+                                        1 -> text2
+                                        2 -> text3
+                                        3 -> text4
+                                        else -> ""
+                                    },
+                                    color = if (selectedButton == i) Color.White else Color.Black,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                        .fillMaxSize()
+                                )
+                            }
+                        }
+
+                    }
+                }
+            }
+
         }
     }
 }

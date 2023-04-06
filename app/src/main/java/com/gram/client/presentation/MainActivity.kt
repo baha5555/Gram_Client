@@ -1,9 +1,12 @@
 package com.gram.client.presentation
 
+import android.app.AlertDialog
 import android.content.*
 import android.content.res.Configuration
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
@@ -51,6 +54,23 @@ class MainActivity : ComponentActivity() {
             wm.defaultDisplay.getMetrics(metrics)
             metrics.scaledDensity = configuration.fontScale * metrics.density
             baseContext.resources.updateConfiguration(configuration, metrics)
+        }
+    }
+    private fun checkGPS(locationManager: LocationManager){
+        var dialog: AlertDialog? = null
+        if (!(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER))) {
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("Для продолжения работы приложения необходимо включить GPS-приемник")
+                .setPositiveButton("Настройки") { _, _ ->
+                    val locationIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    startActivity(locationIntent)
+                }
+                .setCancelable(true)
+            dialog = builder.create()
+            dialog?.setCanceledOnTouchOutside(false)
+            dialog?.setOnKeyListener { dialog, keyCode, event -> true }
+            dialog?.show()
         }
     }
 }
