@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,6 +30,7 @@ import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.CustomSwitch
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Row as Row
 
 class CustomInfoOfActiveOrder : Screen {
     @SuppressLint("CoroutineCreationDuringComposition")
@@ -173,10 +176,7 @@ class CustomInfoOfActiveOrder : Screen {
                                 CustomInfoTitle(title = "Надбавки")
                                 CustomSelectAllowances(
                                     title = "Увеличить",
-                                    text1 = "1 c",
-                                    text2 = "2 c",
-                                    text3 = "3 c",
-                                    text4 = "4 c"
+                                    number = listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
                                 )
                                 Divider(
                                         modifier = Modifier
@@ -185,10 +185,7 @@ class CustomInfoOfActiveOrder : Screen {
                                         )
                                 CustomSelectAllowances(
                                     title = "С детьми",
-                                    text1 = "1",
-                                    text2 = "2",
-                                    text3 = "3",
-                                    text4 = "4"
+                                    number = listOf(1,2,3,4)
                                 )
                                 Divider(
                                     modifier = Modifier
@@ -214,7 +211,8 @@ class CustomInfoOfActiveOrder : Screen {
                                             verticalAlignment = Alignment.CenterVertically) {
                                                 Text(
                                                     text = "+ ${it.price} c", modifier = Modifier
-                                                        .padding(vertical = 25.dp).padding(end = 15.dp)
+                                                        .padding(vertical = 25.dp)
+                                                        .padding(end = 15.dp)
                                                 )
                                                 val switchON = remember {
                                                     mutableStateOf(false) // Initially the switch is ON
@@ -233,10 +231,7 @@ class CustomInfoOfActiveOrder : Screen {
                                 }
                                 CustomSelectAllowances(
                                     title = "Сдача с",
-                                    text1 = "50 c",
-                                    text2 = "100 c",
-                                    text3 = "300 c",
-                                    text4 = "500 c"
+                                    number = listOf(50,100,200,500)
                                 )
                                 Divider(
                                     modifier = Modifier
@@ -245,10 +240,7 @@ class CustomInfoOfActiveOrder : Screen {
                                 )
                                 CustomSelectAllowances(
                                     title = "Чаевые",
-                                    text1 = "1 c",
-                                    text2 = "2 c",
-                                    text3 = "3 c",
-                                    text4 = "4 c"
+                                    listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
                                 )
                             }
                         }
@@ -297,20 +289,15 @@ class CustomInfoOfActiveOrder : Screen {
     @Composable
     fun CustomSelectAllowances(
         title: String,
-        text1: String,
-        text2: String,
-        text3: String,
-        text4: String,
+        number: List<Int>
     ) {
         var selectedButton by remember { mutableStateOf(0) }
+        val switchON = remember { mutableStateOf(false) } // Initially the switch is ON
 
-        val switchON = remember {
-            mutableStateOf(false) // Initially the switch is ON
-        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 25.dp, end = 25.dp, bottom = 20.dp)
+                .padding(top = 25.dp, end = 25.dp, bottom = 25.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -325,38 +312,32 @@ class CustomInfoOfActiveOrder : Screen {
                 CustomSwitch(switchON = switchON) {}
             }
             if(switchON.value){
-                Row(
+                LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 10.dp),
+                        .padding(top = 15.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
-                    for (i in 0 until 4) {
-                        Row(Modifier.padding(start = 10.dp)) {
+                    items(number){
+                        Row(Modifier.padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .padding(2.dp)
-                                    .size(width = 45.dp, height = 30.dp)
-                                    .wrapContentWidth()
+                                    .padding(2.dp).wrapContentWidth()
+                                    .wrapContentHeight()
                                     .background(
-                                        if (selectedButton == i) Color.Black else Color.White,
+                                        if (selectedButton == it) Color.Black else Color.White,
                                         shape = RoundedCornerShape(20)
                                     )
-                                    .clickable { selectedButton = i }
+                                    .clickable { selectedButton = it}
                                     .border(
                                         width = 1.dp,
                                         color = Color.Gray,
                                         shape = RoundedCornerShape(20)
-                                    )
+                                    ),
+                                contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = when (i) {
-                                        0 -> text1
-                                        1 -> text2
-                                        2 -> text3
-                                        3 -> text4
-                                        else -> ""
-                                    },
-                                    color = if (selectedButton == i) Color.White else Color.Black,
+                                    text = if(title== "С детьми") " $it " else "$it c",
+                                    color = if (selectedButton == it) Color.White else Color.Black,
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier
                                         .padding(5.dp)
@@ -364,11 +345,9 @@ class CustomInfoOfActiveOrder : Screen {
                                 )
                             }
                         }
-
                     }
                 }
             }
-
         }
     }
 }
