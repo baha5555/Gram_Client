@@ -15,6 +15,7 @@ import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.components.CustomRequestError
 import com.gram.client.presentation.screens.SplashScreen
+import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.profile.ProfileViewModel
@@ -36,7 +37,7 @@ fun RootScreen() {
     }
     Permissions()
     BottomSheetNavigator(sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)) {
-        Navigator(screen = SplashScreen())
+        Navigator(screen = MyAddressScreen())
     }
     ReturnRequest()
     if (Constants.STATE_DRIVER_IN_SITE.value) {

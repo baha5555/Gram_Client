@@ -28,6 +28,7 @@ import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.screens.authorization.AuthScreen
 import com.gram.client.presentation.screens.drawer.AboutScreen
+import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressScreen
 import com.gram.client.presentation.screens.drawer.orderHistoryScreen.OrdersHistoryScreen
 import com.gram.client.presentation.screens.drawer.setting_screens.SettingScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
@@ -159,8 +160,9 @@ fun ShowItems(
                         navigator.push(SettingScreen())
 */
                     }
-                    "Мои адреса" -> devToast(context)
-                    /*navController.navigate(RoutesName.MY_ADDRESSES_SCREEN)*/
+                    "Мои адреса" -> {
+                        navigator.push(MyAddressScreen())
+                    }
                     "Поддержка" -> devToast(context)
                     /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
                     "О приложении" -> navigator.push(AboutScreen())

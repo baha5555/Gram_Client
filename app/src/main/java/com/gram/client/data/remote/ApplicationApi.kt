@@ -12,6 +12,10 @@ import com.gram.client.domain.mainScreen.order.CancelOrderResponse
 import com.gram.client.domain.mainScreen.order.OrderResponse
 import com.gram.client.domain.mainScreen.order.UpdateOrderResponse
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
+import com.gram.client.domain.myAddresses.AddMyAddressesResponse
+import com.gram.client.domain.myAddresses.DeleteMyAddressesResponse
+import com.gram.client.domain.myAddresses.GetAllMyAddressesResponse
+import com.gram.client.domain.myAddresses.UpdateMyAddressResponse
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
@@ -173,5 +177,40 @@ interface ApplicationApi {
     suspend fun getRatingReasons(
         @Header("Authorization") token: String,
     ) : GetRatingReasonsResponse
+
+    @FormUrlEncoded
+    @POST("/api/mob-app/my-address/create")
+    suspend fun addMyAddresses(
+        @Header("Authorization") token: String,
+        @Field("name") name : String,
+        @Field("search_address_id") search_address_id : Int,
+        @Field("meet_info") meet_info : String?,
+        @Field("comment_to_driver") comment_to_driver : String?,
+        @Field("type") type : String,
+
+    ): AddMyAddressesResponse
+
+    @GET("/api/mob-app/my-address/all")
+    suspend fun getAllMyAddresses(
+        @Header("Authorization") token: String,
+    ) : GetAllMyAddressesResponse
+
+    @PATCH("/api/mob-app/my-address/{id}/update")
+    suspend fun updateMyAddresses(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Field("name") name : String,
+        @Field("search_address_id") search_address_id : Int,
+        @Field("meet_info") meet_info : String?,
+        @Field("comment_to_driver") comment_to_driver : String?,
+        @Field("type") type : String,
+
+        ): UpdateMyAddressResponse
+
+    @DELETE("/api/mob-app/my-address/{id}/delete")
+    suspend fun deleteMyAddresses(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        ): DeleteMyAddressesResponse
 
 }

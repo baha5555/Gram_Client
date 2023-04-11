@@ -15,6 +15,10 @@ import com.gram.client.domain.mainScreen.order.CancelOrderResponse
 import com.gram.client.domain.mainScreen.order.OrderResponse
 import com.gram.client.domain.mainScreen.order.UpdateOrderResponse
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
+import com.gram.client.domain.myAddresses.AddMyAddressesResponse
+import com.gram.client.domain.myAddresses.DeleteMyAddressesResponse
+import com.gram.client.domain.myAddresses.GetAllMyAddressesResponse
+import com.gram.client.domain.myAddresses.UpdateMyAddressResponse
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
@@ -27,6 +31,9 @@ import com.gram.client.domain.promocod.PromoCode
 import com.gram.client.utils.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 class AppRepositoryImpl(
     private val api: ApplicationApi,
@@ -159,5 +166,31 @@ class AppRepositoryImpl(
 
     override suspend fun getRatingReasons(): GetRatingReasonsResponse =
         api.getRatingReasons(prefs.getAccessToken())
+
+    override suspend fun addMyAddresses(
+        name: String,
+        search_address_id: Int,
+        meet_info: String?,
+        comment_to_driver: String?,
+        type: String,
+    ): AddMyAddressesResponse =
+        api.addMyAddresses(prefs.getAccessToken(), name, search_address_id, meet_info, comment_to_driver, type)
+
+    override suspend fun getAllMyAddresses(): GetAllMyAddressesResponse = api.getAllMyAddresses(prefs.getAccessToken())
+
+    override suspend fun updateMyAddresses(
+        id: Int,
+        name: String,
+        search_address_id: Int,
+        meet_info: String?,
+        comment_to_driver: String?,
+        type: String,
+    ): UpdateMyAddressResponse =
+        api.updateMyAddresses(prefs.getAccessToken(), id, name, search_address_id, meet_info, comment_to_driver, type)
+
+    override suspend fun deleteMyAddresses(
+        id: Int,
+    ): DeleteMyAddressesResponse =
+        api.deleteMyAddresses(prefs.getAccessToken(), id)
 
 }

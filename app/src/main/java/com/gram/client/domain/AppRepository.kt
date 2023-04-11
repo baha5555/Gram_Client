@@ -12,6 +12,10 @@ import com.gram.client.domain.mainScreen.order.CancelOrderResponse
 import com.gram.client.domain.mainScreen.order.OrderResponse
 import com.gram.client.domain.mainScreen.order.UpdateOrderResponse
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
+import com.gram.client.domain.myAddresses.AddMyAddressesResponse
+import com.gram.client.domain.myAddresses.DeleteMyAddressesResponse
+import com.gram.client.domain.myAddresses.GetAllMyAddressesResponse
+import com.gram.client.domain.myAddresses.UpdateMyAddressResponse
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
@@ -95,5 +99,24 @@ interface AppRepository {
 
     suspend fun getRatingReasons(): GetRatingReasonsResponse
 
+    suspend fun addMyAddresses(
+        name: String,
+        search_address_id: Int,
+        meet_info: String?,
+        comment_to_driver: String?,
+        type: String
+    ): AddMyAddressesResponse
+
+    suspend fun getAllMyAddresses(): GetAllMyAddressesResponse
+    suspend fun updateMyAddresses(
+        id: Int,
+        name: String,
+        search_address_id: Int,
+        meet_info: String?,
+        comment_to_driver: String?,
+        type: String
+    ): UpdateMyAddressResponse
+
+    suspend fun deleteMyAddresses(id: Int): DeleteMyAddressesResponse
 }
 
