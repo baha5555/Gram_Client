@@ -178,7 +178,7 @@ fun ShowItems(
                     }
                     "Позвонить оператору" -> {
                         val callIntent: Intent = Uri
-                            .parse("tel:0666")
+                            .parse("tel:0220")
                             .let { number ->
                                 Intent(Intent.ACTION_DIAL, number)
                             }

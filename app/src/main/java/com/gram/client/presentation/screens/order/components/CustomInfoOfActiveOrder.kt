@@ -172,77 +172,77 @@ class CustomInfoOfActiveOrder : Screen {
                                     }
                                 }
                             }
-                            order.allowances?.let { allowance ->
-                                CustomInfoTitle(title = "Надбавки")
-                                CustomSelectAllowances(
-                                    title = "Увеличить",
-                                    number = listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
-                                )
-                                Divider(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 15.dp)
-                                        )
-                                CustomSelectAllowances(
-                                    title = "С детьми",
-                                    number = listOf(1,2,3,4)
-                                )
-                                Divider(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 15.dp)
-                                )
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 15.dp),
-                                ) {
-                                    allowance.forEach {
-                                        Row(modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(end = 10.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween) {
-                                            Text(
-                                                text = it.name, modifier = Modifier
-                                                    .padding(vertical = 25.dp)
-                                            )
-                                            Row(modifier = Modifier,
-                                            verticalAlignment = Alignment.CenterVertically) {
-                                                Text(
-                                                    text = "+ ${it.price} c", modifier = Modifier
-                                                        .padding(vertical = 25.dp)
-                                                        .padding(end = 15.dp)
-                                                )
-                                                val switchON = remember {
-                                                    mutableStateOf(false) // Initially the switch is ON
-                                                }
-                                                CustomSwitch(switchON = switchON) {}
-                                            }
-
-                                        }
-
-                                        Divider(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(start = 15.dp)
-                                        )
-                                    }
-                                }
-                                CustomSelectAllowances(
-                                    title = "Сдача с",
-                                    number = listOf(50,100,200,500)
-                                )
-                                Divider(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 15.dp)
-                                )
-                                CustomSelectAllowances(
-                                    title = "Чаевые",
-                                    listOf(1,2,3,4,5,6,7,8,9,10,20,30,40,50)
-                                )
-                            }
+//                            order.allowances?.let { allowance ->
+//                                CustomInfoTitle(title = "Надбавки")
+//                                CustomSelectAllowances(
+//                                    title = "Увеличить",
+//                                    number = listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
+//                                )
+//                                Divider(
+//                                        modifier = Modifier
+//                                            .fillMaxWidth()
+//                                            .padding(start = 15.dp)
+//                                        )
+//                                CustomSelectAllowances(
+//                                    title = "С детьми",
+//                                    number = listOf(1,2,3,4)
+//                                )
+//                                Divider(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .padding(start = 15.dp)
+//                                )
+//                                Column(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .padding(horizontal = 15.dp),
+//                                ) {
+//                                    allowance.forEach {
+//                                        Row(modifier = Modifier
+//                                            .fillMaxWidth()
+//                                            .padding(end = 10.dp),
+//                                            verticalAlignment = Alignment.CenterVertically,
+//                                            horizontalArrangement = Arrangement.SpaceBetween) {
+//                                            Text(
+//                                                text = it.name, modifier = Modifier
+//                                                    .padding(vertical = 25.dp)
+//                                            )
+//                                            Row(modifier = Modifier,
+//                                            verticalAlignment = Alignment.CenterVertically) {
+//                                                Text(
+//                                                    text = "+ ${it.price} c", modifier = Modifier
+//                                                        .padding(vertical = 25.dp)
+//                                                        .padding(end = 15.dp)
+//                                                )
+//                                                val switchON = remember {
+//                                                    mutableStateOf(false) // Initially the switch is ON
+//                                                }
+//                                                CustomSwitch(switchON = switchON) {}
+//                                            }
+//
+//                                        }
+//
+//                                        Divider(
+//                                            modifier = Modifier
+//                                                .fillMaxWidth()
+//                                                .padding(start = 15.dp)
+//                                        )
+//                                    }
+//                                }
+//                                CustomSelectAllowances(
+//                                    title = "Сдача с",
+//                                    number = listOf(50,100,200,500)
+//                                )
+//                                Divider(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .padding(start = 15.dp)
+//                                )
+//                                CustomSelectAllowances(
+//                                    title = "Чаевые",
+//                                    listOf(1,2,3,4,5,6,7,8,9,10,20,30,40,50)
+//                                )
+//                            }
                         }
                     }
                 }

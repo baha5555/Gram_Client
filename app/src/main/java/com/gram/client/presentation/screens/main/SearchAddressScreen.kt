@@ -69,6 +69,7 @@ class SearchAddressScreen : Screen {
         CustomBackHandle(drawerState.isClosed)
 
         LaunchedEffect(true) {
+            Values.WhichAddress.value = Constants.FROM_ADDRESS
             mainViewModel.getActualLocation(context)
         }
         LaunchedEffect(bottomSheetState.bottomSheetState.currentValue) {
