@@ -13,8 +13,8 @@ android {
         applicationId "com.gram.client"
         minSdk 24
         targetSdk 33
-        versionCode 7
-        versionName "1.2.1"
+        versionCode 9
+        versionName "1.2.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
