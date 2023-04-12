@@ -1,5 +1,7 @@
 package com.gram.client.presentation.screens.drawer.myaddresses_screen
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,8 +18,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.components.CustomTopAppBar
+import com.gram.client.presentation.components.voyager.SearchAddressNavigator
+import com.gram.client.utils.Constants
 
 
 class AddAddressScreen(var type: String) : Screen {
@@ -28,9 +34,13 @@ class AddAddressScreen(var type: String) : Screen {
 
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun AddAddressContent(type: String) {
     val navigator = LocalNavigator.currentOrThrow
+    val bottomNavigator = LocalBottomSheetNavigator.current
+
+    val stateAddress = mutableStateOf(Address())
 
     val myAddressViewModel: MyAddressViewModel = hiltViewModel()
     val nameState = remember {
@@ -83,15 +93,20 @@ fun AddAddressContent(type: String) {
                     Column(
                         modifier = Modifier
                             .height(55.dp)
+                            .clickable {
+                                bottomNavigator.show(SearchAddressNavigator(whichScreen = Constants.MY_ADDRESS, stateAddress = stateAddress){
+
+                                })
+                            }
                             .padding(horizontal = 15.dp)
                             .fillMaxWidth(), verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Панчшанбе базар",
+                            text = if(stateAddress.value.address=="") "Выбрать адрес" else (stateAddress.value.address),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )
-                        Text(text = "пр. И.Сомони 46а, подъезд 1", fontSize = 12.sp)
+                        //Text(text = "Добавить адрес", fontSize = 12.sp)
                     }
                     Divider()
 
@@ -125,7 +140,7 @@ fun AddAddressContent(type: String) {
                 onClick = {
                     myAddressViewModel.addMyAddress(
                         name = nameState.value,
-                        search_address_id = 1,
+                        search_address_id = stateAddress.value.id,
                         meet_info = meetState.value,
                         comment = commentDriver.value,
                         type = type
@@ -138,7 +153,7 @@ fun AddAddressContent(type: String) {
                     .padding(20.dp)
                     .height(57.dp),
                 shape = RoundedCornerShape(15.dp),
-                enabled = nameState.value!="" && meetState.value != "" && commentDriver.value != ""
+                enabled = nameState.value!="" && stateAddress.value.id != 0
             ) {
                 Text(
                     text = "Сохранить",

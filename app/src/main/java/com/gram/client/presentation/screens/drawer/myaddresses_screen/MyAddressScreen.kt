@@ -55,53 +55,35 @@ fun MyAddressesScreenContent() {
                 if((stateMyAddresses.response?.result?.home ?: "") != ""){
                     stateMyAddresses.response?.result?.home?.get(0)?.let {
                         ListAddressesShow(R.drawable.ic_home, "Дом",
-                            it.name
+                            it.address.address
                         ){
-                            navigator.push(EditAddressScreen(it.name, it.search_address_id, it.meet_info, it.comment_to_driver, it.type, it.id))
+                            navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                         }
                     }
 
                 }else{
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            navigator.push(AddAddressScreen("home"))
-                        }) {
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_add),
-                            contentDescription = "back",
-                            modifier = Modifier.padding(10.dp)
-                        )
-                        Text(text = "Добавить адрес дома", fontSize = 16.sp)
+                    ListAddressesShow(R.drawable.ic_add, "Добавить адрес дома", null){
+                        navigator.push(AddAddressScreen("home"))
                     }
                 }
                 if((stateMyAddresses.response?.result?.work ?: "") != ""){
                     stateMyAddresses.response?.result?.work?.get(0)?.let {
                         ListAddressesShow(
                             R.drawable.ic_work, "Работа",
-                            it.name
+                            it.address.address
                         ) {
-                            navigator.push(EditAddressScreen(it.name, it.search_address_id, it.meet_info, it.comment_to_driver, it.type, it.id))
+                            navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                         }
                     }
 
                 }else{
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            navigator.push(AddAddressScreen("work"))
-                        }) {
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_add),
-                            contentDescription = "back",
-                            modifier = Modifier.padding(10.dp)
-                        )
-                        Text(text = "Добавить адрес работы", fontSize = 16.sp)
+                    ListAddressesShow(R.drawable.ic_add, "Добавить адрес работы", null){
+                        navigator.push(AddAddressScreen("work"))
                     }
                 }
                 stateMyAddresses.response?.result?.other?.forEach {
-                    ListAddressesShow(R.drawable.ic_favorites, it.name, it.name) {
-                        navigator.push(EditAddressScreen(it.name, it.search_address_id, it.meet_info, it.comment_to_driver, it.type, it.id))
+                    ListAddressesShow(R.drawable.ic_favorites, it.name, it.address.address) {
+                        navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                     }
                 }
             }
@@ -128,7 +110,7 @@ fun AddAddress() {
 fun ListAddressesShow(image: Int, title: String, text: String?, function: () -> Unit) {
     Row(Modifier.clickable {
         function.invoke()
-    }.padding(vertical = 5.dp, horizontal = 10.dp)) {
+    }.padding(vertical = 0.dp, horizontal = 10.dp)) {
         Box(
             modifier = Modifier
                 .height(50.dp)
@@ -146,9 +128,9 @@ fun ListAddressesShow(image: Int, title: String, text: String?, function: () -> 
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text=title, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(text=title, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             if (text != null) {
-                Text(text=text, fontSize = 12.sp)
+                Text(text=text, fontSize = 12.sp, maxLines = 1)
             }
         }
     }

@@ -26,17 +26,24 @@ class MyAddressViewModel @Inject constructor(
     fun addMyAddress(
         name: String,
         search_address_id: Int,
-        meet_info: String,
+        meet_info: String?,
         comment: String,
         type: String,
         success: () -> Boolean
     ) {
-        myAddressesUseCase.addMyAddresses(name, search_address_id, meet_info, comment, type).onEach { result: Resource<AddMyAddressesResponse> ->
+        myAddressesUseCase.addMyAddresses(
+            name,
+            search_address_id,
+            if (meet_info == "") null else meet_info,
+            if (comment != "") comment else null,
+            type
+        ).onEach { result: Resource<AddMyAddressesResponse> ->
             when (result) {
                 is Resource.Success -> {
                     try {
                         val tariffsResponse: AddMyAddressesResponse? = result.data
-                        _stateAddMyAddress.value = AddMyAddressesResponseState(response = tariffsResponse)
+                        _stateAddMyAddress.value =
+                            AddMyAddressesResponseState(response = tariffsResponse)
                         success.invoke()
                         Log.e(
                             "AddMyAddressesResponse",
@@ -47,7 +54,10 @@ class MyAddressViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("AddMyAddressesResponse", "AddMyAddressesResponseError->\n ${result.message}")
+                    Log.e(
+                        "AddMyAddressesResponse",
+                        "AddMyAddressesResponseError->\n ${result.message}"
+                    )
                     _stateAddMyAddress.value = AddMyAddressesResponseState(
                         error = "${result.message}"
                     )
@@ -63,31 +73,37 @@ class MyAddressViewModel @Inject constructor(
     val stateGetAllMyAddresses: State<GetAllMyAddressesResponseState> = _stateGetAllMyAddresses
 
     fun getAllMyAddresses() {
-        myAddressesUseCase.getAllMyAddresses().onEach { result: Resource<GetAllMyAddressesResponse> ->
-            when (result) {
-                is Resource.Success -> {
-                    try {
-                        val response: GetAllMyAddressesResponse? = result.data
-                        _stateGetAllMyAddresses.value = GetAllMyAddressesResponseState(response = response)
+        myAddressesUseCase.getAllMyAddresses()
+            .onEach { result: Resource<GetAllMyAddressesResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val response: GetAllMyAddressesResponse? = result.data
+                            _stateGetAllMyAddresses.value =
+                                GetAllMyAddressesResponseState(response = response)
+                            Log.e(
+                                "GetAllMyAddressesResponse",
+                                "GetAllMyAddressesResponseSuccess->\n ${_stateGetAllMyAddresses.value}"
+                            )
+                        } catch (e: Exception) {
+                            Log.d("Exception", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
                         Log.e(
                             "GetAllMyAddressesResponse",
-                            "GetAllMyAddressesResponseSuccess->\n ${_stateGetAllMyAddresses.value}"
+                            "GetAllMyAddressesResponseError->\n ${result.message}"
                         )
-                    } catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        _stateGetAllMyAddresses.value = GetAllMyAddressesResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateGetAllMyAddresses.value =
+                            GetAllMyAddressesResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("GetAllMyAddressesResponse", "GetAllMyAddressesResponseError->\n ${result.message}")
-                    _stateGetAllMyAddresses.value = GetAllMyAddressesResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateGetAllMyAddresses.value = GetAllMyAddressesResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     private val _stateUpdateMyAddress = mutableStateOf(UpdateMyAddressesResponseState())
@@ -97,17 +113,25 @@ class MyAddressViewModel @Inject constructor(
         id: Int,
         name: String,
         search_address_id: Int,
-        meet_info: String,
-        comment: String,
+        meet_info: String?,
+        comment: String?,
         type: String,
         success: () -> Boolean
     ) {
-        myAddressesUseCase.updateMyAddresses(id, name, search_address_id, meet_info, comment, type).onEach { result: Resource<UpdateMyAddressResponse> ->
+        myAddressesUseCase.updateMyAddresses(
+            id,
+            name,
+            search_address_id,
+            if (meet_info == "") null else meet_info,
+            if (comment == "") null else comment,
+            type
+        ).onEach { result: Resource<UpdateMyAddressResponse> ->
             when (result) {
                 is Resource.Success -> {
                     try {
                         val tariffsResponse: UpdateMyAddressResponse? = result.data
-                        _stateUpdateMyAddress.value = UpdateMyAddressesResponseState(response = tariffsResponse)
+                        _stateUpdateMyAddress.value =
+                            UpdateMyAddressesResponseState(response = tariffsResponse)
                         success.invoke()
                         Log.e(
                             "UpdateMyAddressesResponse",
@@ -118,7 +142,10 @@ class MyAddressViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    Log.e("UpdateMyAddressesResponse", "UpdateMyAddressesResponseError->\n ${result.message}")
+                    Log.e(
+                        "UpdateMyAddressesResponse",
+                        "UpdateMyAddressesResponseError->\n ${result.message}"
+                    )
                     _stateUpdateMyAddress.value = UpdateMyAddressesResponseState(
                         error = "${result.message}"
                     )
@@ -137,32 +164,38 @@ class MyAddressViewModel @Inject constructor(
         id: Int,
         success: () -> Boolean
     ) {
-        myAddressesUseCase.deleteMyAddresses(id).onEach { result: Resource<DeleteMyAddressesResponse> ->
-            when (result) {
-                is Resource.Success -> {
-                    try {
-                        val tariffsResponse: DeleteMyAddressesResponse? = result.data
-                        _stateDeleteMyAddress.value = DeleteMyAddressesResponseState(response = tariffsResponse)
-                        success.invoke()
+        myAddressesUseCase.deleteMyAddresses(id)
+            .onEach { result: Resource<DeleteMyAddressesResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val tariffsResponse: DeleteMyAddressesResponse? = result.data
+                            _stateDeleteMyAddress.value =
+                                DeleteMyAddressesResponseState(response = tariffsResponse)
+                            success.invoke()
+                            Log.e(
+                                "DeleteMyAddressesResponse",
+                                "DeleteMyAddressesResponseSuccess->\n ${_stateDeleteMyAddress.value}"
+                            )
+                        } catch (e: Exception) {
+                            Log.d("Exception", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
                         Log.e(
                             "DeleteMyAddressesResponse",
-                            "DeleteMyAddressesResponseSuccess->\n ${_stateDeleteMyAddress.value}"
+                            "DeleteMyAddressesResponseError->\n ${result.message}"
                         )
-                    } catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
+                        _stateUpdateMyAddress.value = UpdateMyAddressesResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateUpdateMyAddress.value =
+                            UpdateMyAddressesResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("DeleteMyAddressesResponse", "DeleteMyAddressesResponseError->\n ${result.message}")
-                    _stateUpdateMyAddress.value = UpdateMyAddressesResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateUpdateMyAddress.value = UpdateMyAddressesResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
 }

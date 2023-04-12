@@ -1,6 +1,8 @@
 package com.gram.client.presentation.screens.drawer.myaddresses_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,14 +22,18 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
+import com.gram.client.domain.myAddresses.Address
 import com.gram.client.presentation.components.CustomTopAppBar
+import com.gram.client.presentation.components.voyager.SearchAddressNavigator
+import com.gram.client.utils.Constants
 
 
 class EditAddressScreen(
     var name: String?,
-    var searchAddressId: Int,
+    var address: Address,
     var meetInfo: String?,
     var commentToDriver: String?,
     var type: String,
@@ -46,9 +52,13 @@ class EditAddressScreen(
         }
     }
 
+    @SuppressLint("UnrememberedMutableState")
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val bottomNavigator = LocalBottomSheetNavigator.current
+
+        val stateAddress = mutableStateOf(com.gram.client.domain.mainScreen.Address())
 
         val myAddressViewModel: MyAddressViewModel = hiltViewModel()
         val nameState = remember {
@@ -112,15 +122,18 @@ class EditAddressScreen(
                         Column(
                             modifier = Modifier
                                 .height(55.dp)
+                                .clickable {
+                                    bottomNavigator.show(SearchAddressNavigator(whichScreen = Constants.MY_ADDRESS, stateAddress = stateAddress){})
+                                }
                                 .padding(horizontal = 15.dp)
                                 .fillMaxWidth(), verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "Панчшанбе базар",
+                                text = if (stateAddress.value.address=="") address.address else stateAddress.value.address,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
-                            Text(text = "пр. И.Сомони 46а, подъезд 1", fontSize = 12.sp)
+                            Text(text = if (stateAddress.value.address=="") address.city else stateAddress.value.city, fontSize = 12.sp)
                         }
                         Divider()
 
@@ -152,9 +165,10 @@ class EditAddressScreen(
 
                 Button(
                     onClick = {
-                        myAddressViewModel.addMyAddress(
+                        myAddressViewModel.updateMyAddress(
+                            id = id,
                             name = nameState.value,
-                            search_address_id = 1,
+                            search_address_id = if (stateAddress.value.id != 0) stateAddress.value.id else address.id,
                             meet_info = meetState.value,
                             comment = commentDriver.value,
                             type = type

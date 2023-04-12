@@ -24,13 +24,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
+import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.addressComponents.AddressListItem
 import com.gram.client.presentation.screens.main.addressComponents.Loader
 import com.gram.client.utils.Constants
 import kotlinx.coroutines.launch
 
-class SearchAddressNavigator(val whichScreen: String, val inx: Int= -1, val function: () -> Unit ) : Screen {
+class SearchAddressNavigator(
+    val whichScreen: String,
+    val inx: Int = -1,
+    val stateAddress: MutableState<Address>? = null,
+    val function: () -> Unit
+) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
@@ -191,6 +197,9 @@ class SearchAddressNavigator(val whichScreen: String, val inx: Int= -1, val func
                                             }
                                             Constants.FROM_ADDRESS -> {
                                                 mainViewModel.updateFromAddress(it)
+                                            }
+                                            Constants.MY_ADDRESS -> {
+                                                stateAddress?.value = it
                                             }
                                         }
                                     }

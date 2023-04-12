@@ -43,7 +43,7 @@ class AddStopScreen(val function: () -> Unit) : Screen {
             state = state.listState,
             modifier = Modifier.reorderable(state)
         ) {
-            itemsIndexed(items = data, key = {_,it-> it.idIncrement}) {inx, item ->
+            itemsIndexed(items = data, key = { _, it -> it.idIncrement }) { inx, item ->
                 ReorderableItem(state, item.idIncrement) { dragging ->
                     val elevation = animateDpAsState(if (dragging) 8.dp else 0.dp)
                     Column(
@@ -53,9 +53,13 @@ class AddStopScreen(val function: () -> Unit) : Screen {
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
                             .clickable {
-                                bottomNavigator.show(SearchAddressNavigator(Constants.TO_ADDRESS, inx){
+                                bottomNavigator.show(SearchAddressNavigator(
+                                    Constants.TO_ADDRESS,
+                                    inx
+                                ) {
 
-                                })
+                                }
+                                )
                             }
                     ) {
                         Row(
@@ -63,9 +67,23 @@ class AddStopScreen(val function: () -> Unit) : Screen {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.8f)) {
-                                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(start = 10.dp).padding(vertical = 10.dp).size(30.dp).border(1.dp, MaterialTheme.colors.onBackground, RoundedCornerShape(100))) {
-                                    Text(text = "" + (inx+1), fontSize = 18.sp)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth(0.8f)
+                            ) {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .padding(start = 10.dp)
+                                        .padding(vertical = 10.dp)
+                                        .size(30.dp)
+                                        .border(
+                                            1.dp,
+                                            MaterialTheme.colors.onBackground,
+                                            RoundedCornerShape(100)
+                                        )
+                                ) {
+                                    Text(text = "" + (inx + 1), fontSize = 18.sp)
                                 }
                                 Text(
                                     text = item.address,
@@ -78,17 +96,22 @@ class AddStopScreen(val function: () -> Unit) : Screen {
                                     imageVector = Icons.Outlined.Close,
                                     contentDescription = "",
                                     tint = Color.Red,
-                                    modifier = Modifier.size(35.dp).padding(end = 5.dp).clickable {
-                                        vm.removeAddStop(item)
-                                        if (data.size == 1) {
-                                            bottomNavigator.hide()
+                                    modifier = Modifier
+                                        .size(35.dp)
+                                        .padding(end = 5.dp)
+                                        .clickable {
+                                            vm.removeAddStop(item)
+                                            if (data.size == 1) {
+                                                bottomNavigator.hide()
+                                            }
                                         }
-                                    }
                                 )
                                 Icon(
                                     imageVector = Icons.Outlined.Menu,
                                     contentDescription = "",
-                                    modifier = Modifier.size(35.dp).padding(end = 10.dp)
+                                    modifier = Modifier
+                                        .size(35.dp)
+                                        .padding(end = 10.dp)
                                 )
                             }
                         }
@@ -98,9 +121,15 @@ class AddStopScreen(val function: () -> Unit) : Screen {
             }
             item {
                 Button(
-                    onClick = { bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS, -2){
-                        function.invoke()
-                    })},
+                    onClick = {
+                        bottomNavigator.show(SearchAddressNavigator(
+                            Constants.ADD_TO_ADDRESS,
+                            -2
+                        ) {
+                            function.invoke()
+                        }
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp)

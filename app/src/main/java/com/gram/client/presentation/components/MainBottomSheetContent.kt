@@ -300,10 +300,14 @@ fun AddressesContent(
                 Icon(imageVector = Icons.Default.Add, "", modifier = Modifier
                     .size(35.dp)
                     .clickable {
-                        bottomNavigator.show(SearchAddressNavigator(Constants.ADD_TO_ADDRESS) {
-                            navigator.push(MapPointScreen())
-                            Values.WhichAddress.value = Constants.ADD_TO_ADDRESS
-                        })
+                        bottomNavigator.show(SearchAddressNavigator(
+                            Constants.ADD_TO_ADDRESS,
+                            function = {
+                                navigator.push(MapPointScreen())
+                                Values.WhichAddress.value = Constants.ADD_TO_ADDRESS
+                            }
+                        )
+                        )
                     })
             }
 

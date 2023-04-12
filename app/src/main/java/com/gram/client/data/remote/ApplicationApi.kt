@@ -195,6 +195,7 @@ interface ApplicationApi {
         @Header("Authorization") token: String,
     ) : GetAllMyAddressesResponse
 
+    @FormUrlEncoded
     @PATCH("/api/mob-app/my-address/{id}/update")
     suspend fun updateMyAddresses(
         @Header("Authorization") token: String,

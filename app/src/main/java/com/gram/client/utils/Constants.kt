@@ -14,6 +14,9 @@ object Constants {
     const val FROM_ADDRESS="FROM_ADDRESS"
     const val TO_ADDRESS="TO_ADDRESS"
     const val ADD_TO_ADDRESS="ADD_TO_ADDRESS"
+    const val MY_ADDRESS="MY_ADDRESS"
+
+
     const val SOON = "(Скоро)"
     var stateOfDopInfoForDriver = mutableStateOf("")
     var STATE_RATING: MutableState<Boolean> = mutableStateOf(false)
