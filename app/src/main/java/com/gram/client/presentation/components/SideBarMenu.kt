@@ -161,7 +161,8 @@ fun ShowItems(
 */
                     }
                     "Мои адреса" -> {
-                        navigator.push(MyAddressScreen())
+                        if (prefs.getAccessToken() == "") navigator.plusAssign(AuthScreen())
+                        else navigator.push(MyAddressScreen())
                     }
                     "Поддержка" -> devToast(context)
                     /*navController.navigate(RoutesName.SUPPORT_SCREEN)*/
