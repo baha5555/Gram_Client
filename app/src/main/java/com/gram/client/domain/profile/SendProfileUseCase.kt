@@ -20,24 +20,12 @@ private val repository: AppRepository
 ) {
 
     operator fun invoke(
-                        first_name: RequestBody,
-                        last_name: RequestBody,
-                        email: String?,
-                        avatar: MutableState<File?>
+        profileInfoSendModel: ProfileInfoSendModel
     ): Flow<Resource<ProfileResponse>> =
         flow{
             try {
                 emit(Resource.Loading<ProfileResponse>())
-                val response: ProfileResponse = repository.sendProfile(first_name,last_name,email,
-                    if(avatar.value!=null)
-                        MultipartBody.Part
-                        .createFormData(
-                            name = "avatar",
-                            filename = avatar.value!!.name,
-                            body = avatar.value!!.asRequestBody()
-                        )
-                else null
-                )
+                val response: ProfileResponse = repository.sendProfile(profileInfoSendModel)
                 emit(Resource.Success<ProfileResponse>(response))
             }catch (e: HttpException) {
                 var gson = Gson()

@@ -2,20 +2,15 @@ package com.gram.client.domain
 
 import com.gram.client.domain.athorization.AuthResponse
 import com.gram.client.domain.athorization.IdentificationResponse
+import com.gram.client.domain.athorization.IdentificationSendModel
 import com.gram.client.domain.mainScreen.AddressByPointResponse
 import com.gram.client.domain.mainScreen.AllowancesResponse
 import com.gram.client.domain.mainScreen.SearchAddressResponse
 import com.gram.client.domain.mainScreen.TariffsResponse
 import com.gram.client.domain.mainScreen.fast_address.FastAddressesResponse
-import com.gram.client.domain.mainScreen.order.CalculateResponse
-import com.gram.client.domain.mainScreen.order.CancelOrderResponse
-import com.gram.client.domain.mainScreen.order.OrderResponse
-import com.gram.client.domain.mainScreen.order.UpdateOrderResponse
+import com.gram.client.domain.mainScreen.order.*
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
-import com.gram.client.domain.myAddresses.AddMyAddressesResponse
-import com.gram.client.domain.myAddresses.DeleteMyAddressesResponse
-import com.gram.client.domain.myAddresses.GetAllMyAddressesResponse
-import com.gram.client.domain.myAddresses.UpdateMyAddressResponse
+import com.gram.client.domain.myAddresses.*
 import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
@@ -23,6 +18,7 @@ import com.gram.client.domain.orderExecutionScreen.reason.Reasons
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
 
 import com.gram.client.domain.profile.GetProfileInfoResponse
+import com.gram.client.domain.profile.ProfileInfoSendModel
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.PromoCode
 import okhttp3.MultipartBody
@@ -31,11 +27,7 @@ import okhttp3.RequestBody
 interface AppRepository {
     suspend fun authorization(phone_number: String): AuthResponse
 
-    suspend fun identification(
-        client_register_id: String,
-        sms_code: String,
-        fcm_token: String
-    ): IdentificationResponse
+    suspend fun identification(identificationSendModel: IdentificationSendModel): IdentificationResponse
 
     suspend fun getTariffs(): TariffsResponse
     suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse
@@ -44,12 +36,7 @@ interface AppRepository {
     suspend fun getOrderHistory(): OrderHistoryPagingResult
     suspend fun getOrderHistoryResponse(page:Int): OrderHistoryPagingResult
     suspend fun connectClientWithDriver(order_id: String): connectClientWithDriverResponse
-    suspend fun sendProfile(
-        first_name: RequestBody,
-        last_name: RequestBody,
-        email: String?,
-        avatar: MultipartBody.Part?
-    ): ProfileResponse
+    suspend fun sendProfile(profileInfoSendModel: ProfileInfoSendModel): ProfileResponse
 
     suspend fun getAddressByPoint(lng: Double, lat: Double): AddressByPointResponse
     suspend fun sendRating(order_id: Int, add_rating: Int,rating_reason:String?): AddRatingResponse
@@ -100,22 +87,11 @@ interface AppRepository {
     suspend fun getRatingReasons(): GetRatingReasonsResponse
 
     suspend fun addMyAddresses(
-        name: String,
-        search_address_id: Int,
-        meet_info: String?,
-        comment_to_driver: String?,
-        type: String
+        addMyAddressRequest: AddMyAddressRequest
     ): AddMyAddressesResponse
 
     suspend fun getAllMyAddresses(): GetAllMyAddressesResponse
-    suspend fun updateMyAddresses(
-        id: Int,
-        name: String,
-        search_address_id: Int,
-        meet_info: String?,
-        comment_to_driver: String?,
-        type: String
-    ): UpdateMyAddressResponse
+    suspend fun updateMyAddresses(updateMyAddressRequest: UpdateMyAddressRequest): UpdateMyAddressResponse
 
     suspend fun deleteMyAddresses(id: Int): DeleteMyAddressesResponse
 }

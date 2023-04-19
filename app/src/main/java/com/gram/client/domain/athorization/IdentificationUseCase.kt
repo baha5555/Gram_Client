@@ -11,13 +11,13 @@ import javax.inject.Inject
 
 class IdentificationUseCase @Inject constructor(private val repository: AppRepository) {
 
-    operator fun invoke(client_register_id: String, sms_code: String,fcm_token:String): Flow<Resource<IdentificationResponse>> =
-        flow{
+    operator fun invoke(identificationSendModel: IdentificationSendModel): Flow<Resource<IdentificationResponse>> =
+        flow {
             try {
                 emit(Resource.Loading<IdentificationResponse>())
-                val response = repository.identification(client_register_id, sms_code,fcm_token)
+                val response = repository.identification(identificationSendModel)
                 emit(Resource.Success<IdentificationResponse>(response))
-            }catch (e: HttpException) {
+            } catch (e: HttpException) {
                 emit(
                     Resource.Error<IdentificationResponse>(
                         e.localizedMessage ?: "Произошла непредвиденная ошибка"

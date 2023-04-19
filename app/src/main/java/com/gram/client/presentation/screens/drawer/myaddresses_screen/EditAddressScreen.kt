@@ -26,6 +26,7 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.myAddresses.Address
+import com.gram.client.domain.myAddresses.UpdateMyAddressRequest
 import com.gram.client.presentation.components.CustomTopAppBar
 import com.gram.client.presentation.components.voyager.SearchAddressNavigator
 import com.gram.client.utils.Constants
@@ -62,16 +63,16 @@ class EditAddressScreen(
 
         val myAddressViewModel: MyAddressViewModel = hiltViewModel()
         val nameState = remember {
-            mutableStateOf(""+name)
+            mutableStateOf("" + name)
         }
         val meetState = remember {
-            mutableStateOf(""+meetInfo)
+            mutableStateOf("" + meetInfo)
         }
         val commentDriver = remember {
-            mutableStateOf( "")
+            mutableStateOf("")
         }
-        LaunchedEffect(key1 = true ){
-            if(commentToDriver!=null){
+        LaunchedEffect(key1 = true) {
+            if (commentToDriver != null) {
                 commentDriver.value += commentToDriver
             }
         }
@@ -123,17 +124,24 @@ class EditAddressScreen(
                             modifier = Modifier
                                 .height(55.dp)
                                 .clickable {
-                                    bottomNavigator.show(SearchAddressNavigator(whichScreen = Constants.MY_ADDRESS, stateAddress = stateAddress){})
+                                    bottomNavigator.show(
+                                        SearchAddressNavigator(
+                                            whichScreen = Constants.MY_ADDRESS,
+                                            stateAddress = stateAddress
+                                        ) {})
                                 }
                                 .padding(horizontal = 15.dp)
                                 .fillMaxWidth(), verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = if (stateAddress.value.address=="") address.address else stateAddress.value.address,
+                                text = if (stateAddress.value.address == "") address.address else stateAddress.value.address,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
-                            Text(text = if (stateAddress.value.address=="") address.city else stateAddress.value.city, fontSize = 12.sp)
+                            Text(
+                                text = if (stateAddress.value.address == "") address.city else stateAddress.value.city,
+                                fontSize = 12.sp
+                            )
                         }
                         Divider()
 
@@ -166,13 +174,15 @@ class EditAddressScreen(
                 Button(
                     onClick = {
                         myAddressViewModel.updateMyAddress(
-                            id = id,
-                            name = nameState.value,
-                            search_address_id = if (stateAddress.value.id != 0) stateAddress.value.id else address.id,
-                            meet_info = meetState.value,
-                            comment = commentDriver.value,
-                            type = type
-                        ){
+                            updateMyAddressRequest = UpdateMyAddressRequest(
+                                id = id,
+                                name = nameState.value,
+                                search_address_id = if (stateAddress.value.id != 0) stateAddress.value.id else address.id,
+                                meet_info = if (meetInfo=="") null else meetInfo,
+                                comment_to_driver = if (commentDriver.value=="") null else null,
+                                type = type
+                            )
+                        ) {
                             navigator.pop()
                         }
                     },

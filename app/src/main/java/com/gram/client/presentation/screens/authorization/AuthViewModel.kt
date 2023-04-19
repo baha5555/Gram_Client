@@ -10,11 +10,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gram.client.app.preference.CustomPreference
+import com.gram.client.domain.athorization.*
 import com.gram.client.utils.Resource
-import com.gram.client.domain.athorization.AuthResponse
-import com.gram.client.domain.athorization.AuthUseCase
-import com.gram.client.domain.athorization.IdentificationResponse
-import com.gram.client.domain.athorization.IdentificationUseCase
 import com.gram.client.presentation.screens.authorization.states.AuthResponseState
 import com.gram.client.presentation.screens.authorization.states.IdentificationResponseState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -95,13 +92,10 @@ class AuthViewModel @Inject constructor(
     }
 
     fun identification(
-        sms_code: String,
-        client_regiter_id: String,
-        fcm_token: String,
+        identificationSendModel: IdentificationSendModel,
         onSuccess: () -> Unit
     ){
-        var code=sms_code
-        identificationUseCase.invoke(client_regiter_id, code,fcm_token).onEach { result: Resource<IdentificationResponse> ->
+        identificationUseCase.invoke(identificationSendModel).onEach { result: Resource<IdentificationResponse> ->
             when (result) {
                 is Resource.Success -> {
                     val response = result.data
