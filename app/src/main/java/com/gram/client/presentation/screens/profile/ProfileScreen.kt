@@ -47,14 +47,17 @@ import com.gram.client.utils.Constants.SOON
 import com.gram.client.utils.Values
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.gram.client.domain.profile.ProfileInfoSendModel
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import java.io.File
 import java.io.IOException
 
 
-class ProfileScreen : Screen{
+class ProfileScreen : Screen {
     @SuppressLint("UnrememberedMutableState")
     @Composable
     override fun Content() {
@@ -99,11 +102,11 @@ class ProfileScreen : Screen{
                 okBtnClick = {
                     isDialogOpen.value = false
                     prefs.clearPreference()
-                    Values.ImageUrl.value=""
-                    Values.FirstName.value=""
-                    Values.LastName.value=""
-                    Values.Email.value=""
-                    Values.ClientOrders.value=null
+                    Values.ImageUrl.value = ""
+                    Values.FirstName.value = ""
+                    Values.LastName.value = ""
+                    Values.Email.value = ""
+                    Values.ClientOrders.value = null
                     navigator.replaceAll(AuthScreen())
                 },
                 cancelBtnClick = { isDialogOpen.value = false },
@@ -247,7 +250,10 @@ class ProfileScreen : Screen{
                                     text = "Получение рассылки$SOON",
                                     fontSize = 15.sp
                                 )
-                                Row(modifier = Modifier.padding(end = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    modifier = Modifier.padding(end = 5.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
 
                                     val switchON = remember {
                                         mutableStateOf(false) // Initially the switch is ON
@@ -284,13 +290,16 @@ class ProfileScreen : Screen{
                                                     Log.e("selectImage", "${photo.value}")
                                                 }
                                                 viewModel.sendProfile(
-                                                    (profileFirstName.value
-                                                        ?: getProfileFirstName
-                                                        ?: "").toRequestBody(),
-                                                    (profileLastName.value ?: getProfileLastName
-                                                    ?: "").toRequestBody(),
-                                                    if (profileEmail.value != "") profileEmail.value else null,
-                                                    photo,
+                                                    profileInfoSendModel = ProfileInfoSendModel(
+                                                        (profileFirstName.value).toRequestBody(),
+                                                        (profileLastName.value).toRequestBody(),
+                                                        if (profileEmail.value != "") profileEmail.value else null,
+                                                        if (photo.value != null) MultipartBody.Part.createFormData(
+                                                            name = "avatar",
+                                                            filename = photo.value!!.name,
+                                                            body = photo.value!!.asRequestBody()
+                                                        ) else null
+                                                    )
                                                 )
                                                 {
                                                     Toast.makeText(
@@ -379,7 +388,8 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
                 isDownloadsDocument(uri) -> {
                     val fileName = getFilePath(context, uri)
                     if (fileName != null) {
-                        return Environment.getExternalStorageDirectory().toString() + "/Download/" + fileName
+                        return Environment.getExternalStorageDirectory()
+                            .toString() + "/Download/" + fileName
                     }
                     var id = DocumentsContract.getDocumentId(uri)
                     if (id.startsWith("raw:")) {
@@ -387,7 +397,10 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
                         val file = File(id)
                         if (file.exists()) return id
                     }
-                    val contentUri = ContentUris.withAppendedId(Uri.parse("content://"), java.lang.Long.valueOf(id))
+                    val contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://"),
+                        java.lang.Long.valueOf(id)
+                    )
                     return getDataColumn(context, contentUri, null, null)
                 }
                 isMediaDocument(uri) -> {
@@ -414,7 +427,12 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
         }
         "content".equals(uri.scheme, ignoreCase = true) -> {
             // Return the remote address
-            return if (isGooglePhotosUri(uri)) uri.lastPathSegment else getDataColumn(context, uri, null, null)
+            return if (isGooglePhotosUri(uri)) uri.lastPathSegment else getDataColumn(
+                context,
+                uri,
+                null,
+                null
+            )
         }
         "file".equals(uri.scheme, ignoreCase = true) -> {
             return uri.path
@@ -423,82 +441,82 @@ fun getRealPathFromURI(context: Context, uri: Uri): String? {
     return null
 }
 
-    fun getDataColumn(
-        context: Context,
-        uri: Uri?,
-        selection: String?,
-        selectionArgs: Array<String>?
-    ): String? {
-        var cursor: Cursor? = null
-        val column = "_data"
-        val projection = arrayOf(
-            column
+fun getDataColumn(
+    context: Context,
+    uri: Uri?,
+    selection: String?,
+    selectionArgs: Array<String>?
+): String? {
+    var cursor: Cursor? = null
+    val column = "_data"
+    val projection = arrayOf(
+        column
+    )
+    try {
+        if (uri == null) return null
+        cursor = context.contentResolver.query(
+            uri, projection, selection, selectionArgs,
+            null
         )
-        try {
-            if (uri == null) return null
-            cursor = context.contentResolver.query(
-                uri, projection, selection, selectionArgs,
-                null
-            )
-            if (cursor != null && cursor.moveToFirst()) {
-                val index = cursor.getColumnIndexOrThrow(column)
-                return cursor.getString(index)
-            }
-        } finally {
-            cursor?.close()
+        if (cursor != null && cursor.moveToFirst()) {
+            val index = cursor.getColumnIndexOrThrow(column)
+            return cursor.getString(index)
         }
-        return null
+    } finally {
+        cursor?.close()
     }
+    return null
+}
 
-    fun getFilePath(context: Context, uri: Uri?): String? {
-        var cursor: Cursor? = null
-        val projection = arrayOf(
-            MediaStore.MediaColumns.DISPLAY_NAME
+fun getFilePath(context: Context, uri: Uri?): String? {
+    var cursor: Cursor? = null
+    val projection = arrayOf(
+        MediaStore.MediaColumns.DISPLAY_NAME
+    )
+    try {
+        if (uri == null) return null
+        cursor = context.contentResolver.query(
+            uri, projection, null, null,
+            null
         )
-        try {
-            if (uri == null) return null
-            cursor = context.contentResolver.query(
-                uri, projection, null, null,
-                null
-            )
-            if (cursor != null && cursor.moveToFirst()) {
-                val index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
-                return cursor.getString(index)
-            }
-        } finally {
-            cursor?.close()
+        if (cursor != null && cursor.moveToFirst()) {
+            val index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+            return cursor.getString(index)
         }
-        return null
+    } finally {
+        cursor?.close()
     }
+    return null
+}
 
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is ExternalStorageProvider.
-     */
-    fun isExternalStorageDocument(uri: Uri): Boolean {
-        return "com.android.externalstorage.documents" == uri.authority
-    }
+/**
+ * @param uri The Uri to check.
+ * @return Whether the Uri authority is ExternalStorageProvider.
+ */
+fun isExternalStorageDocument(uri: Uri): Boolean {
+    return "com.android.externalstorage.documents" == uri.authority
+}
 
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is DownloadsProvider.
-     */
-    fun isDownloadsDocument(uri: Uri): Boolean {
-        return "com.android.providers.downloads.documents" == uri.authority
-    }
+/**
+ * @param uri The Uri to check.
+ * @return Whether the Uri authority is DownloadsProvider.
+ */
+fun isDownloadsDocument(uri: Uri): Boolean {
+    return "com.android.providers.downloads.documents" == uri.authority
+}
 
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    fun isMediaDocument(uri: Uri): Boolean {
-        return "com.android.providers.media.documents" == uri.authority
-    }
+/**
+ * @param uri The Uri to check.
+ * @return Whether the Uri authority is MediaProvider.
+ */
+fun isMediaDocument(uri: Uri): Boolean {
+    return "com.android.providers.media.documents" == uri.authority
+}
 
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is Google Photos.
-     */
-    fun isGooglePhotosUri(uri: Uri): Boolean {
-        return "com.google.android.apps.photos.content" == uri.authority
-    }
+/**
+ * @param uri The Uri to check.
+ * @return Whether the Uri authority is Google Photos.
+ */
+fun isGooglePhotosUri(uri: Uri): Boolean {
+    return "com.google.android.apps.photos.content" == uri.authority
+}

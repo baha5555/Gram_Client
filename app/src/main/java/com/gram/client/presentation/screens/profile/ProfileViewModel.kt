@@ -12,7 +12,9 @@ import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 
@@ -78,13 +80,11 @@ class ProfileViewModel @Inject constructor(
 
 
     fun sendProfile(
-        first_name: RequestBody,
-        last_name: RequestBody,
-        email: String?,
-        images: MutableState<File?>,
+        profileInfoSendModel: ProfileInfoSendModel,
         onSuccess: () -> Unit = {},
     ) {
-        sendProfileUseCase.invoke(first_name, last_name, email, avatar = images)
+
+        sendProfileUseCase.invoke(profileInfoSendModel)
             .onEach { result: Resource<ProfileResponse> ->
                 when (result) {
                     is Resource.Success -> {

@@ -21,6 +21,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
+import com.gram.client.domain.athorization.IdentificationSendModel
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
@@ -64,11 +65,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                     LaunchedEffect(code.value) {
                         if (code.value!!.length == 4 && !isAutoInsert) {
                             FCM_TOKEN?.let { fcm_token ->
-                                viewModel.identification(
-                                    code.value!!,
-                                    it.result.client_register_id,
-                                    fcm_token
-                                ) {
+                                viewModel.identification(IdentificationSendModel(client_register_id = it.result.client_register_id,code.value!!,  fcm_token),) {
                                     if(Constants.IDENTIFY_TO_SCREEN == "MAINSCREEN")
                                         navigator.replaceAll(MainScreen())
                                     else

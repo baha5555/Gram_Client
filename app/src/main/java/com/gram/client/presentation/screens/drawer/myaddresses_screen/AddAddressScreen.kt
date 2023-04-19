@@ -21,6 +21,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.domain.mainScreen.Address
+import com.gram.client.domain.myAddresses.AddMyAddressRequest
 import com.gram.client.presentation.components.CustomTopAppBar
 import com.gram.client.presentation.components.voyager.SearchAddressNavigator
 import com.gram.client.utils.Constants
@@ -94,15 +95,19 @@ fun AddAddressContent(type: String) {
                         modifier = Modifier
                             .height(55.dp)
                             .clickable {
-                                bottomNavigator.show(SearchAddressNavigator(whichScreen = Constants.MY_ADDRESS, stateAddress = stateAddress){
+                                bottomNavigator.show(
+                                    SearchAddressNavigator(
+                                        whichScreen = Constants.MY_ADDRESS,
+                                        stateAddress = stateAddress
+                                    ) {
 
-                                })
+                                    })
                             }
                             .padding(horizontal = 15.dp)
                             .fillMaxWidth(), verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = if(stateAddress.value.address=="") "Выбрать адрес" else (stateAddress.value.address),
+                            text = if (stateAddress.value.address == "") "Выбрать адрес" else (stateAddress.value.address),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -139,12 +144,14 @@ fun AddAddressContent(type: String) {
             Button(
                 onClick = {
                     myAddressViewModel.addMyAddress(
-                        name = nameState.value,
-                        search_address_id = stateAddress.value.id,
-                        meet_info = meetState.value,
-                        comment = commentDriver.value,
-                        type = type
-                    ){
+                        AddMyAddressRequest(
+                            name = nameState.value,
+                            search_address_id = stateAddress.value.id,
+                            meet_info = if(meetState.value != "") meetState.value else null,
+                            comment_to_driver = if(commentDriver.value!= "") commentDriver.value else null,
+                            type = type
+                        )
+                    ) {
                         navigator.pop()
                     }
                 },
@@ -153,7 +160,7 @@ fun AddAddressContent(type: String) {
                     .padding(20.dp)
                     .height(57.dp),
                 shape = RoundedCornerShape(15.dp),
-                enabled = nameState.value!="" && stateAddress.value.id != 0
+                enabled = nameState.value != "" && stateAddress.value.id != 0
             ) {
                 Text(
                     text = "Сохранить",

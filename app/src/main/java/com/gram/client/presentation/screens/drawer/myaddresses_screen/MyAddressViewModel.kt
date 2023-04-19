@@ -24,19 +24,11 @@ class MyAddressViewModel @Inject constructor(
     val stateAddMyAddress: State<AddMyAddressesResponseState> = _stateAddMyAddress
 
     fun addMyAddress(
-        name: String,
-        search_address_id: Int,
-        meet_info: String?,
-        comment: String,
-        type: String,
+        addMyAddressRequest: AddMyAddressRequest,
         success: () -> Boolean
     ) {
         myAddressesUseCase.addMyAddresses(
-            name,
-            search_address_id,
-            if (meet_info == "") null else meet_info,
-            if (comment != "") comment else null,
-            type
+            addMyAddressRequest = addMyAddressRequest
         ).onEach { result: Resource<AddMyAddressesResponse> ->
             when (result) {
                 is Resource.Success -> {
@@ -110,22 +102,10 @@ class MyAddressViewModel @Inject constructor(
     val stateUpdateMyAddress: State<UpdateMyAddressesResponseState> = _stateUpdateMyAddress
 
     fun updateMyAddress(
-        id: Int,
-        name: String,
-        search_address_id: Int,
-        meet_info: String?,
-        comment: String?,
-        type: String,
+        updateMyAddressRequest: UpdateMyAddressRequest,
         success: () -> Boolean
     ) {
-        myAddressesUseCase.updateMyAddresses(
-            id,
-            name,
-            search_address_id,
-            if (meet_info == "") null else meet_info,
-            if (comment == "") null else comment,
-            type
-        ).onEach { result: Resource<UpdateMyAddressResponse> ->
+        myAddressesUseCase.updateMyAddresses(updateMyAddressRequest = updateMyAddressRequest).onEach { result: Resource<UpdateMyAddressResponse> ->
             when (result) {
                 is Resource.Success -> {
                     try {
