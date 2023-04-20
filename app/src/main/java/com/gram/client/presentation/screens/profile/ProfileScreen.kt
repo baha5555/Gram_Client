@@ -290,7 +290,7 @@ class ProfileScreen : Screen {
                                                     Log.e("selectImage", "${photo.value}")
                                                 }
                                                 viewModel.sendProfile(
-                                                    profileInfoSendModel = ProfileInfoSendModel(
+                                                    sendProfileInfoRequest = ProfileInfoSendModel(
                                                         (profileFirstName.value).toRequestBody(),
                                                         (profileLastName.value).toRequestBody(),
                                                         if (profileEmail.value != "") profileEmail.value else null,

@@ -1,17 +1,12 @@
 package com.gram.client.domain.profile
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import com.gram.client.utils.Resource
 import com.gram.client.domain.AppRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.HttpException
-import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 
@@ -20,12 +15,12 @@ private val repository: AppRepository
 ) {
 
     operator fun invoke(
-        profileInfoSendModel: ProfileInfoSendModel
+        sendProfileInfoReequest: ProfileInfoSendModel
     ): Flow<Resource<ProfileResponse>> =
         flow{
             try {
                 emit(Resource.Loading<ProfileResponse>())
-                val response: ProfileResponse = repository.sendProfile(profileInfoSendModel)
+                val response: ProfileResponse = repository.sendProfile(sendProfileInfoReequest)
                 emit(Resource.Success<ProfileResponse>(response))
             }catch (e: HttpException) {
                 var gson = Gson()

@@ -2,7 +2,7 @@ package com.gram.client.domain
 
 import com.gram.client.domain.athorization.AuthResponse
 import com.gram.client.domain.athorization.IdentificationResponse
-import com.gram.client.domain.athorization.IdentificationSendModel
+import com.gram.client.domain.athorization.IdentificationRequest
 import com.gram.client.domain.mainScreen.AddressByPointResponse
 import com.gram.client.domain.mainScreen.AllowancesResponse
 import com.gram.client.domain.mainScreen.SearchAddressResponse
@@ -21,13 +21,11 @@ import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileInfoSendModel
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.PromoCode
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 
 interface AppRepository {
     suspend fun authorization(phone_number: String): AuthResponse
 
-    suspend fun identification(identificationSendModel: IdentificationSendModel): IdentificationResponse
+    suspend fun identification(identificationRequest: IdentificationRequest): IdentificationResponse
 
     suspend fun getTariffs(): TariffsResponse
     suspend fun getAllowancesByTariffId(tariff_id: Int): AllowancesResponse

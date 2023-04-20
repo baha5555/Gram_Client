@@ -92,10 +92,10 @@ class AuthViewModel @Inject constructor(
     }
 
     fun identification(
-        identificationSendModel: IdentificationSendModel,
+        identificationRequest: IdentificationRequest,
         onSuccess: () -> Unit
     ){
-        identificationUseCase.invoke(identificationSendModel).onEach { result: Resource<IdentificationResponse> ->
+        identificationUseCase.invoke(identificationRequest).onEach { result: Resource<IdentificationResponse> ->
             when (result) {
                 is Resource.Success -> {
                     val response = result.data
