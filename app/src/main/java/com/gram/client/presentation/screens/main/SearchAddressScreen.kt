@@ -48,13 +48,9 @@ class SearchAddressScreen : Screen {
     override fun Content() {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val mainViewModel: MainViewModel = hiltViewModel()
-        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
-        val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
-        val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
         val isSearchState = remember { mutableStateOf(false) }
-        var sheetPeekHeight = remember { mutableStateOf(280) }
+        val sheetPeekHeight = remember { mutableStateOf(280) }
 
-        var WHICH_ADDRESS = remember { mutableStateOf(Constants.FROM_ADDRESS) }
 
         val bottomSheetState = rememberBottomSheetScaffoldState(
             bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
