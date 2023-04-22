@@ -177,7 +177,7 @@ class SearchDriverScreen : Screen {
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             maxLines = 1, overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier.weight(1f)
+                                            modifier = Modifier.weight(1f).padding(end = 12.dp)
                                         )
                                         Row(
                                             modifier = Modifier

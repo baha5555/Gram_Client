@@ -51,21 +51,9 @@ fun TariffItem(
             alpha = if (isSelected) 1.0F else 0.5F
         )
         Text(text = name, fontSize = 13.sp, color = if (isSelected) Color.Black else Color.Black.copy(0.5f), maxLines = 1)
-        if(stateCalculate.isLoading){
-            AnimatedVisibility(visible = true) {
-                Box(modifier = Modifier.shimmer()){
-                    Box(modifier = Modifier
-                        .size(40.dp, 15.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(Color.Gray))
-                }
-            }
-        }
-        else{
-            AnimatedVisibility(visible = true) {
-                Box(modifier = Modifier.height(15.dp)){
-                    Text(text = "$price c", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (isSelected) Color.Black else Color.Black.copy(0.5f))
-                }
+        AnimatedVisibility(visible = true) {
+            Box(modifier = Modifier.height(15.dp)){
+                Text(text = "$price c", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (isSelected) Color.Black else Color.Black.copy(0.5f))
             }
         }
 

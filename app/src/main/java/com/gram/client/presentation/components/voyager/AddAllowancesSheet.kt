@@ -12,9 +12,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.presentation.components.CustomBigButton
@@ -22,13 +24,13 @@ import com.gram.client.presentation.components.CustomLinearShimmer
 import com.gram.client.presentation.components.CustomSwitch
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.states.AllowancesResponseState
+import com.valentinilk.shimmer.shimmer
 
-class AddAllowancesSheet(
-    var mainViewModel: MainViewModel,
-    var stateAllowances: AllowancesResponseState
-) : Screen {
+class AddAllowancesSheet() : Screen {
     @Composable
     override fun Content() {
+        val mainViewModel: MainViewModel = hiltViewModel()
+
         val bottomNavigator = LocalBottomSheetNavigator.current
         Column(modifier = Modifier.fillMaxHeight(0.75f)) {
             Box(
@@ -41,8 +43,6 @@ class AddAllowancesSheet(
                 Text(text = "Добавить надбавки", color = Color.Black, fontSize = 18.sp)
             }
             AllowancesContent(
-                stateAllowances = stateAllowances,
-                mainViewModel = mainViewModel,
                 modifier = Modifier.weight(1f)
             )
             CustomBigButton(text = "Готово") {
@@ -55,10 +55,10 @@ class AddAllowancesSheet(
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun AllowancesContent(
-        stateAllowances: AllowancesResponseState,
-        mainViewModel: MainViewModel,
         modifier: Modifier
     ) {
+        val mainViewModel: MainViewModel = hiltViewModel()
+        val stateAllowances = mainViewModel.stateAllowances.value
         Column(
             modifier = modifier
                 .verticalScroll(rememberScrollState())
@@ -106,8 +106,46 @@ class AddAllowancesSheet(
                 }
             }
         }
-        if (stateAllowances.response == null || stateAllowances.error != "") {
-            CustomLinearShimmer(enabled = true)
+        if (stateAllowances.isLoading) {
+            Column(
+                Modifier
+                    .fillMaxHeight()
+                    .padding(10.dp)) {
+                repeat(5) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shimmer(), verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .padding(15.dp)
+                                .size(20.dp)
+                                .clip(RoundedCornerShape(100))
+                                .background(Color.Gray)
+                        )
+                        Column {
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                                    .height(18.dp)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(100))
+                                    .background(Color(0xFFAAAAAA))
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                                    .height(12.dp)
+                                    .fillMaxWidth(0.8f)
+                                    .clip(RoundedCornerShape(100))
+                                    .background(Color(0xFFAAAAAA))
+                            )
+                        }
+                    }
+                    Divider(Modifier.padding(vertical = 10.dp))
+                }
+            }
         }
     }
 }

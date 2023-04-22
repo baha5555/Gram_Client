@@ -438,13 +438,11 @@ fun OptionsContent(
         ) {
             Column {
                 Text(text = "Коментарий водителю", fontSize = 16.sp)
-                if (mainViewModel.commentToOrder.value != "")
+                if (Values.CommentDriver.value != "")
                     Text(
-                        text = if (mainViewModel.commentToOrder.value.length < 35)
-                            mainViewModel.commentToOrder.value else "${
-                            mainViewModel.commentToOrder.value.take(
-                                35
-                            )
+                        text = if (Values.CommentDriver.value.length < 35)
+                            Values.CommentDriver.value else "${
+                            Values.CommentDriver.value.take(35)
                         }...", fontSize = 12.sp, color = Color.Gray
                     )
             }
@@ -472,8 +470,8 @@ fun OptionsContent(
         ) {
             Column {
                 Text(text = "Заказ другому человеку", fontSize = 16.sp)
-                if (mainViewModel.dopPhone.value != "")
-                    Text(text = mainViewModel.dopPhone.value, fontSize = 12.sp, color = Color.Gray)
+                if (Values.CommentToAnotherHuman.value != "992")
+                    Text(text = Values.CommentToAnotherHuman.value, fontSize = 12.sp, color = Color.Gray)
             }
             if (mainViewModel.dopPhone.value != "")
                 Icon(
@@ -513,18 +511,13 @@ fun OptionsContent(
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                    bottomNavigator.show(AddAllowancesSheet(
-                        mainViewModel,
-                        stateAllowances
-                    ))
+                    bottomNavigator.show(AddAllowancesSheet())
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(text = "Добавить надбавки", fontSize = 16.sp)
-                if (mainViewModel.planTrip.value != "")
-                    Text(text = mainViewModel.planTrip.value, fontSize = 12.sp, color = Color.Gray)
             }
             Icon(
                 modifier = Modifier
