@@ -82,7 +82,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                 )
             }
             when (Values.WhichAddress.value) {
-                Constants.FROM_ADDRESS -> {
+                Constants.FROM_ADDRESS, Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE -> {
                     focusRequester.requestFocus()
                 }
                 Constants.TO_ADDRESS -> {
@@ -275,6 +275,11 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                                             )
                                         )
                                         fromText.value = TextFieldValue(it.address)
+                                        if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE){
+                                            bottomNavigator.hide()
+                                            if(toCreate!=null) toCreate.invoke()
+                                            return@clickable
+                                        }
                                         focusRequesterTo.requestFocus()
                                     } else if (toIsFocused.value) {
                                         mainViewModel.clearToAddress()

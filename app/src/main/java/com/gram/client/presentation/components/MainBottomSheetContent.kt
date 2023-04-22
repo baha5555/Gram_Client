@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -370,10 +371,6 @@ fun TariffsContent(
                 )
             }
         }
-        Image(
-            painter = rememberAsyncImagePainter("https://sip.gram.tj/storage/type_tariffs/img/HKnqbJKRt2OheupWEW7P0o3HdgLciMTfsHswLL3K.png"),
-            contentDescription = "",
-        )
         stateTariffs.response?.let { tariffs ->
             if (tariffs.isNotEmpty()) {
                 LazyRow(

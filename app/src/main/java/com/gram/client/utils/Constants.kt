@@ -15,6 +15,7 @@ object Constants {
     const val TO_ADDRESS="TO_ADDRESS"
     const val ADD_TO_ADDRESS="ADD_TO_ADDRESS"
     const val MY_ADDRESS="MY_ADDRESS"
+    const val ADD_FROM_ADDRESS_FOR_NAVIGATE="ADD_FROM_ADDRESS_FOR_NAVIGATE"
 
 
     const val SOON = "(Скоро)"

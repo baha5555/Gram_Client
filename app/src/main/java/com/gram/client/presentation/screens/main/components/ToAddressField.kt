@@ -49,14 +49,14 @@ fun ToAddressField(
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 Values.WhichAddress.value = Constants.TO_ADDRESS
-                bottomNavigator.show(SearchAddresses {
+                bottomNavigator.show(SearchAddresses() {
                     navigator.push(MapPointScreen())
                 })
             }
             .background(PrimaryColor)
             .padding(horizontal = 5.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
             painter = painterResource(id = R.drawable.car_kuda_edem),
@@ -64,7 +64,7 @@ fun ToAddressField(
             modifier = Modifier.offset(x = -25.dp)
         )
         Text(
-            text = if (toAddress.isEmpty())  "Куда едем?" else toAddress[0].address,
+            text = if (toAddress.isEmpty()) "Куда едем?" else toAddress[0].address,
             textAlign = TextAlign.Start,
             color = if (toAddress.isEmpty()) Color.Gray else Color.White,
             fontSize = 16.sp,
@@ -88,11 +88,15 @@ fun ToAddressField(
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        if (mainViewModel.fromAddress.value.address!=""){
+                        if (mainViewModel.fromAddress.value.address != "") {
                             navigator.push(MainScreen())
                         } else {
-                            Values.WhichAddress.value = Constants.FROM_ADDRESS
-                            bottomNavigator.show(SearchAddresses(){
+                            Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
+                            bottomNavigator.show(SearchAddresses(
+                                {
+                                    navigator.push(MainScreen())
+                                }
+                            ) {
                                 navigator.push(MapPointScreen())
                             })
                         }
