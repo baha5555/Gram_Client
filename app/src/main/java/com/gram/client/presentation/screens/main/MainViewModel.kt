@@ -156,7 +156,7 @@ class MainViewModel @Inject constructor(
     fun updateSelectedTariff(
         value: TariffsResult,
     ) {
-        selectedTariff?.value = value
+        selectedTariff.value = value
         _selectedAllowances = mutableListOf()
         selectedAllowances.value = _selectedAllowances
         getPrice()
@@ -164,29 +164,11 @@ class MainViewModel @Inject constructor(
 
     fun includeAllowance(toDesiredAllowance: ToDesiredAllowance) {
         if (toDesiredAllowance.isSelected.value) {
-            Log.e(
-                "IncludeAllowance",
-                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
-            )
             _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value = _selectedAllowances
-            getPrice()
-            Log.e(
-                "IncludeAllowance",
-                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
-            )
         } else {
-            Log.e(
-                "IncludeAllowance",
-                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
-            )
             _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value = _selectedAllowances
-            getPrice()
-            Log.e(
-                "IncludeAllowance",
-                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
-            )
         }
     }
 
@@ -198,7 +180,7 @@ class MainViewModel @Inject constructor(
                         val tariffsResponse: TariffsResponse? = result.data
                         _stateTariffs.value = TariffsResponseState(response = tariffsResponse?.result)
                         selectedTariff.value= _stateTariffs.value.response?.get(0)?.let {
-                            TariffsResult(it.id, it.name, it.min_price )
+                            TariffsResult(it.id, it.name, it.min_price, it.image, it.icon )
                         }
                         getPrice()
                         Log.e(
@@ -388,7 +370,6 @@ class MainViewModel @Inject constructor(
                         orderExecutionViewModel.getActiveOrders()
                         _stateMeetingInfo.value=""
                         _toAddresses.clear()
-                        _fromAddress.value=Address()
                         Values.CommentDriver.value=""
                         Values.CommentToAnotherHuman.value=""
                     } catch (e: Exception) {

@@ -316,7 +316,7 @@ class MainScreen : Screen{
                                         backgroundColor = MaterialTheme.colors.background,
                                         onClick = {
                                             coroutineScope.launch {
-                                                navigator.replaceAll(SearchAddressScreen())
+                                                navigator.pop()
                                             }
                                         }
                                     ) {
@@ -350,7 +350,7 @@ class MainScreen : Screen{
                                     }
                                 }
                             },
-                            sheetPeekHeight = 325.dp,
+                            sheetPeekHeight = 355.dp,
                         ) {
                             CustomMainMap(mainViewModel = mainViewModel)
                         }

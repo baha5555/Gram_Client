@@ -250,21 +250,21 @@ fun ListHistoryItem(
                     color = if (status == "Отменен") Color.Red else Color.Black, fontSize = 18.sp
                 )
             }
-            if (tariff_id == 4) {
-                Icon(
-                    modifier = Modifier.size( width = 80.dp, height = 50.dp),
-                    painter = painterResource(id = R.drawable.car_business_icon ),
-                    contentDescription = "car_econom_icon",
-                    tint = Color.Unspecified
-                )
-            } else {
-                Icon(
-                    modifier = Modifier.size( 75.dp),
-                    painter = painterResource(id = R.drawable.car_econom_icon),
-                    contentDescription = "car_econom_icon",
-                    tint = Color.Unspecified
-                )
-            }
+//            if (tariff_id == 4) {
+//                Icon(
+//                    modifier = Modifier.size( width = 80.dp, height = 50.dp),
+//                    painter = painterResource(id = R.drawable.car_business_icon ),
+//                    contentDescription = "car_econom_icon",
+//                    tint = Color.Unspecified
+//                )
+//            } else {
+//                Icon(
+//                    modifier = Modifier.size( 75.dp),
+//                    painter = painterResource(id = R.drawable.car_econom_icon),
+//                    contentDescription = "car_econom_icon",
+//                    tint = Color.Unspecified
+//                )
+//            }
 
         }
     }

@@ -1,7 +1,6 @@
 package com.gram.client.presentation.screens.profile
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,10 +11,6 @@ import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -80,11 +75,11 @@ class ProfileViewModel @Inject constructor(
 
 
     fun sendProfile(
-        profileInfoSendModel: ProfileInfoSendModel,
+        sendProfileInfoRequest: ProfileInfoSendModel,
         onSuccess: () -> Unit = {},
     ) {
 
-        sendProfileUseCase.invoke(profileInfoSendModel)
+        sendProfileUseCase.invoke(sendProfileInfoRequest)
             .onEach { result: Resource<ProfileResponse> ->
                 when (result) {
                     is Resource.Success -> {

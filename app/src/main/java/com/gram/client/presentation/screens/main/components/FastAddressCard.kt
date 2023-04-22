@@ -5,56 +5,65 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gram.client.R
+import com.gram.client.domain.mainScreen.fast_address.Result
 
 @Composable
 fun FastAddressCard(
-    title: String,
+    item: Result,
     onClick: () -> Unit
 ) {
-    Box(modifier = Modifier.size(115.dp)) {
-        Image(
-            painter = painterResource(id = R.drawable.img_fast_address),
-            contentDescription = null
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.back_fast_address),
-            contentDescription = null,
-            modifier = Modifier.clip(RoundedCornerShape(20.dp)).clickable {
-                onClick.invoke()
-            },
-            tint = Color(if(MaterialTheme.colors.isLight) 0xEDCFF5FF else 0xE2575963)
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(20.dp))
-                .background(color = Color(0x1400BCD4))
-                .padding(top = 15.dp, start = 15.dp, end = 15.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+    val localDensity = LocalDensity.current
+    var widthIs by remember {
+        mutableStateOf(0.dp)
+    }
+    Column(
+        modifier = Modifier
+            .height(115.dp)
+            .widthIn(0.dp, 150.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(color = Color(0xFFEEEEEE))
+            .clickable {
+                onClick()
+            }
+            .padding(10.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.onGloballyPositioned { coordinates ->
+            widthIs = with(localDensity) { coordinates.size.width.toDp() }
+        }) {
             Text(
-                text = title,
+                text = item.address,
                 color = Color.Black,
+                maxLines = 2,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
-            //Text(text = "15 мин", color = Color.Black, fontSize = 12.sp)
+            Text(text = item.city, color = Color.Black, fontSize = 12.sp)
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.width(widthIs)
+        ) {
             Image(
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                painter = painterResource(id = R.drawable.car_fast_addresses),
+                contentDescription = "car_eco",
+            )
+            Image(
+                painter = painterResource(id = R.drawable.ic_clock),
                 contentDescription = "car_eco",
             )
         }

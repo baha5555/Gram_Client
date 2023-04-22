@@ -11,11 +11,11 @@ import javax.inject.Inject
 
 class IdentificationUseCase @Inject constructor(private val repository: AppRepository) {
 
-    operator fun invoke(identificationSendModel: IdentificationSendModel): Flow<Resource<IdentificationResponse>> =
+    operator fun invoke(identificationRequest: IdentificationRequest): Flow<Resource<IdentificationResponse>> =
         flow {
             try {
                 emit(Resource.Loading<IdentificationResponse>())
-                val response = repository.identification(identificationSendModel)
+                val response = repository.identification(identificationRequest)
                 emit(Resource.Success<IdentificationResponse>(response))
             } catch (e: HttpException) {
                 emit(

@@ -11,20 +11,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.domain.mainScreen.Address
+import com.gram.client.presentation.components.voyager.MapPointScreen
+import com.gram.client.presentation.components.voyager.SearchAddresses
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
-import com.gram.client.presentation.screens.map.map
+import com.gram.client.utils.Constants
+import com.gram.client.utils.Values
 import com.valentinilk.shimmer.shimmer
-import org.osmdroid.util.GeoPoint
 
 @Composable
 fun FastAddresses(mainViewModel: MainViewModel) {
     LaunchedEffect(key1 = true) {
-        mainViewModel.getFastAddresses()
+        if (mainViewModel.stateFastAddress.value.response == null) {
+            mainViewModel.getFastAddresses()
+        }
     }
     val navigator = LocalNavigator.currentOrThrow
+    val bottomNavigator = LocalBottomSheetNavigator.current
     val stateFastAddresses = mainViewModel.stateFastAddress.value
     if (stateFastAddresses.isLoading) {
         Row(Modifier.shimmer()) {
@@ -45,10 +51,21 @@ fun FastAddresses(mainViewModel: MainViewModel) {
             stateFastAddresses.response?.forEach {
                 val toAddress = Address(it.address, it.id, it.address_lat, it.address_lng)
                 item {
-                    FastAddressCard(title = "" + it.address){
+                    FastAddressCard(it) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(toAddress)
-                        navigator.push(MainScreen())
+                        if (mainViewModel.fromAddress.value.address != "") {
+                            navigator.push(MainScreen())
+                        } else {
+                            Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
+                            bottomNavigator.show(
+                                SearchAddresses({
+                                    navigator.push(MainScreen())
+                                }) {
+                                    navigator.push(MapPointScreen())
+                                }
+                            )
+                        }
                         //map.controller.animateTo(GeoPoint(it.address_lat.toDouble(), it.address_lng.toDouble()))
                     }
                     Spacer(modifier = Modifier.width(10.dp))

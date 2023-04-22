@@ -2,6 +2,7 @@ package com.gram.client.data.remote
 
 import com.gram.client.domain.athorization.AuthResponse
 import com.gram.client.domain.athorization.IdentificationResponse
+import com.gram.client.domain.athorization.IdentificationRequest
 import com.gram.client.domain.mainScreen.AddressByPointResponse
 import com.gram.client.domain.mainScreen.AllowancesResponse
 import com.gram.client.domain.mainScreen.SearchAddressResponse
@@ -31,12 +32,9 @@ interface ApplicationApi {
     @POST("/api/auth/client-registers")
     suspend fun authorization(@Field("phone_number") phone_number: String): AuthResponse
 
-    @FormUrlEncoded
     @POST("/api/auth/client-registers/2")
     suspend fun identification(
-        @Field("client_register_id") client_register_id: String,
-        @Field("sms_code") sms_code: String,
-        @Field("fcm_token")fcm_token:String
+        @Body identificationRequest: IdentificationRequest
     ): IdentificationResponse
 
     @GET("/api/orders/tariffs")
@@ -68,9 +66,9 @@ interface ApplicationApi {
     @POST("/api/profile")
     suspend fun sendProfile(
         @Header("Authorization") token: String,
-        @Part("first_name") first_name: RequestBody,
-        @Part("last_name") last_name: RequestBody,
-        @Query("email") email: String?,
+        @Part("first_name")  first_name: RequestBody,
+        @Part("last_name")  last_name: RequestBody,
+        @Query("email")  email: String?,
         @Part avatar: MultipartBody.Part?
     ): ProfileResponse
 

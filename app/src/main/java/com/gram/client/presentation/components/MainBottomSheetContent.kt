@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,6 +28,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import coil.compose.rememberAsyncImagePainter
 import com.gram.client.utils.Constants
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
@@ -56,21 +56,6 @@ fun MainBottomSheetContent(
     stateAllowances: AllowancesResponseState,
     dopPhone: () -> Unit
 ) {
-    val tariffIcons = arrayOf(
-        R.drawable.car_econom_pic,
-        R.drawable.car_comfort_pic,
-        R.drawable.car_business_pic,
-        R.drawable.car_miniven_pic,
-        R.drawable.courier_icon
-    )
-
-    val tariffListIcons = arrayOf(
-        R.drawable.car_econom_icon,
-        R.drawable.car_comfort_icon,
-        R.drawable.car_business_icon,
-        R.drawable.car_miniven_icon,
-        R.drawable.courier_icon
-    )
     val fromAddress by mainViewModel.fromAddress
     val toAddress = mainViewModel.toAddresses
     val selected_tariff = mainViewModel.selectedTariff?.observeAsState()
@@ -97,19 +82,22 @@ fun MainBottomSheetContent(
                     stateCalculate = stateCalculate,
                     address_to = toAddress,
                     stateTariffs = stateTariffs,
-                    tariffListIcons = tariffListIcons,
-                    mainViewModel = mainViewModel,
-                    tariffIcons = tariffIcons
+                    mainViewModel = mainViewModel
                 )
             },
             optionsContent = {
-                OptionsContent(dopPhone)
+                OptionsContent(
+                    dopPhone,
+                    stateAllowances = stateAllowances,
+                    mainViewModel = mainViewModel
+                )
+
             },
             allowancesContent = {
-                AllowancesContent(
-                    stateAllowances = stateAllowances,
-                    mainViewModel = mainViewModel,
-                )
+//                AllowancesContent(
+//                    stateAllowances = stateAllowances,
+//                    mainViewModel = mainViewModel,
+//                )
             }
         )
     }
@@ -331,9 +319,7 @@ fun TariffsContent(
     stateCalculate: CalculateResponseState,
     address_to: List<Address>,
     stateTariffs: TariffsResponseState,
-    tariffListIcons: Array<Int>,
     mainViewModel: MainViewModel,
-    tariffIcons: Array<Int>
 ) {
     val stateCalculate = mainViewModel.stateCalculate.value
     Column(
@@ -375,37 +361,22 @@ fun TariffsContent(
             }
         }
         Column(horizontalAlignment = Alignment.Start) {
-            Image(
-                modifier = Modifier
-                    .padding(
-                        end =
-                        when (selected_tariff?.value!!.id) {
-                            1 -> 110.dp
-                            2 -> 145.dp
-                            4 -> 130.dp
-                            5 -> 130.dp
-                            else -> 310.dp
-                        }, bottom = 30.dp
-                    )
-                    .fillMaxWidth(0f + currentFraction)
-                    .graphicsLayer(alpha = 0f + currentFraction)
-                    .height(0.dp + (currentFraction * 80).dp),
-                painter = painterResource(
-                    when (selected_tariff.value!!.id) {
-                        1 -> tariffIcons[0]
-                        2 -> tariffIcons[1]
-                        3 -> tariffIcons[2]
-                        4 -> tariffIcons[2]
-                        5 -> tariffIcons[3]
-                        else -> tariffIcons[4]
-                    }
-                ),
-                contentDescription = "icon"
-            )
+            if (selected_tariff != null) {
+                Image(
+                    modifier = Modifier
+                        .padding(
+                            end = 150.dp, bottom = 30.dp
+                        )
+                        .fillMaxWidth(0f + currentFraction)
+                        .graphicsLayer(alpha = 0f + currentFraction)
+                        .height(0.dp + (currentFraction * 80).dp),
+                    painter = rememberAsyncImagePainter(selected_tariff.value!!.image),
+                    contentDescription = "icon"
+                )
+            }
         }
-
         stateTariffs.response?.let { tariffs ->
-            if (tariffs.size != 0) {
+            if (tariffs.isNotEmpty()) {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -418,13 +389,7 @@ fun TariffsContent(
                             if (it.tariff_id == tariff.id) price.value = it.amount
                         }
                         TariffItem(
-                            icon = when (tariff.id) {
-                                1 -> tariffListIcons[0]
-                                2 -> tariffListIcons[1]
-                                4 -> tariffListIcons[2]
-                                5 -> tariffListIcons[3]
-                                else -> tariffListIcons[4]
-                            },
+                            icon = tariff.icon,
                             name = tariff.name,
                             price = if (price.value == 0) tariff.min_price else price.value,
                             stateCalculate = stateCalculate,
@@ -445,9 +410,12 @@ fun TariffsContent(
 }
 
 @SuppressLint("NewApi")
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltViewModel()) {
+fun OptionsContent(
+    dopPhone: () -> Unit,
+    mainViewModel: MainViewModel,
+    stateAllowances: AllowancesResponseState
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -464,21 +432,17 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                 .padding(15.dp)
                 .clickable {
                     bottomNavigator.show(CommentSheet("Комментарий водителю", Comments.DRIVER))
-//                    stateOfDopInfoForDriver.value = "COMMENT_TO_ORDER"
-//                    dopPhone()
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(text = "Коментарий водителю", fontSize = 16.sp)
-                if (mainViewModel.commentToOrder.value != "")
+                if (Values.CommentDriver.value != "")
                     Text(
-                        text = if (mainViewModel.commentToOrder.value.length < 35)
-                            mainViewModel.commentToOrder.value else "${
-                            mainViewModel.commentToOrder.value.take(
-                                35
-                            )
+                        text = if (Values.CommentDriver.value.length < 35)
+                            Values.CommentDriver.value else "${
+                            Values.CommentDriver.value.take(35)
                         }...", fontSize = 12.sp, color = Color.Gray
                     )
             }
@@ -500,16 +464,14 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                             Comments.TO_ANOTHER_HUMAN
                         )
                     )
-                    //stateOfDopInfoForDriver.value = "TO_ANOTHER_HUMAN"
-                    //dopPhone()
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(text = "Заказ другому человеку", fontSize = 16.sp)
-                if (mainViewModel.dopPhone.value != "")
-                    Text(text = mainViewModel.dopPhone.value, fontSize = 12.sp, color = Color.Gray)
+                if (Values.CommentToAnotherHuman.value != "992")
+                    Text(text = Values.CommentToAnotherHuman.value, fontSize = 12.sp, color = Color.Gray)
             }
             if (mainViewModel.dopPhone.value != "")
                 Icon(
@@ -543,65 +505,27 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                 contentDescription = "icon"
             )
         }
-    }
-}
-
-@SuppressLint("UnrememberedMutableState")
-@Composable
-fun AllowancesContent(
-    stateAllowances: AllowancesResponseState,
-    mainViewModel: MainViewModel,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                MaterialTheme.colors.background,
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-            )
-            .padding(horizontal = 20.dp, vertical = 15.dp)
-    ) {
-        stateAllowances.response?.let { allowances ->
-            if (allowances.size != 0) {
-                allowances.forEach { allowance ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(15.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(0.7f),
-                            text = allowance.name,
-                            fontSize = 16.sp
-                        )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = " (${allowance.price}" + when (allowance.type) {
-                                    "fix" -> "c"
-                                    "percent" -> "%"
-                                    "minute" -> "мин"
-                                    else -> {
-                                        ""
-                                    }
-                                } + ")",
-                                fontSize = 16.sp,
-                                color = Color.Gray,
-                                modifier = Modifier.padding(end = 18.dp)
-                            )
-                            CustomSwitch(switchON = allowance.isSelected) {
-                                mainViewModel.includeAllowance(allowance)
-                            }
-                        }
-                    }
-                }
-                Divider()
+        Divider()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp)
+                .clickable {
+                    bottomNavigator.show(AddAllowancesSheet())
+                },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(text = "Добавить надбавки", fontSize = 16.sp)
             }
+            Icon(
+                modifier = Modifier
+                    .size(18.dp),
+                imageVector = Icons.Default.Add,
+                contentDescription = "icon"
+            )
         }
-    }
-    if (stateAllowances.response == null || stateAllowances.error != "") {
-        CustomLinearShimmer(enabled = true)
     }
 }
 

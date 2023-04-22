@@ -6,7 +6,7 @@ import com.gram.client.domain.AppRepository
 import com.gram.client.domain.mainScreen.TariffsResponse
 import com.gram.client.domain.athorization.AuthResponse
 import com.gram.client.domain.athorization.IdentificationResponse
-import com.gram.client.domain.athorization.IdentificationSendModel
+import com.gram.client.domain.athorization.IdentificationRequest
 import com.gram.client.domain.mainScreen.AddressByPointResponse
 import com.gram.client.domain.mainScreen.AllowancesResponse
 import com.gram.client.domain.mainScreen.SearchAddressResponse
@@ -25,11 +25,6 @@ import com.gram.client.domain.profile.ProfileInfoSendModel
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.PromoCode
 import com.gram.client.utils.Constants
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
-import retrofit2.http.Query
 
 class AppRepositoryImpl(
     private val api: ApplicationApi,
@@ -39,8 +34,8 @@ class AppRepositoryImpl(
         api.authorization("${Constants.PREFIX}$phone_number")
 
     override suspend fun identification(
-       identificationSendModel: IdentificationSendModel
-    ): IdentificationResponse = api.identification(identificationSendModel.client_register_id, identificationSendModel.sms_code, identificationSendModel.fcm_token)
+        identificationRequest: IdentificationRequest
+    ): IdentificationResponse = api.identification(identificationRequest)
 
     override suspend fun getTariffs(): TariffsResponse = api.getTariffs()
 
@@ -60,9 +55,9 @@ class AppRepositoryImpl(
         api.getAllowancesByTariffId(tariff_id)
 
     override suspend fun sendProfile(
-        profileInfoSendModel: ProfileInfoSendModel
+        sendProfileInfoReequest: ProfileInfoSendModel
     ): ProfileResponse =
-        api.sendProfile(prefs.getAccessToken(), profileInfoSendModel.first_name, profileInfoSendModel.last_name, profileInfoSendModel.email, profileInfoSendModel.avatar)
+        api.sendProfile(prefs.getAccessToken(),sendProfileInfoReequest.first_name, sendProfileInfoReequest.last_name, sendProfileInfoReequest.email, sendProfileInfoReequest.avatar)
 
     override suspend fun getAddressByPoint(
         lng: Double,

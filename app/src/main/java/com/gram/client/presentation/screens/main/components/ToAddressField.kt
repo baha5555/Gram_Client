@@ -13,8 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,28 +42,38 @@ fun ToAddressField(
     val navigator = LocalNavigator.currentOrThrow
     val mainViewModel: MainViewModel = hiltViewModel()
     val bottomNavigator = LocalBottomSheetNavigator.current
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 Values.WhichAddress.value = Constants.TO_ADDRESS
-                bottomNavigator.show(SearchAddresses {
+                bottomNavigator.show(SearchAddresses() {
                     navigator.push(MapPointScreen())
                 })
             }
             .background(PrimaryColor)
-            .padding(horizontal = 5.dp)
+            .padding(horizontal = 5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+            painter = painterResource(id = R.drawable.car_kuda_edem),
             contentDescription = "car_eco",
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier.offset(x = -25.dp)
+        )
+        Text(
+            text = if (toAddress.isEmpty()) "Куда едем?" else toAddress[0].address,
+            textAlign = TextAlign.Start,
+            color = if (toAddress.isEmpty()) Color.Gray else Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f).padding(end = 12.dp)
         )
         Row(
             modifier = Modifier
-                .align(Alignment.CenterEnd)
                 .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -79,37 +88,24 @@ fun ToAddressField(
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        navigator.push(MainScreen())
+                        if (mainViewModel.fromAddress.value.address != "") {
+                            navigator.push(MainScreen())
+                        } else {
+                            Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
+                            bottomNavigator.show(SearchAddresses(
+                                {
+                                    navigator.push(MainScreen())
+                                }
+                            ) {
+                                navigator.push(MapPointScreen())
+                            })
+                        }
                     },
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = "car_eco",
                 tint = Color.White
             )
         }
-        if (toAddress.isEmpty()) {
-            Text(
-                text = "Куда едем?",
-                textAlign = TextAlign.Start,
-                color = Color.Gray,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1, overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.Center)
-            )
-        } else {
-            Text(
-                text = toAddress[0].address,
-                textAlign = TextAlign.Start,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1, overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.Center)
-            )
-        }
+
     }
 }
