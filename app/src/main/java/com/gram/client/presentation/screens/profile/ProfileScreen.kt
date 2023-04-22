@@ -132,7 +132,7 @@ class ProfileScreen : Screen {
                         Spacer(modifier = Modifier.height(75.dp))
                         if (selectImage != null) {
                             Image(
-                                painter = rememberImagePainter(selectImage),
+                                painter = rememberAsyncImagePainter(selectImage),
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .size(150.dp)

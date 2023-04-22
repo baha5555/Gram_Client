@@ -24,9 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,13 +41,19 @@ import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
 import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.*
+import com.gram.client.presentation.components.voyager.MapPointScreen
+import com.gram.client.presentation.components.voyager.SearchAddresses
 import com.gram.client.presentation.components.voyager.reason.Reason2Screen
+import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.main.components.FloatingButton
 import com.gram.client.presentation.screens.map.CustomMainMap
+import com.gram.client.ui.theme.PrimaryColor
+import com.gram.client.utils.Constants
 import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Constants.STATE_RAITING_ORDER_ID
+import com.gram.client.utils.Values
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -61,6 +69,8 @@ class SearchDriverScreen : Screen {
         val context = LocalContext.current
         val prefs = CustomPreference(context)
         val navigator = LocalNavigator.currentOrThrow
+        val bottomNavigator = LocalBottomSheetNavigator.current
+
         val mainViewModel: MainViewModel = hiltViewModel()
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -138,42 +148,60 @@ class SearchDriverScreen : Screen {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(50.dp)
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .clickable {
+                                                Values.WhichAddress.value = Constants.TO_ADDRESS
+                                                bottomNavigator.show(SearchAddresses {
+                                                    navigator.push(MapPointScreen())
+                                                })
+                                            }
+                                            .background(PrimaryColor)
+                                            .padding(horizontal = 5.dp),
                                         verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.fillMaxWidth(0.8f)
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Image(
-                                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+                                            painter = painterResource(id = R.drawable.car_kuda_edem),
                                             contentDescription = "car_eco",
+                                            modifier = Modifier.offset(x = -25.dp)
                                         )
                                         Text(
                                             text = "Заказать ещё одну машину",
-                                            textAlign = TextAlign.Center,
+                                            textAlign = TextAlign.Start,
                                             color = Color.White,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.SemiBold,
+                                            maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.weight(1f)
                                         )
-                                    }
-                                    Row(
-                                        modifier = Modifier
-                                            .padding(end = 10.dp)
-                                            .fillMaxWidth(0.35f),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Divider(
-                                            color = Color.White,
+                                        Row(
                                             modifier = Modifier
-                                                .width(1.dp)
-                                                .fillMaxHeight(0.5f)
-                                                .offset((-10).dp, 0.dp)
-                                        )
-                                        Icon(
-                                            imageVector = Icons.Default.ArrowForward,
-                                            contentDescription = "car_eco",
-                                            modifier = Modifier.size(24.dp),
-                                            tint = Color.White
-                                        )
-                                    }
+                                                .padding(end = 10.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Divider(
+                                                color = Color.White,
+                                                modifier = Modifier
+                                                    .width(1.dp)
+                                                    .fillMaxHeight(0.5f)
+                                                    .offset((-10).dp, 0.dp)
+                                            )
+                                            Icon(
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        navigator.push(MainScreen())
+                                                    },
+                                                imageVector = Icons.Default.ArrowForward,
+                                                contentDescription = "car_eco",
+                                                tint = Color.White
+                                            )
+                                        }
 
+                                    }
                                 }
                                 Spacer(Modifier.requiredHeight(0.dp))
                             }

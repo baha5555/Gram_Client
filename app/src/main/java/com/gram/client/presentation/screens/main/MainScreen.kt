@@ -350,7 +350,7 @@ class MainScreen : Screen{
                                     }
                                 }
                             },
-                            sheetPeekHeight = 325.dp,
+                            sheetPeekHeight = 355.dp,
                         ) {
                             CustomMainMap(mainViewModel = mainViewModel)
                         }

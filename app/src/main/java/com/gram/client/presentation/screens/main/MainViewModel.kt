@@ -156,7 +156,7 @@ class MainViewModel @Inject constructor(
     fun updateSelectedTariff(
         value: TariffsResult,
     ) {
-        selectedTariff?.value = value
+        selectedTariff.value = value
         _selectedAllowances = mutableListOf()
         selectedAllowances.value = _selectedAllowances
         getPrice()
@@ -198,7 +198,7 @@ class MainViewModel @Inject constructor(
                         val tariffsResponse: TariffsResponse? = result.data
                         _stateTariffs.value = TariffsResponseState(response = tariffsResponse?.result)
                         selectedTariff.value= _stateTariffs.value.response?.get(0)?.let {
-                            TariffsResult(it.id, it.name, it.min_price )
+                            TariffsResult(it.id, it.name, it.min_price, it.image, it.icon )
                         }
                         getPrice()
                         Log.e(

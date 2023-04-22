@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,6 +28,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import coil.compose.rememberAsyncImagePainter
 import com.gram.client.utils.Constants
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
@@ -56,21 +56,6 @@ fun MainBottomSheetContent(
     stateAllowances: AllowancesResponseState,
     dopPhone: () -> Unit
 ) {
-    val tariffIcons = arrayOf(
-        R.drawable.car_econom_pic,
-        R.drawable.car_comfort_pic,
-        R.drawable.car_business_pic,
-        R.drawable.car_miniven_pic,
-        R.drawable.courier_icon
-    )
-
-    val tariffListIcons = arrayOf(
-        R.drawable.car_econom_icon,
-        R.drawable.car_comfort_icon,
-        R.drawable.car_business_icon,
-        R.drawable.car_miniven_icon,
-        R.drawable.courier_icon
-    )
     val fromAddress by mainViewModel.fromAddress
     val toAddress = mainViewModel.toAddresses
     val selected_tariff = mainViewModel.selectedTariff?.observeAsState()
@@ -97,9 +82,7 @@ fun MainBottomSheetContent(
                     stateCalculate = stateCalculate,
                     address_to = toAddress,
                     stateTariffs = stateTariffs,
-                    tariffListIcons = tariffListIcons,
-                    mainViewModel = mainViewModel,
-                    tariffIcons = tariffIcons
+                    mainViewModel = mainViewModel
                 )
             },
             optionsContent = {
@@ -331,9 +314,7 @@ fun TariffsContent(
     stateCalculate: CalculateResponseState,
     address_to: List<Address>,
     stateTariffs: TariffsResponseState,
-    tariffListIcons: Array<Int>,
     mainViewModel: MainViewModel,
-    tariffIcons: Array<Int>
 ) {
     val stateCalculate = mainViewModel.stateCalculate.value
     Column(
@@ -375,37 +356,26 @@ fun TariffsContent(
             }
         }
         Column(horizontalAlignment = Alignment.Start) {
-            Image(
-                modifier = Modifier
-                    .padding(
-                        end =
-                        when (selected_tariff?.value!!.id) {
-                            1 -> 110.dp
-                            2 -> 145.dp
-                            4 -> 130.dp
-                            5 -> 130.dp
-                            else -> 310.dp
-                        }, bottom = 30.dp
-                    )
-                    .fillMaxWidth(0f + currentFraction)
-                    .graphicsLayer(alpha = 0f + currentFraction)
-                    .height(0.dp + (currentFraction * 80).dp),
-                painter = painterResource(
-                    when (selected_tariff.value!!.id) {
-                        1 -> tariffIcons[0]
-                        2 -> tariffIcons[1]
-                        3 -> tariffIcons[2]
-                        4 -> tariffIcons[2]
-                        5 -> tariffIcons[3]
-                        else -> tariffIcons[4]
-                    }
-                ),
-                contentDescription = "icon"
-            )
+            if (selected_tariff != null) {
+                Image(
+                    modifier = Modifier
+                        .padding(
+                            end = 150.dp, bottom = 30.dp
+                        )
+                        .fillMaxWidth(0f + currentFraction)
+                        .graphicsLayer(alpha = 0f + currentFraction)
+                        .height(0.dp + (currentFraction * 80).dp),
+                    painter = rememberAsyncImagePainter(selected_tariff.value!!.image),
+                    contentDescription = "icon"
+                )
+            }
         }
-
+        Image(
+            painter = rememberAsyncImagePainter("https://sip.gram.tj/storage/type_tariffs/img/HKnqbJKRt2OheupWEW7P0o3HdgLciMTfsHswLL3K.png"),
+            contentDescription = "",
+        )
         stateTariffs.response?.let { tariffs ->
-            if (tariffs.size != 0) {
+            if (tariffs.isNotEmpty()) {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -418,13 +388,7 @@ fun TariffsContent(
                             if (it.tariff_id == tariff.id) price.value = it.amount
                         }
                         TariffItem(
-                            icon = when (tariff.id) {
-                                1 -> tariffListIcons[0]
-                                2 -> tariffListIcons[1]
-                                4 -> tariffListIcons[2]
-                                5 -> tariffListIcons[3]
-                                else -> tariffListIcons[4]
-                            },
+                            icon = tariff.icon,
                             name = tariff.name,
                             price = if (price.value == 0) tariff.min_price else price.value,
                             stateCalculate = stateCalculate,

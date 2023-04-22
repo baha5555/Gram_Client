@@ -15,14 +15,14 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
-import com.gram.client.presentation.screens.map.map
 import com.valentinilk.shimmer.shimmer
-import org.osmdroid.util.GeoPoint
 
 @Composable
 fun FastAddresses(mainViewModel: MainViewModel) {
     LaunchedEffect(key1 = true) {
-        mainViewModel.getFastAddresses()
+        if (mainViewModel.stateFastAddress.value.response==null){
+            mainViewModel.getFastAddresses()
+        }
     }
     val navigator = LocalNavigator.currentOrThrow
     val stateFastAddresses = mainViewModel.stateFastAddress.value
@@ -45,7 +45,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
             stateFastAddresses.response?.forEach {
                 val toAddress = Address(it.address, it.id, it.address_lat, it.address_lng)
                 item {
-                    FastAddressCard(title = "" + it.address){
+                    FastAddressCard(it){
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(toAddress)
                         navigator.push(MainScreen())

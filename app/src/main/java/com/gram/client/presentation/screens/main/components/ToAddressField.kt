@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +44,7 @@ fun ToAddressField(
     val navigator = LocalNavigator.currentOrThrow
     val mainViewModel: MainViewModel = hiltViewModel()
     val bottomNavigator = LocalBottomSheetNavigator.current
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
@@ -55,16 +56,26 @@ fun ToAddressField(
                 })
             }
             .background(PrimaryColor)
-            .padding(horizontal = 5.dp)
+            .padding(horizontal = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
+            painter = painterResource(id = R.drawable.car_kuda_edem),
             contentDescription = "car_eco",
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier.offset(x = -25.dp)
+        )
+        Text(
+            text = if (toAddress.isEmpty())  "Куда едем?" else toAddress[0].address,
+            textAlign = TextAlign.Start,
+            color = if (toAddress.isEmpty()) Color.Gray else Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
         )
         Row(
             modifier = Modifier
-                .align(Alignment.CenterEnd)
                 .padding(end = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -86,30 +97,6 @@ fun ToAddressField(
                 tint = Color.White
             )
         }
-        if (toAddress.isEmpty()) {
-            Text(
-                text = "Куда едем?",
-                textAlign = TextAlign.Start,
-                color = Color.Gray,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1, overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.Center)
-            )
-        } else {
-            Text(
-                text = toAddress[0].address,
-                textAlign = TextAlign.Start,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1, overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.Center)
-            )
-        }
+
     }
 }
