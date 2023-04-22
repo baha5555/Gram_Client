@@ -67,7 +67,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                             FCM_TOKEN?.let { fcm_token ->
                                 viewModel.identification(IdentificationRequest(client_register_id = it.result.client_register_id,code.value!!,  fcm_token),) {
                                     if(Constants.IDENTIFY_TO_SCREEN == "MAINSCREEN")
-                                        navigator.replaceAll(MainScreen())
+                                        navigator.replace(MainScreen())
                                     else
                                         navigator.replaceAll(SearchAddressScreen())
                                     if(phone.value!=null) {

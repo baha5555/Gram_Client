@@ -149,7 +149,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (fromText.value.text != "") {
                                 ClearText(fromText) {
-                                    mainViewModel.updateFromAddress(Address())
+                                    //mainViewModel.updateFromAddress(Address())
                                 }
                             }
                             Divider(

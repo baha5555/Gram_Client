@@ -88,7 +88,14 @@ fun ToAddressField(
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        navigator.push(MainScreen())
+                        if (mainViewModel.fromAddress.value.address!=""){
+                            navigator.push(MainScreen())
+                        } else {
+                            Values.WhichAddress.value = Constants.FROM_ADDRESS
+                            bottomNavigator.show(SearchAddresses(){
+                                navigator.push(MapPointScreen())
+                            })
+                        }
                     },
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = "car_eco",
