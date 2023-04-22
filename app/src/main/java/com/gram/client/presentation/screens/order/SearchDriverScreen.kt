@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -78,9 +79,6 @@ class SearchDriverScreen : Screen {
                 initialValue = BottomSheetValue.Expanded
             )
         )
-        val bottomSheetState = rememberBottomSheetScaffoldState(
-            bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
-        )
         val scope = rememberCoroutineScope()
         var sheetPeekHeight by remember {
             mutableStateOf(200)
@@ -105,186 +103,157 @@ class SearchDriverScreen : Screen {
             }
         }
 
-        CustomBackHandle(drawerState.isClosed)
-
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            BackHandler(enabled = drawerState.isOpen) {
-                scope.launch { drawerState.close() }
-            }
-            ModalDrawer(drawerState = drawerState,
-                gesturesEnabled = !drawerState.isClosed,
-                drawerContent = {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        Column(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            SideBarMenu()
-                        }
-                    }
-                },
-                content = {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-
-                        Scaffold(backgroundColor = MaterialTheme.colors.background, bottomBar = {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .clip(
-                                        shape = RoundedCornerShape(
-                                            topStart = 25.dp, topEnd = 25.dp
-                                        )
-                                    )
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(15.dp)
-                                        .height(50.dp)
-                                        .clip(RoundedCornerShape(20.dp))
-                                        .background(MaterialTheme.colors.primary)
-                                        .clickable { navigator.replace(SearchAddressScreen()) },
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(50.dp)
-                                            .clip(RoundedCornerShape(20.dp))
-                                            .clickable {
-                                                Values.WhichAddress.value = Constants.TO_ADDRESS
-                                                bottomNavigator.show(SearchAddresses ({
-                                                    navigator.push(MainScreen())
-                                                }){
-                                                    navigator.push(MapPointScreen())
-                                                })
-                                            }
-                                            .background(PrimaryColor)
-                                            .padding(horizontal = 5.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.car_kuda_edem),
-                                            contentDescription = "car_eco",
-                                            modifier = Modifier.offset(x = -25.dp)
-                                        )
-                                        Text(
-                                            text = "Заказать ещё одну машину",
-                                            textAlign = TextAlign.Start,
-                                            color = Color.White,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            maxLines = 1, overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier.weight(1f).padding(end = 12.dp)
-                                        )
-                                        Row(
-                                            modifier = Modifier
-                                                .padding(end = 10.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Divider(
-                                                color = Color.White,
-                                                modifier = Modifier
-                                                    .width(1.dp)
-                                                    .fillMaxHeight(0.5f)
-                                                    .offset((-10).dp, 0.dp)
-                                            )
-                                            Icon(
-                                                modifier = Modifier
-                                                    .size(24.dp)
-                                                    .clickable {
-                                                        navigator.push(MainScreen())
-                                                    },
-                                                imageVector = Icons.Default.ArrowForward,
-                                                contentDescription = "car_eco",
-                                                tint = Color.White
-                                            )
-                                        }
-
-                                    }
-                                }
-                                Spacer(Modifier.requiredHeight(0.dp))
+        CustomBackHandle(true)
+        Scaffold(backgroundColor = MaterialTheme.colors.background, bottomBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .clip(
+                        shape = RoundedCornerShape(
+                            topStart = 25.dp, topEnd = 25.dp
+                        )
+                    )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp)
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(MaterialTheme.colors.primary)
+                        .clickable { navigator.replace(SearchAddressScreen()) },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable {
+                                Values.WhichAddress.value = Constants.TO_ADDRESS
+                                bottomNavigator.show(SearchAddresses({
+                                    navigator.push(MainScreen())
+                                }) {
+                                    navigator.push(MapPointScreen())
+                                })
                             }
-                        }) {
-                            BottomSheetScaffold(
-                                sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
-                                scaffoldState = bottomSheetScaffoldState,
-                                floatingActionButton = {
-                                    FloatingButton(
-                                        icon = Icons.Filled.Menu
-                                    ) {
-                                        scope.launch {
-                                            drawerState.open()
-                                        }
-                                    }
-                                },
-                                sheetContent = {
-                                    Column(
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentHeight()
-                                            .background(MaterialTheme.colors.secondary)
-                                    ) {
-                                        stateRealtimeDatabaseOrders.response?.let { response ->
-                                            response.observeAsState().value?.let { orders ->
-                                                orderCount.value = orders.size
-                                                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
-                                                    responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
-                                                        LazyColumn() {
-                                                            items(orders) { order ->
-                                                                clientOrdersId.active_orders?.let { active ->
-                                                                    active.forEach { clientOrderId ->
-                                                                        val isOpen = remember {
-                                                                            mutableStateOf(
-                                                                                false
-                                                                            )
-                                                                        }
-                                                                        if (order.id == clientOrderId) {
-                                                                            orderCard(
-                                                                                orderExecutionViewModel,
-                                                                                order,
-                                                                                sheetPeekHeightUpOnClick = {
-                                                                                    scope.launch {
-                                                                                        isOpen.value =
-                                                                                            !isOpen.value
-                                                                                        sheetPeekHeight =
-                                                                                            if (isOpen.value) 367
-                                                                                            else 200
+                            .background(PrimaryColor)
+                            .padding(horizontal = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.car_kuda_edem),
+                            contentDescription = "car_eco",
+                            modifier = Modifier.offset(x = -25.dp)
+                        )
+                        Text(
+                            text = "Заказать ещё одну машину",
+                            textAlign = TextAlign.Start,
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 12.dp)
+                        )
+                        Row(
+                            modifier = Modifier
+                                .padding(end = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Divider(
+                                color = Color.White,
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .fillMaxHeight(0.5f)
+                                    .offset((-10).dp, 0.dp)
+                            )
+                            Icon(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        navigator.push(MainScreen())
+                                    },
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = "car_eco",
+                                tint = Color.White
+                            )
+                        }
 
-                                                                                    }
-                                                                                },
-                                                                                isOpen = isOpen,
-                                                                            )
-                                                                            Spacer(
-                                                                                Modifier.height(10.dp)
-                                                                            )
-                                                                        }
+                    }
+                }
+                Spacer(Modifier.requiredHeight(0.dp))
+            }
+        }) {
+            BottomSheetScaffold(
+                sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
+                scaffoldState = bottomSheetScaffoldState,
+                sheetContent = {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .background(MaterialTheme.colors.secondary)
+                    ) {
+                        stateRealtimeDatabaseOrders.response?.let { response ->
+                            response.observeAsState().value?.let { orders ->
+                                orderCount.value = orders.size
+                                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
+                                    responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
+                                        LazyColumn() {
+                                            items(orders) { order ->
+                                                clientOrdersId.active_orders?.let { active ->
+                                                    active.forEach { clientOrderId ->
+                                                        val isOpen = remember {
+                                                            mutableStateOf(
+                                                                false
+                                                            )
+                                                        }
+                                                        if (order.id == clientOrderId) {
+                                                            orderCard(
+                                                                orderExecutionViewModel,
+                                                                order,
+                                                                sheetPeekHeightUpOnClick = {
+                                                                    scope.launch {
+                                                                        isOpen.value =
+                                                                            !isOpen.value
+                                                                        sheetPeekHeight =
+                                                                            if (isOpen.value) 367
+                                                                            else 200
+
                                                                     }
-                                                                }
-                                                            }
-                                                            item {
-                                                                Spacer(
-                                                                    modifier = Modifier.height(120.dp)
-                                                                )
-                                                            }
+                                                                },
+                                                                isOpen = isOpen,
+                                                            )
+                                                            Spacer(
+                                                                Modifier.height(10.dp)
+                                                            )
                                                         }
                                                     }
                                                 }
                                             }
+                                            item {
+                                                Spacer(
+                                                    modifier = Modifier.height(120.dp)
+                                                )
+                                            }
                                         }
                                     }
-                                },
-                                sheetPeekHeight = sheetPeekHeight.dp
-                            ) {
-                                CustomMainMap(
-                                    mainViewModel = mainViewModel
-                                )
+                                }
                             }
                         }
                     }
-                })
+                },
+                sheetPeekHeight = sheetPeekHeight.dp
+            ) {
+                CustomMainMap(
+                    mainViewModel = mainViewModel
+                )
+            }
         }
     }
 
@@ -314,11 +283,9 @@ class SearchDriverScreen : Screen {
         }
         val scope = rememberCoroutineScope()
 
-        val stateReasonsResponse = orderExecutionViewModel.stateGetReasons.value.response
         LaunchedEffect(key1 = true) {
             orderExecutionViewModel.getReasons()
         }
-        val reasonsCheck = remember { mutableStateOf("") }
         scope.launch {
             if (STATE_RAITING_ORDER_ID.value != order.id) {
                 STATE_RATING.value = false
@@ -327,10 +294,8 @@ class SearchDriverScreen : Screen {
                 fillingTimeDateParse = dateFormatParse.parse(it).time
                 diff = (System.currentTimeMillis() - fillingTimeDateParse) * -1
                 fillingTimeMinutes = diff / (60 * 1000) % 60
-//            Log.e(TAG,"fillingTimeMinutes $fillingTimeMinutes")
             }
         }
-        val cancelOrderIsDialogOpen = remember { mutableStateOf(false) }
         val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
         Column(modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
@@ -410,7 +375,7 @@ class SearchDriverScreen : Screen {
                     }
                 }
             }
-            if (isOpen.value) {
+            AnimatedVisibility(visible = isOpen.value) {
                 Divider()
                 Row(
                     modifier = Modifier
@@ -456,48 +421,5 @@ class SearchDriverScreen : Screen {
             cancelBtnClick = { connectClientWithDriverIsDialogOpen.value = false },
             isDialogOpen = connectClientWithDriverIsDialogOpen.value
         )
-    }
-
-    @Composable
-    fun PulseLoading(
-        durationMillis: Int = 1000,
-        maxPulseSize: Float = 300f,
-        minPulseSize: Float = 50f,
-        pulseColor: Color = Color(234, 240, 246),
-        centreColor: Color = Color(66, 133, 244)
-    ) {
-        val infiniteTransition = rememberInfiniteTransition()
-        val size by infiniteTransition.animateFloat(
-            initialValue = minPulseSize,
-            targetValue = maxPulseSize,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            )
-        )
-        val alpha by infiniteTransition.animateFloat(
-            initialValue = 1f, targetValue = 0f, animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            )
-        )
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Card(
-                shape = CircleShape,
-                modifier = Modifier
-                    .size(size.dp)
-                    .align(Alignment.Center)
-                    .alpha(alpha),
-                backgroundColor = pulseColor,
-                elevation = 0.dp
-            ) {}
-            Card(
-                modifier = Modifier
-                    .size(minPulseSize.dp)
-                    .align(Alignment.Center),
-                shape = CircleShape,
-                backgroundColor = centreColor
-            ) {}
-        }
     }
 }
