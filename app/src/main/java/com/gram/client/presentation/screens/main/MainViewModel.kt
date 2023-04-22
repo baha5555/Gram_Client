@@ -164,29 +164,11 @@ class MainViewModel @Inject constructor(
 
     fun includeAllowance(toDesiredAllowance: ToDesiredAllowance) {
         if (toDesiredAllowance.isSelected.value) {
-            Log.e(
-                "IncludeAllowance",
-                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
-            )
             _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value = _selectedAllowances
-            getPrice()
-            Log.e(
-                "IncludeAllowance",
-                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
-            )
         } else {
-            Log.e(
-                "IncludeAllowance",
-                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
-            )
             _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value = _selectedAllowances
-            getPrice()
-            Log.e(
-                "IncludeAllowance",
-                "selectedAllowances->\n ${_selectedAllowances}\n ${selectedAllowances.value}"
-            )
         }
     }
 

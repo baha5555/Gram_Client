@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -87,13 +86,18 @@ fun MainBottomSheetContent(
                 )
             },
             optionsContent = {
-                OptionsContent(dopPhone)
+                OptionsContent(
+                    dopPhone,
+                    stateAllowances = stateAllowances,
+                    mainViewModel = mainViewModel
+                )
+
             },
             allowancesContent = {
-                AllowancesContent(
-                    stateAllowances = stateAllowances,
-                    mainViewModel = mainViewModel,
-                )
+//                AllowancesContent(
+//                    stateAllowances = stateAllowances,
+//                    mainViewModel = mainViewModel,
+//                )
             }
         )
     }
@@ -406,9 +410,12 @@ fun TariffsContent(
 }
 
 @SuppressLint("NewApi")
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltViewModel()) {
+fun OptionsContent(
+    dopPhone: () -> Unit,
+    mainViewModel: MainViewModel,
+    stateAllowances: AllowancesResponseState
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -425,8 +432,6 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                 .padding(15.dp)
                 .clickable {
                     bottomNavigator.show(CommentSheet("Комментарий водителю", Comments.DRIVER))
-//                    stateOfDopInfoForDriver.value = "COMMENT_TO_ORDER"
-//                    dopPhone()
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -461,8 +466,6 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                             Comments.TO_ANOTHER_HUMAN
                         )
                     )
-                    //stateOfDopInfoForDriver.value = "TO_ANOTHER_HUMAN"
-                    //dopPhone()
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -504,65 +507,32 @@ fun OptionsContent(dopPhone: () -> Unit, mainViewModel: MainViewModel = hiltView
                 contentDescription = "icon"
             )
         }
-    }
-}
-
-@SuppressLint("UnrememberedMutableState")
-@Composable
-fun AllowancesContent(
-    stateAllowances: AllowancesResponseState,
-    mainViewModel: MainViewModel,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                MaterialTheme.colors.background,
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-            )
-            .padding(horizontal = 20.dp, vertical = 15.dp)
-    ) {
-        stateAllowances.response?.let { allowances ->
-            if (allowances.size != 0) {
-                allowances.forEach { allowance ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(15.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(0.7f),
-                            text = allowance.name,
-                            fontSize = 16.sp
-                        )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = " (${allowance.price}" + when (allowance.type) {
-                                    "fix" -> "c"
-                                    "percent" -> "%"
-                                    "minute" -> "мин"
-                                    else -> {
-                                        ""
-                                    }
-                                } + ")",
-                                fontSize = 16.sp,
-                                color = Color.Gray,
-                                modifier = Modifier.padding(end = 18.dp)
-                            )
-                            CustomSwitch(switchON = allowance.isSelected) {
-                                mainViewModel.includeAllowance(allowance)
-                            }
-                        }
-                    }
-                }
-                Divider()
+        Divider()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp)
+                .clickable {
+                    bottomNavigator.show(AddAllowancesSheet(
+                        mainViewModel,
+                        stateAllowances
+                    ))
+                },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(text = "Добавить надбавки", fontSize = 16.sp)
+                if (mainViewModel.planTrip.value != "")
+                    Text(text = mainViewModel.planTrip.value, fontSize = 12.sp, color = Color.Gray)
             }
+            Icon(
+                modifier = Modifier
+                    .size(18.dp),
+                imageVector = Icons.Default.Add,
+                contentDescription = "icon"
+            )
         }
-    }
-    if (stateAllowances.response == null || stateAllowances.error != "") {
-        CustomLinearShimmer(enabled = true)
     }
 }
 
