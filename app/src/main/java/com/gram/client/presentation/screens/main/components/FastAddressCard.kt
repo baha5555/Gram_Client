@@ -22,7 +22,9 @@ import com.gram.client.domain.mainScreen.fast_address.Result
 
 @Composable
 fun FastAddressCard(
-    item: Result,
+    title: String,
+    city: String,
+    icon: Int = R.drawable.ic_clock,
     onClick: () -> Unit
 ) {
     val localDensity = LocalDensity.current
@@ -32,7 +34,7 @@ fun FastAddressCard(
     Column(
         modifier = Modifier
             .height(115.dp)
-            .widthIn(0.dp, 150.dp)
+            .widthIn(115.dp, 150.dp)
             .clip(RoundedCornerShape(20.dp))
             .background(color = Color(0xFFEEEEEE))
             .clickable {
@@ -45,25 +47,25 @@ fun FastAddressCard(
             widthIs = with(localDensity) { coordinates.size.width.toDp() }
         }) {
             Text(
-                text = item.address,
+                text = title,
                 color = Color.Black,
                 maxLines = 2,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
-            Text(text = item.city, color = Color.Black, fontSize = 12.sp)
+            Text(text = city, color = Color.Black, fontSize = 12.sp)
         }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.width(widthIs)
+            modifier = Modifier.widthIn(if(widthIs<115.dp) 100.dp else widthIs)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.car_fast_addresses),
                 contentDescription = "car_eco",
             )
             Image(
-                painter = painterResource(id = R.drawable.ic_clock),
+                painter = painterResource(id = icon),
                 contentDescription = "car_eco",
             )
         }

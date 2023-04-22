@@ -18,6 +18,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -29,6 +30,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
+import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressViewModel
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
@@ -39,6 +41,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
     @Composable
     override fun Content() {
         val mainViewModel: MainViewModel = hiltViewModel()
+
         val searchState = mainViewModel.stateSearchAddress.value
 
         val bottomNavigator = LocalBottomSheetNavigator.current
@@ -86,13 +89,13 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                     focusRequester.requestFocus()
                 }
                 Constants.TO_ADDRESS -> {
-                    if (toCreate!=null){
-                        if(mainViewModel.fromAddress.value.address==""){
+                    if (toCreate != null) {
+                        if (mainViewModel.fromAddress.value.address == "") {
                             focusRequester.requestFocus()
-                        }else{
+                        } else {
                             focusRequesterTo.requestFocus()
                         }
-                    }else{
+                    } else {
                         focusRequesterTo.requestFocus()
                     }
                 }
@@ -259,7 +262,11 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                         }
                         Divider(Modifier.padding(vertical = 10.dp))
                     }
-                } else {
+                }
+                else {
+                    if(fromIsFocused.value && fromText.value==TextFieldValue("") || toIsFocused.value && toText.value==TextFieldValue("")){
+                        showMyAddresses(fromIsFocused, toIsFocused, fromText, toText, focusRequesterTo)
+                    }
                     searchState.response?.forEach {
                         Column(
                             Modifier
@@ -275,9 +282,9 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                                             )
                                         )
                                         fromText.value = TextFieldValue(it.address)
-                                        if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE){
+                                        if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE) {
                                             bottomNavigator.hide()
-                                            if(toCreate!=null) toCreate.invoke()
+                                            if (toCreate != null) toCreate.invoke()
                                             return@clickable
                                         }
                                         focusRequesterTo.requestFocus()
@@ -326,6 +333,190 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
             Icon(
                 Icons.Default.Close, contentDescription = ""
             )
+        }
+    }
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Composable
+    fun showMyAddresses(
+        fromIsFocused: MutableState<Boolean>,
+        toIsFocused: MutableState<Boolean>,
+        fromText: MutableState<TextFieldValue>,
+        toText: MutableState<TextFieldValue>,
+        focusRequesterTo: FocusRequester
+    ) {
+        val mainViewModel: MainViewModel = hiltViewModel()
+        val myAddressViewModel: MyAddressViewModel = hiltViewModel()
+        val stateMyAddresses = myAddressViewModel.stateGetAllMyAddresses.value
+        val bottomNavigator = LocalBottomSheetNavigator.current
+        val keyboard = LocalSoftwareKeyboardController.current
+
+        stateMyAddresses.response?.result?.home.let {
+            if (it == null) return@let
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        if (fromIsFocused.value) {
+                            mainViewModel.updateFromAddress(
+                                Address(
+                                    address = it[0].address.address,
+                                    id = it[0].address.id,
+                                    address_lat = it[0].address.address_lat,
+                                    address_lng = it[0].address.address_lng
+                                )
+                            )
+                            fromText.value = TextFieldValue(
+                                "Дом: " + it[0].address.address,
+                                selection = TextRange("Дом: ${it[0].address.address}".length)
+                            )
+                            if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE) {
+                                bottomNavigator.hide()
+                                if (toCreate != null) toCreate.invoke()
+                                return@clickable
+                            }
+                            focusRequesterTo.requestFocus()
+                        } else if (toIsFocused.value) {
+                            mainViewModel.clearToAddress()
+                            mainViewModel.addToAddress(
+                                Address(
+                                    address = it[0].address.address,
+                                    id = it[0].address.id,
+                                    address_lat = it[0].address.address_lat,
+                                    address_lng = it[0].address.address_lng
+                                )
+                            )
+                            toText.value =
+                                TextFieldValue("Дом: " + it[0].address.address)
+                            keyboard?.hide()
+                            if (mainViewModel.fromAddress.value.address != "") {
+                                if (toCreate != null) {
+                                    toCreate.invoke()
+                                }
+                                bottomNavigator.hide()
+                            }
+                        }
+                    }
+                    .padding(start = 7.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Image(painter = painterResource(id = R.drawable.ic_home), contentDescription = "", modifier = Modifier.padding(end = 15.dp))
+                Column() {
+                    Text(
+                        text = "Дом",
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        maxLines = 1
+                    )
+                    Divider()
+                }
+            }
+        }
+        stateMyAddresses.response?.result?.work.let {
+            if (it == null) return@let
+            val address = Address(
+                address = it[0].address.address,
+                id = it[0].address.id,
+                address_lat = it[0].address.address_lat,
+                address_lng = it[0].address.address_lng
+            )
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        if (fromIsFocused.value) {
+                            mainViewModel.updateFromAddress(address)
+                            fromText.value = TextFieldValue(
+                                it[0].address.address,
+                                selection = TextRange(it[0].address.address.length)
+                            )
+                            if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE) {
+                                bottomNavigator.hide()
+                                if (toCreate != null) toCreate.invoke()
+                                return@clickable
+                            }
+                            focusRequesterTo.requestFocus()
+                        } else if (toIsFocused.value) {
+                            mainViewModel.clearToAddress()
+                            mainViewModel.addToAddress(address)
+                            toText.value = TextFieldValue(
+                                it[0].address.address,
+                                selection = TextRange(it[0].address.address.length)
+                            )
+                            keyboard?.hide()
+                            if (mainViewModel.fromAddress.value.address != "") {
+                                if (toCreate != null) {
+                                    toCreate.invoke()
+                                }
+                                bottomNavigator.hide()
+                            }
+                        }
+                    }
+                    .padding(start = 7.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Image(painter = painterResource(id = R.drawable.ic_work), contentDescription = "", modifier = Modifier.padding(end = 15.dp))
+                Column() {
+                    Text(
+                        text = "Работа",
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        maxLines = 1
+                    )
+                    Divider()
+                }
+            }
+        }
+        stateMyAddresses.response?.result?.other?.forEach {
+            if (it == null) return@forEach
+            val address = Address(
+                address = it.address.address,
+                id = it.address.id,
+                address_lat = it.address.address_lat,
+                address_lng = it.address.address_lng
+            )
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        if (fromIsFocused.value) {
+                            mainViewModel.updateFromAddress(address)
+                            fromText.value = TextFieldValue(
+                                it.address.address,
+                                selection = TextRange(it.address.address.length)
+                            )
+                            if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE) {
+                                bottomNavigator.hide()
+                                if (toCreate != null) toCreate.invoke()
+                                return@clickable
+                            }
+                            focusRequesterTo.requestFocus()
+                        } else if (toIsFocused.value) {
+                            mainViewModel.clearToAddress()
+                            mainViewModel.addToAddress(address)
+                            toText.value = TextFieldValue(
+                                it.address.address,
+                                selection = TextRange(it.address.address.length)
+                            )
+                            keyboard?.hide()
+                            if (mainViewModel.fromAddress.value.address != "") {
+                                if (toCreate != null) {
+                                    toCreate.invoke()
+                                }
+                                bottomNavigator.hide()
+                            }
+                        }
+                    }
+                    .padding(start = 7.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Image(painter = painterResource(id = R.drawable.ic_favorites), contentDescription = "", modifier = Modifier.padding(end = 15.dp))
+                Column() {
+                    Text(
+                        text = it.name,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        maxLines = 1
+                    )
+                    Divider()
+                }
+            }
         }
     }
 }

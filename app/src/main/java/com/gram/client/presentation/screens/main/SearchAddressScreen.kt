@@ -28,6 +28,7 @@ import com.gram.client.R
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.components.voyager.MapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddresses
+import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressViewModel
 import com.gram.client.presentation.screens.main.components.AddressSearchBottomSheet
 import com.gram.client.presentation.screens.main.components.FloatingButton
 import com.gram.client.presentation.screens.main.components.FromAddressField
@@ -63,9 +64,14 @@ class SearchAddressScreen : Screen {
 
         CustomBackHandle(drawerState.isClosed)
 
+        val myAddressViewModel: MyAddressViewModel = hiltViewModel()
+
         LaunchedEffect(true) {
             Values.WhichAddress.value = Constants.FROM_ADDRESS
             mainViewModel.getActualLocation(context)
+            if(myAddressViewModel.stateGetAllMyAddresses.value.response==null){
+                myAddressViewModel.getAllMyAddresses()
+            }
         }
         LaunchedEffect(bottomSheetState.bottomSheetState.currentValue) {
             if (bottomSheetState.bottomSheetState.isCollapsed) {
