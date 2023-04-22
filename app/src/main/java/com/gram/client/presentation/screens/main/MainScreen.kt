@@ -316,7 +316,7 @@ class MainScreen : Screen{
                                         backgroundColor = MaterialTheme.colors.background,
                                         onClick = {
                                             coroutineScope.launch {
-                                                navigator.replaceAll(SearchAddressScreen())
+                                                navigator.pop()
                                             }
                                         }
                                     ) {

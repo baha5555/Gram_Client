@@ -34,7 +34,7 @@ import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
 import com.valentinilk.shimmer.shimmer
 
-class SearchAddresses(val function: () -> Unit) : Screen {
+class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Unit) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
@@ -86,7 +86,15 @@ class SearchAddresses(val function: () -> Unit) : Screen {
                     focusRequester.requestFocus()
                 }
                 Constants.TO_ADDRESS -> {
-                    focusRequesterTo.requestFocus()
+                    if (toCreate!=null){
+                        if(mainViewModel.fromAddress.value.address==""){
+                            focusRequester.requestFocus()
+                        }else{
+                            focusRequesterTo.requestFocus()
+                        }
+                    }else{
+                        focusRequesterTo.requestFocus()
+                    }
                 }
             }
             mainViewModel.searchAddress("")
@@ -154,7 +162,7 @@ class SearchAddresses(val function: () -> Unit) : Screen {
                                     .padding(start = 10.dp, end = 15.dp)
                                     .clickable {
                                         bottomNavigator.hide()
-                                        Values.WhichAddress.value=Constants.FROM_ADDRESS
+                                        Values.WhichAddress.value = Constants.FROM_ADDRESS
                                         function.invoke()
                                     })
                         }
@@ -207,7 +215,7 @@ class SearchAddresses(val function: () -> Unit) : Screen {
                                     .padding(start = 10.dp, end = 15.dp)
                                     .clickable {
                                         bottomNavigator.hide()
-                                        Values.WhichAddress.value=Constants.TO_ADDRESS
+                                        Values.WhichAddress.value = Constants.TO_ADDRESS
                                         function.invoke()
                                     })
                         }
@@ -270,10 +278,22 @@ class SearchAddresses(val function: () -> Unit) : Screen {
                                         focusRequesterTo.requestFocus()
                                     } else if (toIsFocused.value) {
                                         mainViewModel.clearToAddress()
-                                        mainViewModel.addToAddress( Address(address = it.address, id = it.id, address_lat = it.address_lat, address_lng = it.address_lng) )
+                                        mainViewModel.addToAddress(
+                                            Address(
+                                                address = it.address,
+                                                id = it.id,
+                                                address_lat = it.address_lat,
+                                                address_lng = it.address_lng
+                                            )
+                                        )
                                         toText.value = TextFieldValue(it.address)
                                         keyboard?.hide()
-                                        bottomNavigator.hide()
+                                        if (mainViewModel.fromAddress.value.address != "") {
+                                            if (toCreate != null) {
+                                                toCreate.invoke()
+                                            }
+                                            bottomNavigator.hide()
+                                        }
                                     }
                                 }
                                 .padding(start = 45.dp)) {

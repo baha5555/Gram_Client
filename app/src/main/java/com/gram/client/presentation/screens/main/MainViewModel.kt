@@ -388,7 +388,6 @@ class MainViewModel @Inject constructor(
                         orderExecutionViewModel.getActiveOrders()
                         _stateMeetingInfo.value=""
                         _toAddresses.clear()
-                        _fromAddress.value=Address()
                         Values.CommentDriver.value=""
                         Values.CommentToAnotherHuman.value=""
                     } catch (e: Exception) {
