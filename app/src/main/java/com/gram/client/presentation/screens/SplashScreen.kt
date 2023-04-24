@@ -16,6 +16,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
@@ -35,6 +36,7 @@ import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.presentation.screens.profile.ProfileViewModel
+import kotlinx.coroutines.delay
 
 class SplashScreen : Screen {
     @Composable
@@ -48,6 +50,7 @@ class SplashScreen : Screen {
 
         val prefs = CustomPreference(LocalContext.current)
         LaunchedEffect(key1 = true) {
+            delay(4800)
             if (prefs.getAccessToken() == "") {
                 navigator.replace(SearchAddressScreen())
                 //mainViewModel.getFastAddresses()
@@ -69,59 +72,13 @@ class SplashScreen : Screen {
 
     @Composable
     fun Splash() {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colors.secondary),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.logo_gram_black),
-                    "",
-                    tint = MaterialTheme.colors.onSecondary
-                )
-
-                val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.day_and_night))
-                //val progress by animateLottieCompositionAsState(composition)
-                LottieAnimation(
-                    composition = composition,
-                    modifier = Modifier.fillMaxSize(0.4f),
-                    alignment = Alignment.BottomCenter
-                    //progress = { progress },
-                )
-
-            }
-
-            Text(
-                text = "БЫСТРО, ДЕШЕВО, БЕЗОПАСНО",
-                fontSize = 18.sp,
-                modifier = Modifier.padding(top = 30.dp)
-            )
-            var visible by remember { mutableStateOf(false) }
-
-            val animationTime = 15000
-            val animationDelayTime = 5
-
-            val arrowStartLocation = Offset(0F, 100F)
-            val arrowEndLocation = Offset(0F, 0F)
-
-            LaunchedEffect(Unit) {
-                visible = true
-            }
-            val arrowLocation by animateOffsetAsState(
-                targetValue = if (visible) arrowEndLocation else arrowStartLocation,
-                animationSpec = tween(animationTime, animationDelayTime, easing = LinearOutSlowInEasing)
-            )
-            Image(
-                painter = BitmapPainter(ImageBitmap.imageResource(R.drawable.city)),
-                contentDescription = "Зимний лес",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .offset(arrowLocation.x.dp, arrowLocation.y.dp),
-                alignment = Alignment.BottomCenter
-            )
-        }
+        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash))
+        //val progress by animateLottieCompositionAsState(composition)
+        LottieAnimation(
+            composition = composition,
+            modifier = Modifier.fillMaxHeight(),
+            contentScale = ContentScale.Crop
+            //progress = { progress },
+        )
     }
 }
