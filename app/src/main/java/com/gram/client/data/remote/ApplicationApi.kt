@@ -3,6 +3,7 @@ package com.gram.client.data.remote
 import com.gram.client.domain.athorization.AuthResponse
 import com.gram.client.domain.athorization.IdentificationResponse
 import com.gram.client.domain.athorization.IdentificationRequest
+import com.gram.client.domain.countries.CountriesKeyResponse
 import com.gram.client.domain.mainScreen.AddressByPointResponse
 import com.gram.client.domain.mainScreen.AllowancesResponse
 import com.gram.client.domain.mainScreen.SearchAddressResponse
@@ -197,4 +198,9 @@ interface ApplicationApi {
         @Path("id") id: Int,
         ): DeleteMyAddressesResponse
 
+    @GET("/api/mob-app/countries/{code}")
+    suspend fun getCountriesKey(
+        @Header("Authorization") token: String,
+        @Path("code") code :String
+    ): CountriesKeyResponse
 }

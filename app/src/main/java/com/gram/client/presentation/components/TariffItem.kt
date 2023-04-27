@@ -24,6 +24,7 @@ import com.valentinilk.shimmer.shimmer
 fun TariffItem(
     icon: String?,
     price: Int,
+    key: String,
     name: String,
     isSelected: Boolean,
     onSelected: () -> Unit = {},
@@ -53,7 +54,7 @@ fun TariffItem(
         Text(text = name, fontSize = 13.sp, color = if (isSelected) Color.Black else Color.Black.copy(0.5f), maxLines = 1)
         AnimatedVisibility(visible = true) {
             Box(modifier = Modifier.height(15.dp)){
-                Text(text = "$price c", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (isSelected) Color.Black else Color.Black.copy(0.5f))
+                Text(text = "$price $key", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (isSelected) Color.Black else Color.Black.copy(0.5f))
             }
         }
 

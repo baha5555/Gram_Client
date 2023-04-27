@@ -99,6 +99,9 @@ class MainScreen : Screen{
                 mainViewModel.getTariffs()
                 mainViewModel.getAllowancesByTariffId(1)
                 mainViewModel.getPrice()
+                if(mainViewModel.stateCountriesKey.value.response==null){
+                    mainViewModel.getCountriesKey("tj")
+                }
                 initialApiCalled = true
             }
         }
@@ -122,6 +125,8 @@ class MainScreen : Screen{
         val stateAllowances by mainViewModel.stateAllowances
 
         val stateCalculate by mainViewModel.stateCalculate
+
+        val countriesKey by mainViewModel.stateCountriesKey
 
         ModalBottomSheetLayout(
             sheetState = modalSheetState,
