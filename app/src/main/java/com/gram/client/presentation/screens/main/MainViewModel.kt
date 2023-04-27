@@ -24,6 +24,9 @@ import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
+import com.gram.client.domain.countries.CountriesKeyResponse
+import com.gram.client.domain.countries.GetCountriesKeyResponseState
+import com.gram.client.domain.countries.GetCountriesKeyUseCase
 import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -40,6 +43,7 @@ class MainViewModel @Inject constructor(
     private val searchAddressUseCase: SearchAddressUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
     private val getPriceUseCase: GetPriceUseCase,
+    private val getCountriesKeyUseCase: GetCountriesKeyUseCase,
     private val fastAddressesUseCase: FastAddressesUseCase
 ) : AndroidViewModel(application) {
     val context get() = getApplication<Application>()
@@ -59,6 +63,9 @@ class MainViewModel @Inject constructor(
 
     private val _stateCalculate = mutableStateOf(CalculateResponseState())
     val stateCalculate: State<CalculateResponseState> = _stateCalculate
+
+    private val _stateCountriesKey = mutableStateOf(GetCountriesKeyResponseState())
+    val stateCountriesKey: State<GetCountriesKeyResponseState> = _stateCountriesKey
 
     private val _stateCreateOrder = mutableStateOf(OrderResponseState())
     val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
@@ -170,6 +177,33 @@ class MainViewModel @Inject constructor(
             _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
             selectedAllowances.value = _selectedAllowances
         }
+    }
+    fun getCountriesKey(str:String){
+        getCountriesKeyUseCase.invoke(str).onEach { result: Resource<CountriesKeyResponse> ->
+            when (result) {
+                is Resource.Success -> {
+                    try {
+                        val responses: CountriesKeyResponse? = result.data
+                        _stateCountriesKey.value = GetCountriesKeyResponseState(response = responses?.result )
+                        Log.e(
+                            "CountriesKeyResponse",
+                            "CountriesKeyResponseSuccess->\n ${_stateCountriesKey.value}"
+                        )
+                    } catch (e: Exception) {
+                        Log.d("CountriesKeyResponse", "${e.message} Exception")
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e("CountriesKeyResponse", "CountriesKeyResponseError->\n ${result.message}")
+                    _stateCountriesKey.value = GetCountriesKeyResponseState(
+                        error = "${result.message}"
+                    )
+                }
+                is Resource.Loading -> {
+                    _stateCountriesKey.value = GetCountriesKeyResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun getTariffs() {

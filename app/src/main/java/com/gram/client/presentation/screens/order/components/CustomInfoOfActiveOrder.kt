@@ -28,8 +28,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.CustomSwitch
+import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 import androidx.compose.foundation.layout.Row as Row
 
 class CustomInfoOfActiveOrder : Screen {
@@ -40,12 +42,14 @@ class CustomInfoOfActiveOrder : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+        val mainViewModel: MainViewModel = hiltViewModel()
         val stateRealtimeDatabaseOrders =
             orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
         var symbol by remember { mutableStateOf(65) }
         var selectRealtimeDatabaseOrder: RealtimeDatabaseOrder by remember {
             mutableStateOf(RealtimeDatabaseOrder())
         }
+        val countriesKey =mainViewModel.stateCountriesKey.value.response
         val selectedOrder by orderExecutionViewModel.selectedOrder
         scope.launch {
             Log.e("runRe", "get")
@@ -172,77 +176,79 @@ class CustomInfoOfActiveOrder : Screen {
                                     }
                                 }
                             }
-//                            order.allowances?.let { allowance ->
-//                                CustomInfoTitle(title = "Надбавки")
-//                                CustomSelectAllowances(
-//                                    title = "Увеличить",
-//                                    number = listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
-//                                )
-//                                Divider(
-//                                        modifier = Modifier
-//                                            .fillMaxWidth()
-//                                            .padding(start = 15.dp)
-//                                        )
-//                                CustomSelectAllowances(
-//                                    title = "С детьми",
-//                                    number = listOf(1,2,3,4)
-//                                )
-//                                Divider(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .padding(start = 15.dp)
-//                                )
-//                                Column(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .padding(horizontal = 15.dp),
-//                                ) {
-//                                    allowance.forEach {
-//                                        Row(modifier = Modifier
-//                                            .fillMaxWidth()
-//                                            .padding(end = 10.dp),
-//                                            verticalAlignment = Alignment.CenterVertically,
-//                                            horizontalArrangement = Arrangement.SpaceBetween) {
-//                                            Text(
-//                                                text = it.name, modifier = Modifier
-//                                                    .padding(vertical = 25.dp)
-//                                            )
-//                                            Row(modifier = Modifier,
-//                                            verticalAlignment = Alignment.CenterVertically) {
-//                                                Text(
-//                                                    text = "+ ${it.price} c", modifier = Modifier
-//                                                        .padding(vertical = 25.dp)
-//                                                        .padding(end = 15.dp)
-//                                                )
-//                                                val switchON = remember {
-//                                                    mutableStateOf(false) // Initially the switch is ON
-//                                                }
-//                                                CustomSwitch(switchON = switchON) {}
-//                                            }
-//
-//                                        }
-//
-//                                        Divider(
-//                                            modifier = Modifier
-//                                                .fillMaxWidth()
-//                                                .padding(start = 15.dp)
-//                                        )
-//                                    }
-//                                }
-//                                CustomSelectAllowances(
-//                                    title = "Сдача с",
-//                                    number = listOf(50,100,200,500)
-//                                )
-//                                Divider(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .padding(start = 15.dp)
-//                                )
-//                                CustomSelectAllowances(
-//                                    title = "Чаевые",
-//                                    listOf(1,2,3,4,5,6,7,8,9,10,20,30,40,50)
-//                                )
-//                            }
+                            order.allowances?.let { allowance ->
+                                CustomInfoTitle(title = "Надбавки")
+                                CustomSelectAllowances(
+                                    title = "Увеличить",
+                                    number = listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
+                                )
+                                Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 15.dp)
+                                        )
+                                CustomSelectAllowances(
+                                    title = "С детьми",
+                                    number = listOf(1,2,3,4)
+                                )
+                                Text(text = "${order.price} ${countriesKey?.currency_symbol?.monetary_unit}.")
+
+                                Divider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp)
+                                )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 15.dp),
+                                ) {
+                                    allowance.forEach {
+                                        Row(modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(end = 10.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Text(
+                                                text = it.name, modifier = Modifier
+                                                    .padding(vertical = 25.dp)
+                                            )
+                                            Row(modifier = Modifier,
+                                            verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = "+ ${it.price} ${countriesKey?.currency_symbol?.key}", modifier = Modifier
+                                                        .padding(vertical = 25.dp)
+                                                        .padding(end = 15.dp)
+                                                )
+                                                val switchON = remember {
+                                                    mutableStateOf(false) // Initially the switch is ON
+                                                }
+                                                CustomSwitch(switchON = switchON) {}
+                                            }
+
+                                        }
+
+                                        Divider(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(start = 15.dp)
+                                        )
+                                    }
+                                }
+                                CustomSelectAllowances(
+                                    title = "Сдача с",
+                                    number = listOf(50,100,200,500)
+                                )
+                                Divider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp)
+                                )
+                                CustomSelectAllowances(
+                                    title = "Чаевые",
+                                    listOf(1,2,3,4,5,6,7,8,9,10,20,30,40,50)
+                                )
+                            }
                         }
                     }
                 }
@@ -291,6 +297,9 @@ class CustomInfoOfActiveOrder : Screen {
         title: String,
         number: List<Int>
     ) {
+        val mainViewModel: MainViewModel = hiltViewModel()
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+
         var selectedButton by remember { mutableStateOf(0) }
         val switchON = remember { mutableStateOf(false) } // Initially the switch is ON
 
@@ -321,13 +330,20 @@ class CustomInfoOfActiveOrder : Screen {
                         Row(Modifier.padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .padding(2.dp).wrapContentWidth()
+                                    .padding(2.dp)
+                                    .wrapContentWidth()
                                     .wrapContentHeight()
                                     .background(
                                         if (selectedButton == it) Color.Black else Color.White,
                                         shape = RoundedCornerShape(20)
                                     )
-                                    .clickable { selectedButton = it}
+                                    .clickable {
+                                        selectedButton = it
+                                        mainViewModel.stateAllowances.value.response?.forEach { it.price + number.lastIndex }
+                                        orderExecutionViewModel.editOrder()
+
+
+                                    }
                                     .border(
                                         width = 1.dp,
                                         color = Color.Gray,

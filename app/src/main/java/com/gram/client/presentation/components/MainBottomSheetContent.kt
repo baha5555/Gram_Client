@@ -1,6 +1,7 @@
 package com.gram.client.presentation.components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -31,6 +32,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import com.gram.client.utils.Constants
 import com.gram.client.R
+import com.gram.client.domain.countries.GetCountriesKeyResponseState
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.domain.mainScreen.TariffsResult
 import com.gram.client.presentation.components.voyager.*
@@ -322,6 +324,7 @@ fun TariffsContent(
     mainViewModel: MainViewModel,
 ) {
     val stateCalculate = mainViewModel.stateCalculate.value
+val countriesKey = mainViewModel.stateCountriesKey.value
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -350,9 +353,11 @@ fun TariffsContent(
                     if (selected_tariff.value == null) return
                     if (it.tariff_id == selected_tariff.value!!.id) {
                         Text(
-                            text = "${it.amount} c",
+                            text = "${it.amount} ${countriesKey.response?.currency_symbol?.monetary_unit}",
                             fontSize = 25.sp
                         )
+                        Log.e("esfsefs","$it")
+
                     }
                 }
             }
@@ -388,16 +393,22 @@ fun TariffsContent(
                         stateCalculate.response?.result?.forEach {
                             if (it.tariff_id == tariff.id) price.value = it.amount
                         }
-                        TariffItem(
-                            icon = tariff.icon,
-                            name = tariff.name,
-                            price = if (price.value == 0) tariff.min_price else price.value,
-                            stateCalculate = stateCalculate,
-                            isSelected = selected_tariff?.value == tariff,
-                            onSelected = {
-                                mainViewModel.getAllowancesByTariffId(tariff.id)
-                                mainViewModel.updateSelectedTariff(tariff)
-                            })
+                        countriesKey.response?.currency_symbol?.key?.let {
+                            TariffItem(
+                                icon = tariff.icon,
+                                name = tariff.name,
+                                price = if (price.value == 0) tariff.min_price else price.value,
+                                stateCalculate = stateCalculate,
+                                isSelected = selected_tariff?.value == tariff,
+                                onSelected = {
+                                    mainViewModel.getAllowancesByTariffId(tariff.id)
+                                    mainViewModel.updateSelectedTariff(tariff)
+                                },
+                                key = it
+                            )
+                            Log.e("esfsefs","$it")
+                        }
+
                         Spacer(modifier = Modifier.width(10.dp))
                     })
                 }

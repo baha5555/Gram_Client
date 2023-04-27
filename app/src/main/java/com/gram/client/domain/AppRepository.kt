@@ -3,6 +3,7 @@ package com.gram.client.domain
 import com.gram.client.domain.athorization.AuthResponse
 import com.gram.client.domain.athorization.IdentificationResponse
 import com.gram.client.domain.athorization.IdentificationRequest
+import com.gram.client.domain.countries.CountriesKeyResponse
 import com.gram.client.domain.mainScreen.AddressByPointResponse
 import com.gram.client.domain.mainScreen.AllowancesResponse
 import com.gram.client.domain.mainScreen.SearchAddressResponse
@@ -83,6 +84,8 @@ interface AppRepository {
     suspend fun getReasons(): Reasons
 
     suspend fun getRatingReasons(): GetRatingReasonsResponse
+
+    suspend fun getCountriesKey(str:String): CountriesKeyResponse
 
     suspend fun addMyAddresses(
         addMyAddressRequest: AddMyAddressRequest
