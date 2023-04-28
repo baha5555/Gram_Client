@@ -16,6 +16,7 @@ import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.components.CustomRequestError
 import com.gram.client.presentation.screens.SplashScreen
 import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressScreen
+import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressViewModel
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.profile.ProfileViewModel
@@ -58,16 +59,23 @@ fun RootScreen() {
 fun ReturnRequest(
     mainViewModel: MainViewModel = hiltViewModel(),
     orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel(),
-    profileViewModel: ProfileViewModel = hiltViewModel()
+    profileViewModel: ProfileViewModel = hiltViewModel(),
+    myAddressViewModel: MyAddressViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val prefs = CustomPreference(context)
     val activeOrders = orderExecutionViewModel.stateActiveOrders.value
     val profileInfo = profileViewModel.stateGetProfileInfo.value
     val fastAddresses = mainViewModel.stateFastAddress.value
+    val myAddresses = myAddressViewModel.stateGetAllMyAddresses.value
 
-    if ((activeOrders.error + profileInfo.error + fastAddresses.error) != "")
+    if ((activeOrders.error + profileInfo.error + fastAddresses.error + myAddresses.error) != "")
         CustomRequestError {
             if (activeOrders.error != "") orderExecutionViewModel.getActiveOrders()
             if (profileInfo.error != "") profileViewModel.getProfileInfo()
             if (fastAddresses.error != "") mainViewModel.getFastAddresses()
+            if(prefs.getAccessToken()!=""){
+                if (myAddresses.error != "") myAddressViewModel.getAllMyAddresses()
+            }
         }
 }

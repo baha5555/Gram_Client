@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -22,10 +25,11 @@ fun CustomRequestError(onClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp)
+                .shadow(3.dp, shape = RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colors.background)
+                .background(Color.White)
                 .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = "Не удалось отправить запрос.\n" +
@@ -34,7 +38,8 @@ fun CustomRequestError(onClick: () -> Unit) {
                 modifier = Modifier.weight(0.7f))
             Text(
                 text = "Повторить", modifier = Modifier.clickable { onClick.invoke() },
-                fontSize = 16.sp
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
             )
         }
 
