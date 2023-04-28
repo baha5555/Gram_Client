@@ -14,6 +14,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
+import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.order.SearchDriverScreen
@@ -25,6 +26,7 @@ class SplashScreen : Screen {
     override fun Content() {
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val profileViewModel: ProfileViewModel = hiltViewModel()
+        val mainViewModel: MainViewModel = hiltViewModel()
 
         val navigator = LocalNavigator.currentOrThrow
         val currentKey = navigator.lastItem.key
@@ -44,6 +46,9 @@ class SplashScreen : Screen {
             else {
                 orderExecutionViewModel.getActiveOrders()
                 profileViewModel.getProfileInfo()
+                if(mainViewModel.stateCountriesKey.value.response==null){
+                    mainViewModel.getCountriesKey("tj")
+                }
                 //mainViewModel.getFastAddresses()
             }
             isAnimationEnd.value = true

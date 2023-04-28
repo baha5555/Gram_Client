@@ -7,6 +7,7 @@ import com.gram.client.domain.mainScreen.TariffsResponse
 import com.gram.client.domain.athorization.AuthResponse
 import com.gram.client.domain.athorization.IdentificationResponse
 import com.gram.client.domain.athorization.IdentificationRequest
+import com.gram.client.domain.countries.CountriesKeyResponse
 import com.gram.client.domain.mainScreen.AddressByPointResponse
 import com.gram.client.domain.mainScreen.AllowancesResponse
 import com.gram.client.domain.mainScreen.SearchAddressResponse
@@ -169,5 +170,8 @@ class AppRepositoryImpl(
         id: Int,
     ): DeleteMyAddressesResponse =
         api.deleteMyAddresses(prefs.getAccessToken(), id)
+
+    override suspend fun getCountriesKey(str:String): CountriesKeyResponse =
+        api.getCountriesKey(prefs.getAccessToken(),str)
 
 }
