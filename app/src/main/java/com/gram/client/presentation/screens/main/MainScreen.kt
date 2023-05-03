@@ -149,6 +149,7 @@ class MainScreen : Screen{
                             else if(dopPhoneState.length<12) {
                                 Toast.makeText(context, "Неподходящая длина", Toast.LENGTH_SHORT).show()
                             }
+
                         },
                         textFieldValue = dopPhoneState,
                         onValueChange = {
@@ -221,7 +222,13 @@ class MainScreen : Screen{
                             }
                         },
                         selectedDate = selectedDate,
-                        selectedTime = selectedTime
+                        selectedTime = selectedTime,
+                        onResetClick = {
+                            mainViewModel.resetPlannedTrip()
+                            coroutineScope.launch {
+                                modalSheetState.animateTo(ModalBottomSheetValue.Hidden)
+                            }
+                        }
                     )
                 }
                 else {

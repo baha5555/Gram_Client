@@ -120,6 +120,10 @@ class MainViewModel @Inject constructor(
         _planTrip.value = plan
     }
 
+    fun resetPlannedTrip() {
+        _planTrip.value = ""
+    }
+
     fun updateDopPhone(phone: String) {
         _dopPhone.value = phone
     }
