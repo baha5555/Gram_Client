@@ -52,6 +52,7 @@ fun CustomDopInfoForDriver(
     planTripFifteenMinutesOnClick:()->Unit = {},
     selectedTime:MutableState<String> = mutableStateOf(""),
     selectedDate:MutableState<String> = mutableStateOf(""),
+    onResetClick: () -> Unit = {}
 ) {
     var stateTimeDialog by remember{mutableStateOf(false)}
     var stateDatePickerDialog = remember{mutableStateOf(false)}
@@ -124,6 +125,15 @@ fun CustomDopInfoForDriver(
 
                 Text(text = if(selectedDate.value=="" && selectedTime.value=="")"Указать дату и время" else "${selectedDate.value} ${selectedTime.value}")
                 Icon(imageVector = Icons.Default.ArrowForward, contentDescription = null)
+            }
+            TextButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onResetClick, // Вызов функции resetOnClick при нажатии на кнопку "Сбросить"
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colors.error
+                )
+            ) {
+                Text(text = "Сбросить", color = MaterialTheme.colors.error)
             }
         }
         if(textFieldValue!="" || stateViewOfInfo.value) {
