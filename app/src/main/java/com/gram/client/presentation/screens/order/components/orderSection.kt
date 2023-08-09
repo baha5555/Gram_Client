@@ -1,5 +1,6 @@
 package com.gram.client.presentation.screens.order.components
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,7 @@ fun orderSection(
 ) {
     val navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,6 +140,8 @@ fun orderSection(
                             if (order.to_address.size > 1) {
                                 Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
                                 bottomNavigator.show(AddStopScreenOrderExcecution())
+                                Toast.makeText(context,"Можно изменить порядок остановки", Toast.LENGTH_SHORT).show()
+
                             } else {
                                 Values.WhichAddress.value=Constants.TO_ADDRESS
                                 bottomNavigator.show(

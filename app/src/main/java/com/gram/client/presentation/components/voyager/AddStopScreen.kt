@@ -97,7 +97,7 @@ class AddStopScreen(val function: () -> Unit) : Screen {
                                     contentDescription = "",
                                     tint = Color.Red,
                                     modifier = Modifier
-                                        .size(35.dp)
+                                        .size(30.dp)
                                         .padding(end = 5.dp)
                                         .clickable {
                                             vm.removeAddStop(item)

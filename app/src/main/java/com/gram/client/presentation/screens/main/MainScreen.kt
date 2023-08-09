@@ -253,7 +253,11 @@ class MainScreen : Screen{
                                 Row(modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        paymentState.value = item
+                                        when (idx) {
+                                            0 -> paymentState.value = item
+                                            1 -> Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_SHORT).show()
+                                            else -> Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_SHORT).show()
+                                        }
                                     }
                                     .padding(vertical = 15.dp),
                                     verticalAlignment = Alignment.CenterVertically,
@@ -275,7 +279,11 @@ class MainScreen : Screen{
                                     }
                                     CustomCheckBox(size = 25.dp,
                                         isChecked = paymentState.value == item,
-                                        onChecked = { paymentState.value = item })
+                                        onChecked = {  when (idx) {
+                                            0 -> paymentState.value = item
+                                            1 -> Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_SHORT).show()
+                                            else -> Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_SHORT).show()
+                                        }})
                                 }
                                 Divider()
                             }
