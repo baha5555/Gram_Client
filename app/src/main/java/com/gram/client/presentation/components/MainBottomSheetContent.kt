@@ -2,6 +2,7 @@ package com.gram.client.presentation.components
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -152,6 +154,7 @@ fun AddressesContent(
     val navigator: Navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
     val meeting = mainViewModel.stateMeetingInfo.value
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -245,6 +248,7 @@ fun AddressesContent(
                         bottomNavigator.show(AddStopScreen {
                             navigator.push(MapPointScreen())
                         })
+                        Toast.makeText(context,"Можно изменить порядок остановки",Toast.LENGTH_SHORT).show()
                     }
                 }
                 .fillMaxWidth()
