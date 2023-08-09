@@ -356,7 +356,6 @@ val countriesKey = mainViewModel.stateCountriesKey.value
                             text = "${it.amount} ${countriesKey.response?.currency_symbol?.monetary_unit}",
                             fontSize = 25.sp
                         )
-                        Log.e("esfsefs","$it")
 
                     }
                 }
@@ -406,7 +405,6 @@ val countriesKey = mainViewModel.stateCountriesKey.value
                                 },
                                 key = it
                             )
-                            Log.e("esfsefs","$it")
                         }
 
                         Spacer(modifier = Modifier.width(10.dp))

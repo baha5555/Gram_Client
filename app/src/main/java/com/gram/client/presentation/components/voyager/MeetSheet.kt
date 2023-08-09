@@ -71,7 +71,7 @@ class MeetSheet : Screen {
                     .fillMaxWidth(),
                 placeholder = {
                     Text(
-                        "Укажите номер подъезда",
+                        "Укажите номер подъезда или места встречи",
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()

@@ -84,7 +84,10 @@ fun BottomBar(
                         IDENTIFY_TO_SCREEN = "MAINSCREEN"
                         navigator.push(AuthScreen())
                     } else {
-                        isDialogOpen.value = true
+                        createOrder().let {
+                            navigator.push(SearchDriverScreen())
+                        }
+
                     }
                 }
             })
