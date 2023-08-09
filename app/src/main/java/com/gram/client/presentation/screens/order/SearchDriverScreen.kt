@@ -210,7 +210,7 @@ class SearchDriverScreen : Screen {
                                                     active.forEach { clientOrderId ->
                                                         val isOpen = remember {
                                                             mutableStateOf(
-                                                                false
+                                                                true
                                                             )
                                                         }
                                                         if (order.id == clientOrderId) {
@@ -352,7 +352,7 @@ class SearchDriverScreen : Screen {
                         color = MaterialTheme.colors.onBackground
                     )
                     Text(
-                        text = if (order.performer == null) "Среднее время поиска водителя: 1 мин" else "${order.performer.transport?.color ?: ""} ${order.performer.transport?.model ?: ""}",
+                        text = if (order.performer == null) "Среднее время поиска водителя ≈ 4 мин" else "${order.performer.transport?.color ?: ""} ${order.performer.transport?.model ?: ""}",
                         fontSize = 14.sp
                     )
                 }
@@ -384,20 +384,18 @@ class SearchDriverScreen : Screen {
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if (order.performer == null) {
-                        CustomCircleButton(
-                            text = "Отменить\nзаказ", icon = Icons.Default.Close
-                        ) {
-                            bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order))
-                        }
-                    } else {
+
                         CustomCircleButton(
                             text = "Связаться",
                             icon = ImageVector.vectorResource(id = R.drawable.phone)
                         ) {
-                            connectClientWithDriverIsDialogOpen.value = true
+                            if(order.performer == null){
+                                Toast.makeText(context,"Водитель еще не найден!",Toast.LENGTH_SHORT).show()
+                            }else{
+                                connectClientWithDriverIsDialogOpen.value = true
+                            }
                         }
-                    }
+
                     Spacer(modifier = Modifier.width(50.dp))
                     CustomCircleButton(text = "Детали", icon = Icons.Default.Menu) {
                         orderExecutionViewModel.updateSelectedOrder(order)
