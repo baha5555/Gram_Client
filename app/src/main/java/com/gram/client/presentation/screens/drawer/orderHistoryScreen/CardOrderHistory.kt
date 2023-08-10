@@ -36,10 +36,8 @@ class CardOrderHistory : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: OrderHistoryViewModel = hiltViewModel()
-        val mainViewModel: MainViewModel = hiltViewModel()
         val order = viewModel.selectedOrder.value
-        val context = LocalContext.current
-        var WHICH_ADDRESS = remember { mutableStateOf(Constants.FROM_ADDRESS) }
+
 
         Scaffold(
             topBar = {
@@ -126,6 +124,7 @@ class CardOrderHistory : Screen {
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
+                               // if (order.status == "Выполнен"){
                                 Text(
                                     text = viewModel.selectedOrder.value.performer?.first_name
                                         ?: "   ",
@@ -137,12 +136,14 @@ class CardOrderHistory : Screen {
                                             color = Color(0xFFF4B91D)
                                         )
                                 )
+                                //}
+
                                 Image(
                                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_car),
                                     contentDescription = "car_eco",
                                     modifier = Modifier
                                         .offset(y = (-10).dp)
-                                        .size(65.dp)
+                                        .size(80.dp)
                                 )
                             }
                         }/*

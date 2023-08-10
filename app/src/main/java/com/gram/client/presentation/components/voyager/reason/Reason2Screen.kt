@@ -1,5 +1,6 @@
 package com.gram.client.presentation.components.voyager.reason
 
+import android.service.autofill.OnClickAction
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,7 +27,8 @@ import com.gram.client.utils.Values
 
 class Reason2Screen(
     val orderExecutionViewModel: OrderExecutionViewModel,
-    val order: RealtimeDatabaseOrder
+    val order: RealtimeDatabaseOrder,
+   val  onClickAction: ()->Unit
 ) : Screen {
     private var reasonsCheck: MutableState<String> = mutableStateOf("")
 
@@ -78,11 +80,13 @@ class Reason2Screen(
                 onClick = {
                     reasonsCheck.value+="\n"+Values.CommentCancelReasons.value
                     bottomNavigator.hide()
+
                     orderExecutionViewModel.cancelOrder(order.id, reasonsCheck.value) {
                         orderExecutionViewModel.stateCancelOrder.value.response.let {}
                     }
                     Values.CommentCancelReasons.value=""
                     reasonsCheck.value=""
+                    onClickAction()
                 },
                 enabled = reasonsCheck.value != "" || Values.CommentCancelReasons.value!="",
                 modifier = Modifier

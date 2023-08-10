@@ -12,9 +12,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
+import com.gram.client.presentation.screens.order.SearchDriverScreen
 
 class Reason1Screen(
     val orderExecutionViewModel: OrderExecutionViewModel,
@@ -23,6 +26,7 @@ class Reason1Screen(
     @Composable
     override fun Content() {
         val bottomNavigator = LocalBottomSheetNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -41,7 +45,7 @@ class Reason1Screen(
             Spacer(modifier = Modifier.height(35.dp))
             Button(
                 onClick = {
-                    bottomNavigator.replace(Reason2Screen(orderExecutionViewModel, order))
+                    bottomNavigator.replace(Reason2Screen(orderExecutionViewModel, order) {navigator.replace(SearchDriverScreen())})
                 },
                 modifier = Modifier
                     .fillMaxWidth()

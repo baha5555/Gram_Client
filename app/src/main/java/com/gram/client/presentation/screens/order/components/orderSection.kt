@@ -27,7 +27,6 @@ import com.gram.client.utils.Values
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun orderSection(
     order: RealtimeDatabaseOrder,
