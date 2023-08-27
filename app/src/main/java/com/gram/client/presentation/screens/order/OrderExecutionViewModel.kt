@@ -285,7 +285,11 @@ class OrderExecutionViewModel @Inject constructor(
                         _stateActiveOrdersList.clear()
                         stateActiveOrders.value.response?.forEach {
                             _stateActiveOrdersList.add(it)
+                            if(it.id == selectedOrder.value.id){
+                                updateSelectedOrder(it)
+                            }
                         }
+
                         Log.e(
                             "ActiveOrdersResponse",
                             "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}"

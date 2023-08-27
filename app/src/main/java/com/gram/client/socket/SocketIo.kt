@@ -34,7 +34,7 @@ object SocketHandler {
                     var gson = Gson()
                     var model: EditOrderSocketResponse = gson.fromJson(args[0].toString(), EditOrderSocketResponse::class.java)
                     Log.e("SocketIODATA","${model.data.id}")
-                    orderExecutionViewModel.addActiveOrder(model.data)
+                    orderExecutionViewModel.getActiveOrders()
                 }catch (_ : Exception){
 
                 }
