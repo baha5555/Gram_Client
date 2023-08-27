@@ -21,7 +21,6 @@ import com.gram.client.domain.mainScreen.order.*
 import com.gram.client.presentation.screens.main.states.*
 import com.gram.client.presentation.screens.map.MapController
 import com.gram.client.presentation.screens.map.map
-import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.gram.client.domain.countries.CountriesKeyResponse
@@ -378,13 +377,13 @@ class MainViewModel @Inject constructor(
     fun updateMeetingInfo(text: String){
         _stateMeetingInfo.value = text
     }
-    fun createOrder(orderExecutionViewModel: OrderExecutionViewModel) {
+    fun createOrder(onSuccess: () -> Unit) {
         createOrderUseCase.invoke(
             dop_phone = if (Values.CommentToAnotherHuman.value.length==12) Values.CommentToAnotherHuman.value else null,
             from_address = if (fromAddress.value.id != 0 && fromAddress.value.id!=-1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
             comment = if (Values.CommentDriver.value!= "") Values.CommentDriver.value else null,
-            tariff_id = selectedTariff?.value?.id ?: 1,
+            tariff_id = selectedTariff.value?.id ?: 1,
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
@@ -395,6 +394,7 @@ class MainViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     try {
+                        onSuccess()
                         updateDopPhone("")
                         updatePlanTrip("")
                         updateCommentToOrder("")
@@ -405,7 +405,6 @@ class MainViewModel @Inject constructor(
                             "OrderResponse",
                             "OrderResponseSuccess->\n ${_stateCreateOrder.value}\n -> ${_planTrip.value}"
                         )
-                        orderExecutionViewModel.getActiveOrders()
                         _stateMeetingInfo.value=""
                         _toAddresses.clear()
                         Values.CommentDriver.value=""

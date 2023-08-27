@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,7 +19,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.components.voyager.RatingScreen
 import com.gram.client.presentation.components.voyager.reason.Reason1Screen
@@ -54,8 +50,7 @@ class OrderExecutionScreen : Screen {
 
         val coroutineScope = rememberCoroutineScope()
 
-        val stateRealtimeDatabaseOrders =
-            orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
+
 
         val stateReasonsResponse = orderExecutionViewModel.stateGetReasons.value.response
         val reasonsCheck = remember { mutableStateOf("") }
@@ -78,21 +73,11 @@ class OrderExecutionScreen : Screen {
             Log.i("asdasda", "" + Values.DriverLocation.value)
         }
 
-        var selectRealtimeDatabaseOrder: RealtimeDatabaseOrder by remember {
-            mutableStateOf(RealtimeDatabaseOrder())
-        }
         val bottomNavigator = LocalBottomSheetNavigator.current
-        // searchState dependencies ->
-        var WHICH_ADDRESS = remember { mutableStateOf("") }
-        val isAddressList = remember { mutableStateOf(true) }
         val searchText = remember { mutableStateOf("") }
-        val focusManager = LocalFocusManager.current
-        val isSearchState = remember { mutableStateOf(false) }
-        val focusRequester = remember { FocusRequester() }
         var orderId by remember {
             mutableStateOf(-1)
         }
-        //searchState dependencies <-
 
         val selectedOrder by orderExecutionViewModel.selectedOrder
 
@@ -102,35 +87,6 @@ class OrderExecutionScreen : Screen {
 
         var stateCancelOrderText by remember {
             mutableStateOf("Вы уверены, что хотите отменить данный заказ?")
-        }
-        scope.launch {
-            Log.e("runRe", "get")
-            stateRealtimeDatabaseOrders.let { orders ->
-                orders?.forEach { order ->
-                    if (order.id == selectedOrder.id) {
-                        Log.e("Select Order", "$selectRealtimeDatabaseOrder")
-                        selectRealtimeDatabaseOrder = order
-                    }
-                }
-            }
-
-            selectRealtimeDatabaseOrder.from_address?.let {
-                if (it != mainViewModel.fromAddress.value) {
-                    orderExecutionViewModel.updateFromAddress(it)
-                }
-                Log.e("From_address-1", "$it")
-            }
-
-            selectRealtimeDatabaseOrder.to_address?.let { to_Addresses ->
-                orderExecutionViewModel.updateToAddress(clear = true)
-                if (to_Addresses.toMutableStateList() != mainViewModel.toAddresses) {
-                    //orderExecutionViewModel.updateToAddress(to_Addresses.toMutableStateList())
-                    to_Addresses.toMutableStateList().forEach {
-                        orderExecutionViewModel.updateToAddress(it)
-                    }
-                }
-                Log.e("From_address-1", ""+to_Addresses.toMutableStateList().size)
-            }
         }
             BottomSheetScaffold(
             scaffoldState = sheetState,
@@ -148,8 +104,8 @@ class OrderExecutionScreen : Screen {
                         if (searchText.value != "")
                             searchText.value = ""
                     }
-                    selectRealtimeDatabaseOrder.let { order ->
-                        Log.i("orderAddresses", "" + order.from_address)
+                    orderExecutionViewModel.selectedOrder.value.let { order ->
+                        Log.i("orderAddresses", "" + order)
                         if (order.id != -1) orderExecutionViewModel.getDriverLocation(order.id)
                         if (isGet.value) {
                             order.from_address.let {
@@ -158,7 +114,7 @@ class OrderExecutionScreen : Screen {
                                     //mainViewModel.updateFromAddress(it)
                                 }
                             }
-                            order.to_address.let {
+                            order.to_addresses.let {
                                 it?.forEach { it2 ->
                                     //mainViewModel.updateToAddress(it2)
                                 }
@@ -219,18 +175,7 @@ class OrderExecutionScreen : Screen {
                                         coroutineScope.launch {
                                             isDialogOpen.value = false
                                             sheetState.bottomSheetState.collapse()
-                                            if (orderId != -1)
-                                                orderExecutionViewModel.cancelOrder(orderId, reasonsCheck.value) {
-                                                    orderExecutionViewModel.stateCancelOrder.value.response.let {
-                                                        if(it == null ) return@cancelOrder
-                                                        if(it.result[0].count==0){
-                                                            navigator.replaceAll(SearchAddressScreen())
-                                                        }
-                                                        else{
-                                                            navigator.pop()
-                                                        }
-                                                    }
-                                                }
+
                                         }
                                     }, enabled = reasonsCheck.value != "") {
                                         Text("Отменить заказ")
@@ -251,7 +196,7 @@ class OrderExecutionScreen : Screen {
                     )
                 }
                 if (STATE_RATING.value) {
-                    bottomNavigator.show(RatingScreen(STATE_RAITING_ORDER_ID.value, selectRealtimeDatabaseOrder.price){
+                    bottomNavigator.show(RatingScreen(STATE_RAITING_ORDER_ID.value, orderExecutionViewModel.selectedOrder.value.price){
                         navigator.replaceAll(SearchAddressScreen())
                     })
                     STATE_RATING.value=false

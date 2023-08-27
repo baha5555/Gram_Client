@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gram.client.R
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
+import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.presentation.components.CustomCircleButton
 import com.gram.client.presentation.components.CustomDialog
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat
 @SuppressLint("CoroutineCreationDuringComposition", "SimpleDateFormat")
 @Composable
 fun performerSection(
-    performer: RealtimeDatabaseOrder,
+    performer: AllActiveOrdersResult,
     orderExecutionViewModel: OrderExecutionViewModel
 ){
     val context = LocalContext.current

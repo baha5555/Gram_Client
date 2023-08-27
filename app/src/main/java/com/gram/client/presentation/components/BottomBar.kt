@@ -17,11 +17,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.screens.authorization.AuthScreen
+import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.utils.Constants.IDENTIFY_TO_SCREEN
 import com.gram.client.utils.Constants.stateOfDopInfoForDriver
@@ -38,6 +40,7 @@ fun BottomBar(
     val coroutineScope= rememberCoroutineScope()
     val isDialogOpen=remember{ mutableStateOf(false) }
     val prefs = CustomPreference(LocalContext.current)
+    val mainViewModel: MainViewModel = hiltViewModel()
     BottomAppBar(
         backgroundColor = MaterialTheme.colors.background,
         contentColor = Color.White,
@@ -78,16 +81,14 @@ fun BottomBar(
                 text = "Заказать",
                 textSize = 18,
                 textBold = true,
+                isLoading = mainViewModel.stateCreateOrder.value.isLoading,
             onClick = {
                 coroutineScope.launch {
                     if (prefs.getAccessToken() == "") {
                         IDENTIFY_TO_SCREEN = "MAINSCREEN"
                         navigator.push(AuthScreen())
                     } else {
-                        createOrder().let {
-                            navigator.push(SearchDriverScreen())
-                        }
-
+                        isDialogOpen.value = true
                     }
                 }
             })
@@ -112,12 +113,10 @@ fun BottomBar(
             text = "Оформить данный заказ?",
             okBtnClick = {
                 coroutineScope.launch {
-                    createOrder().let {
-                        navigator.push(SearchDriverScreen())
-                        isDialogOpen.value = false
-                    }
+                    isDialogOpen.value = false
+                    createOrder()
                 }
-                         },
+            },
             cancelBtnClick = { coroutineScope.launch { isDialogOpen.value=false } },
             isDialogOpen = isDialogOpen.value
         )

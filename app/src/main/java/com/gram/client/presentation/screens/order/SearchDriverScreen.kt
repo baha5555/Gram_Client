@@ -1,36 +1,29 @@
 package com.gram.client.presentation.screens.order
 
 import android.annotation.SuppressLint
-import android.util.Log
+
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,15 +33,13 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
+import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.components.voyager.MapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddresses
-import com.gram.client.presentation.components.voyager.reason.Reason2Screen
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
-import com.gram.client.presentation.screens.main.components.FloatingButton
 import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants
@@ -83,22 +74,10 @@ class SearchDriverScreen : Screen {
         var sheetPeekHeight by remember {
             mutableStateOf(200)
         }
-        val stateRealtimeDatabaseOrders by orderExecutionViewModel.stateRealtimeOrdersDatabase
-        val stateRealtimeClientOrderIdDatabase by orderExecutionViewModel.stateRealtimeClientOrderIdDatabase
-        val stateActiveOrder = remember { orderExecutionViewModel.stateActiveOrders }
-        val stateClientOrderId =
-            stateRealtimeClientOrderIdDatabase.response?.observeAsState()?.value
-        scope.launch {
-            if (stateClientOrderId == null) {
-                delay(1000)
-                orderExecutionViewModel.getActiveOrders() {
-                    Log.e(
-                        "RESPONSEEEE",
-                        "${stateActiveOrder.value.response} \n ${stateActiveOrder.value.code} \n ${stateActiveOrder.value.success}"
-                    )
-                    if (stateActiveOrder.value.response?.isEmpty() == true && stateActiveOrder.value.code == 200) {
-                        navigator.replaceAll(SearchAddressScreen())
-                    }
+        LaunchedEffect(key1 = orderExecutionViewModel.stateActiveOrders.value.response?.size == 0){
+            orderExecutionViewModel.getActiveOrders() {
+                if (orderExecutionViewModel.stateActiveOrders.value.response?.isEmpty() == true && orderExecutionViewModel.stateActiveOrders.value.code == 200) {
+                    navigator.replaceAll(SearchAddressScreen())
                 }
             }
         }
@@ -199,54 +178,55 @@ class SearchDriverScreen : Screen {
                             .wrapContentHeight()
                             .background(MaterialTheme.colors.secondary)
                     ) {
-                        stateRealtimeDatabaseOrders.response?.let { response ->
-                            response.observeAsState().value?.let { orders ->
-                                orderCount.value = orders.size
-                                stateRealtimeClientOrderIdDatabase.response?.let { responseClientOrderId ->
-                                    responseClientOrderId.observeAsState().value?.let { clientOrdersId ->
-                                        LazyColumn() {
-                                            items(orders) { order ->
-                                                clientOrdersId.active_orders?.let { active ->
-                                                    active.forEach { clientOrderId ->
-                                                        val isOpen = remember {
-                                                            mutableStateOf(
-                                                                true
-                                                            )
-                                                        }
-                                                        if (order.id == clientOrderId) {
-                                                            orderCard(
-                                                                orderExecutionViewModel,
-                                                                order,
-                                                                sheetPeekHeightUpOnClick = {
-                                                                    scope.launch {
-                                                                        isOpen.value =
-                                                                            !isOpen.value
-                                                                        sheetPeekHeight =
-                                                                            if (isOpen.value) 367
-                                                                            else 200
 
-                                                                    }
-                                                                },
-                                                                isOpen = isOpen,
-                                                            )
-                                                            Spacer(
-                                                                Modifier.height(10.dp)
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            item {
-                                                Spacer(
-                                                    modifier = Modifier.height(120.dp)
+                        LazyColumn() {
+                            orderExecutionViewModel.stateActiveOrders.value.response?.forEach{
+                                item {
+                                    val isOpen = remember {
+                                                mutableStateOf(
+                                                    true
                                                 )
                                             }
-                                        }
-                                    }
+                                    orderCard(
+                                        orderExecutionViewModel,
+                                        it,
+                                        sheetPeekHeightUpOnClick = {
+                                            scope.launch {
+                                                isOpen.value =
+                                                    !isOpen.value
+                                                sheetPeekHeight =
+                                                    if (isOpen.value) 367
+                                                    else 200
+
+                                            }
+                                        },
+                                        isOpen = isOpen,
+                                    )
+                                    Spacer(
+                                        Modifier.height(10.dp)
+                                    )
+//                                    clientOrdersId.active_orders?.let { active ->
+//                                        active.forEach { clientOrderId ->
+//                                            val isOpen = remember {
+//                                                mutableStateOf(
+//                                                    true
+//                                                )
+//                                            }
+//                                            if (order.id == clientOrderId) {
+//
+//                                            }
+//                                        }
+//                                    }
                                 }
+                            }
+                            item {
+                                Spacer(
+                                    modifier = Modifier.height(120.dp)
+                                )
                             }
                         }
                     }
+
                 },
                 sheetPeekHeight = sheetPeekHeight.dp
             ) {
@@ -261,7 +241,7 @@ class SearchDriverScreen : Screen {
     @Composable
     fun orderCard(
         orderExecutionViewModel: OrderExecutionViewModel,
-        order: RealtimeDatabaseOrder,
+        order: AllActiveOrdersResult,
         sheetPeekHeightUpOnClick: () -> Unit,
         isOpen: MutableState<Boolean>,
     ) {

@@ -32,7 +32,7 @@ fun RootScreen() {
     val context = LocalContext.current
     val prefs = CustomPreference(context)
     DisposableEffect(key1 = true){
-        orderExecutionViewModel.readAllOrders()
+        orderExecutionViewModel.getActiveOrders()
         orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
         onDispose {  }
     }

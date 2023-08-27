@@ -15,13 +15,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
+import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.order.SearchDriverScreen
 
 class Reason1Screen(
     val orderExecutionViewModel: OrderExecutionViewModel,
-    val order: RealtimeDatabaseOrder
+    val order: AllActiveOrdersResult
 ) : Screen {
     @Composable
     override fun Content() {

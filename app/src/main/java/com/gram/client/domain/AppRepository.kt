@@ -12,8 +12,8 @@ import com.gram.client.domain.mainScreen.fast_address.FastAddressesResponse
 import com.gram.client.domain.mainScreen.order.*
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.gram.client.domain.myAddresses.*
-import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
+import com.gram.client.domain.orderExecutionScreen.active.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
 import com.gram.client.domain.orderExecutionScreen.reason.Reasons
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult

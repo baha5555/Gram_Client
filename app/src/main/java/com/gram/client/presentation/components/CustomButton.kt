@@ -1,8 +1,10 @@
 package com.gram.client.presentation.components
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +22,7 @@ fun CustomButton(
     textBold: Boolean,
     enabled: Boolean = true,
     color: Color = MaterialTheme.colors.primary,
+    isLoading: Boolean = false,
     onClick: () -> Unit,
 ) {
     Button(
@@ -30,6 +33,15 @@ fun CustomButton(
         enabled = enabled,
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(backgroundColor = color, contentColor = Color.White),
-        content = { Text(text = text, fontWeight = if(textBold) FontWeight.Bold else FontWeight.Normal, fontSize = textSize.sp, lineHeight = 28.sp) },
+        content = {
+            if (isLoading){
+                CircularProgressIndicator(
+                    color= Color.White
+                )
+            }
+            else{
+                Text(text = text, fontWeight = if(textBold) FontWeight.Bold else FontWeight.Normal, fontSize = textSize.sp, lineHeight = 28.sp)
+            }
+        },
     )
 }

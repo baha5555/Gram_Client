@@ -2,6 +2,7 @@ package com.gram.client.domain.orderExecutionScreen
 
 import com.gram.client.utils.Resource
 import com.gram.client.domain.AppRepository
+import com.gram.client.domain.orderExecutionScreen.active.ActiveOrdersResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -14,20 +15,20 @@ class GetActiveOrdersUseCase @Inject constructor(private val repository: AppRepo
     ): Flow<Resource<ActiveOrdersResponse>> =
         flow {
             try {
-                emit(Resource.Loading<ActiveOrdersResponse>())
+                emit(Resource.Loading())
                 val response: ActiveOrdersResponse =
                     repository.getActiveOrders()
-                emit(Resource.Success<ActiveOrdersResponse>(response))
+                emit(Resource.Success(response))
             } catch (e: HttpException) {
                 emit(
-                    Resource.Error<ActiveOrdersResponse>(
+                    Resource.Error(
                         e.localizedMessage ?: "Произошла непредвиденная ошибка"
                     )
                 )
             } catch (e: IOException) {
-                emit(Resource.Error<ActiveOrdersResponse>("Не удалось связаться с сервером. Проверьте подключение к Интернету."))
+                emit(Resource.Error("Не удалось связаться с сервером. Проверьте подключение к Интернету."))
             } catch (e: Exception) {
-                emit(Resource.Error<ActiveOrdersResponse>("${e.message}"))
+                emit(Resource.Error("${e.message}"))
             }
         }
 }

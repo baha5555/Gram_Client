@@ -33,18 +33,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.components.*
-import com.gram.client.presentation.components.voyager.CommentSheet
 import com.gram.client.presentation.screens.main.components.CustomDopInfoForDriver
 import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
+import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.presentation.screens.profile.ProfileViewModel
-import com.gram.client.utils.Comments
 import com.gram.client.utils.Constants.SOON
 import com.gram.client.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
@@ -317,7 +315,11 @@ class MainScreen : Screen{
                     Scaffold(scaffoldState = scaffoldState, bottomBar = {
                         BottomBar(mainBottomSheetState, modalSheetState,
                             createOrder = {
-                                mainViewModel.createOrder(orderExecutionViewModel)
+                                mainViewModel.createOrder(){
+                                    navigator.push(SearchDriverScreen())
+                                    orderExecutionViewModel.getActiveOrders()
+                                }
+
                             }
                         )
                     }) {

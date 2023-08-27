@@ -6,7 +6,7 @@ data class OrderResponse(
     val code: Int,
     val error: List<Any>,
     val message: String,
-    val result: Int,
+    val result: com.gram.client.domain.mainScreen.order.Result,
     val success: Boolean
 )
 

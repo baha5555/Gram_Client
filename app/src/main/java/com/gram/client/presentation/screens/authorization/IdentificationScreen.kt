@@ -72,7 +72,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                         navigator.replaceAll(SearchAddressScreen())
                                     if(phone.value!=null) {
                                         prefs.setPhoneNumber(phone.value!!)
-                                        orderExecutionViewModel.readAllOrders()
+                                        orderExecutionViewModel.getActiveOrders()
                                         orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
                                     }
                                 }

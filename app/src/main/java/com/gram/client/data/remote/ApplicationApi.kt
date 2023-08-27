@@ -15,8 +15,8 @@ import com.gram.client.domain.mainScreen.order.OrderResponse
 import com.gram.client.domain.mainScreen.order.UpdateOrderResponse
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
 import com.gram.client.domain.myAddresses.*
-import com.gram.client.domain.orderExecutionScreen.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.AddRatingResponse
+import com.gram.client.domain.orderExecutionScreen.active.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
 import com.gram.client.domain.orderExecutionScreen.reason.Reasons
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
@@ -114,7 +114,8 @@ interface ApplicationApi {
         @Field("allowances") allowances: String?,
         @Field("date_time")date_time:String?,
         @Field("from_address") from_address_point:String?,
-        @Field("meeting_info") meeting_info:String?): OrderResponse
+        @Field("meeting_info") meeting_info:String?,
+        @Field("active_bonus") active_bonus:Int?): OrderResponse
 
     @FormUrlEncoded
     @POST("/api/orders/calculate")

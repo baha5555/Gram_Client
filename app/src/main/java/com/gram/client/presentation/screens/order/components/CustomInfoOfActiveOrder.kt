@@ -43,25 +43,12 @@ class CustomInfoOfActiveOrder : Screen {
         val scope = rememberCoroutineScope()
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val mainViewModel: MainViewModel = hiltViewModel()
-        val stateRealtimeDatabaseOrders =
-            orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.observeAsState()?.value
+
         var symbol by remember { mutableStateOf(65) }
-        var selectRealtimeDatabaseOrder: RealtimeDatabaseOrder by remember {
-            mutableStateOf(RealtimeDatabaseOrder())
-        }
+
         val countriesKey =mainViewModel.stateCountriesKey.value.response
         val selectedOrder by orderExecutionViewModel.selectedOrder
-        scope.launch {
-            Log.e("runRe", "get")
-            stateRealtimeDatabaseOrders.let { orders ->
-                orders?.forEach { order ->
-                    if (order.id == selectedOrder.id) {
-                        Log.e("Select Order", "$selectRealtimeDatabaseOrder")
-                        selectRealtimeDatabaseOrder = order
-                    }
-                }
-            }
-        }
+
         Scaffold(topBar = {
 
         }) {
@@ -85,15 +72,15 @@ class CustomInfoOfActiveOrder : Screen {
                 }
                 LazyColumn() {
                     item {
-                        selectRealtimeDatabaseOrder.let { order ->
+                        selectedOrder.let { order ->
                             CustomInfoTitle(title = "Маршрут")
-                            order.from_address?.address?.let {
+                            order.from_address?.let {
                                 CustomAddressText(
-                                    title = it,
+                                    title = it.name,
                                     point = R.drawable.ic_from_address_marker
                                 )
                             }
-                            order.to_address?.let { toAddress ->
+                            order.to_addresses?.let { toAddress ->
                                 for (i in toAddress.indices) {
                                     Divider(
                                         modifier = Modifier
@@ -101,12 +88,12 @@ class CustomInfoOfActiveOrder : Screen {
                                             .padding(start = 50.dp)
                                     )
                                     CustomAddressText(
-                                        title = toAddress[i].address,
+                                        title = toAddress[i].name,
                                         point = if (i == toAddress.size - 1) R.drawable.ic_to_address_marker else R.drawable.ic_to_address_second_marker
                                     )
                                 }
                             }
-                            order.create_order?.let {
+                            order.created_at?.let {
                                 CustomInfoTitle(title = "Время")
                                 Row(
                                     modifier = Modifier
@@ -216,7 +203,7 @@ class CustomInfoOfActiveOrder : Screen {
                                             Row(modifier = Modifier,
                                             verticalAlignment = Alignment.CenterVertically) {
                                                 Text(
-                                                    text = "+ ${it.price} ${countriesKey?.currency_symbol?.key}", modifier = Modifier
+                                                    text = "+ ${it.name} ${countriesKey?.currency_symbol?.key}", modifier = Modifier
                                                         .padding(vertical = 25.dp)
                                                         .padding(end = 15.dp)
                                                 )

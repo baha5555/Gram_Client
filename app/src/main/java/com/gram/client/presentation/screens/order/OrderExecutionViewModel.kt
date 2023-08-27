@@ -36,6 +36,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.gram.client.domain.orderExecutionScreen.active.ActiveOrdersResponse
+import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.domain.orderExecutionScreen.reason.*
 import com.gram.client.presentation.screens.order.states.GetRatingReasonsResponseState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,7 +60,7 @@ class OrderExecutionViewModel @Inject constructor(
     private val searchAddressUseCase: SearchAddressUseCase,
     private val getAddressByPointUseCase: GetAddressByPointUseCase,
     private val getReasonsUseCase: GetReasonsUseCase,
-    private val getRatingReasonsUseCase: GetRatingReasonsUseCase,
+    private val getRatingReasonsUseCase: GetRatingReasonsUseCase
     ) : AndroidViewModel(application) {
     val context get() = getApplication<Application>()
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -89,8 +91,8 @@ class OrderExecutionViewModel @Inject constructor(
     private val _stateAddressPoint = mutableStateOf(AddressByPointResponseState())
     val stateAddressPoint: State<AddressByPointResponseState> = _stateAddressPoint
 
-    private val _selectedOrder = mutableStateOf(RealtimeDatabaseOrder())
-    val selectedOrder: State<RealtimeDatabaseOrder> = _selectedOrder
+    private val _selectedOrder = mutableStateOf(AllActiveOrdersResult())
+    val selectedOrder: State<AllActiveOrdersResult> = _selectedOrder
 
     private var _toAddresses = mutableStateListOf<Address>()
     val toAddresses: SnapshotStateList<Address> = _toAddresses
@@ -163,32 +165,8 @@ class OrderExecutionViewModel @Inject constructor(
         showRoad()
     }
 
-    fun updateSelectedOrder(order: RealtimeDatabaseOrder) {
+    fun updateSelectedOrder(order: AllActiveOrdersResult) {
         _selectedOrder.value = order
-    }
-
-    fun readAllOrders() {
-        getOrdersUseCase.invoke()
-            .onEach { result: Resource<LiveData<List<RealtimeDatabaseOrder>>> ->
-                when (result) {
-                    is Resource.Success -> {
-                        try {
-                            val addressResponse: LiveData<List<RealtimeDatabaseOrder>>? =
-                                result.data
-
-                            _stateRealtimeOrdersDatabase.value =
-                                GetOrdersState(response = addressResponse)
-                            Log.e(
-                                "readAllOrdersFromRealtimeResponse",
-                                "Success->\n ${_stateRealtimeOrdersDatabase.value.response?.value}"
-                            )
-                        } catch (e: Exception) {
-                            Log.d("readAllOrdersFromRealtimeResponse", "${e.message} Exception")
-                        }
-                    }
-                    else -> {}
-                }
-            }.launchIn(viewModelScope)
     }
 
     fun readAllClient(client: String) {

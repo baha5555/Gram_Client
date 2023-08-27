@@ -18,7 +18,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
+import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.presentation.components.voyager.AddStopScreenOrderExcecution
 import com.gram.client.presentation.components.voyager.OrderExecutionMapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddressOrderExecutionNavigator
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun orderSection(
-    order: RealtimeDatabaseOrder,
+    order: AllActiveOrdersResult,
     scope: CoroutineScope,
 ) {
     val navigator = LocalNavigator.currentOrThrow
@@ -69,7 +69,7 @@ fun orderSection(
                 var text by remember{ mutableStateOf("")}
                 Spacer(modifier = Modifier.width(20.dp))
                 order.from_address.let {
-                    text = it?.address ?: "Откуда?"
+                    text = it?.name ?: "Откуда?"
                     if(order.meeting_info!=null){
                         text+=", подъезд ${order.meeting_info}"
                     }
@@ -131,12 +131,12 @@ fun orderSection(
         ) {
             Divider()
         }
-        order.to_address?.let { address ->
+        order.to_addresses?.let { address ->
             Row(
                 modifier = Modifier
                     .clickable {
                         scope.launch {
-                            if (order.to_address.size > 1) {
+                            if (order.to_addresses.size > 1) {
                                 Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
                                 bottomNavigator.show(AddStopScreenOrderExcecution())
                                 Toast.makeText(context,"Можно изменить порядок остановки", Toast.LENGTH_SHORT).show()
@@ -169,7 +169,7 @@ fun orderSection(
                     when (address.size) {
                         1 -> {
                             Text(
-                                address[0].address,
+                                address[0].name,
                                 maxLines = 1, overflow = TextOverflow.Ellipsis
                             )
                         }

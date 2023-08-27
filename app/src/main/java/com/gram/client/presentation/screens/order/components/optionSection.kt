@@ -25,9 +25,6 @@ import com.gram.client.R
 @Composable
 fun optionSection(onClick:()->Unit){
 
-    val switch= remember{ mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(MaterialTheme.colors.background)

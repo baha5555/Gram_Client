@@ -2,6 +2,7 @@ package com.gram.client.app.preference
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.gram.client.utils.PreferencesName
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

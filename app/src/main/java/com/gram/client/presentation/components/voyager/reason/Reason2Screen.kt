@@ -1,6 +1,5 @@
 package com.gram.client.presentation.components.voyager.reason
 
-import android.service.autofill.OnClickAction
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,17 +17,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
+import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.presentation.components.CustomCheckBox
 import com.gram.client.presentation.components.voyager.CommentSheet
+import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.utils.Comments
 import com.gram.client.utils.Values
 
 class Reason2Screen(
     val orderExecutionViewModel: OrderExecutionViewModel,
-    val order: RealtimeDatabaseOrder,
-   val  onClickAction: ()->Unit
+    val order: AllActiveOrdersResult,
+    val onClickAction: ()->Unit
 ) : Screen {
     private var reasonsCheck: MutableState<String> = mutableStateOf("")
 
