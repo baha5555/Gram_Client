@@ -69,7 +69,7 @@ fun ReturnRequest(
     val fastAddresses = mainViewModel.stateFastAddress.value
     val myAddresses = myAddressViewModel.stateGetAllMyAddresses.value
 
-    if ((activeOrders.error + profileInfo.error + fastAddresses.error + myAddresses.error) != "")
+    if ((activeOrders.error + profileInfo.error + fastAddresses.error) != "")
         CustomRequestError {
             if (activeOrders.error != "") orderExecutionViewModel.getActiveOrders()
             if (profileInfo.error != "") profileViewModel.getProfileInfo()

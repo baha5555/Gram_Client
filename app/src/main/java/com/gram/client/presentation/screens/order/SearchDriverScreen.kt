@@ -46,7 +46,6 @@ import com.gram.client.utils.Constants
 import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Constants.STATE_RAITING_ORDER_ID
 import com.gram.client.utils.Values
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
@@ -180,7 +179,7 @@ class SearchDriverScreen : Screen {
                     ) {
 
                         LazyColumn() {
-                            orderExecutionViewModel.stateActiveOrders.value.response?.forEach{
+                            orderExecutionViewModel.stateActiveOrdersList.forEachIndexed{inx, it ->
                                 item {
                                     val isOpen = remember {
                                                 mutableStateOf(
@@ -201,6 +200,7 @@ class SearchDriverScreen : Screen {
                                             }
                                         },
                                         isOpen = isOpen,
+                                        inx = inx
                                     )
                                     Spacer(
                                         Modifier.height(10.dp)
@@ -244,6 +244,7 @@ class SearchDriverScreen : Screen {
         order: AllActiveOrdersResult,
         sheetPeekHeightUpOnClick: () -> Unit,
         isOpen: MutableState<Boolean>,
+        inx: Int,
     ) {
         val navigator = LocalNavigator.currentOrThrow
         val bottomNavigator = LocalBottomSheetNavigator.current
@@ -285,7 +286,7 @@ class SearchDriverScreen : Screen {
                 color = MaterialTheme.colors.background,
                 shape = RoundedCornerShape(20.dp)
             )) {
-            if (order.performer == null) {
+            if (order.performer == null || order.status=="Поступило") {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -305,8 +306,8 @@ class SearchDriverScreen : Screen {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        top = if (order.performer == null) 10.dp else 20.dp,
-                        bottom = if (order.performer == null) 20.dp else 5.dp,
+                        top = if (order.performer == null || order.status=="Поступило") 10.dp else 20.dp,
+                        bottom = if (order.performer == null || order.status=="Поступило") 20.dp else 5.dp,
                         start = 20.dp,
                         end = 20.dp
                     ),
@@ -315,7 +316,7 @@ class SearchDriverScreen : Screen {
             ) {
                 Column(modifier = Modifier.fillMaxWidth(0.75f)) {
                     Text(
-                        text = if (order.performer == null) "Ищем ближайших водителей..."
+                        text = if (order.performer == null || order.status=="Поступило") "Ищем ближайших водителей..."
                         else {
                             when (order.status) {
                                 "Водитель на месте" -> "Водитель на месте,\n можете выходить"
@@ -332,11 +333,11 @@ class SearchDriverScreen : Screen {
                         color = MaterialTheme.colors.onBackground
                     )
                     Text(
-                        text = if (order.performer == null) "Среднее время поиска водителя ≈ 4 мин" else "${order.performer.transport?.color ?: ""} ${order.performer.transport?.model ?: ""}",
+                        text = if (order.performer == null || order.status=="Поступило") "Среднее время поиска водителя ≈ 4 мин" else "${order.performer.transport?.color ?: ""} ${order.performer.transport?.model ?: ""}",
                         fontSize = 14.sp
                     )
                 }
-                if (order.performer != null) {
+                if (order.performer != null && order.status!="Поступило") {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = order.performer.transport?.car_number ?: "",
@@ -369,7 +370,7 @@ class SearchDriverScreen : Screen {
                             text = "Связаться",
                             icon = ImageVector.vectorResource(id = R.drawable.phone)
                         ) {
-                            if(order.performer == null){
+                            if(order.performer == null  || order.status=="Поступило"){
                                 Toast.makeText(context,"Водитель еще не найден!",Toast.LENGTH_SHORT).show()
                             }else{
                                 connectClientWithDriverIsDialogOpen.value = true
@@ -378,6 +379,7 @@ class SearchDriverScreen : Screen {
 
                     Spacer(modifier = Modifier.width(50.dp))
                     CustomCircleButton(text = "Детали", icon = Icons.Default.Menu) {
+                        Values.ActiveOrdersInx.value = inx
                         orderExecutionViewModel.updateSelectedOrder(order)
                         navigator.push(OrderExecutionScreen())
                     }

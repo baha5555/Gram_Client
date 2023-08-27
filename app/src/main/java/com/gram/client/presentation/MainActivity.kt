@@ -15,14 +15,13 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.gram.client.*
-import com.gram.client.presentation.screens.authorization.AuthViewModel
 import com.gram.client.ui.theme.GramClientTheme
-import com.gram.client.utils.Constants.FCM_TOKEN
 import com.gram.client.utils.MyFirebaseMessagingService
-import com.google.android.gms.auth.api.phone.SmsRetriever
+import com.gram.client.app.preference.CustomPreference
+import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 
 
 @Suppress("DEPRECATION")
@@ -35,13 +34,24 @@ class MainActivity : ComponentActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         //window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
+            val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
             GramClientTheme {
                 RootScreen()
                 MyFirebaseMessagingService().onCreate()
             }
+            Connect(orderExecutionViewModel)
         }
         adjustFontScale(getResources().getConfiguration())
 
+    }
+
+    fun Connect(orderExecutionViewModel: OrderExecutionViewModel) {
+        val customPreference = CustomPreference(this).getSocketAccessToken()
+        Log.i("tokenSocket", customPreference)
+        SocketHandler.setSocket(
+            customPreference,
+            orderExecutionViewModel
+        )
     }
 
     fun adjustFontScale(configuration: Configuration) {

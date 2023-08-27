@@ -82,6 +82,10 @@ class OrderExecutionViewModel @Inject constructor(
     private val _stateActiveOrders = mutableStateOf(ActiveOrdersResponseState())
     val stateActiveOrders: State<ActiveOrdersResponseState> = _stateActiveOrders
 
+    private val _stateActiveOrdersList = mutableStateListOf<AllActiveOrdersResult>()
+    val stateActiveOrdersList: SnapshotStateList<AllActiveOrdersResult> = _stateActiveOrdersList
+
+
     private val _stateCancelOrder = mutableStateOf(CancelOrderResponseState())
     val stateCancelOrder: State<CancelOrderResponseState> = _stateCancelOrder
 
@@ -278,6 +282,10 @@ class OrderExecutionViewModel @Inject constructor(
                             success = true,
                             code = response?.code
                         )
+                        _stateActiveOrdersList.clear()
+                        stateActiveOrders.value.response?.forEach {
+                            _stateActiveOrdersList.add(it)
+                        }
                         Log.e(
                             "ActiveOrdersResponse",
                             "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}"
@@ -300,6 +308,18 @@ class OrderExecutionViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    fun addActiveOrder(element: AllActiveOrdersResult){
+        _stateActiveOrdersList.forEachIndexed{inx, it ->
+            if(it.id == element.id){
+                _stateActiveOrdersList[inx] = element
+                return@forEachIndexed
+            }else{
+                _stateActiveOrdersList.add(element)
+            }
+        }
+    }
+
+
     fun cancelOrder(order_id: Int, reason_cancel_order: String, onSuccess: () -> Unit) {
         cancelOrderUseCase.invoke(order_id, reason_cancel_order).onEach { result: Resource<CancelOrderResponse> ->
             when (result) {
@@ -311,7 +331,7 @@ class OrderExecutionViewModel @Inject constructor(
                         _stateCancelOrder.value =
                             CancelOrderResponseState(response = response)
                         onSuccess()
-                        getActiveOrders()
+                        //getActiveOrders()
                         Log.e(
                             "CancelOrderResponse",
                             "CancelOrderResponseSuccess->\n ${_stateCancelOrder.value}"

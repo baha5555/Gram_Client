@@ -103,6 +103,7 @@ class AuthViewModel @Inject constructor(
                         IdentificationResponseState(response = response?.result)
                     Log.e("authresponse", "authresponseSuccess->\n ${_stateLogin.value}\n")
                     prefs.setAccessToken("Bearer ${response?.result?.access_token}")
+                    prefs.setSocketAccessToken("${response?.result?.access_token}")
                     smsCode.value=""
                     onSuccess.invoke()
                 }

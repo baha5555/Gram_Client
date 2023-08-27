@@ -20,6 +20,12 @@ class CustomPreference @Inject constructor(@ApplicationContext context : Context
     fun setAccessToken(query: String) {
         prefs.edit().putString(PreferencesName.ACCESS_TOKEN, query).apply()
     }
+    fun getSocketAccessToken(): String {
+        return prefs.getString(PreferencesName.SOCKET_ACCESS_TOKEN, "")!!
+    }
+    fun setSocketAccessToken(query: String) {
+        prefs.edit().putString(PreferencesName.SOCKET_ACCESS_TOKEN, query).apply()
+    }
     fun getFcmToken(): String {
         return prefs.getString(PreferencesName.FCM_TOKEN, "")!!
     }

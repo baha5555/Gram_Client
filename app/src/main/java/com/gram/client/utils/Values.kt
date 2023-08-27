@@ -25,5 +25,6 @@ object Values {
     val WhichAddress = mutableStateOf("")
 
     val AdjustResize = mutableStateOf(false)
+    val ActiveOrdersInx: MutableState<Int> = mutableStateOf(-1)
 
 }
