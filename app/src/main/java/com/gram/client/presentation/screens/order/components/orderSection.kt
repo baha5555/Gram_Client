@@ -132,6 +132,7 @@ fun orderSection(
             Divider()
         }
         order.to_addresses?.let { address ->
+            if(address.isEmpty()) return@let
             Row(
                 modifier = Modifier
                     .clickable {
