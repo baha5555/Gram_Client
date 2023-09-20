@@ -31,9 +31,9 @@ object SocketHandler {
             mSocket.on("client-mob-app:orders"){args->
                 try {
                     Log.e("SocketIODATA","${args[0]}")
-                    var gson = Gson()
+                    /*var gson = Gson()
                     var model: EditOrderSocketResponse = gson.fromJson(args[0].toString(), EditOrderSocketResponse::class.java)
-                    Log.e("SocketIODATA","${model.data.id}")
+                    Log.e("SocketIODATA","${model.data.id}")*/
                     orderExecutionViewModel.getActiveOrders()
                 }catch (_ : Exception){
 

@@ -2,8 +2,8 @@ package com.gram.client.domain.profile
 
 data class ProfileResponse(
     val code: Int,
-    val error: List<ProfileErrors>? = null,
+    val error: List<Any>,
     val message: String,
-    val result: List<Result>? = null,
+    val result: List<Result>,
     val success: Boolean
 )

@@ -39,7 +39,9 @@ class MainActivity : ComponentActivity() {
                 RootScreen()
                 MyFirebaseMessagingService().onCreate()
             }
-            Connect(orderExecutionViewModel)
+            if (CustomPreference(this).getAccessToken()!=""){
+                Connect(orderExecutionViewModel)
+            }
         }
         adjustFontScale(getResources().getConfiguration())
 

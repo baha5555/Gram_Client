@@ -1,6 +1,7 @@
 package com.gram.client.presentation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -32,6 +33,7 @@ fun RootScreen() {
     val context = LocalContext.current
     val prefs = CustomPreference(context)
     DisposableEffect(key1 = true){
+        Log.i("TokenAccess", ""+prefs.getAccessToken())
         orderExecutionViewModel.getActiveOrders()
         orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
         onDispose {  }
@@ -69,13 +71,14 @@ fun ReturnRequest(
     val fastAddresses = mainViewModel.stateFastAddress.value
     val myAddresses = myAddressViewModel.stateGetAllMyAddresses.value
 
-    if ((activeOrders.error + profileInfo.error + fastAddresses.error) != "")
+    if (( profileInfo.error + fastAddresses.error) != "")
         CustomRequestError {
-            if (activeOrders.error != "") orderExecutionViewModel.getActiveOrders()
             if (profileInfo.error != "") profileViewModel.getProfileInfo()
             if (fastAddresses.error != "") mainViewModel.getFastAddresses()
             if(prefs.getAccessToken()!=""){
                 if (myAddresses.error != "") myAddressViewModel.getAllMyAddresses()
             }
-        }
+        } else if(prefs.getAccessToken()!="" && activeOrders.error != ""){
+        if (activeOrders.error != "") orderExecutionViewModel.getActiveOrders()
+    }
 }

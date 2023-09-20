@@ -340,25 +340,11 @@ class ProfileScreen : Screen {
             }
         }
         if (stateProfile.value.error != null) {
-            if (stateProfile.value.error!![0].first_name != null && stateProfile.value.error!![0].last_name != null) {
-                Toast.makeText(
-                    context,
-                    "Поля Имя и Фамилия обьязательны для заполнения",
-                    Toast.LENGTH_LONG
-                ).show()
-            } else if (stateProfile.value.error!![0].first_name != null) {
-                Toast.makeText(context, "Поле Имя обьязательна для заполнения", Toast.LENGTH_LONG)
-                    .show()
-            } else if (stateProfile.value.error!![0].last_name != null) {
-                Toast.makeText(
-                    context,
-                    "Поле Фамилия обьязательна для заполнения",
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-            } else if (stateProfile.value.error!![0].email != null) {
-                Toast.makeText(context, "Неправильный формат почты", Toast.LENGTH_LONG).show()
-            }
+            Toast.makeText(
+                context,
+                "Поля Имя и Фамилия обьязательны для заполнения",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 }
