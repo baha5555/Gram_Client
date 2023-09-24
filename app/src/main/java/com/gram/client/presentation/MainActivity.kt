@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
             val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
             GramClientTheme {
                 RootScreen()
-                //StoryScreen()
                 MyFirebaseMessagingService().onCreate()
             }
             if (CustomPreference(this).getAccessToken()!=""){

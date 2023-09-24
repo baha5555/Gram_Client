@@ -1,6 +1,5 @@
 package com.gram.client.presentation.screens.main
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +14,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -76,9 +74,7 @@ class SearchAddressScreen : Screen {
         LaunchedEffect(bottomSheetState.bottomSheetState.currentValue) {
             if (bottomSheetState.bottomSheetState.isCollapsed) {
                 isSearchState.value = false
-                Log.e("singleTapConfirmedHelper", "isCollapsed")
             } else {
-                Log.e("singleTapConfirmedHelper", "isExpanded")
             }
         }
         val toAddress = mainViewModel.toAddresses
@@ -150,7 +146,7 @@ class SearchAddressScreen : Screen {
                             sheetBackgroundColor = MaterialTheme.colors.background,
                             scaffoldState = bottomSheetState,
                             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                            sheetGesturesEnabled = !bottomSheetState.bottomSheetState.isCollapsed,
+                            sheetGesturesEnabled = true,
                             sheetContent = {
                                 AddressSearchBottomSheet(
                                     isSearchState = isSearchState,

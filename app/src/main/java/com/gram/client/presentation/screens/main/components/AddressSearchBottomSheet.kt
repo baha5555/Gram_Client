@@ -37,6 +37,7 @@ fun AddressSearchBottomSheet(
             )
             Spacer(modifier = Modifier.height(15.dp))
             FastAddresses(mainViewModel)
+            StoriesList()
 //            Spacer(modifier = Modifier.height(15.dp))
 //            Services()
         }

@@ -1,6 +1,6 @@
 @file:Suppress("UNUSED_EXPRESSION")
 
-package com.gram.client.presentation.components
+package com.gram.client.presentation.screens.story
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -32,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -44,6 +46,8 @@ fun CustomStory(
     activedInx: MutableState<Int>,
     content: @Composable () -> Unit,
 ) {
+    val navigator = LocalNavigator.currentOrThrow
+
     var active by remember { mutableStateOf(false) }
     var activeInx by remember { mutableStateOf(0) }
     val status = remember {
@@ -112,14 +116,14 @@ fun CustomStory(
                                     GlobalScope.launch {
                                         delay(50)
                                         repeat(count) { inx -> status[inx] = 0.0f }
-                                        repeat(it + 1) { inx -> status[inx] = 1.0f }
+                                        repeat(it) { inx -> status[inx] = 1.0f }
                                         active = true
                                         activeInx = it
                                     }
                                 } else {
                                     scope.cancel()
                                     repeat(count) { inx -> status[inx] = 0.0f }
-                                    repeat(it + 1) { inx -> status[inx] = 1.0f }
+                                    repeat(it) { inx -> status[inx] = 1.0f }
                                     active = true
                                     activeInx = it
                                 }
@@ -188,7 +192,7 @@ fun CustomStory(
                             }
                         }
                     })
-                IconButton(onClick = { /*TODO*/ }, modifier = Modifier .align(alignment = Alignment.TopEnd)) {
+                IconButton(onClick = { navigator.pop() }, modifier = Modifier .align(alignment = Alignment.TopEnd)) {
                     Image(imageVector = Icons.Default.Close, contentDescription = "", Modifier.size(24.dp))
                 }
             }
