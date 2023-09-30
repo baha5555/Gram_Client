@@ -2,16 +2,11 @@
 <resources>
     <array name="StoryList">
         <item>Как заказать такси</item>
-        <item>Быстро найти свое
-            такси</item>
-        <item>Как мы проверяем
-            водителей</item>
-        <item>Почему цена
-            повышена</item>
-        <item>Чем карта лучше
-            наличных</item>
-        <item>Доставка вещей
-            по городу</item>
+        <item>Быстро найти свое такси</item>
+        <item>Как мы проверяем водителей</item>
+        <item>Почему цена повышена</item>
+        <item>Чем карта лучше наличных</item>
+        <item>Доставка вещей по городу</item>
     </array>
     <array name="StoryListImage">
         <item>story_list_1.png</item>
