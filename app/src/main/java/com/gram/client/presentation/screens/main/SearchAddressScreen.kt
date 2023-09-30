@@ -155,7 +155,7 @@ class SearchAddressScreen : Screen {
                                     toAddress = toAddress
                                 )
                             },
-                            sheetPeekHeight = sheetPeekHeight.value.dp-65.dp,
+                            sheetPeekHeight = sheetPeekHeight.value.dp-40.dp,
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),

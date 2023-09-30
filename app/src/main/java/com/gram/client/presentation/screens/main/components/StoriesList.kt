@@ -66,7 +66,7 @@ fun StoriesList() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 0.dp)
             ) {
 
                 StoriesCard(
@@ -130,7 +130,6 @@ private fun StoriesCard(
                 )
             ).clickable { function() },
     ) {
-        Text(text = text, fontSize = 16.sp, modifier = Modifier.padding(15.dp))
         Image(
             bitmap = bitmap.asImageBitmap(),
             contentDescription = "",
@@ -141,5 +140,6 @@ private fun StoriesCard(
                     Alignment.BottomEnd
                 )
         )
+        Text(text = text, fontSize = 16.sp, modifier = Modifier.padding(15.dp))
     }
 }
