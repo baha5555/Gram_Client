@@ -31,19 +31,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gram.client.R
 import com.gram.client.presentation.screens.story.StoryScreen
+import com.gram.client.presentation.screens.story.StoryViewModel
 import java.io.InputStream
 
 @Preview(showBackground = true)
 @Composable
 fun StoriesList() {
+    val storyViewModel: StoryViewModel = hiltViewModel()
+    val getStoryGroup = storyViewModel.getStoriesGroup()
+
     val navigator = LocalNavigator.currentOrThrow
     val res = LocalContext.current.resources
-    val storiesList = res.getStringArray(R.array.StoryList)
-    val storiesListImage = res.getStringArray(R.array.StoryListImage)
+
     val color1 = arrayOf(
         Color(0xFF9DDCFF),
         Color(0xFFB6EDFF),
@@ -61,7 +64,7 @@ fun StoriesList() {
         Color(0xFFDCF7FF)
     )
     Column(Modifier.fillMaxSize()) {
-        for (i in 0 until storiesList.size step 2) {
+        for (i in getStoryGroup.indices step 2) {
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier
@@ -73,32 +76,24 @@ fun StoriesList() {
                     modifier = Modifier
                         .height(115.dp)
                         .weight(1f),
-                    text = storiesList[i],
-                    image = storiesListImage[i],
+                    text = getStoryGroup[i].name.toString(),
+                    image = getStoryGroup[i].img_src.toString(),
                     color1 = color1[i],
                     color2 = color2[i]
                 ){
-                    when(i){
-                        0-> navigator.push(StoryScreen(5))
-                            2->navigator.push(StoryScreen(1))
-                        4->navigator.push(StoryScreen(3))
-                    }
+                    navigator.push(StoryScreen(getStoryGroup[i].id))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 StoriesCard(
                     modifier = Modifier
                         .height(115.dp)
                         .weight(1f),
-                    text = storiesList[i + 1],
-                    image = storiesListImage[i + 1],
+                    text = getStoryGroup[i+1].name.toString(),
+                    image = getStoryGroup[i+1].img_src.toString(),
                     color1 = color1[i+1],
                     color2 = color2[i+1]
                 ) {
-                    when(i+1){
-                        1->navigator.push(StoryScreen(6))
-                            3->navigator.push(StoryScreen(2))
-                        5->navigator.push(StoryScreen(4))
-                    }
+                    navigator.push(StoryScreen(getStoryGroup[i+1].id))
                 }
             }
         }
