@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -39,7 +40,12 @@ import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.screens.main.components.CustomDopInfoForDriver
+import com.gram.client.presentation.screens.main.components.FloatingButton
+import com.gram.client.presentation.screens.main.components.FloatingButton2
 import com.gram.client.presentation.screens.map.CustomMainMap
+import com.gram.client.presentation.screens.map.currentRoute
+import com.gram.client.presentation.screens.map.mLocationOverlay
+import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.presentation.screens.profile.ProfileViewModel
@@ -51,7 +57,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class MainScreen : Screen{
-    @SuppressLint("UnrememberedMutableState")
+    @SuppressLint("UnrememberedMutableState", "LongLogTag")
     @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
@@ -82,6 +88,8 @@ class MainScreen : Screen{
         val paymentState = remember { mutableStateOf("") }
 
         val coroutineScope = rememberCoroutineScope()
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+
 
         var initialApiCalled by rememberSaveable { mutableStateOf(false) }
         val focusRequester = remember { FocusRequester() }
@@ -121,6 +129,9 @@ class MainScreen : Screen{
         val stateTariffs by mainViewModel.stateTariffs
 
         val stateAllowances by mainViewModel.stateAllowances
+        val scope = rememberCoroutineScope()
+
+
 
         val stateCalculate by mainViewModel.stateCalculate
 
@@ -253,8 +264,20 @@ class MainScreen : Screen{
                                     .clickable {
                                         when (idx) {
                                             0 -> paymentState.value = item
-                                            1 -> Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_SHORT).show()
-                                            else -> Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_SHORT).show()
+                                            1 -> Toast
+                                                .makeText(
+                                                    context,
+                                                    "Эти страницы на стадии разработки",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                            else -> Toast
+                                                .makeText(
+                                                    context,
+                                                    "Эти страницы на стадии разработки",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
                                         }
                                     }
                                     .padding(vertical = 15.dp),
@@ -323,30 +346,63 @@ class MainScreen : Screen{
                             }
                         )
                     }) {
+
                         BottomSheetScaffold(
                             scaffoldState = mainBottomSheetState,
+
                             floatingActionButton = {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 30.dp)
-                                        .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-35).dp else (-65).dp),
-                                    horizontalAlignment = Alignment.Start
-                                ) {
-                                    FloatingActionButton(
-                                        modifier = Modifier.size(50.dp),
-                                        backgroundColor = MaterialTheme.colors.background,
-                                        onClick = {
-                                            coroutineScope.launch {
-                                                navigator.pop()
+                                Column(  modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 25.dp),) {
+
+
+                                    Row( modifier = Modifier
+                                        .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        FloatingButton2(
+                                            ImageVector.vectorResource(id = R.drawable.btn_show_location)
+                                        ) {
+                                            map.controller.animateTo(mLocationOverlay.myLocation)
+                                            if (mLocationOverlay.myLocation != null) {
+                                                scope.launch {
+                                                    if (currentRoute == SearchAddressScreen().key) {
+                                                        mainViewModel.getAddressFromMap(
+                                                            mLocationOverlay.myLocation.longitude,
+                                                            mLocationOverlay.myLocation.latitude
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
+                                        FloatingButton2(
+                                            Icons.Filled.Menu
+                                        ) {
+                                            scope.launch {
+                                                drawerState.open()
+                                            }
+                                        }
+                                    }
+                                    Column(
+                                        modifier = Modifier
+                                            .offset(y = if (bottomSheetState.bottomSheetState.isCollapsed) (-120).dp else (-65).dp),
+                                        horizontalAlignment = Alignment.Start
                                     ) {
-                                        Icon(
-                                            Icons.Filled.ArrowBack,
-                                            contentDescription = "Menu",
-                                            modifier = Modifier.size(25.dp)
-                                        )
+                                        FloatingActionButton(
+                                            modifier = Modifier.size(50.dp),
+                                            backgroundColor = MaterialTheme.colors.background,
+                                            onClick = {
+                                                coroutineScope.launch {
+                                                    navigator.pop()
+                                                }
+                                            }
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.ArrowBack,
+                                                contentDescription = "Menu",
+                                                modifier = Modifier.size(25.dp)
+                                            )
+                                        }
                                     }
                                 }
                             },

@@ -1,6 +1,7 @@
 package com.gram.client.presentation.screens.map
 
 import TwoFingerDrag
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -17,6 +18,7 @@ import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -86,6 +88,13 @@ lateinit var mLocationOverlay: MyLocationNewOverlay
 lateinit var getAddressMarker: ImageView
 var currentRoute: String? = null
 val myLocationPoint = mutableStateOf(GeoPoint(0.0, 0.0))
+
+@SuppressLint("StaticFieldLeak")
+lateinit var btnZoomIn: ImageButton
+@SuppressLint("StaticFieldLeak")
+lateinit var btnZoomOut: ImageButton
+private var zoomAnimation: ValueAnimator? = null
+private var targetZoom = 0.0
 
 
 @Composable
@@ -179,6 +188,27 @@ fun CustomMainMap(
                     map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
                     map.setMultiTouchControls(true)
 
+                    btnZoomIn = this.findViewById(R.id.btnZoomIn)
+                    btnZoomOut = this.findViewById(R.id.btnZoomOut)
+                    zoomAnimation = ValueAnimator.ofFloat(0f, 1f)
+                    zoomAnimation?.duration = 250.toLong()
+                    btnZoomIn.setOnClickListener {
+                        btnZoomOut.visibility = View.VISIBLE
+                        changeZoom(+1.0, it.context)
+                        if (map.zoomLevelDouble == 21.0) {
+                            btnZoomIn.visibility = View.INVISIBLE
+                        }
+                    }
+                    btnZoomOut.setOnClickListener {
+                        btnZoomIn.visibility = View.VISIBLE
+                        changeZoom(-1.0, it.context)
+                        if (map.zoomLevelDouble == 15.0) {
+                            btnZoomOut.visibility = View.INVISIBLE
+                        }
+                    }
+
+
+
                     map.minZoomLevel = 10.0
                     map.maxZoomLevel = 24.0
 
@@ -231,6 +261,7 @@ fun CustomMainMap(
                             TwoFingerDrag(
                                 context,
                                 object : TwoFingerDrag.Listener {
+                                    @SuppressLint("LongLogTag")
                                     override fun onOneFinger(event: MotionEvent?) {
                                         map.dispatchTouchEvent(event)
                                         if (event != null) {
@@ -286,6 +317,7 @@ fun CustomMainMap(
                                         }
                                     }
 
+                                    @SuppressLint("LongLogTag")
                                     override fun onTwoFingers(event: MotionEvent?) {
                                         map.dispatchTouchEvent(event)
                                         if (event != null) {
@@ -354,6 +386,7 @@ fun CustomMainMap(
                             TwoFingerDrag(
                                 context,
                                 object : TwoFingerDrag.Listener {
+                                    @SuppressLint("LongLogTag")
                                     override fun onOneFinger(event: MotionEvent?) {
                                         map.dispatchTouchEvent(event)
                                         if (event != null) {
@@ -380,6 +413,7 @@ fun CustomMainMap(
                                         }
                                     }
 
+                                    @SuppressLint("LongLogTag")
                                     override fun onTwoFingers(event: MotionEvent?) {
                                         map.dispatchTouchEvent(event)
                                         if (event != null) {
@@ -448,6 +482,7 @@ fun CustomMainMap(
                             TwoFingerDrag(
                                 context,
                                 object : TwoFingerDrag.Listener {
+                                    @SuppressLint("LongLogTag")
                                     override fun onOneFinger(event: MotionEvent?) {
                                         map.dispatchTouchEvent(event)
                                         if (event != null) {
@@ -474,6 +509,7 @@ fun CustomMainMap(
                                         }
                                     }
 
+                                    @SuppressLint("LongLogTag")
                                     override fun onTwoFingers(event: MotionEvent?) {
                                         map.dispatchTouchEvent(event)
                                         if (event != null) {
@@ -619,6 +655,32 @@ fun addOverlays() {
     map.overlays.add(mRotationGestureOverlay)
 }
 
+private fun changeZoom(requestedDiff: Double, context: Context) {
+
+    val startZoom = map.zoomLevelDouble
+    if (zoomAnimation!!.isRunning) { // user clicked zoom button once again before the previous animation was finished
+        targetZoom += requestedDiff
+        zoomAnimation!!.cancel()
+    } else { // usual case
+        if (startZoom == Math.round(startZoom).toDouble()) { // user is already on even level
+            targetZoom =
+                Math.round(startZoom + requestedDiff)
+                    .toDouble() // zoom to an another even level
+        } else {
+            targetZoom = if (requestedDiff > 0) // zoom to the closest even level
+                Math.ceil(startZoom) else Math.floor(startZoom)
+        }
+    }
+    zoomAnimation!!.removeAllUpdateListeners()
+    zoomAnimation!!.addUpdateListener(ValueAnimator.AnimatorUpdateListener { updatedAnimation: ValueAnimator ->
+        val fraction = updatedAnimation.animatedFraction
+        map.controller.setZoom(startZoom + (targetZoom - startZoom) * fraction)
+    })
+    zoomAnimation!!.duration = 1000
+    zoomAnimation!!.start()
+
+}
+
 private fun myLocationShow(context: Context?, mLocationOverlay: MyLocationNewOverlay) {
     val person: Bitmap = context?.let { getBitmap(it, R.drawable.ic_person) }!!
     val arrow: Bitmap = getBitmap(context, R.drawable.ic_navigation)!!
@@ -705,6 +767,8 @@ private fun printoutDebugInfo(
         }
     }
 }
+
+
 
 inline fun <reified T : ViewGroup.LayoutParams> View.layoutParams(block: T.() -> Unit) {
     if (layoutParams is T) block(layoutParams as T)

@@ -1,5 +1,6 @@
 package com.gram.client.presentation.screens.order
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.os.Vibrator
@@ -46,6 +47,7 @@ import kotlinx.coroutines.flow.onEach
 import org.burnoutcrew.reorderable.ItemPosition
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
+@SuppressLint("LongLogTag")
 
 @HiltViewModel
 class OrderExecutionViewModel @Inject constructor(
@@ -62,6 +64,7 @@ class OrderExecutionViewModel @Inject constructor(
     private val getReasonsUseCase: GetReasonsUseCase,
     private val getRatingReasonsUseCase: GetRatingReasonsUseCase
     ) : AndroidViewModel(application) {
+
     val context get() = getApplication<Application>()
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private val mapController = MapController(context)
@@ -69,15 +72,14 @@ class OrderExecutionViewModel @Inject constructor(
     private val _stateAddRating = mutableStateOf(AddRatingResponseState())
     val stateAddRating: State<AddRatingResponseState> = _stateAddRating
 
-    private val _stateConnectClientWithDriver =
-        mutableStateOf(ConnectClientWithDriverResponseState())
+    private val _stateConnectClientWithDriver = mutableStateOf(ConnectClientWithDriverResponseState())
     val stateConnectClientWithDriver = _stateConnectClientWithDriver
+
     private val _stateRealtimeOrdersDatabase = mutableStateOf(GetOrdersState())
     val stateRealtimeOrdersDatabase: State<GetOrdersState> = _stateRealtimeOrdersDatabase
 
     private val _stateRealtimeClientOrderIdDatabase = mutableStateOf(GetClientOrderState())
-    val stateRealtimeClientOrderIdDatabase: State<GetClientOrderState> =
-        _stateRealtimeClientOrderIdDatabase
+    val stateRealtimeClientOrderIdDatabase: State<GetClientOrderState> = _stateRealtimeClientOrderIdDatabase
 
     private val _stateActiveOrders = mutableStateOf(ActiveOrdersResponseState())
     val stateActiveOrders: State<ActiveOrdersResponseState> = _stateActiveOrders

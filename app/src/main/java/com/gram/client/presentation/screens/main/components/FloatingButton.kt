@@ -35,3 +35,27 @@ fun FloatingButton(
         )
     }
 }
+
+@Composable
+fun FloatingButton2(
+    icon: ImageVector,
+    backgroundColor: Color = PrimaryColor,
+    contentColor: Color = Color.White,
+    onClick: () -> Unit
+) {
+    FloatingActionButton(
+        modifier = Modifier
+            .size(50.dp)
+            .offset(y = (-10).dp),
+        backgroundColor = backgroundColor,
+        onClick = {
+            onClick.invoke()
+        }
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = "Menu", tint = contentColor,
+            modifier = Modifier.size(25.dp)
+        )
+    }
+}
