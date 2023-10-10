@@ -140,7 +140,7 @@ class OrderExecutionScreen : Screen {
                             if (order.performer != null) {
                                 bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
                             }else{
-                                bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.replace(SearchDriverScreen())})
+                                bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(SearchDriverScreen())})
                             }
                         })
                     }
