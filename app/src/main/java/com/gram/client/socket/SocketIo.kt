@@ -2,7 +2,6 @@
 
 import android.util.Log
 import com.google.gson.Gson
-import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.domain.socket.EditOrderSocketResponse
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import io.socket.client.IO
@@ -13,6 +12,8 @@ import java.util.Collections.singletonMap
 object SocketHandler {
 
     lateinit var mSocket: Socket
+    private var gson = Gson()
+
 
     @Synchronized
     fun setSocket(accessToken: String, orderExecutionViewModel: OrderExecutionViewModel) {
@@ -30,21 +31,22 @@ object SocketHandler {
 
             mSocket.on("client-mob-app:orders"){args->
                 try {
-                    Log.e("SocketIODATA","${args[0]}")
-                    /*var gson = Gson()
+                    Log.e("SocketIODATA","SocketIODATA ${args[0]}")
                     var model: EditOrderSocketResponse = gson.fromJson(args[0].toString(), EditOrderSocketResponse::class.java)
-                    Log.e("SocketIODATA","${model.data.id}")*/
+                    //orderExecutionViewModel.addActiveOrder(model.data)
                     orderExecutionViewModel.getActiveOrders()
                 }catch (_ : Exception){
 
                 }
             }
             mSocket.on("client-mob-app:cancel-orders"){args->
-                Log.e("SocketIODATA","${args[0]}")
+                Log.e("SocketIODATA","cancelSocketIODATA ${args[0]}")
+                orderExecutionViewModel.getActiveOrders()
 
             }
             mSocket.on("client-mob-app:complete-orders"){args->
-                Log.e("SocketIODATA","${args[0]}")
+                Log.e("SocketIODATA","completeSocketIODATA ${args[0]}")
+                orderExecutionViewModel.getActiveOrders()
             }
 
             mSocket.on(Socket.EVENT_CONNECT) { args ->

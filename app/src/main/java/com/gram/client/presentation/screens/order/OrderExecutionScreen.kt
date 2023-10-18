@@ -27,8 +27,8 @@ import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.presentation.screens.order.components.*
-import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Constants.STATE_RAITING_ORDER_ID
+import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
 

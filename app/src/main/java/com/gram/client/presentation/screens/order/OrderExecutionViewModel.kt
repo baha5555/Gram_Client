@@ -13,34 +13,33 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.gram.client.domain.mainScreen.order.*
-import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
-import com.gram.client.domain.orderExecutionScreen.*
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
-import com.gram.client.domain.firebase.GetClientOrderUseCase
-import com.gram.client.domain.firebase.GetOrdersUseCase
-import com.gram.client.domain.firebase.profile.Client
-import com.gram.client.domain.mainScreen.*
-import com.gram.client.presentation.screens.main.states.AddressByPointResponseState
-import com.gram.client.presentation.screens.order.states.GetClientOrderState
-import com.gram.client.presentation.screens.order.states.GetOrdersState
-import com.gram.client.presentation.screens.main.states.CancelOrderResponseState
-import com.gram.client.presentation.screens.main.states.SearchAddressResponseState
-import com.gram.client.presentation.screens.map.MapController
-import com.gram.client.presentation.screens.map.map
-import com.gram.client.presentation.screens.order.states.GetReasonsResponseState
-import com.gram.client.utils.Constants
-import com.gram.client.utils.Resource
-import com.gram.client.utils.Values
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.gram.client.domain.firebase.GetClientOrderUseCase
+import com.gram.client.domain.firebase.GetOrdersUseCase
+import com.gram.client.domain.firebase.profile.Client
+import com.gram.client.domain.mainScreen.*
+import com.gram.client.domain.mainScreen.order.*
+import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
+import com.gram.client.domain.orderExecutionScreen.*
 import com.gram.client.domain.orderExecutionScreen.active.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.domain.orderExecutionScreen.reason.*
+import com.gram.client.presentation.screens.main.states.AddressByPointResponseState
+import com.gram.client.presentation.screens.main.states.CancelOrderResponseState
+import com.gram.client.presentation.screens.main.states.SearchAddressResponseState
+import com.gram.client.presentation.screens.map.MapController
+import com.gram.client.presentation.screens.map.map
+import com.gram.client.presentation.screens.order.states.GetClientOrderState
+import com.gram.client.presentation.screens.order.states.GetOrdersState
 import com.gram.client.presentation.screens.order.states.GetRatingReasonsResponseState
+import com.gram.client.presentation.screens.order.states.GetReasonsResponseState
+import com.gram.client.utils.Constants
+import com.gram.client.utils.Resource
+import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -324,6 +323,14 @@ class OrderExecutionViewModel @Inject constructor(
             }
         }
     }
+    fun deleteActiveOrder(id: Int){
+        _stateActiveOrdersList.forEachIndexed{inx, it ->
+            if(it.id == id){
+                _stateActiveOrdersList.removeAt(inx)
+                return@forEachIndexed
+            }
+        }
+    }
 
 
     fun cancelOrder(order_id: Int, reason_cancel_order: String, onSuccess: () -> Unit) {
@@ -336,8 +343,14 @@ class OrderExecutionViewModel @Inject constructor(
                         val response: CancelOrderResponse? = result.data
                         _stateCancelOrder.value =
                             CancelOrderResponseState(response = response)
-                        onSuccess()
                         //getActiveOrders()
+//                        _stateActiveOrdersList.forEachIndexed { index, item ->
+//                            if(item.id == order_id){
+//                                _stateActiveOrdersList.removeAt(index)
+//                                return@forEachIndexed
+//                            }
+//                        }
+                        onSuccess()
                         Log.e(
                             "CancelOrderResponse",
                             "CancelOrderResponseSuccess->\n ${_stateCancelOrder.value}"
