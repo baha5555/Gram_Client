@@ -172,12 +172,17 @@ class MainViewModel @Inject constructor(
         getPrice()
     }
 
-    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance) {
+    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance, price: Int? = null) {
+        selectedAllowances.value?.forEachIndexed{ inx, it->
+            if(it.allowance_id==toDesiredAllowance.id){
+                _selectedAllowances.removeAt(inx)
+            }
+        }
         if (toDesiredAllowance.isSelected.value) {
-            _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest())
+            _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest(price))
             selectedAllowances.value = _selectedAllowances
         } else {
-            _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest())
+            _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest(price))
             selectedAllowances.value = _selectedAllowances
         }
     }
