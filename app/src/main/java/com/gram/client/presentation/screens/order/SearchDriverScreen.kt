@@ -183,7 +183,7 @@ class SearchDriverScreen : Screen {
                                 item {
                                     val isOpen = remember {
                                                 mutableStateOf(
-                                                    true
+                                                    orderExecutionViewModel.stateActiveOrdersList.size==1
                                                 )
                                             }
                                     orderCard(
