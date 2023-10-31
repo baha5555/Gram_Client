@@ -28,6 +28,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.CustomSwitch
+import com.gram.client.presentation.components.voyager.AddAllowancesSheet
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import kotlinx.coroutines.launch
@@ -165,6 +166,10 @@ class CustomInfoOfActiveOrder : Screen {
                             }
                             order.allowances?.let { allowance ->
                                 CustomInfoTitle(title = "Надбавки")
+                                Button(onClick = {navigator.push(AddAllowancesSheet()) }) {
+                                    Text(text = "добавить надбавку")
+                                }
+
                                 CustomSelectAllowances(
                                     title = "Увеличить",
                                     number = listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
