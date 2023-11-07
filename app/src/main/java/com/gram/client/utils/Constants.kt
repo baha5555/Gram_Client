@@ -8,8 +8,8 @@ object Constants {
     var FCM_TOKEN:String? = ""
     const val LOCAL_BASE_URL="http://10.250.1.96/"
     const val TEST_URL="https://testapi.client.gram.tj/"
-    const val BASE_URL="https://api-client.gram.tj"
-    const val URL= TEST_URL
+    const val BASE_URL="https://api-client.gram.tj/"
+    const val URL= BASE_URL
     var IDENTIFY_TO_SCREEN = ""
     const val PREFIX="992"
     const val FROM_ADDRESS="FROM_ADDRESS"
