@@ -128,6 +128,7 @@ class OrderExecutionScreen : Screen {
                         orderSection(order, scope)
                         Spacer(modifier = Modifier.height(10.dp))
                         optionSection(onClick = {
+
                             navigator.push(CustomInfoOfActiveOrder())
                         })
                         val context = LocalContext.current
