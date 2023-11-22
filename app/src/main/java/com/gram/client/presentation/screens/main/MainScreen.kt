@@ -26,9 +26,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -136,7 +138,25 @@ class MainScreen : Screen{
         val stateCalculate by mainViewModel.stateCalculate
 
         val countriesKey by mainViewModel.stateCountriesKey
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            BackHandler(enabled = drawerState.isOpen) {
+                scope.launch { drawerState.close() }
+            }
+            ModalDrawer(
+                drawerState = drawerState,
+                gesturesEnabled = !drawerState.isClosed,
+                drawerContent = {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            SideBarMenu()
+                        }
+                    }
+                },
+                content = {
 
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         ModalBottomSheetLayout(
             sheetState = modalSheetState,
             sheetContent = {
@@ -435,7 +455,7 @@ class MainScreen : Screen{
                     }
                 }
             }
-        }
+        }}})}
     }
 }
 
