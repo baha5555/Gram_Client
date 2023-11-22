@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -24,9 +25,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
+import com.gram.client.presentation.components.CustomDialog
 import com.gram.client.presentation.components.CustomSwitch
 import com.gram.client.presentation.components.voyager.AddAllowancesSheet
 import com.gram.client.presentation.screens.main.MainViewModel
@@ -44,12 +47,22 @@ class CustomInfoOfActiveOrder : Screen {
         val scope = rememberCoroutineScope()
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val mainViewModel: MainViewModel = hiltViewModel()
+        val bottomNavigator = LocalBottomSheetNavigator.current
+
 
         var symbol by remember { mutableStateOf(65) }
 
-        val countriesKey =mainViewModel.stateCountriesKey.value.response
+        val countriesKey = mainViewModel.stateCountriesKey.value.response
         val selectedOrder by orderExecutionViewModel.selectedOrder
+        val coroutineScope = rememberCoroutineScope()
+        val isDialogOpen = remember { mutableStateOf(false) }
+        val stateTariffs by mainViewModel.stateTariffs
 
+
+
+        LaunchedEffect(key1 = true) {
+            mainViewModel.getAllowancesByTariffId(selectedOrder.tariff_id)
+        }
         Scaffold(topBar = {
 
         }) {
@@ -166,86 +179,52 @@ class CustomInfoOfActiveOrder : Screen {
                             }
                             order.allowances?.let { allowance ->
                                 CustomInfoTitle(title = "Надбавки")
-                                Button(onClick = {navigator.push(AddAllowancesSheet()) }) {
-                                    Text(text = "добавить надбавку")
-                                }
-
-                                CustomSelectAllowances(
-                                    title = "Увеличить",
-                                    number = listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
-                                )
-                                Divider(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 15.dp)
-                                        )
-                                CustomSelectAllowances(
-                                    title = "С детьми",
-                                    number = listOf(1,2,3,4)
-                                )
-                                Text(text = "${order.price} ${countriesKey?.currency_symbol?.monetary_unit}.")
-
-                                Divider(
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(start = 15.dp)
-                                )
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 15.dp),
+                                        .padding(15.dp)
+                                        .clickable {
+                                            bottomNavigator.show(AddAllowancesSheet() {
+                                                isDialogOpen.value = true
+                                            })
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    allowance.forEach {
-                                        Row(modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(end = 10.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween) {
-                                            Text(
-                                                text = it.name, modifier = Modifier
-                                                    .padding(vertical = 25.dp)
-                                            )
-                                            Row(modifier = Modifier,
-                                            verticalAlignment = Alignment.CenterVertically) {
-                                                Text(
-                                                    text = "+ ${it.name} ${countriesKey?.currency_symbol?.key}", modifier = Modifier
-                                                        .padding(vertical = 25.dp)
-                                                        .padding(end = 15.dp)
-                                                )
-                                                val switchON = remember {
-                                                    mutableStateOf(false) // Initially the switch is ON
-                                                }
-                                                CustomSwitch(switchON = switchON) {}
-                                            }
-
-                                        }
-
-                                        Divider(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(start = 15.dp)
-                                        )
+                                    Column {
+                                        Text(text = "Добавить надбавки", fontSize = 16.sp)
                                     }
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(18.dp),
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = "icon"
+                                    )
                                 }
-                                CustomSelectAllowances(
-                                    title = "Сдача с",
-                                    number = listOf(50,100,200,500)
-                                )
-                                Divider(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 15.dp)
-                                )
-                                CustomSelectAllowances(
-                                    title = "Чаевые",
-                                    listOf(1,2,3,4,5,6,7,8,9,10,20,30,40,50)
-                                )
                             }
                         }
                     }
                 }
             }
         }
+        CustomDialog(
+            text = "Вы хотите изменить данный заказ?",
+            okBtnClick = {
+                coroutineScope.launch {
+                    isDialogOpen.value = false
+                    stateTariffs.response?.let { tariffs ->
+                        mainViewModel.updateSelectedTariff(tariffs[0])
+
+                    }
+                }
+            },
+            cancelBtnClick = {
+                coroutineScope.launch {
+                    isDialogOpen.value = false
+                }
+            },
+            isDialogOpen = isDialogOpen.value
+        )
     }
 
     @Composable
@@ -312,7 +291,7 @@ class CustomInfoOfActiveOrder : Screen {
                 )
                 CustomSwitch(switchON = switchON) {}
             }
-            if(switchON.value){
+            if (switchON.value) {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()

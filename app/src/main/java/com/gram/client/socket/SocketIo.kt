@@ -24,7 +24,7 @@ object SocketHandler {
                 .setTransports(arrayOf("websocket"))
                 .build()
 
-            mSocket = IO.socket(URL+"traffic_gram", options)
+            mSocket = IO.socket(URL+"client_gram", options)
             mSocket.connect()
 
             mSocket.on(Socket.EVENT_CONNECT) { args ->

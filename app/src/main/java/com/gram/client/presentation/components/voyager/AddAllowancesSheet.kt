@@ -31,7 +31,7 @@ import com.gram.client.presentation.components.CustomSwitch
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.valentinilk.shimmer.shimmer
 
-class AddAllowancesSheet() : Screen {
+class AddAllowancesSheet(val onClick:()->Unit) : Screen {
     @Composable
     override fun Content() {
         val mainViewModel: MainViewModel = hiltViewModel()
@@ -53,6 +53,7 @@ class AddAllowancesSheet() : Screen {
             CustomBigButton(text = "Готово") {
                 mainViewModel.getPrice()
                 bottomNavigator.hide()
+                onClick()
             }
         }
     }
@@ -64,6 +65,7 @@ class AddAllowancesSheet() : Screen {
     ) {
         val mainViewModel: MainViewModel = hiltViewModel()
         val stateAllowances = mainViewModel.stateAllowances.value
+        Log.e("надбавки","${mainViewModel.stateAllowances.value}")
         Column(
             modifier = modifier
                 .verticalScroll(rememberScrollState())

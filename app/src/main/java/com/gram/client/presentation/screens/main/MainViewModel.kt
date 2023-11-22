@@ -163,6 +163,9 @@ class MainViewModel @Inject constructor(
         _toAddresses.clear()
     }
 
+    fun selectedAllowances(){
+
+    }
     fun updateSelectedTariff(
         value: TariffsResult,
     ) {
@@ -185,6 +188,7 @@ class MainViewModel @Inject constructor(
             _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest(price))
             selectedAllowances.value = _selectedAllowances
         }
+        getPrice()
     }
     fun getCountriesKey(str:String){
         getCountriesKeyUseCase.invoke(str).onEach { result: Resource<CountriesKeyResponse> ->
@@ -471,6 +475,7 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    @SuppressLint("LongLogTag")
     fun getAddressFromMap(
         lng: Double,
         lat: Double
