@@ -45,7 +45,7 @@ class Reason1Screen(
             Spacer(modifier = Modifier.height(35.dp))
             Button(
                 onClick = {
-                    bottomNavigator.replace(Reason2Screen(orderExecutionViewModel, order) {navigator.replace(SearchDriverScreen())})
+                    bottomNavigator.replace(Reason2Screen(orderExecutionViewModel, order) {navigator.replaceAll(SearchDriverScreen())})
                 },
                 modifier = Modifier
                     .fillMaxWidth()
