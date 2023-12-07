@@ -45,7 +45,7 @@ fun ToAddressField(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(55.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 Values.WhichAddress.value = Constants.TO_ADDRESS
@@ -61,13 +61,13 @@ fun ToAddressField(
         Image(
             painter = painterResource(id = R.drawable.car_kuda_edem),
             contentDescription = "car_eco",
-            modifier = Modifier.offset(x = -25.dp)
+            modifier = Modifier.offset(x = -20.dp).size(60.dp)
         )
         Text(
             text = if (toAddress.isEmpty()) "Куда едем?" else toAddress[0].address,
             textAlign = TextAlign.Start,
-            color = if (toAddress.isEmpty()) Color.Gray else Color.White,
-            fontSize = 16.sp,
+            color = if (toAddress.isEmpty()) Color.White else Color.White,
+            fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1, overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f).padding(end = 12.dp)
