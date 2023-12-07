@@ -68,7 +68,6 @@ class SearchDriverScreen : Screen {
         val prefs = CustomPreference(context)
         val navigator = LocalNavigator.currentOrThrow
         val bottomNavigator = LocalBottomSheetNavigator.current
-
         val mainViewModel: MainViewModel = hiltViewModel()
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -90,11 +89,7 @@ class SearchDriverScreen : Screen {
                 }
             }
         }
-
         CustomBackHandle(true)
-
-
-
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 BackHandler(enabled = drawerState.isOpen) {
                     scope.launch { drawerState.close() }
@@ -112,7 +107,6 @@ class SearchDriverScreen : Screen {
                         }
                     },
                     content = {
-
                         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                             BottomSheetScaffold(
                                 sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
@@ -123,15 +117,14 @@ class SearchDriverScreen : Screen {
                                             .fillMaxWidth()
                                             .padding(start = 25.dp, bottom = 50.dp),
                                     ) {
-
-
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             FloatingButton2(
-                                                ImageVector.vectorResource(id = R.drawable.btn_show_location)
+                                                ImageVector.vectorResource(id = R.drawable.btn_show_location), backgroundColor = Color.White,
+                                                contentColor = PrimaryColor
                                             ) {
                                                 map.controller.animateTo(mLocationOverlay.myLocation)
                                                 if (mLocationOverlay.myLocation != null) {
@@ -146,7 +139,8 @@ class SearchDriverScreen : Screen {
                                                 }
                                             }
                                             FloatingButton2(
-                                                Icons.Filled.Menu
+                                                Icons.Filled.Menu, backgroundColor = Color.White,
+                                                contentColor = PrimaryColor
                                             ) {
                                                 scope.launch {
                                                     drawerState.open()
@@ -156,7 +150,6 @@ class SearchDriverScreen : Screen {
 
                                     }
                                 },
-
                                 sheetContent = {
                                     Column(
                                         Modifier
@@ -164,7 +157,6 @@ class SearchDriverScreen : Screen {
                                             .wrapContentHeight()
                                             .background(MaterialTheme.colors.secondary)
                                     ) {
-
                                         LazyColumn() {
                                             orderExecutionViewModel.stateActiveOrdersList.forEachIndexed { inx, it ->
                                                 item {
