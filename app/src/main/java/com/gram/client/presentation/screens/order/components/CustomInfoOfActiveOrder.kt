@@ -1,7 +1,6 @@
 package com.gram.client.presentation.screens.order.components
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,15 +26,12 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.CustomDialog
 import com.gram.client.presentation.components.CustomSwitch
 import com.gram.client.presentation.components.voyager.AddAllowancesSheet
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import kotlinx.coroutines.launch
-import kotlin.math.absoluteValue
-import androidx.compose.foundation.layout.Row as Row
 
 class CustomInfoOfActiveOrder : Screen {
     @SuppressLint("CoroutineCreationDuringComposition")
