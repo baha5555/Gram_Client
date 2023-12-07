@@ -14,6 +14,9 @@ import com.gram.client.domain.athorization.*
 import com.gram.client.utils.Resource
 import com.gram.client.presentation.screens.authorization.states.AuthResponseState
 import com.gram.client.presentation.screens.authorization.states.IdentificationResponseState
+import com.gram.client.utils.Values.CLIENT_REGISTER_ID
+import com.gram.client.utils.Values.PHONE_NUMBER
+import com.gram.client.utils.Values.SMS_CODE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -39,9 +42,7 @@ class AuthViewModel @Inject constructor(
     private val _stateLogin = mutableStateOf(IdentificationResponseState())
     val stateLogin: State<IdentificationResponseState> = _stateLogin
 
-    val smsCode=MutableLiveData("")
-    val client_regiter_id=MutableLiveData("")
-    val phoneNumber=MutableLiveData("")
+
 
     private val _isAutoInsert = mutableStateOf(false)
     val isAutoInsert: State<Boolean> = _isAutoInsert
@@ -52,18 +53,18 @@ class AuthViewModel @Inject constructor(
 
     fun setCodeAutomaticly(code:String, scope:CoroutineScope,fcm_token:String){
         scope.launch {
-            smsCode.value = code
+            SMS_CODE.value = code
             delay(2000)
             //identification(smsCode.value!!, client_regiter_id.value!!, navController,fcm_token)
         }
     }
 
     fun updateCode(code: String){
-        smsCode.value=code
+        SMS_CODE.value=code
     }
 
     fun authorization(phone: String, onSuccess: () -> Unit){
-        phoneNumber.value=phone.toString()
+        PHONE_NUMBER.value=phone
         authUseCase.invoke(phone).onEach { result: Resource<AuthResponse> ->
             when (result){
                 is Resource.Success -> {
@@ -71,7 +72,7 @@ class AuthViewModel @Inject constructor(
                         val response: AuthResponse? = result.data
                         _stateAuth.value = AuthResponseState(response = response)
                         Log.e("TariffsResponse", "AuthResponse->\n ${_stateAuth.value}")
-                        client_regiter_id.value=response?.result?.client_register_id
+                        CLIENT_REGISTER_ID.value= response?.result?.client_register_id.toString()
 //                        Toast.makeText(context, ""+ (_stateAuth.value.response?.result?.sms_code ?: "not"), Toast.LENGTH_LONG).show()
                         onSuccess.invoke()
                     }catch (e: Exception) {
@@ -104,7 +105,7 @@ class AuthViewModel @Inject constructor(
                     Log.e("authresponse", "authresponseSuccess->\n ${_stateLogin.value}\n")
                     prefs.setAccessToken("Bearer ${response?.result?.access_token}")
                     prefs.setSocketAccessToken("${response?.result?.access_token}")
-                    smsCode.value=""
+                    SMS_CODE.value=""
                     onSuccess.invoke()
                 }
                 is Resource.Error -> {
