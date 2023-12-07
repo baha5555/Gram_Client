@@ -194,6 +194,7 @@ class SearchAddressOrderExecutionNavigator(val inx: Int = -1,  val function: () 
                                                 orderExecutionViewModel.editOrder()
                                             }
                                         }
+                                        orderExecutionViewModel.getActiveOrders {  }
                                     }
                                 )
                                 Divider()

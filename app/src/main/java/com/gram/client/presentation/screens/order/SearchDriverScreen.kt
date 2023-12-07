@@ -37,6 +37,7 @@ import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.components.voyager.MapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddresses
+import com.gram.client.presentation.components.voyager.reason.Reason2Screen
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
@@ -366,13 +367,14 @@ class SearchDriverScreen : Screen {
                     horizontalArrangement = Arrangement.Center
                 ) {
 
+
                         CustomCircleButton(
-                            text = "Связаться",
-                            icon = ImageVector.vectorResource(id = R.drawable.phone)
+                            text = if(order.status=="Не оформлен" || order.status == "Поступило") "Отменить\nзаказ" else "Связаться",
+                            icon = if(order.status=="Не оформлен" || order.status == "Поступило")Icons.Default.Close else ImageVector.vectorResource(id = R.drawable.phone)
                         ) {
-                            if(order.performer == null  || order.status=="Поступило"){
-                                Toast.makeText(context,"Водитель еще не найден!",Toast.LENGTH_SHORT).show()
-                            }else{
+                            if(order.status=="Не оформлен" || order.status == "Поступило"){
+                                bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){})
+                            }else {
                                 connectClientWithDriverIsDialogOpen.value = true
                             }
                         }
