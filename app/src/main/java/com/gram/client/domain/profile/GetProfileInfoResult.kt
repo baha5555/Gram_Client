@@ -1,7 +1,7 @@
 package com.gram.client.domain.profile
 
 data class GetProfileInfoResult(
-    val avatar_url: String? ="",
+    val avatar: String? ="",
     val birth_date: String,
     val email: String,
     val first_name: String,

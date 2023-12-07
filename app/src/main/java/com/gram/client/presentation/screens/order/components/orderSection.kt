@@ -43,14 +43,6 @@ fun orderSection(
     ) {
         Row(
             modifier = Modifier
-                .clickable {
-                    Values.WhichAddress.value=Constants.FROM_ADDRESS
-                    if(order.status=="Поступило" || order.status=="Не оформлен"){
-                        bottomNavigator.show(SearchAddressOrderExecutionNavigator(){
-                            navigator.push(OrderExecutionMapPointScreen())
-                        })
-                    }
-                }
                 .fillMaxWidth()
                 .padding(15.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -79,13 +71,6 @@ fun orderSection(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            Image(
-                modifier = Modifier
-                    .size(18.dp)
-                    .fillMaxWidth(0.1f),
-                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
-                contentDescription = "icon"
-            )
         }
         Column(
             modifier = Modifier

@@ -5,12 +5,10 @@ import androidx.room.Room
 import com.gram.client.data.room.Dao.PostDao
 import com.gram.client.data.room.Database.PostDatabase
 import com.gram.client.app.preference.CustomPreference
-import com.gram.client.data.AppFirebaseRepositoryImpl
 import com.gram.client.data.AppRepositoryImpl
 import com.gram.client.data.remote.ApplicationApi
 import com.gram.client.data.room.Repository.RoomRepositoryImpl
 import com.gram.client.domain.AppRepository
-import com.gram.client.domain.FirebaseRepository
 import com.gram.client.domain.RoomRepository
 import com.gram.client.utils.Constants
 import dagger.Module
@@ -49,10 +47,6 @@ object AppModule {
     @Singleton
     fun provideAppRepository(api: ApplicationApi, customPreference: CustomPreference): AppRepository =
         AppRepositoryImpl(api, customPreference)
-
-    @Provides
-    @Singleton
-    fun provideFirebaseRepository(): FirebaseRepository = AppFirebaseRepositoryImpl()
 
     @Provides
     @Singleton

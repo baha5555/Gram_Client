@@ -11,16 +11,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.gram.client.domain.firebase.GetClientOrderUseCase
-import com.gram.client.domain.firebase.GetOrdersUseCase
-import com.gram.client.domain.firebase.profile.Client
 import com.gram.client.domain.mainScreen.*
 import com.gram.client.domain.mainScreen.order.*
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
@@ -33,8 +29,6 @@ import com.gram.client.presentation.screens.main.states.CancelOrderResponseState
 import com.gram.client.presentation.screens.main.states.SearchAddressResponseState
 import com.gram.client.presentation.screens.map.MapController
 import com.gram.client.presentation.screens.map.map
-import com.gram.client.presentation.screens.order.states.GetClientOrderState
-import com.gram.client.presentation.screens.order.states.GetOrdersState
 import com.gram.client.presentation.screens.order.states.GetRatingReasonsResponseState
 import com.gram.client.presentation.screens.order.states.GetReasonsResponseState
 import com.gram.client.utils.Constants
@@ -46,6 +40,7 @@ import kotlinx.coroutines.flow.onEach
 import org.burnoutcrew.reorderable.ItemPosition
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
+
 @SuppressLint("LongLogTag")
 
 @HiltViewModel
@@ -55,8 +50,6 @@ class OrderExecutionViewModel @Inject constructor(
     private val getActiveOrdersUseCase: GetActiveOrdersUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase,
     private val editOrderUseCase: EditOrderUseCase,
-    private val getOrdersUseCase: GetOrdersUseCase,
-    private val getClientOrderUseCase: GetClientOrderUseCase,
     private val connectClientWithDriverUseCase: ConnectClientWithDriverUseCase,
     private val searchAddressUseCase: SearchAddressUseCase,
     private val getAddressByPointUseCase: GetAddressByPointUseCase,
@@ -73,12 +66,6 @@ class OrderExecutionViewModel @Inject constructor(
 
     private val _stateConnectClientWithDriver = mutableStateOf(ConnectClientWithDriverResponseState())
     val stateConnectClientWithDriver = _stateConnectClientWithDriver
-
-    private val _stateRealtimeOrdersDatabase = mutableStateOf(GetOrdersState())
-    val stateRealtimeOrdersDatabase: State<GetOrdersState> = _stateRealtimeOrdersDatabase
-
-    private val _stateRealtimeClientOrderIdDatabase = mutableStateOf(GetClientOrderState())
-    val stateRealtimeClientOrderIdDatabase: State<GetClientOrderState> = _stateRealtimeClientOrderIdDatabase
 
     private val _stateActiveOrders = mutableStateOf(ActiveOrdersResponseState())
     val stateActiveOrders: State<ActiveOrdersResponseState> = _stateActiveOrders
@@ -172,31 +159,6 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun updateSelectedOrder(order: AllActiveOrdersResult) {
         _selectedOrder.value = order
-    }
-
-    fun readAllClient(client: String) {
-        if (client == "") return
-        getClientOrderUseCase.invoke(client).onEach { result: Resource<LiveData<Client>> ->
-            when (result) {
-                is Resource.Success -> {
-                    try {
-                        val realtimeClientOrderIdDatabaseResponseResponse: LiveData<Client>? =
-                            result.data
-
-                        _stateRealtimeClientOrderIdDatabase.value =
-                            GetClientOrderState(response = realtimeClientOrderIdDatabaseResponseResponse)
-
-                        Log.e(
-                            "RealtimeClientOrderIdDatabaseResponse",
-                            "Success->\n ${_stateRealtimeClientOrderIdDatabase.value.response?.value}"
-                        )
-                    } catch (e: Exception) {
-                        Log.d("Exception", "${e.message} Exception")
-                    }
-                }
-                else -> {}
-            }
-        }.launchIn(viewModelScope)
     }
 
     fun sendRating2(
@@ -295,6 +257,7 @@ class OrderExecutionViewModel @Inject constructor(
                             "ActiveOrdersResponse",
                             "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}"
                         )
+                        showRoad()
                         onSuccess()
                     } catch (e: Exception) {
                         Log.d("ActiveOrdersResponse", "${e.message} Exception")

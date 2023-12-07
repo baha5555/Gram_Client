@@ -11,6 +11,7 @@ import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,7 +50,7 @@ class ProfileViewModel @Inject constructor(
                             Values.FirstName.value = it?.first_name ?: ""
                             Values.LastName.value = it?.last_name ?: ""
                             Values.Email.value = it?.email ?: ""
-                            Values.ImageUrl.value = it?.avatar_url ?: ""
+                            Values.ImageUrl.value = it?.avatar ?: ""
                             Values.PhoneNumber.value = it?.phone ?: ""
                         }
                         Log.e(
@@ -80,6 +81,41 @@ class ProfileViewModel @Inject constructor(
     ) {
 
         sendProfileUseCase.invoke(sendProfileInfoRequest)
+            .onEach { result: Resource<ProfileResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val allowancesResponse: ProfileResponse? = result.data
+                            _stateprofile.value =
+                                ProfileResponseState(response = allowancesResponse?.result?.get(0))
+                            getProfileInfo()
+                            onSuccess()
+                            Log.e(
+                                "ProfileResponse",
+                                "SendProfileSuccess->\n ${_stateprofile.value}"
+                            )
+                        } catch (e: Exception) {
+                            Log.d("Exception", "${e.message} Exception")
+                        }
+                    }
+                    is Resource.Error -> {
+                        Log.e("ProfileResponse", "SendProfileErorr->\n${result.message}\n ${result.data}")
+                        _stateprofile.value = ProfileResponseState(
+                            error = result.data?.error
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _stateprofile.value = ProfileResponseState(isLoading = true)
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
+    fun sendAvatar(
+        avatar: MultipartBody.Part,
+        onSuccess: () -> Unit = {},
+    ) {
+
+        sendProfileUseCase.sendAvatar(avatar)
             .onEach { result: Resource<ProfileResponse> ->
                 when (result) {
                     is Resource.Success -> {

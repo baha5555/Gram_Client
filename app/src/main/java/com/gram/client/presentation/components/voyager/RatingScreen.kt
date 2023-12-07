@@ -126,9 +126,7 @@ class RatingScreen(
             Button(
                 onClick = {
                     bottomNavigator.hide()
-                    if (Values.ClientOrders.value == null) {
-                        function.invoke()
-                    }
+
                     orderExecutionViewModel.sendRating2(
                         orderId,
                         ratingState.value * 10,

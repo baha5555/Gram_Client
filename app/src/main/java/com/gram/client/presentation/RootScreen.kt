@@ -35,7 +35,6 @@ fun RootScreen() {
     DisposableEffect(key1 = true){
         Log.i("TokenAccess", ""+prefs.getAccessToken())
         orderExecutionViewModel.getActiveOrders()
-        orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
         onDispose {  }
     }
     Permissions()
@@ -44,16 +43,14 @@ fun RootScreen() {
     }
     ReturnRequest()
     if (Constants.STATE_DRIVER_IN_SITE.value) {
-        orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.let { response ->
-            response.observeAsState().value?.let {
-                for (i in it) {
-                    if (i.id == Constants.STATE_DRIVER_IN_SITE_ORDER_ID.value)
-                        DriverInSiteScreen(i, isDialog = Constants.STATE_DRIVER_IN_SITE)
-                }
-            }
-        }
+//        orderExecutionViewModel.stateRealtimeOrdersDatabase.value.response?.let { response ->
+//            response.observeAsState().value?.let {
+//                for (i in it) {
+//                    if (i.id == Constants.STATE_DRIVER_IN_SITE_ORDER_ID.value) DriverInSiteScreen(i, isDialog = Constants.STATE_DRIVER_IN_SITE)
+//                }
+//            }
+//        }
     }
-    Values.ClientOrders.value= orderExecutionViewModel.stateRealtimeClientOrderIdDatabase.value.response?.observeAsState()?.value
     //Text(text = ""+ (Values.ClientOrders.value?.active_orders?.size ?: -1)+"\nValue="+Values.ClientOrders.value)
 }
 

@@ -22,6 +22,7 @@ import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileInfoSendModel
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.PromoCode
+import okhttp3.MultipartBody
 
 interface AppRepository {
     suspend fun authorization(phone_number: String): AuthResponse
@@ -36,6 +37,7 @@ interface AppRepository {
     suspend fun getOrderHistoryResponse(page:Int): OrderHistoryPagingResult
     suspend fun connectClientWithDriver(order_id: String): connectClientWithDriverResponse
     suspend fun sendProfile(profileInfoSendModel: ProfileInfoSendModel): ProfileResponse
+    suspend fun sendAvatar(avatar: MultipartBody.Part): ProfileResponse
 
     suspend fun getAddressByPoint(lng: Double, lat: Double): AddressByPointResponse
     suspend fun sendRating(order_id: Int, add_rating: Int,rating_reason:String?): AddRatingResponse

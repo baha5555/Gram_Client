@@ -26,6 +26,7 @@ import com.gram.client.domain.profile.ProfileInfoSendModel
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.PromoCode
 import com.gram.client.utils.Constants
+import okhttp3.MultipartBody
 
 class AppRepositoryImpl(
     private val api: ApplicationApi,
@@ -59,6 +60,10 @@ class AppRepositoryImpl(
         sendProfileInfoReequest: ProfileInfoSendModel
     ): ProfileResponse =
         api.sendProfile(prefs.getAccessToken(),sendProfileInfoReequest.first_name, sendProfileInfoReequest.last_name, sendProfileInfoReequest.email, sendProfileInfoReequest.avatar)
+    override suspend fun sendAvatar(
+        avatar: MultipartBody.Part
+    ): ProfileResponse =
+        api.sendAvatar(prefs.getAccessToken(), avatar)
 
     override suspend fun getAddressByPoint(
         lng: Double,

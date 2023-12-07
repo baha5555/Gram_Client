@@ -73,7 +73,6 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                     if(phone.value!=null) {
                                         prefs.setPhoneNumber(phone.value!!)
                                         orderExecutionViewModel.getActiveOrders()
-                                        orderExecutionViewModel.readAllClient(prefs.getPhoneNumber())
                                     }
                                 }
                             }

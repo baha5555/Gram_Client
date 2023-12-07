@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.gram.client.R
-import com.gram.client.domain.firebase.order.RealtimeDatabaseOrder
 import com.gram.client.presentation.components.CustomButton
 import java.util.*
 
@@ -32,7 +31,6 @@ import java.util.*
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun DriverInSiteScreen(
-    selectRealtimeDatabaseOrder:RealtimeDatabaseOrder,
     isDialog:MutableState<Boolean>
 ) {
     val context = LocalContext.current
@@ -59,12 +57,12 @@ fun DriverInSiteScreen(
                 )
                 Spacer(modifier = Modifier.height(45.dp))
                 Log.e("DRIVER","INSITE")
-                Text(
+                /*Text(
                     text = "Приехал ${selectRealtimeDatabaseOrder.performer?.first_name} на ${selectRealtimeDatabaseOrder.performer?.transport?.model?:"Model"}\n цвет ${selectRealtimeDatabaseOrder.performer?.transport?.color?:"Color"}, госномер ${selectRealtimeDatabaseOrder.performer?.transport?.car_number}\n Платное ожидание начнется в $formattedTime \n Пожалуйста выходите",
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
-                )
+                )*/
             }
         }
         Box(modifier = Modifier

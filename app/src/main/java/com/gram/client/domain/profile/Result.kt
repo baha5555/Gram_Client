@@ -1,7 +1,7 @@
 package com.gram.client.domain.profile
 
 data class Result(
-    val avatar_url: String,
+    val avatar: String,
     val balance: Balance,
     val birth_date: Any,
     val email: String,

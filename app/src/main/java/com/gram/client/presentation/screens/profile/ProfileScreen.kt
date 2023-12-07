@@ -106,7 +106,6 @@ class ProfileScreen : Screen {
                     Values.FirstName.value = ""
                     Values.LastName.value = ""
                     Values.Email.value = ""
-                    Values.ClientOrders.value = null
                     navigator.replaceAll(AuthScreen())
                 },
                 cancelBtnClick = { isDialogOpen.value = false },
@@ -287,7 +286,7 @@ class ProfileScreen : Screen {
                                                     photo.value = File(
                                                         getRealPathFromURI(context, it)
                                                     )
-                                                    Log.e("selectImage", "${photo.value}")
+                                                    Log.e("selectImage", "${photo.value?.name?:"?"}")
                                                 }
                                                 viewModel.sendProfile(
                                                     sendProfileInfoRequest = ProfileInfoSendModel(

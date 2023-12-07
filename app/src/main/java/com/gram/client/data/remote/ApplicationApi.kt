@@ -73,6 +73,13 @@ interface ApplicationApi {
         @Part avatar: MultipartBody.Part?
     ): ProfileResponse
 
+    @Multipart
+    @POST("/api/profile")
+    suspend fun sendAvatar(
+        @Header("Authorization") token: String,
+        @Part avatar: MultipartBody.Part
+    ): ProfileResponse
+
     @FormUrlEncoded
     @POST("/api/get-address-by-point")
     suspend fun getAddressByPoint(
