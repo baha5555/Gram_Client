@@ -91,7 +91,10 @@ fun CustomStory(
                         break
                     }
                 }
-                if (i == count - 1) active = false
+                if (i == count - 1) {
+                    navigator.pop()
+                    active = false
+                }
             }
         }
     }
