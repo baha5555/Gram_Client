@@ -10,6 +10,12 @@ object Values {
     val Email = mutableStateOf("")
     val PhoneNumber = mutableStateOf("")
     val ImageUrl: MutableState<String?> = mutableStateOf("")
+
+    val SMS_CODE: MutableState<String?> = mutableStateOf("")
+    val CLIENT_REGISTER_ID: MutableState<String?> = mutableStateOf("")
+    val PHONE_NUMBER: MutableState<String?> = mutableStateOf("")
+
+
     val ClientOrdersSize = mutableStateOf(0)
     //Map
     val DriverLocation = mutableStateOf(GeoPoint(0.0, 0.0))

@@ -7,11 +7,16 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,15 +24,20 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gram.client.domain.mainScreen.Address
+import com.gram.client.R
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.components.voyager.RatingScreen
 import com.gram.client.presentation.components.voyager.reason.Reason1Screen
 import com.gram.client.presentation.components.voyager.reason.Reason2Screen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
+import com.gram.client.presentation.screens.main.components.FloatingButton
 import com.gram.client.presentation.screens.map.CustomMainMap
+import com.gram.client.presentation.screens.map.currentRoute
+import com.gram.client.presentation.screens.map.mLocationOverlay
+import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.components.*
+import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants.STATE_RAITING_ORDER_ID
 import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Values
@@ -91,6 +101,35 @@ class OrderExecutionScreen : Screen {
         }
             BottomSheetScaffold(
             scaffoldState = sheetState,
+                floatingActionButton = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 25.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        FloatingButton(
+                            Icons.Filled.ArrowBack,
+                            backgroundColor = Color.White,
+                            contentColor = PrimaryColor
+                        ) {
+                            navigator.pop()
+                        }
+                        FloatingButton(
+                            ImageVector.vectorResource(id = R.drawable.btn_show_location),
+                            backgroundColor = Color.White,
+                            contentColor = PrimaryColor
+                        ) {
+                            map.controller.animateTo(mLocationOverlay.myLocation)
+                            if (mLocationOverlay.myLocation != null) {
+                                mainViewModel.getAddressFromMap(
+                                    mLocationOverlay.myLocation.longitude,
+                                    mLocationOverlay.myLocation.latitude
+                                )
+                            }
+                        }
+                    }
+                },
             sheetBackgroundColor = MaterialTheme.colors.background,
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
@@ -112,14 +151,12 @@ class OrderExecutionScreen : Screen {
                             order.from_address.let {
                                 if (it != null) {
                                     isGet.value = false
-                                    val address = Address(address = it.name, id = it.id, address_lat = it.lat, address_lng = it.lng)
-                                    orderExecutionViewModel.updateFromAddress(address)
+                                    //mainViewModel.updateFromAddress(it)
                                 }
                             }
-                            order.to_addresses.let { it ->
-                                it?.forEach {
-                                    val address = Address(address = it.name, id = it.id, address_lat = it.lat, address_lng = it.lng)
-                                    orderExecutionViewModel.updateFromAddress(address)
+                            order.to_addresses.let {
+                                it?.forEach { it2 ->
+                                    //mainViewModel.updateToAddress(it2)
                                 }
                             }
                         }
@@ -131,6 +168,7 @@ class OrderExecutionScreen : Screen {
                         orderSection(order, scope)
                         Spacer(modifier = Modifier.height(10.dp))
                         optionSection(onClick = {
+
                             navigator.push(CustomInfoOfActiveOrder())
                         })
                         val context = LocalContext.current
@@ -141,7 +179,7 @@ class OrderExecutionScreen : Screen {
                                 return@actionSection
                             }
                             if (order.performer != null) {
-                                bottomNavigator.show(Reason1Screen(orderExecutionViewModel, order))
+                                bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(SearchDriverScreen())})
                             }else{
                                 bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(SearchDriverScreen())})
                             }

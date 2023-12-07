@@ -169,7 +169,7 @@ class AuthScreen : Screen {
                         textBold = true,
                     ) {
                         viewModel.authorization(phone.value) {
-                            navigator.replace(IdentificationScreen(viewModel))
+                            navigator.replace(IdentificationScreen())
                         }
                     }
                 }

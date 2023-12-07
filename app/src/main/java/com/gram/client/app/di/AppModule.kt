@@ -31,7 +31,7 @@ object AppModule {
     fun provideApplicationApi(): ApplicationApi =
         Retrofit
             .Builder()
-            .baseUrl(Constants.TEST_URL)
+            .baseUrl(Constants.URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(
                 OkHttpClient.Builder().addInterceptor(

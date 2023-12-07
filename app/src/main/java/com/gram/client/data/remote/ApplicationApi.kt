@@ -206,9 +206,9 @@ interface ApplicationApi {
         @Path("id") id: Int,
         ): DeleteMyAddressesResponse
 
-    @GET("/api/mob-app/countries/{code}")
+    @GET("/api/mob-app/countries/{country_code}")
     suspend fun getCountriesKey(
         @Header("Authorization") token: String,
-        @Path("code") code :String
+        @Path("country_code") code :String
     ): CountriesKeyResponse
 }

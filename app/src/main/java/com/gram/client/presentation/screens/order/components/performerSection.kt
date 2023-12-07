@@ -111,7 +111,7 @@ fun performerSection(
                 modifier = Modifier.width(80.dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.avatar),
+                    painter = painterResource(id = R.drawable.profile_icon),
                     "",
                     modifier = Modifier.size(55.dp)
                 )

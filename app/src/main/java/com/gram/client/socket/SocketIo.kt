@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.gram.client.domain.socket.EditOrderSocketResponse
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
+import com.gram.client.utils.Constants.URL
 import io.socket.client.IO
 import io.socket.client.Socket
 import java.net.URISyntaxException
@@ -23,10 +24,13 @@ object SocketHandler {
                 .setTransports(arrayOf("websocket"))
                 .build()
 
-            mSocket = IO.socket("https://testapi.client.gram.tj/client_gram", options)
+            mSocket = IO.socket(URL+"client_gram", options)
             mSocket.connect()
 
-
+            mSocket.on(Socket.EVENT_CONNECT) { args ->
+                Log.d("SocketIOCONNECT", "Socket connected")
+                Log.d("SocketIOCONNECT", "Socket connected: ")
+            }
 
 
             mSocket.on("client-mob-app:orders"){args->
@@ -49,9 +53,7 @@ object SocketHandler {
                 orderExecutionViewModel.getActiveOrders()
             }
 
-            mSocket.on(Socket.EVENT_CONNECT) { args ->
-                Log.d("SocketIO", "Socket connected")
-            }
+
             mSocket.on(Socket.EVENT_CONNECT_ERROR) { args ->
                 mSocket = IO.socket("https://testapi.client.gram.tj/client_gram", options)
                 Log.d("SocketIO", "Socket connection error: ${args[0]}")

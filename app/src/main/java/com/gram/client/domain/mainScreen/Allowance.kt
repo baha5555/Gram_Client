@@ -7,7 +7,7 @@ import com.gram.client.domain.mainScreen.order.AllowanceRequest
 data class Allowance(
     val allowance_id: Int,
     val name: String,
-    val price: Int,
+    val price: Double,
     val price_property: ArrayList<Int>?,
     val tariff: String,
     val tariff_id: Int,
@@ -18,7 +18,7 @@ data class Allowance(
 data class ToDesiredAllowance(
     val id: Int,
     val name: String,
-    val price: Int,
+    val price: Double,
     val price_property: ArrayList<Int>?,
     var isSelected: MutableState<Boolean>,
     val type: String,

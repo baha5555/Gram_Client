@@ -28,21 +28,22 @@ import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Constants.FCM_TOKEN
+import com.gram.client.utils.Values.PHONE_NUMBER
+import com.gram.client.utils.Values.SMS_CODE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
+class IdentificationScreen() : Screen {
     @Composable
     override fun Content() {
+        val viewModel: AuthViewModel  = hiltViewModel()
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
         val prefs = CustomPreference(context)
         val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val modifier: Modifier = Modifier
         var time: Int by remember { mutableStateOf(25) }
-        val code = viewModel.smsCode.observeAsState()
-        val phone = viewModel.phoneNumber.observeAsState()
 
         val coroutineScope = rememberCoroutineScope()
         val stateLogin by viewModel.stateLogin
@@ -62,16 +63,22 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
         } else {
             stateAuth.response?.let {
                 if (!initialApiCalled) {
-                    LaunchedEffect(code.value) {
-                        if (code.value!!.length == 4 && !isAutoInsert) {
+                    LaunchedEffect(SMS_CODE.value) {
+                        if (SMS_CODE.value?.length == 4 && !isAutoInsert) {
                             FCM_TOKEN?.let { fcm_token ->
-                                viewModel.identification(IdentificationRequest(client_register_id = it.result.client_register_id,code.value!!,  fcm_token),) {
-                                    if(Constants.IDENTIFY_TO_SCREEN == "MAINSCREEN")
+                                viewModel.identification(
+                                    IdentificationRequest(
+                                        client_register_id = it.result.client_register_id,
+                                        SMS_CODE.value!!,
+                                        fcm_token
+                                    ),
+                                ) {
+                                    if (Constants.IDENTIFY_TO_SCREEN == "MAINSCREEN")
                                         navigator.replace(MainScreen())
                                     else
                                         navigator.replaceAll(SearchAddressScreen())
-                                    if(phone.value!=null) {
-                                        prefs.setPhoneNumber(phone.value!!)
+                                    if (PHONE_NUMBER.value != null) {
+                                        prefs.setPhoneNumber(PHONE_NUMBER.value!!)
                                         orderExecutionViewModel.getActiveOrders()
                                     }
                                 }
@@ -117,7 +124,7 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "+992${phone.value}",
+                            text = "+992${PHONE_NUMBER.value}",
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold
@@ -133,15 +140,13 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                         .padding(top = 20.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        RegistrationCodeInput(
-                            codeLength = 4,
-                            initialCode = code.value!!
-                        ) {
+                        DecoratedTextField(value = SMS_CODE.value!!, length = 4, onValueChange = {
+                            SMS_CODE.value = it
                             viewModel.updateCode(it)
                             if (it.length == 4) {
                                 initialApiCalled = false
                             }
-                        }
+                        })
                     }
                     ErrorMessage(
                         modifier = Modifier
@@ -183,11 +188,11 @@ class IdentificationScreen(val viewModel: AuthViewModel) : Screen {
                                             time -= 1
                                         }
                                     }
-                                    phone.value?.let { it1 ->
+                                    PHONE_NUMBER.value?.let { it1 ->
                                         viewModel.authorization(
                                             it1
                                         ) {
-                                            navigator.replace(IdentificationScreen(viewModel))
+                                            navigator.replace(IdentificationScreen())
                                         }
                                     }
                                 },

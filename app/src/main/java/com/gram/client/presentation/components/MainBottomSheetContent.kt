@@ -44,6 +44,7 @@ import com.gram.client.presentation.screens.main.states.AllowancesResponseState
 import com.gram.client.presentation.screens.main.states.CalculateResponseState
 import com.gram.client.presentation.screens.main.states.TariffsResponseState
 import com.gram.client.utils.Comments
+import com.gram.client.utils.Constants.TARIFF_ID
 import com.gram.client.utils.Constants.stateOfDopInfoForDriver
 import com.gram.client.utils.Values
 import currentFraction
@@ -383,6 +384,7 @@ val countriesKey = mainViewModel.stateCountriesKey.value
                 )
             }
         }
+
         stateTariffs.response?.let { tariffs ->
             if (tariffs.isNotEmpty()) {
                 LazyRow(
@@ -524,7 +526,7 @@ fun OptionsContent(
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                    bottomNavigator.show(AddAllowancesSheet())
+                    bottomNavigator.show(AddAllowancesSheet(){})
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
