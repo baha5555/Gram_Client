@@ -38,7 +38,6 @@ class SplashScreen : Screen {
 
         val prefs = CustomPreference(LocalContext.current)
         LaunchedEffect(key1 = true) {
-            delay(4600)
             if (prefs.getAccessToken() == "") {
                 navigator.replace(SearchAddressScreen())
                 //mainViewModel.getFastAddresses()
