@@ -19,6 +19,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.components.voyager.RatingScreen
 import com.gram.client.presentation.components.voyager.reason.Reason1Screen
@@ -111,12 +112,14 @@ class OrderExecutionScreen : Screen {
                             order.from_address.let {
                                 if (it != null) {
                                     isGet.value = false
-                                    //mainViewModel.updateFromAddress(it)
+                                    val address = Address(address = it.name, id = it.id, address_lat = it.lat, address_lng = it.lng)
+                                    orderExecutionViewModel.updateFromAddress(address)
                                 }
                             }
-                            order.to_addresses.let {
-                                it?.forEach { it2 ->
-                                    //mainViewModel.updateToAddress(it2)
+                            order.to_addresses.let { it ->
+                                it?.forEach {
+                                    val address = Address(address = it.name, id = it.id, address_lat = it.lat, address_lng = it.lng)
+                                    orderExecutionViewModel.updateFromAddress(address)
                                 }
                             }
                         }

@@ -1,5 +1,6 @@
 package com.gram.client.presentation.components.voyager
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -170,6 +171,10 @@ class SearchAddressOrderExecutionNavigator(val inx: Int = -1,  val function: () 
                                     addressText = it.address,
                                     onItemClick = { selectedAddress ->
                                         address.value = selectedAddress
+                                        Log.e(
+                                            "EditOrderResponse",
+                                            ""+it.id
+                                        )
                                         if (inx == -2) bottomNavigator.replaceAll(AddStopScreen {
                                             function.invoke()
                                         })

@@ -7,4 +7,5 @@ data class Address(
     var address_lng: String="",
     var city: String="",
     var idIncrement: Int = 0,
+
 )
