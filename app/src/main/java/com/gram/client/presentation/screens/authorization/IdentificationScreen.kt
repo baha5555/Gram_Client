@@ -26,6 +26,7 @@ import com.gram.client.presentation.components.*
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
+import com.gram.client.presentation.screens.profile.ProfileViewModel
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Constants.FCM_TOKEN
 import com.gram.client.utils.Values.PHONE_NUMBER
@@ -38,6 +39,7 @@ class IdentificationScreen() : Screen {
     @Composable
     override fun Content() {
         val viewModel: AuthViewModel  = hiltViewModel()
+        val profileViewModel: ProfileViewModel  = hiltViewModel()
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
         val prefs = CustomPreference(context)
@@ -73,6 +75,7 @@ class IdentificationScreen() : Screen {
                                         fcm_token
                                     ),
                                 ) {
+                                    profileViewModel.getProfileInfo()
                                     if (Constants.IDENTIFY_TO_SCREEN == "MAINSCREEN")
                                         navigator.replace(MainScreen())
                                     else
