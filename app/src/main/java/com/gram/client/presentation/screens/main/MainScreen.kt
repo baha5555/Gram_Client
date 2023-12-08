@@ -316,10 +316,10 @@ class MainScreen : Screen{
                                             contentDescription = "Logo"
                                         )
                                         Spacer(modifier = Modifier.width(19.dp))
-                                        Text(text = item+SOON)
+                                        Text(text = if(item == "Наличные" ){item }else item+SOON)
                                     }
                                     CustomCheckBox(size = 25.dp,
-                                        isChecked = paymentState.value == item,
+                                        isChecked = idx == 0 || paymentState.value == item,
                                         onChecked = {  when (idx) {
                                             0 -> paymentState.value = item
                                             1 -> Toast.makeText(context,"Эти страницы на стадии разработки",Toast.LENGTH_SHORT).show()
