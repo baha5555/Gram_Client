@@ -208,13 +208,13 @@ fun AddressesContent(
                     )
                 } else {
                     Text(
-                        if (meeting == "") address_from.address else address_from.address + ", подъезд " + meeting,
+                        if (meeting == "") address_from.address else address_from.address + ", Место встречи " + meeting,
                         maxLines = 2, overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
             if (mainViewModel.fromAddress.value.address != "") {
-                Text("Подъезд", modifier = Modifier
+                Text("Место встречи", modifier = Modifier
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFF1A1A1A))
                     .clickable {
@@ -431,6 +431,7 @@ fun OptionsContent(
     mainViewModel: MainViewModel,
     stateAllowances: AllowancesResponseState
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -502,8 +503,10 @@ fun OptionsContent(
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                    stateOfDopInfoForDriver.value = "PLAN_TRIP"
-                    dopPhone()
+                    Toast.makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT).show()
+
+                    /*stateOfDopInfoForDriver.value = "PLAN_TRIP"
+                    dopPhone()*/
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

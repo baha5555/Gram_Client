@@ -209,8 +209,8 @@ fun CustomMainMap(
 
 
 
-                    map.minZoomLevel = 10.0
-                    map.maxZoomLevel = 24.0
+                    map.minZoomLevel = 16.0
+                    map.maxZoomLevel = 20.0
 
                     val myLocationProvider = GpsMyLocationProvider(it)
                     mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)

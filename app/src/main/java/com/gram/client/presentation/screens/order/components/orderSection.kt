@@ -64,7 +64,7 @@ fun orderSection(
                 order.from_address.let {
                     text = it?.name ?: "Откуда?"
                     if(order.meeting_info!=null){
-                        text+=", подъезд ${order.meeting_info}"
+                        text+=", Место встречи ${order.meeting_info}"
                     }
                 }
                 Text(
