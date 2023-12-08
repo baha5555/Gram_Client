@@ -7,19 +7,29 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gram.client.domain.mainScreen.Address
 
 @Composable
-fun AddressListItem(addressText: String, onItemClick: (String) -> Unit) {
-    Row(
-        modifier = Modifier
-            .clickable(onClick = { onItemClick(addressText) })
-            .background(MaterialTheme.colors.background)
-            .height(57.dp)
-            .fillMaxWidth()
-            .padding(PaddingValues(8.dp, 16.dp))
-    ) {
-        Text(text = addressText, fontSize = 18.sp, modifier = Modifier.padding(start = 15.dp))
+fun AddressListItem(it: Address, onItemClick: (String) -> Unit) {
+    Column( modifier = Modifier.padding(vertical = 10.dp).clickable { onItemClick(if(it.type == "address") "${it.street}, ${it.address}" else it.address) }) {
+        Text(
+            text = if(it.type == "address") "${it.street}, ${it.address}" else it.address,
+            fontSize = 18.sp,
+            maxLines = 1
+        )
+        Text(
+            text = if(it.type == "address") "${it.city}, ${it.region}" else "${it.street}",
+            style = TextStyle(
+                fontSize = 12.sp,
+                fontWeight = FontWeight(400),
+                color = Color(0xFF989898),
+
+                ),
+        )
     }
 }

@@ -24,6 +24,7 @@ import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
 import com.valentinilk.shimmer.shimmer
 import com.gram.client.R
+import com.gram.client.utils.getAddressText
 
 @Composable
 fun FastAddresses(mainViewModel: MainViewModel) {
@@ -56,10 +57,9 @@ fun FastAddresses(mainViewModel: MainViewModel) {
             stateMyAddresses.response?.result?.home.let {
                 item {
                     if(it==null) return@item
-                    val toAddress = Address(it[0].address.address, it[0].address.id, it[0].address.address_lat, it[0].address.address_lng)
                     FastAddressCard("Дом", it[0].address.city, icon = R.drawable.ic_home) {
                         mainViewModel.clearToAddress()
-                        mainViewModel.addToAddress(toAddress)
+                        mainViewModel.addToAddress(it[0].address)
                         if (mainViewModel.fromAddress.value.address != "") {
                             navigator.push(MainScreen())
                         } else {
@@ -80,10 +80,9 @@ fun FastAddresses(mainViewModel: MainViewModel) {
             stateMyAddresses.response?.result?.work.let {
                 item {
                     if(it==null) return@item
-                    val toAddress = Address(it[0].address.address, it[0].address.id, it[0].address.address_lat, it[0].address.address_lng)
                     FastAddressCard("Работа", it[0].address.city, icon = R.drawable.ic_work) {
                         mainViewModel.clearToAddress()
-                        mainViewModel.addToAddress(toAddress)
+                        mainViewModel.addToAddress(it[0].address)
                         if (mainViewModel.fromAddress.value.address != "") {
                             navigator.push(MainScreen())
                         } else {
@@ -106,10 +105,9 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                 it.forEach {
                     item {
                         if(it==null) return@item
-                        val toAddress = Address(it.address.address, it.address.id, it.address.address_lat, it.address.address_lng)
-                        FastAddressCard(it.name, it.address.city, icon = R.drawable.ic_favorites) {
+                        FastAddressCard(getAddressText(it.address), it.address.city, icon = R.drawable.ic_favorites) {
                             mainViewModel.clearToAddress()
-                            mainViewModel.addToAddress(toAddress)
+                            mainViewModel.addToAddress(it.address)
                             if (mainViewModel.fromAddress.value.address != "") {
                                 navigator.push(MainScreen())
                             } else {
@@ -129,11 +127,10 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                 }
             }
             stateFastAddresses.response?.forEach {
-                val toAddress = Address(it.address, it.id, it.address_lat, it.address_lng)
                 item {
-                    FastAddressCard(it.address, it.city) {
+                    FastAddressCard(getAddressText(it), it.city) {
                         mainViewModel.clearToAddress()
-                        mainViewModel.addToAddress(toAddress)
+                        mainViewModel.addToAddress(it)
                         if (mainViewModel.fromAddress.value.address != "") {
                             navigator.push(MainScreen())
                         } else {

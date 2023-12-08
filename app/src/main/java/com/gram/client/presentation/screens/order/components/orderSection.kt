@@ -25,6 +25,7 @@ import com.gram.client.presentation.components.voyager.SearchAddressNavigator
 import com.gram.client.presentation.components.voyager.SearchAddressOrderExecutionNavigator
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
+import com.gram.client.utils.getAddressText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -62,7 +63,9 @@ fun orderSection(
                 var text by remember{ mutableStateOf("")}
                 Spacer(modifier = Modifier.width(20.dp))
                 order.from_address.let {
-                    text = it?.name ?: "Откуда?"
+                    if(it == null) text = "Откуда?"
+                    else text = getAddressText(it)
+
                     if(order.meeting_info!=null){
                         text+=", Место встречи ${order.meeting_info}"
                     }
@@ -80,36 +83,36 @@ fun orderSection(
         ) {
             Divider()
         }
-        Row(
-            modifier = Modifier
-                .clickable {
-                    Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
-                    scope.launch {
-                        bottomNavigator.show(SearchAddressOrderExecutionNavigator(){
-                            navigator.push(OrderExecutionMapPointScreen())
-                        })
-                    }
-                }
-                .fillMaxWidth()
-                .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row {
-                Icon(
-                    modifier = Modifier.size(20.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.plus_icon),
-                    contentDescription = "Logo"
-                )
-                Spacer(modifier = Modifier.width(20.dp))
-                Text(text = "Добавить остановку", maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-            Image(
-                modifier = Modifier.size(18.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
-                contentDescription = "icon"
-            )
-        }
+//        Row(
+//            modifier = Modifier
+//                .clickable {
+//                    Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
+//                    scope.launch {
+//                        bottomNavigator.show(SearchAddressOrderExecutionNavigator(){
+//                            navigator.push(OrderExecutionMapPointScreen())
+//                        })
+//                    }
+//                }
+//                .fillMaxWidth()
+//                .padding(15.dp),
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.SpaceBetween
+//        ) {
+//            Row {
+//                Icon(
+//                    modifier = Modifier.size(20.dp),
+//                    imageVector = ImageVector.vectorResource(R.drawable.plus_icon),
+//                    contentDescription = "Logo"
+//                )
+//                Spacer(modifier = Modifier.width(20.dp))
+//                Text(text = "Добавить остановку", maxLines = 1, overflow = TextOverflow.Ellipsis)
+//            }
+//            Image(
+//                modifier = Modifier.size(18.dp),
+//                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+//                contentDescription = "icon"
+//            )
+//        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -121,23 +124,23 @@ fun orderSection(
             if(address.isEmpty()) return@let
             Row(
                 modifier = Modifier
-                    .clickable {
-                        scope.launch {
-                            if (order.to_addresses.size > 1) {
-                                Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
-                                bottomNavigator.show(AddStopScreenOrderExcecution())
-                                Toast.makeText(context,"Можно изменить порядок остановки", Toast.LENGTH_SHORT).show()
-
-                            } else {
-                                Values.WhichAddress.value=Constants.TO_ADDRESS
-                                bottomNavigator.show(
-                                    SearchAddressOrderExecutionNavigator(inx = 0){
-                                        navigator.push(OrderExecutionMapPointScreen())
-                                    }
-                                )
-                            }
-                        }
-                    }
+//                    .clickable {
+//                        scope.launch {
+//                            if (order.to_addresses.size > 1) {
+//                                Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
+//                                bottomNavigator.show(AddStopScreenOrderExcecution())
+//                                Toast.makeText(context,"Можно изменить порядок остановки", Toast.LENGTH_SHORT).show()
+//
+//                            } else {
+//                                Values.WhichAddress.value=Constants.TO_ADDRESS
+//                                bottomNavigator.show(
+//                                    SearchAddressOrderExecutionNavigator(inx = 0){
+//                                        navigator.push(OrderExecutionMapPointScreen())
+//                                    }
+//                                )
+//                            }
+//                        }
+//                    }
                     .fillMaxWidth()
                     .padding(15.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -156,7 +159,7 @@ fun orderSection(
                     when (address.size) {
                         1 -> {
                             Text(
-                                address[0].name,
+                                getAddressText(address[0]),
                                 maxLines = 1, overflow = TextOverflow.Ellipsis
                             )
                         }

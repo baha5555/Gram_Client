@@ -178,7 +178,7 @@ class SearchAddressNavigator(
                         if (items.isNotEmpty()) {
                             items.forEach {
                                 AddressListItem(
-                                    addressText = it.address,
+                                    it = it,
                                     onItemClick = { selectedAddress ->
                                         address.value = selectedAddress
                                         if (inx == -2) bottomNavigator.replaceAll(AddStopScreen {

@@ -1,5 +1,7 @@
 package com.gram.client.domain.myAddresses
 
+import com.gram.client.domain.mainScreen.Address
+
 data class Other(
     val address: Address,
     val client_id: Int,

@@ -25,7 +25,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
-import com.gram.client.domain.myAddresses.Address
+import com.gram.client.domain.mainScreen.Address
 import com.gram.client.domain.myAddresses.UpdateMyAddressRequest
 import com.gram.client.presentation.components.CustomTopAppBar
 import com.gram.client.presentation.components.voyager.SearchAddressNavigator

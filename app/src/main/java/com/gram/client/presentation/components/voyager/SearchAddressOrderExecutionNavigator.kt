@@ -168,7 +168,7 @@ class SearchAddressOrderExecutionNavigator(val inx: Int = -1,  val function: () 
                         if (items.isNotEmpty()) {
                             items.forEach {
                                 AddressListItem(
-                                    addressText = it.address,
+                                    it = it,
                                     onItemClick = { selectedAddress ->
                                         address.value = selectedAddress
                                         Log.e(

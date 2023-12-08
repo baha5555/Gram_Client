@@ -301,6 +301,7 @@ class OrderExecutionViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     try {
+                        getActiveOrders()
                         Toast.makeText(context, "Заказ успешно отменен", Toast.LENGTH_LONG).show()
                         vibrator.vibrate(700)
                         val response: CancelOrderResponse? = result.data
@@ -378,23 +379,13 @@ class OrderExecutionViewModel @Inject constructor(
                             when (Values.WhichAddress.value) {
                                 Constants.FROM_ADDRESS -> {
                                     updateFromAddress(
-                                        Address(
-                                            _stateAddressPoint.value.response!!.name,
-                                            _stateAddressPoint.value.response!!.id,
-                                            _stateAddressPoint.value.response!!.lat,
-                                            _stateAddressPoint.value.response!!.lng
-                                        )
+                                        _stateAddressPoint.value.response!!
                                     )
                                 }
                                 Constants.TO_ADDRESS -> {
                                     clearToAddress()
                                     addToAddress(
-                                        Address(
-                                            _stateAddressPoint.value.response!!.name,
-                                            _stateAddressPoint.value.response!!.id,
-                                            _stateAddressPoint.value.response!!.lat,
-                                            _stateAddressPoint.value.response!!.lng
-                                        )
+                                        _stateAddressPoint.value.response!!
                                     )
                                 }
                             }

@@ -1,5 +1,7 @@
 package com.gram.client.domain.orderExecutionScreen.active
 
+import com.gram.client.domain.mainScreen.Address
+
 data class AllActiveOrdersResult(
     val active_bonus: Int? = 0,
     val allowances: List<Allowance>? = null,
@@ -9,7 +11,7 @@ data class AllActiveOrdersResult(
     val distance: Double? = 0.0,
     val dop_phone: String? = "",
     val filing_time: String?= "",
-    val from_address: FromAddress?= null,
+    val from_address: Address?= null,
     val id: Int = 0,
     val meeting_info: String? = "",
     val performer: Performer?= null,
@@ -20,5 +22,5 @@ data class AllActiveOrdersResult(
     val status: String = "",
     val tariff: String? = "",
     val tariff_id: Int = 0,
-    val to_addresses: List<ToAddresse>?= null
+    val to_addresses: List<Address>?= null
 )

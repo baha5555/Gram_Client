@@ -47,6 +47,7 @@ import com.gram.client.utils.Comments
 import com.gram.client.utils.Constants.TARIFF_ID
 import com.gram.client.utils.Constants.stateOfDopInfoForDriver
 import com.gram.client.utils.Values
+import com.gram.client.utils.getAddressText
 import currentFraction
 
 @SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
@@ -208,7 +209,7 @@ fun AddressesContent(
                     )
                 } else {
                     Text(
-                        if (meeting == "") address_from.address else address_from.address + ", Место встречи " + meeting,
+                        if (meeting == "") getAddressText(address_from) else getAddressText(address_from) + ", Место встречи " + meeting,
                         maxLines = 2, overflow = TextOverflow.Ellipsis,
                     )
                 }
@@ -279,7 +280,7 @@ fun AddressesContent(
                     }
                     1 -> {
                         Text(
-                            toAddresses[0].address,
+                            getAddressText(toAddresses[0]),
                             maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
                     }

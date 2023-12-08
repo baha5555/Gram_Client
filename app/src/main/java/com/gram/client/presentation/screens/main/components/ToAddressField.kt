@@ -32,6 +32,7 @@ import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
+import com.gram.client.utils.getAddressText
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -64,7 +65,7 @@ fun ToAddressField(
             modifier = Modifier.offset(x = -20.dp).size(60.dp)
         )
         Text(
-            text = if (toAddress.isEmpty()) "Куда едем?" else toAddress[0].address,
+            text = if (toAddress.isEmpty()) "Куда едем?" else getAddressText(toAddress[0]),
             textAlign = TextAlign.Start,
             color = if (toAddress.isEmpty()) Color.White else Color.White,
             fontSize = 18.sp,

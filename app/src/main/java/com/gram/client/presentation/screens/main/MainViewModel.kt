@@ -70,7 +70,7 @@ class MainViewModel @Inject constructor(
     val stateCreateOrder: State<OrderResponseState> = _stateCreateOrder
 
     val selectedTariff: MutableLiveData<TariffsResult> = MutableLiveData<TariffsResult>(
-        TariffsResult(1,"", 0)
+        TariffsResult(1, "", 0)
     )
 
     private var _selectedAllowances: MutableList<AllowanceRequest> =
@@ -131,27 +131,27 @@ class MainViewModel @Inject constructor(
         _commentToOrder.value = comment
     }
 
-    fun updateToAddress(address: Address?) {
+    fun updateToAddress(address: Address) {
         clearToAddress()
         addToAddress(address)
     }
+
     fun updateToAddressInx(address: Address?, inx: Int) {
-        if(address==null) return
+        if (address == null) return
         _toAddresses[inx].address = address.address
         _toAddresses[inx].id = address.id
         _toAddresses[inx].address_lat = address.address_lat
         _toAddresses[inx].address_lng = address.address_lng
     }
 
-    fun addToAddress(address: Address?) {
-        if (address != null) {
-            _toAddresses.add(address)
-            _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
-            getPrice()
-            showRoad()
-        }
+    fun addToAddress(address: Address) {
+        _toAddresses.add(address)
+        _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
+        getPrice()
+        showRoad()
     }
-    fun showRoad(){
+
+    fun showRoad() {
         map.overlays.clear()
         mapController.showRoadAB(
             _fromAddress,
@@ -163,9 +163,10 @@ class MainViewModel @Inject constructor(
         _toAddresses.clear()
     }
 
-    fun selectedAllowances(){
+    fun selectedAllowances() {
 
     }
+
     fun updateSelectedTariff(
         value: TariffsResult,
     ) {
@@ -176,8 +177,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun includeAllowance(toDesiredAllowance: ToDesiredAllowance, price: Int? = null) {
-        selectedAllowances.value?.forEachIndexed{ inx, it->
-            if(it.allowance_id==toDesiredAllowance.id){
+        selectedAllowances.value?.forEachIndexed { inx, it ->
+            if (it.allowance_id == toDesiredAllowance.id) {
                 _selectedAllowances.removeAt(inx)
             }
         }
@@ -190,13 +191,15 @@ class MainViewModel @Inject constructor(
         }
         getPrice()
     }
-    fun getCountriesKey(str:String){
+
+    fun getCountriesKey(str: String) {
         getCountriesKeyUseCase.invoke(str).onEach { result: Resource<CountriesKeyResponse> ->
             when (result) {
                 is Resource.Success -> {
                     try {
                         val responses: CountriesKeyResponse? = result.data
-                        _stateCountriesKey.value = GetCountriesKeyResponseState(response = responses?.result )
+                        _stateCountriesKey.value =
+                            GetCountriesKeyResponseState(response = responses?.result)
                         Log.e(
                             "CountriesKeyResponse",
                             "CountriesKeyResponseSuccess->\n ${_stateCountriesKey.value}"
@@ -205,12 +208,14 @@ class MainViewModel @Inject constructor(
                         Log.d("CountriesKeyResponse", "${e.message} Exception")
                     }
                 }
+
                 is Resource.Error -> {
                     Log.e("CountriesKeyResponse", "CountriesKeyResponseError->\n ${result.message}")
                     _stateCountriesKey.value = GetCountriesKeyResponseState(
                         error = "${result.message}"
                     )
                 }
+
                 is Resource.Loading -> {
                     _stateCountriesKey.value = GetCountriesKeyResponseState(isLoading = true)
                 }
@@ -224,9 +229,10 @@ class MainViewModel @Inject constructor(
                 is Resource.Success -> {
                     try {
                         val tariffsResponse: TariffsResponse? = result.data
-                        _stateTariffs.value = TariffsResponseState(response = tariffsResponse?.result)
-                        selectedTariff.value= _stateTariffs.value.response?.get(0)?.let {
-                            TariffsResult(it.id, it.name, it.min_price, it.image, it.icon )
+                        _stateTariffs.value =
+                            TariffsResponseState(response = tariffsResponse?.result)
+                        selectedTariff.value = _stateTariffs.value.response?.get(0)?.let {
+                            TariffsResult(it.id, it.name, it.min_price, it.image, it.icon)
                         }
                         getPrice()
                         Log.e(
@@ -237,12 +243,14 @@ class MainViewModel @Inject constructor(
                         Log.d("Exception", "${e.message} Exception")
                     }
                 }
+
                 is Resource.Error -> {
                     Log.e("TariffsResponse", "TariffsResponseError->\n ${result.message}")
                     _stateTariffs.value = TariffsResponseState(
                         error = "${result.message}"
                     )
                 }
+
                 is Resource.Loading -> {
                     _stateTariffs.value = TariffsResponseState(isLoading = true)
                 }
@@ -267,12 +275,14 @@ class MainViewModel @Inject constructor(
                             Log.d("Exception", "${e.message} Exception")
                         }
                     }
+
                     is Resource.Error -> {
                         Log.e("AllowancesResponse", "AllowancesResponseError->\n ${result.message}")
                         _stateAllowances.value = AllowancesResponseState(
                             error = "${result.message}"
                         )
                     }
+
                     is Resource.Loading -> {
                         _stateAllowances.value = AllowancesResponseState(isLoading = true)
                     }
@@ -287,23 +297,20 @@ class MainViewModel @Inject constructor(
                     is Resource.Success -> {
                         try {
                             val addressResponse: AddressByPointResponse? = result.data
-                            _stateAddressPoint.value = AddressByPointResponseState(response = addressResponse?.result)
+                            _stateAddressPoint.value =
+                                AddressByPointResponseState(response = addressResponse?.result)
                             Log.e(
                                 "AddressByPointResponse",
                                 "AddressByPointResponseSuccess->\n ${_stateAddressPoint.value}"
                             )
                             updateFromAddress(
-                                Address(
-                                    _stateAddressPoint.value.response!!.name,
-                                    _stateAddressPoint.value.response!!.id,
-                                    _stateAddressPoint.value.response!!.lat,
-                                    _stateAddressPoint.value.response!!.lng
-                                )
+                                _stateAddressPoint.value.response!!
                             )
                         } catch (e: Exception) {
                             Log.d("AddressByPointResponse", "${e.message} Exception")
                         }
                     }
+
                     is Resource.Error -> {
                         Log.e(
                             "AddressByPointResponse",
@@ -313,6 +320,7 @@ class MainViewModel @Inject constructor(
                             error = "${result.message}"
                         )
                     }
+
                     is Resource.Loading -> {
                         _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
                     }
@@ -342,7 +350,7 @@ class MainViewModel @Inject constructor(
         }
 
         task.addOnSuccessListener {
-            if (it != null && fromAddress.value.address=="") {
+            if (it != null && fromAddress.value.address == "") {
                 getAddressByPoint(it.longitude, it.latitude)
                 Log.e("ActualLocation", "Location - > ${it.longitude}  + ${it.latitude}")
             } else {
@@ -353,52 +361,56 @@ class MainViewModel @Inject constructor(
     }
 
     fun searchAddress(addressName: String) {
-        searchAddressUseCase.invoke(if(addressName=="") null else addressName).onEach { result: Resource<SearchAddressResponse> ->
-            when (result) {
-                is Resource.Success -> {
-                    try {
-                        val addressResponse: SearchAddressResponse? = result.data
-                        _stateSearchAddress.value =
-                            SearchAddressResponseState(response = addressResponse?.result)
-                        Log.e(
-                            "SearchAddressResponse",
-                            "SearchAddressResponseSuccess->\n ${_stateSearchAddress.value}"
+        searchAddressUseCase.invoke(if (addressName == "") null else addressName)
+            .onEach { result: Resource<SearchAddressResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val addressResponse: SearchAddressResponse? = result.data
+                            _stateSearchAddress.value =
+                                SearchAddressResponseState(response = addressResponse?.result)
+                            Log.e(
+                                "SearchAddressResponse",
+                                "SearchAddressResponseSuccess->\n ${_stateSearchAddress.value}"
+                            )
+                        } catch (e: Exception) {
+                            Log.d("SearchAddressResponse", "${e.message} Exception")
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        Log.e("SearchAddressResponse", "TariffsResponseError->\n ${result.message}")
+                        _stateSearchAddress.value = SearchAddressResponseState(
+                            error = "${result.message}"
                         )
-                    } catch (e: Exception) {
-                        Log.d("SearchAddressResponse", "${e.message} Exception")
+                    }
+
+                    is Resource.Loading -> {
+                        _stateSearchAddress.value = SearchAddressResponseState(isLoading = true)
                     }
                 }
-                is Resource.Error -> {
-                    Log.e("SearchAddressResponse", "TariffsResponseError->\n ${result.message}")
-                    _stateSearchAddress.value = SearchAddressResponseState(
-                        error = "${result.message}"
-                    )
-                }
-                is Resource.Loading -> {
-                    _stateSearchAddress.value = SearchAddressResponseState(isLoading = true)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     private val _stateMeetingInfo = mutableStateOf("")
-    val stateMeetingInfo : State<String> = _stateMeetingInfo
-    fun updateMeetingInfo(text: String){
+    val stateMeetingInfo: State<String> = _stateMeetingInfo
+    fun updateMeetingInfo(text: String) {
         _stateMeetingInfo.value = text
     }
+
     fun createOrder(onSuccess: () -> Unit) {
         createOrderUseCase.invoke(
-            dop_phone = if (Values.CommentToAnotherHuman.value.length==12) Values.CommentToAnotherHuman.value else null,
-            from_address = if (fromAddress.value.id != 0 && fromAddress.value.id!=-1) fromAddress.value.id else null,
+            dop_phone = if (Values.CommentToAnotherHuman.value.length == 12) Values.CommentToAnotherHuman.value else null,
+            from_address = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
-            comment = if (Values.CommentDriver.value!= "") Values.CommentDriver.value else null,
+            comment = if (Values.CommentDriver.value != "") Values.CommentDriver.value else null,
             tariff_id = selectedTariff.value?.id ?: 1,
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
             date_time = if (_planTrip.value != "") _planTrip.value else null,
-            from_address_point = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null,
-            meeting_info = if(stateMeetingInfo.value!="") stateMeetingInfo.value else null
+            from_address_point = if (fromAddress.value.id == -1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null,
+            meeting_info = if (stateMeetingInfo.value != "") stateMeetingInfo.value else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result) {
                 is Resource.Success -> {
@@ -414,20 +426,22 @@ class MainViewModel @Inject constructor(
                             "OrderResponse",
                             "OrderResponseSuccess->\n ${_stateCreateOrder.value}\n -> ${_planTrip.value}"
                         )
-                        _stateMeetingInfo.value=""
+                        _stateMeetingInfo.value = ""
                         _toAddresses.clear()
-                        Values.CommentDriver.value=""
-                        Values.CommentToAnotherHuman.value=""
+                        Values.CommentDriver.value = ""
+                        Values.CommentToAnotherHuman.value = ""
                     } catch (e: Exception) {
                         Log.d("OrderResponse", "${e.message} Exception")
                     }
                 }
+
                 is Resource.Error -> {
                     Log.e("OrderResponse", "OrderResponseError->\n ${result.message}")
                     _stateCreateOrder.value = OrderResponseState(
                         error = "${result.message}"
                     )
                 }
+
                 is Resource.Loading -> {
                     _stateCreateOrder.value = OrderResponseState(isLoading = true)
                 }
@@ -437,7 +451,7 @@ class MainViewModel @Inject constructor(
 
     fun getPrice() {
         val tariffIdsList = arrayListOf<String>()
-        _stateTariffs.value.response?.forEach{ tariffIdsList.add("{\"tariff_id\":${it.id}}") }
+        _stateTariffs.value.response?.forEach { tariffIdsList.add("{\"tariff_id\":${it.id}}") }
         getPriceUseCase.invoke(
             tariff_ids = tariffIdsList.toString(),
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
@@ -446,7 +460,7 @@ class MainViewModel @Inject constructor(
             value_allowances = null,
             search_address_id = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
-            from_address = if(fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
+            from_address = if (fromAddress.value.id == -1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
         ).onEach { result: Resource<CalculateResponse> ->
             when (result) {
                 is Resource.Success -> {
@@ -462,12 +476,14 @@ class MainViewModel @Inject constructor(
                         Log.d("CalculateResponse", "${e.message} Exception")
                     }
                 }
+
                 is Resource.Error -> {
                     Log.e("CalculateResponse", "CalculateResponseError->\n ${result.message}")
                     _stateCalculate.value = CalculateResponseState(
                         error = "${result.message}"
                     )
                 }
+
                 is Resource.Loading -> {
                     _stateCalculate.value = CalculateResponseState(isLoading = true)
                 }
@@ -494,24 +510,15 @@ class MainViewModel @Inject constructor(
                             )
                             when (Values.WhichAddress.value) {
                                 Constants.FROM_ADDRESS -> {
-                                   updateFromAddress(
-                                       Address(
-                                           _stateAddressPoint.value.response!!.name,
-                                           _stateAddressPoint.value.response!!.id,
-                                           _stateAddressPoint.value.response!!.lat,
-                                           _stateAddressPoint.value.response!!.lng
-                                   )
-                                   )
+                                    updateFromAddress(
+                                        _stateAddressPoint.value.response!!
+                                    )
                                 }
+
                                 Constants.TO_ADDRESS -> {
                                     clearToAddress()
                                     addToAddress(
-                                        Address(
-                                            _stateAddressPoint.value.response!!.name,
-                                            _stateAddressPoint.value.response!!.id,
-                                            _stateAddressPoint.value.response!!.lat,
-                                            _stateAddressPoint.value.response!!.lng
-                                        )
+                                        _stateAddressPoint.value.response!!
                                     )
                                 }
                             }
@@ -521,12 +528,13 @@ class MainViewModel @Inject constructor(
                             Log.d("AddressByPointResponse", "${e.message} Exception")
                         }
                     }
+
                     is Resource.Error -> {
                         Log.e(
                             "AddressByPointResponse",
                             "AddressByPointResponseError->\n ${result.message}"
                         )
-                        if(result.message == "HTTP 404 Not Found"){
+                        if (result.message == "HTTP 404 Not Found") {
                             updateFromAddress(
                                 Address(
                                     "Метка на карте",
@@ -540,6 +548,7 @@ class MainViewModel @Inject constructor(
                             error = "${result.message}"
                         )
                     }
+
                     is Resource.Loading -> {
                         _stateAddressPoint.value = AddressByPointResponseState(isLoading = true)
                     }
@@ -565,6 +574,7 @@ class MainViewModel @Inject constructor(
                         Log.d("FastAddressesResponse", "${e.message} Exception")
                     }
                 }
+
                 is Resource.Error -> {
                     Log.e(
                         "FastAddressesResponse",
@@ -574,6 +584,7 @@ class MainViewModel @Inject constructor(
                         error = "${result.message}"
                     )
                 }
+
                 is Resource.Loading -> {
                     _stateFastAddress.value = FastAddressesResponseState(isLoading = true)
                 }

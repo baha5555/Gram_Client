@@ -62,12 +62,7 @@ class OrderExecutionMapPointScreen () : Screen {
                                     )
                                 } else {
                                     orderExecutionViewModel.updateFromAddress(
-                                        Address(
-                                            address = it.name,
-                                            id = it.id,
-                                            address_lat = it.lat,
-                                            address_lng = it.lng
-                                        )
+                                        it
                                     )
                                 }
                             }
@@ -83,12 +78,7 @@ class OrderExecutionMapPointScreen () : Screen {
                                     )
                                 } else {
                                     orderExecutionViewModel.updateToAddress(
-                                        Address(
-                                            address = it.name,
-                                            id = it.id,
-                                            address_lat = it.lat,
-                                            address_lng = it.lng
-                                        )
+                                        it
                                     )
                                 }
                             }

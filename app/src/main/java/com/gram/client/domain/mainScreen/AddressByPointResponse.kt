@@ -4,6 +4,6 @@ data class AddressByPointResponse(
     val code: Int,
     val error: List<Any>,
     val message: String,
-    val result: AddressByPointResult,
+    val result: Address,
     val success: Boolean
 )

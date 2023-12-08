@@ -58,12 +58,7 @@ class MapPointScreen() : Screen {
                                     )
                                 } else {
                                     mainViewModel.updateFromAddress(
-                                        Address(
-                                            address = it.name,
-                                            id = it.id,
-                                            address_lat = it.lat,
-                                            address_lng = it.lng
-                                        )
+                                        it
                                     )
                                 }
                             }
@@ -80,12 +75,7 @@ class MapPointScreen() : Screen {
                                     mainViewModel.clearToAddress()
                                 } else {
                                     mainViewModel.updateToAddress(
-                                        Address(
-                                            address = it.name,
-                                            id = it.id,
-                                            address_lat = it.lat,
-                                            address_lng = it.lng
-                                        )
+                                        it
                                     )
                                 }
                             }
@@ -161,7 +151,7 @@ fun SheetContent(whichScreen: String?,stateViews:Boolean = false,onClick: () -> 
                         .background(Color.Gray))
                 }
             }else{
-                Text(text = ""+ (statePoint.response?.name ?: "Метка на карте"), fontSize = 18.sp, modifier = Modifier.padding(start = 10.dp))
+                Text(text = ""+ (statePoint.response?.address ?: "Метка на карте"), fontSize = 18.sp, modifier = Modifier.padding(start = 10.dp))
             }
         }
         Button(

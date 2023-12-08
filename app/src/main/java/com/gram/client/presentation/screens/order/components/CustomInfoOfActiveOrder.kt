@@ -31,6 +31,7 @@ import com.gram.client.presentation.components.CustomSwitch
 import com.gram.client.presentation.components.voyager.AddAllowancesSheet
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
+import com.gram.client.utils.getAddressText
 import kotlinx.coroutines.launch
 
 class CustomInfoOfActiveOrder : Screen {
@@ -85,7 +86,7 @@ class CustomInfoOfActiveOrder : Screen {
                             CustomInfoTitle(title = "Маршрут")
                             order.from_address?.let {
                                 CustomAddressText(
-                                    title = it.name,
+                                    title = getAddressText(it),
                                     point = R.drawable.ic_from_address_marker
                                 )
                             }
@@ -97,7 +98,7 @@ class CustomInfoOfActiveOrder : Screen {
                                             .padding(start = 50.dp)
                                     )
                                     CustomAddressText(
-                                        title = toAddress[i].name,
+                                        title = getAddressText(toAddress[i]),
                                         point = if (i == toAddress.size - 1) R.drawable.ic_to_address_marker else R.drawable.ic_to_address_second_marker
                                     )
                                 }

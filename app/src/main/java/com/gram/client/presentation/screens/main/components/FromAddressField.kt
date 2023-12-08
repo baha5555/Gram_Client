@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import com.gram.client.R
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
+import com.gram.client.utils.getAddressText
 
 @Composable
 fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
@@ -90,7 +91,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                 )
             } else {
                 Text(
-                    text = fromAddress.address ?: "", color = Color.White, fontSize = 11.sp,
+                    text = getAddressText(fromAddress), color = Color.White, fontSize = 11.sp,
                     fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
             }

@@ -50,7 +50,7 @@ fun AddressList(
             if (items.isNotEmpty()) {
                 items.forEach {
                     AddressListItem(
-                        addressText = it.address,
+                        it = it,
                         onItemClick = { selectedAddress ->
                             address.value = selectedAddress
                             keyboardController?.hide()

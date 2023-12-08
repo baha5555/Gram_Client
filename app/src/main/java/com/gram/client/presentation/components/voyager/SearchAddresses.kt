@@ -22,6 +22,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +37,7 @@ import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressV
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
+import com.gram.client.utils.getAddressText
 import com.valentinilk.shimmer.shimmer
 
 class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Unit) : Screen {
@@ -50,12 +54,12 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
         val focusRequesterTo = remember { FocusRequester() }
 
         val keyboard = LocalSoftwareKeyboardController.current
-
+        val fromAddressTxt = getAddressText(mainViewModel.fromAddress.value)
         val fromText = remember {
             mutableStateOf(
                 TextFieldValue(
-                    "" + mainViewModel.fromAddress.value.address,
-                    selection = TextRange(mainViewModel.fromAddress.value.address.length)
+                    fromAddressTxt,
+                    selection = TextRange(fromAddressTxt.length)
                 )
             )
         }
@@ -79,15 +83,17 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
 
         LaunchedEffect(key1 = true) {
             if (mainViewModel.toAddresses.isNotEmpty()) {
+                val toAddressTxt = getAddressText(mainViewModel.toAddresses[0])
                 toText.value = TextFieldValue(
-                    mainViewModel.toAddresses[0].address,
-                    TextRange(mainViewModel.toAddresses[0].address.length)
+                    toAddressTxt,
+                    TextRange(toAddressTxt.length)
                 )
             }
             when (Values.WhichAddress.value) {
                 Constants.FROM_ADDRESS, Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE -> {
                     focusRequester.requestFocus()
                 }
+
                 Constants.TO_ADDRESS -> {
                     if (toCreate != null) {
                         if (mainViewModel.fromAddress.value.address == "") {
@@ -262,10 +268,18 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                         }
                         Divider(Modifier.padding(vertical = 10.dp))
                     }
-                }
-                else {
-                    if(fromIsFocused.value && fromText.value==TextFieldValue("") || toIsFocused.value && toText.value==TextFieldValue("")){
-                        showMyAddresses(fromIsFocused, toIsFocused, fromText, toText, focusRequesterTo)
+                } else {
+                    if (fromIsFocused.value && fromText.value == TextFieldValue("") || toIsFocused.value && toText.value == TextFieldValue(
+                            ""
+                        )
+                    ) {
+                        showMyAddresses(
+                            fromIsFocused,
+                            toIsFocused,
+                            fromText,
+                            toText,
+                            focusRequesterTo
+                        )
                     }
                     searchState.response?.forEach {
                         Column(
@@ -274,14 +288,9 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                                 .clickable {
                                     if (fromIsFocused.value) {
                                         mainViewModel.updateFromAddress(
-                                            Address(
-                                                address = it.address,
-                                                id = it.id,
-                                                address_lat = it.address_lat,
-                                                address_lng = it.address_lng
-                                            )
+                                            it
                                         )
-                                        fromText.value = TextFieldValue(it.address)
+                                        fromText.value = TextFieldValue(getAddressText(it))
                                         if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE) {
                                             bottomNavigator.hide()
                                             if (toCreate != null) toCreate.invoke()
@@ -290,15 +299,8 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                                         focusRequesterTo.requestFocus()
                                     } else if (toIsFocused.value) {
                                         mainViewModel.clearToAddress()
-                                        mainViewModel.addToAddress(
-                                            Address(
-                                                address = it.address,
-                                                id = it.id,
-                                                address_lat = it.address_lat,
-                                                address_lng = it.address_lng
-                                            )
-                                        )
-                                        toText.value = TextFieldValue(it.address)
+                                        mainViewModel.addToAddress(it)
+                                        toText.value = TextFieldValue(getAddressText(it))
                                         keyboard?.hide()
                                         if (mainViewModel.fromAddress.value.address != "") {
                                             if (toCreate != null) {
@@ -309,12 +311,22 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                                     }
                                 }
                                 .padding(start = 45.dp)) {
-                            Text(
-                                text = "" + it.address,
-                                fontSize = 18.sp,
-                                modifier = Modifier.padding(vertical = 10.dp),
-                                maxLines = 1
-                            )
+                            Column( modifier = Modifier.padding(vertical = 10.dp)) {
+                                Text(
+                                    text = if(it.type == "address") "${it.street}, ${it.address}" else it.address,
+                                    fontSize = 18.sp,
+                                    maxLines = 1
+                                )
+                                Text(
+                                    text = if(it.type == "address") "${it.city}, ${it.region}" else "${it.street}",
+                                    style = TextStyle(
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight(400),
+                                        color = Color(0xFF989898),
+
+                                        ),
+                                )
+                            }
                             Divider()
                         }
                     }
@@ -335,6 +347,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
             )
         }
     }
+
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun showMyAddresses(
@@ -358,12 +371,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                     .clickable {
                         if (fromIsFocused.value) {
                             mainViewModel.updateFromAddress(
-                                Address(
-                                    address = it[0].address.address,
-                                    id = it[0].address.id,
-                                    address_lat = it[0].address.address_lat,
-                                    address_lng = it[0].address.address_lng
-                                )
+                                it[0].address
                             )
                             fromText.value = TextFieldValue(
                                 "Дом: " + it[0].address.address,
@@ -377,14 +385,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                             focusRequesterTo.requestFocus()
                         } else if (toIsFocused.value) {
                             mainViewModel.clearToAddress()
-                            mainViewModel.addToAddress(
-                                Address(
-                                    address = it[0].address.address,
-                                    id = it[0].address.id,
-                                    address_lat = it[0].address.address_lat,
-                                    address_lng = it[0].address.address_lng
-                                )
-                            )
+                            mainViewModel.addToAddress(it[0].address)
                             toText.value =
                                 TextFieldValue("Дом: " + it[0].address.address)
                             keyboard?.hide()
@@ -398,7 +399,11 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                     }
                     .padding(start = 7.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                Image(painter = painterResource(id = R.drawable.ic_home), contentDescription = "", modifier = Modifier.padding(end = 15.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.ic_home),
+                    contentDescription = "",
+                    modifier = Modifier.padding(end = 15.dp)
+                )
                 Column() {
                     Text(
                         text = "Дом",
@@ -452,7 +457,11 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                     }
                     .padding(start = 7.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                Image(painter = painterResource(id = R.drawable.ic_work), contentDescription = "", modifier = Modifier.padding(end = 15.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.ic_work),
+                    contentDescription = "",
+                    modifier = Modifier.padding(end = 15.dp)
+                )
                 Column() {
                     Text(
                         text = "Работа",
@@ -506,7 +515,11 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                     }
                     .padding(start = 7.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                Image(painter = painterResource(id = R.drawable.ic_favorites), contentDescription = "", modifier = Modifier.padding(end = 15.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.ic_favorites),
+                    contentDescription = "",
+                    modifier = Modifier.padding(end = 15.dp)
+                )
                 Column() {
                     Text(
                         text = it.name,
