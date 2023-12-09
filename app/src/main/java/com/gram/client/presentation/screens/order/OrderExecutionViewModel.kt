@@ -423,8 +423,16 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun editOrder() {
         Log.e(
-            "EditOrderResponse",
+            "EditOrderResponseFrom",
             ""+_fromAddress.value.id
+        )
+        Log.e(
+            "EditOrderResponseTo",
+            ""+_toAddresses[0].id
+        )
+        Log.e(
+            "EditOrderResponseSelected",
+            ""+ (_selectedOrder.value.from_address?.id ?: 0)
         )
         editOrderUseCase.invoke(
             order_id = selectedOrder.value.id,
