@@ -138,10 +138,7 @@ class MainViewModel @Inject constructor(
 
     fun updateToAddressInx(address: Address?, inx: Int) {
         if (address == null) return
-        _toAddresses[inx].address = address.address
-        _toAddresses[inx].id = address.id
-        _toAddresses[inx].address_lat = address.address_lat
-        _toAddresses[inx].address_lng = address.address_lng
+        _toAddresses[inx] = address
     }
 
     fun addToAddress(address: Address) {
@@ -350,7 +347,7 @@ class MainViewModel @Inject constructor(
         }
 
         task.addOnSuccessListener {
-            if (it != null && fromAddress.value.address == "") {
+            if (it != null && fromAddress.value.name == "") {
                 getAddressByPoint(it.longitude, it.latitude)
                 Log.e("ActualLocation", "Location - > ${it.longitude}  + ${it.latitude}")
             } else {
@@ -409,7 +406,7 @@ class MainViewModel @Inject constructor(
                 selectedAllowances.value
             ) else null,
             date_time = if (_planTrip.value != "") _planTrip.value else null,
-            from_address_point = if (fromAddress.value.id == -1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null,
+            from_address_point = if (fromAddress.value.id == -1) "{\"lng\":\"${fromAddress.value.lng}\",\"lat\":\"${fromAddress.value.lat}\"}" else null,
             meeting_info = if (stateMeetingInfo.value != "") stateMeetingInfo.value else null
         ).onEach { result: Resource<OrderResponse> ->
             when (result) {
@@ -460,7 +457,7 @@ class MainViewModel @Inject constructor(
             value_allowances = null,
             search_address_id = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
-            from_address = if (fromAddress.value.id == -1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
+            from_address = if (fromAddress.value.id == -1) "{\"lng\":\"${fromAddress.value.lng}\",\"lat\":\"${fromAddress.value.lat}\"}" else null
         ).onEach { result: Resource<CalculateResponse> ->
             when (result) {
                 is Resource.Success -> {

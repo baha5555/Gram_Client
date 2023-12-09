@@ -30,8 +30,8 @@ class MapController(val context: Context) {
             try {
                 val waypoints = ArrayList<GeoPoint>()
                 val fromAddressPoint = GeoPoint(0, 0)
-                fromAddressPoint.latitude = fromAddress.value.address_lat.toDouble()
-                fromAddressPoint.longitude = fromAddress.value.address_lng.toDouble()
+                fromAddressPoint.latitude = fromAddress.value.lat.toDouble()
+                fromAddressPoint.longitude = fromAddress.value.lng.toDouble()
                 waypoints.add(fromAddressPoint)
 
 
@@ -39,9 +39,9 @@ class MapController(val context: Context) {
                 val toAddressesNames = ArrayList<String>()
                 toAddress.forEach { address ->
                     val toAddressPoint = GeoPoint(0, 0)
-                    toAddressPoint.latitude = address.address_lat.toDouble()
-                    toAddressPoint.longitude = address.address_lng.toDouble()
-                    toAddressesNames.add(address.address)
+                    toAddressPoint.latitude = address.lat.toDouble()
+                    toAddressPoint.longitude = address.lng.toDouble()
+                    toAddressesNames.add(address.name)
                     toAddressesPoints.add(toAddressPoint)
                 }
                 if (fromAddressPoint.latitude != 0.0 && toAddressesPoints[0].latitude != 0.0 && fromAddressPoint != toAddressesPoints[0])
@@ -64,7 +64,7 @@ class MapController(val context: Context) {
                         context,
                         map,
                         geoPoint = fromAddressPoint,
-                        title = fromAddress.value.address,
+                        title = fromAddress.value.name,
                         R.drawable.ic_from_address_marker
                     )
                     toAddressesPoints.forEachIndexed { inx, it ->

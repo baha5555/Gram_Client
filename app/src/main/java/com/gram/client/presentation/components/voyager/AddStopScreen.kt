@@ -86,7 +86,7 @@ class AddStopScreen(val function: () -> Unit) : Screen {
                                     Text(text = "" + (inx + 1), fontSize = 18.sp)
                                 }
                                 Text(
-                                    text = item.address,
+                                    text = item.name,
                                     modifier = Modifier.padding(start = 10.dp),
                                     maxLines = 2
                                 )

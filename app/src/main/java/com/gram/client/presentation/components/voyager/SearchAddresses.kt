@@ -22,8 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -32,7 +30,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.R
-import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressViewModel
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.utils.Constants
@@ -96,7 +93,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
 
                 Constants.TO_ADDRESS -> {
                     if (toCreate != null) {
-                        if (mainViewModel.fromAddress.value.address == "") {
+                        if (mainViewModel.fromAddress.value.name == "") {
                             focusRequester.requestFocus()
                         } else {
                             focusRequesterTo.requestFocus()
@@ -302,7 +299,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                                         mainViewModel.addToAddress(it)
                                         toText.value = TextFieldValue(getAddressText(it))
                                         keyboard?.hide()
-                                        if (mainViewModel.fromAddress.value.address != "") {
+                                        if (mainViewModel.fromAddress.value.name != "") {
                                             if (toCreate != null) {
                                                 toCreate.invoke()
                                             }
@@ -313,7 +310,7 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                                 .padding(start = 45.dp)) {
                             Column( modifier = Modifier.padding(vertical = 10.dp)) {
                                 Text(
-                                    text = if(it.type == "address") "${it.street}, ${it.address}" else it.address,
+                                    text = if(it.type == "address") "${it.street}, ${it.name}" else it.name,
                                     fontSize = 18.sp,
                                     maxLines = 1
                                 )
@@ -374,8 +371,8 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                                 it[0].address
                             )
                             fromText.value = TextFieldValue(
-                                "Дом: " + it[0].address.address,
-                                selection = TextRange("Дом: ${it[0].address.address}".length)
+                                "Дом: " + it[0].address.name,
+                                selection = TextRange("Дом: ${it[0].address.name}".length)
                             )
                             if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE) {
                                 bottomNavigator.hide()
@@ -387,9 +384,9 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                             mainViewModel.clearToAddress()
                             mainViewModel.addToAddress(it[0].address)
                             toText.value =
-                                TextFieldValue("Дом: " + it[0].address.address)
+                                TextFieldValue("Дом: " + it[0].address.name)
                             keyboard?.hide()
-                            if (mainViewModel.fromAddress.value.address != "") {
+                            if (mainViewModel.fromAddress.value.name != "") {
                                 if (toCreate != null) {
                                     toCreate.invoke()
                                 }
@@ -417,21 +414,15 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
         }
         stateMyAddresses.response?.result?.work.let {
             if (it == null) return@let
-            val address = Address(
-                address = it[0].address.address,
-                id = it[0].address.id,
-                address_lat = it[0].address.address_lat,
-                address_lng = it[0].address.address_lng
-            )
             Row(
                 Modifier
                     .fillMaxWidth()
                     .clickable {
                         if (fromIsFocused.value) {
-                            mainViewModel.updateFromAddress(address)
+                            mainViewModel.updateFromAddress(it[0].address)
                             fromText.value = TextFieldValue(
-                                it[0].address.address,
-                                selection = TextRange(it[0].address.address.length)
+                                getAddressText(it[0].address),
+                                selection = TextRange(getAddressText(it[0].address).length)
                             )
                             if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE) {
                                 bottomNavigator.hide()
@@ -441,13 +432,13 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                             focusRequesterTo.requestFocus()
                         } else if (toIsFocused.value) {
                             mainViewModel.clearToAddress()
-                            mainViewModel.addToAddress(address)
+                            mainViewModel.addToAddress(it[0].address)
                             toText.value = TextFieldValue(
-                                it[0].address.address,
-                                selection = TextRange(it[0].address.address.length)
+                                it[0].address.name,
+                                selection = TextRange(it[0].address.name.length)
                             )
                             keyboard?.hide()
-                            if (mainViewModel.fromAddress.value.address != "") {
+                            if (mainViewModel.fromAddress.value.name != "") {
                                 if (toCreate != null) {
                                     toCreate.invoke()
                                 }
@@ -475,21 +466,16 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
         }
         stateMyAddresses.response?.result?.other?.forEach {
             if (it == null) return@forEach
-            val address = Address(
-                address = it.address.address,
-                id = it.address.id,
-                address_lat = it.address.address_lat,
-                address_lng = it.address.address_lng
-            )
+
             Row(
                 Modifier
                     .fillMaxWidth()
                     .clickable {
                         if (fromIsFocused.value) {
-                            mainViewModel.updateFromAddress(address)
+                            mainViewModel.updateFromAddress(it.address)
                             fromText.value = TextFieldValue(
-                                it.address.address,
-                                selection = TextRange(it.address.address.length)
+                                it.address.name,
+                                selection = TextRange(it.address.name.length)
                             )
                             if (Values.WhichAddress.value == Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE) {
                                 bottomNavigator.hide()
@@ -499,13 +485,13 @@ class SearchAddresses(val toCreate: (() -> Unit)? = null, val function: () -> Un
                             focusRequesterTo.requestFocus()
                         } else if (toIsFocused.value) {
                             mainViewModel.clearToAddress()
-                            mainViewModel.addToAddress(address)
+                            mainViewModel.addToAddress(it.address)
                             toText.value = TextFieldValue(
-                                it.address.address,
-                                selection = TextRange(it.address.address.length)
+                                it.address.name,
+                                selection = TextRange(it.address.name.length)
                             )
                             keyboard?.hide()
-                            if (mainViewModel.fromAddress.value.address != "") {
+                            if (mainViewModel.fromAddress.value.name != "") {
                                 if (toCreate != null) {
                                     toCreate.invoke()
                                 }

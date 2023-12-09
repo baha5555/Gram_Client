@@ -134,12 +134,12 @@ class EditAddressScreen(
                                 .fillMaxWidth(), verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = if (stateAddress.value.address == "") address.address else stateAddress.value.address,
+                                text = if (stateAddress.value.name == "") address.name else stateAddress.value.name,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = if (stateAddress.value.address == "") address.city else stateAddress.value.city,
+                                text = if (stateAddress.value.name == "") address.city else stateAddress.value.city,
                                 fontSize = 12.sp
                             )
                         }

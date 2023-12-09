@@ -435,7 +435,7 @@ class OrderExecutionViewModel @Inject constructor(
             comment = null,
             tariff_id = selectedOrder.value.tariff_id ?: 0,
             allowances = null,
-            from_address = if (_fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.address_lng}\",\"lat\":\"${fromAddress.value.address_lat}\"}" else null
+            from_address = if (_fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.lng}\",\"lat\":\"${fromAddress.value.lat}\"}" else null
         ).onEach { result: Resource<UpdateOrderResponse> ->
             when (result) {
                 is Resource.Success -> {

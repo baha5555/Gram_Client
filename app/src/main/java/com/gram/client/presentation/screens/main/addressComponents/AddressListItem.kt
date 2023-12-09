@@ -1,9 +1,7 @@
 package com.gram.client.presentation.screens.main.addressComponents
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,9 +14,9 @@ import com.gram.client.domain.mainScreen.Address
 
 @Composable
 fun AddressListItem(it: Address, onItemClick: (String) -> Unit) {
-    Column( modifier = Modifier.padding(vertical = 10.dp).clickable { onItemClick(if(it.type == "address") "${it.street}, ${it.address}" else it.address) }) {
+    Column( modifier = Modifier.padding(vertical = 10.dp).clickable { onItemClick(if(it.type == "address") "${it.street}, ${it.name}" else it.name) }) {
         Text(
-            text = if(it.type == "address") "${it.street}, ${it.address}" else it.address,
+            text = if(it.type == "address") "${it.street}, ${it.name}" else it.name,
             fontSize = 18.sp,
             maxLines = 1
         )

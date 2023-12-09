@@ -1,7 +1,6 @@
 package com.gram.client.presentation.components
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -34,7 +33,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import com.gram.client.utils.Constants
 import com.gram.client.R
-import com.gram.client.domain.countries.GetCountriesKeyResponseState
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.domain.mainScreen.TariffsResult
 import com.gram.client.presentation.components.voyager.*
@@ -44,8 +42,6 @@ import com.gram.client.presentation.screens.main.states.AllowancesResponseState
 import com.gram.client.presentation.screens.main.states.CalculateResponseState
 import com.gram.client.presentation.screens.main.states.TariffsResponseState
 import com.gram.client.utils.Comments
-import com.gram.client.utils.Constants.TARIFF_ID
-import com.gram.client.utils.Constants.stateOfDopInfoForDriver
 import com.gram.client.utils.Values
 import com.gram.client.utils.getAddressText
 import currentFraction
@@ -200,7 +196,7 @@ fun AddressesContent(
                     contentDescription = "Logo"
                 )
                 Spacer(modifier = Modifier.width(20.dp))
-                if (address_from.address == "") {
+                if (address_from.name == "") {
                     Text(
                         text = "Откуда?",
                         maxLines = 1,
@@ -214,7 +210,7 @@ fun AddressesContent(
                     )
                 }
             }
-            if (mainViewModel.fromAddress.value.address != "") {
+            if (mainViewModel.fromAddress.value.name != "") {
                 Text("Место встречи", modifier = Modifier
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFF1A1A1A))

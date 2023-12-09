@@ -1,10 +1,10 @@
 package com.gram.client.domain.mainScreen
 
 data class Address(
-    var address: String="",
+    var name: String="",
     var id: Int=0,
-    var address_lat: String="",
-    var address_lng: String="",
+    var lat: String="",
+    var lng: String="",
     var city: String="",
     var idIncrement: Int = 0,
     val addr_icon: Any? = null,

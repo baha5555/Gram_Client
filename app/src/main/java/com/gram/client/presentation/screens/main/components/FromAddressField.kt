@@ -37,7 +37,7 @@ import com.gram.client.utils.getAddressText
 fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
     val mainViewModel: MainViewModel = hiltViewModel()
     val statePoint = mainViewModel.stateAddressPoint.value
-    val addressName = mainViewModel.fromAddress.value.address
+    val addressName = mainViewModel.fromAddress.value.name
     Column(
         modifier = if (statePoint.isLoading) {
             Modifier
@@ -84,7 +84,7 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
                     fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis
                 )
             }
-            else if (fromAddress.address == "") {
+            else if (fromAddress.name == "") {
                 Text(
                     text = "Откуда?", color = Color.Gray, fontSize = 11.sp,
                     fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis

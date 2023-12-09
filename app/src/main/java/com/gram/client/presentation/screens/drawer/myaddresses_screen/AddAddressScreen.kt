@@ -107,7 +107,7 @@ fun AddAddressContent(type: String) {
                             .fillMaxWidth(), verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = if (stateAddress.value.address == "") "Выбрать адрес" else (stateAddress.value.address),
+                            text = if (stateAddress.value.name == "") "Выбрать адрес" else (stateAddress.value.name),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )

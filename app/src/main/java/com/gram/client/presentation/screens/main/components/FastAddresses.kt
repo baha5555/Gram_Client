@@ -14,7 +14,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.components.voyager.MapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddresses
 import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressViewModel
@@ -60,7 +59,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                     FastAddressCard("Дом", it[0].address.city, icon = R.drawable.ic_home) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it[0].address)
-                        if (mainViewModel.fromAddress.value.address != "") {
+                        if (mainViewModel.fromAddress.value.name != "") {
                             navigator.push(MainScreen())
                         } else {
                             Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
@@ -83,7 +82,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                     FastAddressCard("Работа", it[0].address.city, icon = R.drawable.ic_work) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it[0].address)
-                        if (mainViewModel.fromAddress.value.address != "") {
+                        if (mainViewModel.fromAddress.value.name != "") {
                             navigator.push(MainScreen())
                         } else {
                             Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
@@ -108,7 +107,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                         FastAddressCard(getAddressText(it.address), it.address.city, icon = R.drawable.ic_favorites) {
                             mainViewModel.clearToAddress()
                             mainViewModel.addToAddress(it.address)
-                            if (mainViewModel.fromAddress.value.address != "") {
+                            if (mainViewModel.fromAddress.value.name != "") {
                                 navigator.push(MainScreen())
                             } else {
                                 Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
@@ -131,7 +130,7 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                     FastAddressCard(getAddressText(it), it.city) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it)
-                        if (mainViewModel.fromAddress.value.address != "") {
+                        if (mainViewModel.fromAddress.value.name != "") {
                             navigator.push(MainScreen())
                         } else {
                             Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE

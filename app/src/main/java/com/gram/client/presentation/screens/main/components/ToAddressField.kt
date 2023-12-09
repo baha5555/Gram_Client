@@ -89,7 +89,7 @@ fun ToAddressField(
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        if (mainViewModel.fromAddress.value.address != "") {
+                        if (mainViewModel.fromAddress.value.name != "") {
                             navigator.push(MainScreen())
                         } else {
                             Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE

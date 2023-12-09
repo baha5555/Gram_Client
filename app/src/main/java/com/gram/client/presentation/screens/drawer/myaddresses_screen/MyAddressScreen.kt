@@ -55,7 +55,7 @@ fun MyAddressesScreenContent() {
                 if((stateMyAddresses.response?.result?.home ?: "") != ""){
                     stateMyAddresses.response?.result?.home?.get(0)?.let {
                         ListAddressesShow(R.drawable.ic_home, "Дом",
-                            it.address.address
+                            it.address.name
                         ){
                             navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                         }
@@ -70,7 +70,7 @@ fun MyAddressesScreenContent() {
                     stateMyAddresses.response?.result?.work?.get(0)?.let {
                         ListAddressesShow(
                             R.drawable.ic_work, "Работа",
-                            it.address.address
+                            it.address.name
                         ) {
                             navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                         }
@@ -82,7 +82,7 @@ fun MyAddressesScreenContent() {
                     }
                 }
                 stateMyAddresses.response?.result?.other?.forEach {
-                    ListAddressesShow(R.drawable.ic_favorites, it.name, it.address.address) {
+                    ListAddressesShow(R.drawable.ic_favorites, it.name, it.address.name) {
                         navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                     }
                 }
