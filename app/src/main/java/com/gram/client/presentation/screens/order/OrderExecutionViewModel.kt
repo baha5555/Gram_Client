@@ -257,7 +257,6 @@ class OrderExecutionViewModel @Inject constructor(
                             "ActiveOrdersResponse",
                             "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}"
                         )
-                        showRoad()
                         onSuccess()
                     } catch (e: Exception) {
                         Log.d("ActiveOrdersResponse", "${e.message} Exception")
@@ -345,10 +344,12 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun showRoad() {
         map.overlays.clear()
-        mapController.showRoadAB(
-            _fromAddress,
-            _toAddresses
-        )
+        selectedOrder.value.from_address?.let {
+            mapController.showRoadAB(
+                it,
+                _toAddresses
+            )
+        }
     }
 
     fun clearToAddress() {

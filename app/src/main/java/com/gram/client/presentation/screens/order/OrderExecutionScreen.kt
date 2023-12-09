@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,13 +26,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.components.voyager.RatingScreen
-import com.gram.client.presentation.components.voyager.reason.Reason1Screen
 import com.gram.client.presentation.components.voyager.reason.Reason2Screen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.main.components.FloatingButton
-import com.gram.client.presentation.screens.map.CustomMainMap
-import com.gram.client.presentation.screens.map.currentRoute
+import com.gram.client.presentation.screens.map.ActiveMap
 import com.gram.client.presentation.screens.map.mLocationOverlay
 import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.components.*
@@ -76,6 +73,22 @@ class OrderExecutionScreen : Screen {
 
         DisposableEffect(key1 = true ){
             orderExecutionViewModel.getRatingReasons()
+            orderExecutionViewModel.selectedOrder.value.let { order ->
+            order.from_address.let {
+                if (it != null) {
+                    isGet.value = false
+                    orderExecutionViewModel.updateFromAddress(it)
+                }
+            }
+            order.to_addresses.let {
+                it?.forEach { it2 ->
+                    orderExecutionViewModel.updateToAddress(it2)
+                }
+            }
+            }
+            scope.launch {
+                orderExecutionViewModel.showRoad()
+            }
             onDispose {
                 orderExecutionViewModel.clearAddresses()
             }
@@ -190,9 +203,7 @@ class OrderExecutionScreen : Screen {
             sheetPeekHeight = 210.dp,
         ) {
             Box {
-                CustomMainMap(
-                    mainViewModel = mainViewModel
-                )
+                ActiveMap()
                 if (stateCancelOrderText != "Вы не можете отменить активный заказ.\nЭто может сделать только оператор") {
                     if (isDialogOpen.value) {
                         Dialog(onDismissRequest = { isDialogOpen.value = false }) {

@@ -1,37 +1,41 @@
 package com.gram.client.presentation.screens.map
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.util.Log
-import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.core.content.res.ResourcesCompat
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.components.voyager.MapPointScreen
 import com.gram.client.presentation.components.voyager.OrderExecutionMapPointScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class MapController(val context: Context) {
+    @OptIn(DelicateCoroutinesApi::class)
     fun showRoadAB(
-        fromAddress: State<Address>,
+        fromAddress: Address,
         toAddress: SnapshotStateList<Address>,
     ) {
-        if(currentRoute==SearchAddressScreen().key || currentRoute==MapPointScreen().key || currentRoute==OrderExecutionMapPointScreen().key) return
         val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
-        Log.d("showRoad", ""+fromAddress.value)
 
         GlobalScope.launch {
             try {
+                if(currentRoute==SearchAddressScreen().key || currentRoute==MapPointScreen().key || currentRoute==OrderExecutionMapPointScreen().key) return@launch
+
                 val waypoints = ArrayList<GeoPoint>()
                 val fromAddressPoint = GeoPoint(0, 0)
-                fromAddressPoint.latitude = fromAddress.value.lat.toDouble()
-                fromAddressPoint.longitude = fromAddress.value.lng.toDouble()
+                fromAddressPoint.latitude = fromAddress.lat.toDouble()
+                fromAddressPoint.longitude = fromAddress.lng.toDouble()
                 waypoints.add(fromAddressPoint)
 
 
@@ -64,7 +68,7 @@ class MapController(val context: Context) {
                         context,
                         map,
                         geoPoint = fromAddressPoint,
-                        title = fromAddress.value.name,
+                        title = fromAddress.name,
                         R.drawable.ic_from_address_marker
                     )
                     toAddressesPoints.forEachIndexed { inx, it ->
@@ -81,6 +85,33 @@ class MapController(val context: Context) {
             } catch (_: Exception) {
 
             }
+        }
+    }
+    fun myLocationShow(mLocationOverlay: MyLocationNewOverlay) {
+        val person: Bitmap = context?.let { getBitmap(R.drawable.ic_person) }!!
+        val arrow: Bitmap = getBitmap(R.drawable.ic_navigation)!!
+        mLocationOverlay.setPersonHotspot(person.width / 2f, person.height / 2f)
+        mLocationOverlay.setPersonIcon(person)
+        mLocationOverlay.setDirectionArrow(person, arrow)
+        mLocationOverlay.enableMyLocation()
+    }
+    private fun getBitmap(resID: Int): Bitmap? {
+        val drawable = ResourcesCompat.getDrawable(context.resources, resID, null)
+        val bitmap: Bitmap
+        return try {
+            bitmap = drawable?.let {
+                Bitmap.createBitmap(
+                    it.intrinsicWidth,
+                    drawable.intrinsicHeight,
+                    Bitmap.Config.ARGB_8888
+                )
+            }!!
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            bitmap
+        } catch (e: OutOfMemoryError) {
+            null
         }
     }
 }

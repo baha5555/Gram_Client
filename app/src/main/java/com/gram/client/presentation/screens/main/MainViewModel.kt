@@ -151,7 +151,7 @@ class MainViewModel @Inject constructor(
     fun showRoad() {
         map.overlays.clear()
         mapController.showRoadAB(
-            _fromAddress,
+            _fromAddress.value,
             _toAddresses
         )
     }
