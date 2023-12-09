@@ -104,7 +104,7 @@ class AddAllowancesSheet(val onClick:()->Unit) : Screen {
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    modifier = Modifier.fillMaxWidth(0.7f),
+                                    modifier = Modifier.fillMaxWidth(0.6f),
                                     text = allowance.name,
                                     fontSize = 16.sp
                                 )

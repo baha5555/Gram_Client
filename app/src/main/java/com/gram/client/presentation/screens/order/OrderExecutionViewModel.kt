@@ -142,7 +142,7 @@ class OrderExecutionViewModel @Inject constructor(
             _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         }
         showRoad()
-        Log.i("fromaDA", "" + _toAddresses.size)
+        //Log.i("fromaDA", "" + _toAddresses.size)
     }
 
     fun clearAddresses() {

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Vibrator
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -14,9 +15,11 @@ import com.gram.client.domain.athorization.*
 import com.gram.client.utils.Resource
 import com.gram.client.presentation.screens.authorization.states.AuthResponseState
 import com.gram.client.presentation.screens.authorization.states.IdentificationResponseState
+import com.gram.client.utils.Constants
 import com.gram.client.utils.Values.CLIENT_REGISTER_ID
 import com.gram.client.utils.Values.PHONE_NUMBER
 import com.gram.client.utils.Values.SMS_CODE
+import com.gram.client.utils.isTestApp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -73,7 +76,7 @@ class AuthViewModel @Inject constructor(
                         _stateAuth.value = AuthResponseState(response = response)
                         Log.e("TariffsResponse", "AuthResponse->\n ${_stateAuth.value}")
                         CLIENT_REGISTER_ID.value= response?.result?.client_register_id.toString()
-//                        Toast.makeText(context, ""+ (_stateAuth.value.response?.result?.sms_code ?: "not"), Toast.LENGTH_LONG).show()
+                        if(isTestApp()) Toast.makeText(context, ""+ (_stateAuth.value.response?.result?.sms_code ?: "not"), Toast.LENGTH_LONG).show()
                         onSuccess.invoke()
                     }catch (e: Exception) {
                         Log.d("Exception", "${e.message} Exception")

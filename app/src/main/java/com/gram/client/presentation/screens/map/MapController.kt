@@ -3,6 +3,7 @@ package com.gram.client.presentation.screens.map
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.gram.client.R
@@ -23,6 +24,8 @@ class MapController(val context: Context) {
     ) {
         if(currentRoute==SearchAddressScreen().key || currentRoute==MapPointScreen().key || currentRoute==OrderExecutionMapPointScreen().key) return
         val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
+        Log.d("showRoad", ""+fromAddress.value)
+
         GlobalScope.launch {
             try {
                 val waypoints = ArrayList<GeoPoint>()

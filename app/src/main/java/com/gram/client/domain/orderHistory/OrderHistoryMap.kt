@@ -50,6 +50,7 @@ import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.map.Markers
 import com.gram.client.presentation.screens.map.UserTouchSurface
+import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.OrderExecutionScreen
 import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.ui.theme.BackgroundColor
@@ -69,9 +70,6 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-
-
-lateinit var map: MapView
 
 @SuppressLint("StaticFieldLeak")
 lateinit var markers: Markers

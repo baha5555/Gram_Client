@@ -122,8 +122,8 @@ fun CustomMainMap(
     DisposableEffect(lifecycleOwner) {
         if (currentRoute == OrderExecutionScreen().key) {
             Log.i("showRoad", "run")
-            //mainViewModel.updateToAddress(Address())
-            mainViewModel.updateFromAddress(Address())
+            orderExecutionViewModel.updateToAddress(Address())
+            orderExecutionViewModel.updateFromAddress(Address())
             isGet.value = true
         }else if (currentRoute == MainScreen().key){
             mainViewModel.showRoad()
