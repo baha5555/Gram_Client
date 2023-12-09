@@ -347,7 +347,7 @@ class OrderExecutionViewModel @Inject constructor(
         selectedOrder.value.from_address?.let {
             mapController.showRoadAB(
                 it,
-                _toAddresses
+                selectedOrder.value.to_addresses
             )
         }
     }

@@ -59,7 +59,6 @@ import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.ui.theme.BackgroundColor
 import com.gram.client.ui.theme.PrimaryColor
-import com.gram.client.utils.Constants
 import com.gram.client.utils.PreferencesName
 import com.gram.client.utils.Values
 import org.osmdroid.config.Configuration
@@ -118,6 +117,7 @@ fun CustomMainMap(
         mutableStateOf(manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
     }
 
+    val mapControllers = MapController(context)
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         if (currentRoute == OrderExecutionScreen().key) {
@@ -194,14 +194,15 @@ fun CustomMainMap(
                     zoomAnimation?.duration = 250.toLong()
                     btnZoomIn.setOnClickListener {
                         btnZoomOut.visibility = View.VISIBLE
-                        changeZoom(+1.0, it.context)
+                        mapControllers.changeZoom(+1.0)
+
                         if (map.zoomLevelDouble == 21.0) {
                             btnZoomIn.visibility = View.INVISIBLE
                         }
                     }
                     btnZoomOut.setOnClickListener {
                         btnZoomIn.visibility = View.VISIBLE
-                        changeZoom(-1.0, it.context)
+                        mapControllers.changeZoom(-1.0)
                         if (map.zoomLevelDouble == 15.0) {
                             btnZoomOut.visibility = View.INVISIBLE
                         }
@@ -655,31 +656,7 @@ fun addOverlays() {
     map.overlays.add(mRotationGestureOverlay)
 }
 
-private fun changeZoom(requestedDiff: Double, context: Context) {
 
-    val startZoom = map.zoomLevelDouble
-    if (zoomAnimation!!.isRunning) { // user clicked zoom button once again before the previous animation was finished
-        targetZoom += requestedDiff
-        zoomAnimation!!.cancel()
-    } else { // usual case
-        if (startZoom == Math.round(startZoom).toDouble()) { // user is already on even level
-            targetZoom =
-                Math.round(startZoom + requestedDiff)
-                    .toDouble() // zoom to an another even level
-        } else {
-            targetZoom = if (requestedDiff > 0) // zoom to the closest even level
-                Math.ceil(startZoom) else Math.floor(startZoom)
-        }
-    }
-    zoomAnimation!!.removeAllUpdateListeners()
-    zoomAnimation!!.addUpdateListener(ValueAnimator.AnimatorUpdateListener { updatedAnimation: ValueAnimator ->
-        val fraction = updatedAnimation.animatedFraction
-        map.controller.setZoom(startZoom + (targetZoom - startZoom) * fraction)
-    })
-    zoomAnimation!!.duration = 1000
-    zoomAnimation!!.start()
-
-}
 
 private fun myLocationShow(context: Context?, mLocationOverlay: MyLocationNewOverlay) {
     val person: Bitmap = context?.let { getBitmap(it, R.drawable.ic_person) }!!

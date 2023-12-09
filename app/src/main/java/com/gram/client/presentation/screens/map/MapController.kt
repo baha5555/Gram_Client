@@ -1,11 +1,11 @@
 package com.gram.client.presentation.screens.map
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.content.res.ResourcesCompat
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
@@ -21,10 +21,13 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class MapController(val context: Context) {
+    private var zoomAnimation: ValueAnimator? = null
+    private var targetZoom = 0.0
+
     @OptIn(DelicateCoroutinesApi::class)
     fun showRoadAB(
         fromAddress: Address,
-        toAddress: SnapshotStateList<Address>,
+        toAddress: List<Address>?,
     ) {
         val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")
 
@@ -41,7 +44,7 @@ class MapController(val context: Context) {
 
                 val toAddressesPoints = ArrayList<GeoPoint>()
                 val toAddressesNames = ArrayList<String>()
-                toAddress.forEach { address ->
+                toAddress?.forEach { address ->
                     val toAddressPoint = GeoPoint(0, 0)
                     toAddressPoint.latitude = address.lat.toDouble()
                     toAddressPoint.longitude = address.lng.toDouble()
@@ -113,5 +116,31 @@ class MapController(val context: Context) {
         } catch (e: OutOfMemoryError) {
             null
         }
+    }
+    fun changeZoom(requestedDiff: Double) {
+        zoomAnimation = ValueAnimator.ofFloat(0f, 1f)
+        zoomAnimation?.duration = 250.toLong()
+        val startZoom = map.zoomLevelDouble
+        if (zoomAnimation!!.isRunning) { // user clicked zoom button once again before the previous animation was finished
+            targetZoom += requestedDiff
+            zoomAnimation!!.cancel()
+        } else { // usual case
+            if (startZoom == Math.round(startZoom).toDouble()) { // user is already on even level
+                targetZoom =
+                    Math.round(startZoom + requestedDiff)
+                        .toDouble() // zoom to an another even level
+            } else {
+                targetZoom = if (requestedDiff > 0) // zoom to the closest even level
+                    Math.ceil(startZoom) else Math.floor(startZoom)
+            }
+        }
+        zoomAnimation!!.removeAllUpdateListeners()
+        zoomAnimation!!.addUpdateListener(ValueAnimator.AnimatorUpdateListener { updatedAnimation: ValueAnimator ->
+            val fraction = updatedAnimation.animatedFraction
+            map.controller.setZoom(startZoom + (targetZoom - startZoom) * fraction)
+        })
+        zoomAnimation!!.duration = 1000
+        zoomAnimation!!.start()
+
     }
 }
