@@ -31,7 +31,7 @@ import com.gram.client.utils.Values
 
 class RatingScreen(
     private val orderId: Int,
-    private val price: Int?,
+    private val price: Double?,
     private val function: () -> Unit
 ) : Screen {
     private var reasonsCheck: MutableState<String> = mutableStateOf("")
