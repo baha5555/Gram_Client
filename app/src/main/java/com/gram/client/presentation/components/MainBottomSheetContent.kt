@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -158,10 +159,10 @@ fun AddressesContent(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                MaterialTheme.colors.background,
+                Color(0xffFFFFFF),
                 shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
             )
-            .padding(top = 15.dp, bottom = 0.dp + (currentFraction * 15).dp)
+            .padding(top = 10.dp, bottom = 0.dp + (currentFraction * 15).dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -171,7 +172,7 @@ fun AddressesContent(
                 modifier = Modifier
                     .width(45.dp)
                     .height(5.dp)
-                    .graphicsLayer(translationY = -15f)
+                    .graphicsLayer(translationY = -1f)
                     .clip(RoundedCornerShape(50.dp))
                     .background(Color(0xFFCACAC2))
             )
@@ -331,10 +332,10 @@ val countriesKey = mainViewModel.stateCountriesKey.value
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                MaterialTheme.colors.background,
+                Color(0xffFFFFFF),
                 shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
             )
-            .padding(horizontal = 20.dp, vertical = 15.dp)
+            .padding(horizontal = 20.dp, vertical =20.dp)
     ) {
         Row(
             Modifier
@@ -347,8 +348,8 @@ val countriesKey = mainViewModel.stateCountriesKey.value
         ) {
             Text(
                 text = selected_tariff?.value!!.name,
-                fontSize = 25.sp,
-                color = MaterialTheme.colors.onBackground
+                fontSize = 32.sp,
+                color = MaterialTheme.colors.onBackground, fontWeight = FontWeight.Bold
             )
             stateCalculate.response?.let { it ->
                 it.result.forEach {
@@ -356,7 +357,7 @@ val countriesKey = mainViewModel.stateCountriesKey.value
                     if (it.tariff_id == selected_tariff.value!!.id) {
                         Text(
                             text = "${it.amount} ${countriesKey.response?.currency_symbol?.monetary_unit}",
-                            fontSize = 25.sp
+                            fontSize = 30.sp
                         )
 
                     }
@@ -371,11 +372,11 @@ val countriesKey = mainViewModel.stateCountriesKey.value
                 Image(
                     modifier = Modifier
                         .padding(
-                            end = 150.dp, bottom = 30.dp
+                            end = 120.dp, bottom = 20.dp
                         )
                         .fillMaxWidth(0f + currentFraction)
                         .graphicsLayer(alpha = 0f + currentFraction)
-                        .height(0.dp + (currentFraction * 80).dp),
+                        .height(0.dp + (currentFraction * 120).dp),
                     painter = rememberAsyncImagePainter(selected_tariff.value!!.image),
                     contentDescription = "icon"
                 )
@@ -433,7 +434,7 @@ fun OptionsContent(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                MaterialTheme.colors.background,
+                Color(0xffFFFFFF),
                 shape = RoundedCornerShape(20.dp)
             )
             .padding(horizontal = 20.dp, vertical = 0.dp)
@@ -526,7 +527,8 @@ fun OptionsContent(
                 .fillMaxWidth()
                 .padding(15.dp)
                 .clickable {
-                    bottomNavigator.show(AddAllowancesSheet(){})
+                    Toast.makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT).show()
+                    /*bottomNavigator.show(AddAllowancesSheet(){})*/
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

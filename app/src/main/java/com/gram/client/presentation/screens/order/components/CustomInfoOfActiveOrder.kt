@@ -173,7 +173,7 @@ class CustomInfoOfActiveOrder : Screen {
                                     }
                                 }
                             }
-                            order.allowances?.let { allowance ->
+                            /*order.allowances?.let { allowance ->
                                 CustomInfoTitle(title = "Надбавки")
                                 Row(
                                     modifier = Modifier
@@ -197,7 +197,7 @@ class CustomInfoOfActiveOrder : Screen {
                                         contentDescription = "icon"
                                     )
                                 }
-                            }
+                            }*/
                         }
                     }
                 }

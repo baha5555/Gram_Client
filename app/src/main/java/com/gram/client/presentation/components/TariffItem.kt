@@ -33,8 +33,8 @@ fun TariffItem(
 
     Column(
         modifier = Modifier
-            .width(85.dp)
-            .height(95.dp)
+            .width(73.dp)
+            .height(76.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 onSelected()
@@ -51,10 +51,10 @@ fun TariffItem(
             contentDescription = "icon",
             alpha = if (isSelected) 1.0F else 0.5F
         )
-        Text(text = name, fontSize = 13.sp, color = if (isSelected) Color.Black else Color.Black.copy(0.5f), maxLines = 1)
+        Text(text = name, fontSize = 12.sp, color = if (isSelected) Color.Black else Color.Black.copy(0.5f), maxLines = 1)
         AnimatedVisibility(visible = true) {
             Box(modifier = Modifier.height(15.dp)){
-                Text(text = "$price $key", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (isSelected) Color.Black else Color.Black.copy(0.5f))
+                Text(text = "$price $key", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (isSelected) Color.Black else Color.Black.copy(0.5f))
             }
         }
 

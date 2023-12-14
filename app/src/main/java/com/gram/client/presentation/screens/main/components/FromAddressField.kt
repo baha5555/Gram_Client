@@ -98,33 +98,3 @@ fun FromAddressField(fromAddress: Address, onClick: () -> Unit) {
         }
     }
 }
-
-@Composable
-fun ArrowBack() {
-    val navigator = LocalNavigator.currentOrThrow
-    val coroutineScope = rememberCoroutineScope()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 10.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Center
-    ) {
-        FloatingActionButton(
-            modifier = Modifier
-                .size(50.dp),
-            backgroundColor = Color.White,
-            onClick = {
-                coroutineScope.launch {
-                    navigator.replaceAll(SearchDriverScreen())
-                }
-            }
-        ) {
-            Icon(
-                Icons.Filled.ArrowBack,
-                contentDescription = "Menu", tint = Color.Black,
-                modifier = Modifier.size(25.dp)
-            )
-        }
-    }
-}
