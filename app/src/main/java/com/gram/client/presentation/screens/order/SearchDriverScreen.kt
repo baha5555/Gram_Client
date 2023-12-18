@@ -1,6 +1,9 @@
 package com.gram.client.presentation.screens.order
 
 import android.annotation.SuppressLint
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -54,8 +57,10 @@ import com.gram.client.utils.Constants
 import com.gram.client.utils.Constants.STATE_RATING
 import com.gram.client.utils.Constants.STATE_RAITING_ORDER_ID
 import com.gram.client.utils.Values
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.*
 
 val orderCount = mutableStateOf(-1)
 
@@ -91,100 +96,101 @@ class SearchDriverScreen : Screen {
             }
         }
         CustomBackHandle(true)
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                BackHandler(enabled = drawerState.isOpen) {
-                    scope.launch { drawerState.close() }
-                }
-                ModalDrawer(
-                    drawerState = drawerState,
-                    gesturesEnabled = !drawerState.isClosed,
-                    drawerContent = {
-                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                            Column(
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                SideBarMenu()
-                            }
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            BackHandler(enabled = drawerState.isOpen) {
+                scope.launch { drawerState.close() }
+            }
+            ModalDrawer(
+                drawerState = drawerState,
+                gesturesEnabled = !drawerState.isClosed,
+                drawerContent = {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            SideBarMenu()
                         }
-                    },
-                    content = {
-                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                            BottomSheetScaffold(
-                                sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
-                                scaffoldState = bottomSheetScaffoldState,
-                                floatingActionButton = {
-                                    Column(
+                    }
+                },
+                content = {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        BottomSheetScaffold(
+                            sheetShape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
+                            scaffoldState = bottomSheetScaffoldState,
+                            floatingActionButton = {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 25.dp, bottom = 50.dp),
+                                ) {
+                                    Row(
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 25.dp, bottom = 50.dp),
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        FloatingButton2(
+                                            ImageVector.vectorResource(id = R.drawable.btn_show_location),
+                                            backgroundColor = Color.White,
+                                            contentColor = PrimaryColor
                                         ) {
-                                            FloatingButton2(
-                                                ImageVector.vectorResource(id = R.drawable.btn_show_location), backgroundColor = Color.White,
-                                                contentColor = PrimaryColor
-                                            ) {
-                                                map.controller.animateTo(mLocationOverlay.myLocation)
-                                                if (mLocationOverlay.myLocation != null) {
-                                                    scope.launch {
-                                                        if (currentRoute == SearchAddressScreen().key) {
-                                                            mainViewModel.getAddressFromMap(
-                                                                mLocationOverlay.myLocation.longitude,
-                                                                mLocationOverlay.myLocation.latitude
-                                                            )
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            FloatingButton2(
-                                                Icons.Filled.Menu, backgroundColor = Color.White,
-                                                contentColor = PrimaryColor
-                                            ) {
+                                            map.controller.animateTo(mLocationOverlay.myLocation)
+                                            if (mLocationOverlay.myLocation != null) {
                                                 scope.launch {
-                                                    drawerState.open()
+                                                    if (currentRoute == SearchAddressScreen().key) {
+                                                        mainViewModel.getAddressFromMap(
+                                                            mLocationOverlay.myLocation.longitude,
+                                                            mLocationOverlay.myLocation.latitude
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
-
+                                        FloatingButton2(
+                                            Icons.Filled.Menu, backgroundColor = Color.White,
+                                            contentColor = PrimaryColor
+                                        ) {
+                                            scope.launch {
+                                                drawerState.open()
+                                            }
+                                        }
                                     }
-                                },
-                                sheetContent = {
-                                    Column(
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentHeight()
-                                            .background(MaterialTheme.colors.secondary)
-                                    ) {
-                                        LazyColumn() {
-                                            orderExecutionViewModel.stateActiveOrdersList.forEachIndexed { inx, it ->
-                                                item {
-                                                    val isOpen = remember {
-                                                        mutableStateOf(
-                                                            orderExecutionViewModel.stateActiveOrdersList.size == 1
-                                                        )
-                                                    }
-                                                    orderCard(
-                                                        orderExecutionViewModel,
-                                                        it,
-                                                        sheetPeekHeightUpOnClick = {
-                                                            scope.launch {
-                                                                isOpen.value =
-                                                                    !isOpen.value
-                                                                sheetPeekHeight =
-                                                                    if (isOpen.value) 367
-                                                                    else 200
 
-                                                            }
-                                                        },
-                                                        isOpen = isOpen,
-                                                        inx = inx
+                                }
+                            },
+                            sheetContent = {
+                                Column(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
+                                        .background(MaterialTheme.colors.secondary)
+                                ) {
+                                    LazyColumn() {
+                                        orderExecutionViewModel.stateActiveOrdersList.forEachIndexed { inx, it ->
+                                            item {
+                                                val isOpen = remember {
+                                                    mutableStateOf(
+                                                        orderExecutionViewModel.stateActiveOrdersList.size == 1
                                                     )
-                                                    Spacer(
-                                                        Modifier.height(1.dp)
-                                                    )
+                                                }
+                                                orderCard(
+                                                    orderExecutionViewModel,
+                                                    it,
+                                                    sheetPeekHeightUpOnClick = {
+                                                        scope.launch {
+                                                            isOpen.value =
+                                                                !isOpen.value
+                                                            sheetPeekHeight =
+                                                                if (isOpen.value) 367
+                                                                else 200
+
+                                                        }
+                                                    },
+                                                    isOpen = isOpen,
+                                                    inx = inx
+                                                )
+                                                Spacer(
+                                                    Modifier.height(1.dp)
+                                                )
 //                                    clientOrdersId.active_orders?.let { active ->
 //                                        active.forEach { clientOrderId ->
 //                                            val isOpen = remember {
@@ -197,110 +203,110 @@ class SearchDriverScreen : Screen {
 //                                            }
 //                                        }
 //                                    }
-                                                }
-                                            }
-                                            item {
-                                                Spacer(
-                                                    modifier = Modifier.height(40.dp)
-                                                )
                                             }
                                         }
-                                        Column(
+                                        item {
+                                            Spacer(
+                                                modifier = Modifier.height(40.dp)
+                                            )
+                                        }
+                                    }
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .wrapContentHeight()
+                                            .clip(
+                                                shape = RoundedCornerShape(
+                                                    topStart = 25.dp, topEnd = 25.dp
+                                                )
+                                            )
+                                    ) {
+                                        Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .wrapContentHeight()
-                                                .clip(
-                                                    shape = RoundedCornerShape(
-                                                        topStart = 25.dp, topEnd = 25.dp
-                                                    )
-                                                )
+                                                .padding(15.dp)
+                                                .height(50.dp)
+                                                .clip(RoundedCornerShape(20.dp))
+                                                .background(MaterialTheme.colors.primary)
+                                                .clickable { navigator.replace(SearchAddressScreen()) },
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .padding(15.dp)
                                                     .height(50.dp)
                                                     .clip(RoundedCornerShape(20.dp))
-                                                    .background(MaterialTheme.colors.primary)
-                                                    .clickable { navigator.replace(SearchAddressScreen()) },
-                                                horizontalArrangement = Arrangement.SpaceBetween,
-                                                verticalAlignment = Alignment.CenterVertically
+                                                    .clickable {
+                                                        Values.WhichAddress.value =
+                                                            Constants.TO_ADDRESS
+                                                        bottomNavigator.show(SearchAddresses({
+                                                            navigator.push(MainScreen())
+                                                        }) {
+                                                            navigator.push(MapPointScreen())
+                                                        })
+                                                    }
+                                                    .background(PrimaryColor)
+                                                    .padding(horizontal = 5.dp),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
                                             ) {
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.car_kuda_edem),
+                                                    contentDescription = "car_eco",
+                                                    modifier = Modifier.offset(x = -25.dp)
+                                                )
+                                                Text(
+                                                    text = "Заказать ещё одну машину",
+                                                    textAlign = TextAlign.Start,
+                                                    color = Color.White,
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .padding(end = 12.dp)
+                                                )
                                                 Row(
                                                     modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .height(50.dp)
-                                                        .clip(RoundedCornerShape(20.dp))
-                                                        .clickable {
-                                                            Values.WhichAddress.value = Constants.TO_ADDRESS
-                                                            bottomNavigator.show(SearchAddresses({
-                                                                navigator.push(MainScreen())
-                                                            }) {
-                                                                navigator.push(MapPointScreen())
-                                                            })
-                                                        }
-                                                        .background(PrimaryColor)
-                                                        .padding(horizontal = 5.dp),
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                        .padding(end = 10.dp),
+                                                    verticalAlignment = Alignment.CenterVertically
                                                 ) {
-                                                    Image(
-                                                        painter = painterResource(id = R.drawable.car_kuda_edem),
-                                                        contentDescription = "car_eco",
-                                                        modifier = Modifier.offset(x = -25.dp)
-                                                    )
-                                                    Text(
-                                                        text = "Заказать ещё одну машину",
-                                                        textAlign = TextAlign.Start,
+                                                    Divider(
                                                         color = Color.White,
-                                                        fontSize = 16.sp,
-                                                        fontWeight = FontWeight.SemiBold,
-                                                        maxLines = 1, overflow = TextOverflow.Ellipsis,
                                                         modifier = Modifier
-                                                            .weight(1f)
-                                                            .padding(end = 12.dp)
+                                                            .width(1.dp)
+                                                            .fillMaxHeight(0.5f)
+                                                            .offset((-10).dp, 0.dp)
                                                     )
-                                                    Row(
+                                                    Icon(
                                                         modifier = Modifier
-                                                            .padding(end = 10.dp),
-                                                        verticalAlignment = Alignment.CenterVertically
-                                                    ) {
-                                                        Divider(
-                                                            color = Color.White,
-                                                            modifier = Modifier
-                                                                .width(1.dp)
-                                                                .fillMaxHeight(0.5f)
-                                                                .offset((-10).dp, 0.dp)
-                                                        )
-                                                        Icon(
-                                                            modifier = Modifier
-                                                                .size(24.dp)
-                                                                .clickable {
-                                                                    navigator.push(MainScreen())
-                                                                },
-                                                            imageVector = Icons.Default.ArrowForward,
-                                                            contentDescription = "car_eco",
-                                                            tint = Color.White
-                                                        )
-                                                    }
-
+                                                            .size(24.dp)
+                                                            .clickable {
+                                                                navigator.push(MainScreen())
+                                                            },
+                                                        imageVector = Icons.Default.ArrowForward,
+                                                        contentDescription = "car_eco",
+                                                        tint = Color.White
+                                                    )
                                                 }
+
                                             }
-                                            Spacer(Modifier.requiredHeight(0.dp))
                                         }
+                                        Spacer(Modifier.requiredHeight(0.dp))
                                     }
+                                }
 
-                                },
-                                sheetPeekHeight = sheetPeekHeight.dp
-                            ) {
-                                CustomMainMap(
-                                    mainViewModel = mainViewModel
-                                )
-                            }
+                            },
+                            sheetPeekHeight = sheetPeekHeight.dp
+                        ) {
+                            CustomMainMap(
+                                mainViewModel = mainViewModel
+                            )
                         }
-                        })
-            }
-
+                    }
+                })
+        }
 
 
     }
@@ -326,6 +332,10 @@ class SearchDriverScreen : Screen {
         var diff: Long by remember {
             mutableStateOf(0)
         }
+        var diff1 = remember {
+            mutableStateOf(0)
+        }
+        val handler = Handler(Looper.getMainLooper())
 
         var fillingTimeMinutes: Long by remember {
             mutableStateOf(0)
@@ -343,6 +353,15 @@ class SearchDriverScreen : Screen {
                 fillingTimeDateParse = dateFormatParse.parse(it).time
                 diff = (System.currentTimeMillis() - fillingTimeDateParse) * -1
                 fillingTimeMinutes = diff / (60 * 1000) % 60
+            }
+        }
+        scope.launch {
+            order.filing_time_to_int?.let {
+                diff1.value = it
+                if (it != null && it > 0) {
+                    diff1.value = diff1.value - 1
+                    delay(10000)
+                }
             }
         }
         val connectClientWithDriverIsDialogOpen = remember { mutableStateOf(false) }
@@ -384,14 +403,13 @@ class SearchDriverScreen : Screen {
             ) {
                 Column(modifier = Modifier.fillMaxWidth(0.75f)) {
                     Text(
-                        text = if (order.performer == null || order.status == "Поступило") "Ищем ближайших водителей..."
+                        text = if (order.performer == null || order.status == "Поступило") {"Ищем ближайших водителей..."}
                         else {
                             when (order.status) {
                                 "Водитель на месте" -> "Водитель на месте,\n можете выходить"
                                 "Исполняется" -> "За рулем ${order.performer?.first_name ?: "Водитель"}"
                                 "Водитель назначен" -> {
-                                    if (fillingTimeMinutes > 0 && order.filing_time != null) "Через $fillingTimeMinutes мин приедет"
-                                    else "В ближайшее время \n приедет ${order.performer.first_name}"
+                                    if (diff1.value > 0) { "Через ${diff1.value} мин приедет" } else { "В ближайшее время \n приедет ${order.performer?.first_name}" }
                                 }
                                 else -> {
                                     ""
@@ -435,12 +453,14 @@ class SearchDriverScreen : Screen {
                 ) {
 
                     CustomCircleButton(
-                        text = if(order.status=="Не оформлен" || order.status == "Поступило") "Отменить\nзаказ" else "Связаться",
-                        icon = if(order.status=="Не оформлен" || order.status == "Поступило")Icons.Default.Close else ImageVector.vectorResource(id = R.drawable.phone)
+                        text = if (order.status == "Не оформлен" || order.status == "Поступило") "Отменить\nзаказ" else "Связаться",
+                        icon = if (order.status == "Не оформлен" || order.status == "Поступило") Icons.Default.Close else ImageVector.vectorResource(
+                            id = R.drawable.phone
+                        )
                     ) {
-                        if(order.status=="Не оформлен" || order.status == "Поступило"){
-                            bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){})
-                        }else {
+                        if (order.status == "Не оформлен" || order.status == "Поступило") {
+                            bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order) {})
+                        } else {
                             connectClientWithDriverIsDialogOpen.value = true
                         }
                     }

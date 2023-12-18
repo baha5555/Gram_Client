@@ -48,6 +48,11 @@ object SocketHandler {
                 orderExecutionViewModel.getActiveOrders()
 
             }
+            mSocket.on("client-mob-app:filing-time"){args->
+                Log.e("SocketIODATA","cancelSocketIODATA ${args[0]}")
+                orderExecutionViewModel.getActiveOrders()
+
+            }
             mSocket.on("client-mob-app:complete-orders"){args->
                 Log.e("SocketIODATA","completeSocketIODATA ${args[0]}")
                 orderExecutionViewModel.getActiveOrders()

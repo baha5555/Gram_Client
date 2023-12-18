@@ -83,8 +83,8 @@ fun performerSection(
                 "Водитель на месте"->"Водитель на месте,\n можете выходить"
                 "Исполняется"->"За рулем ${performer.performer?.first_name?:"Водитель"}"
                 "Водитель назначен"->{
-                    if(fillingTimeMinutes>0)"Через $fillingTimeMinutes мин приедет ${performer.performer?.first_name}"
-                    else "Скоро приедет ${performer.performer?.first_name}"
+                    if(fillingTimeMinutes>0){"Через $fillingTimeMinutes мин приедет ${performer.performer?.first_name}"}
+                    else {"Скоро приедет ${performer.performer?.first_name}"}
                 }
                 else -> {"Вы завершили поездку"}
             }, fontSize = 22.sp, fontWeight = FontWeight.Bold)
