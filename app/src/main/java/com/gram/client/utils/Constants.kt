@@ -9,7 +9,7 @@ object Constants {
     const val LOCAL_BASE_URL = "http://10.250.1.96/"
     const val TEST_URL = "https://testapi.client.gram.tj/"
     const val BASE_URL = "https://api-client.gram.tj/"
-    const val URL = BASE_URL
+    const val URL = TEST_URL
     var IDENTIFY_TO_SCREEN = ""
     const val PREFIX = "992"
     const val FROM_ADDRESS = "FROM_ADDRESS"
@@ -20,7 +20,7 @@ object Constants {
     const val ADD_FROM_ADDRESS_FOR_NAVIGATE = "ADD_FROM_ADDRESS_FOR_NAVIGATE"
 
 
-    const val SOON = "(Скоро)"
+    const val SOON = " (Скоро)"
     var stateOfDopInfoForDriver = mutableStateOf("")
     var STATE_RATING: MutableState<Boolean> = mutableStateOf(false)
     var STATE_RAITING_ORDER_ID: MutableState<Int> = mutableStateOf(-1)

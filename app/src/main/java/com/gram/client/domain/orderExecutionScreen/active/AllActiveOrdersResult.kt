@@ -11,6 +11,7 @@ data class AllActiveOrdersResult(
     val distance: Double? = 0.0,
     val dop_phone: String? = "",
     val filing_time: String?= "",
+    val filing_time_to_int: Int?=0,
     val from_address: Address?= null,
     val id: Int = 0,
     val meeting_info: String? = "",
