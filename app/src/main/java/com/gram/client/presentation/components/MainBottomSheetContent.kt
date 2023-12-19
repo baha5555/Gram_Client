@@ -430,6 +430,8 @@ fun OptionsContent(
     stateAllowances: AllowancesResponseState
 ) {
     val context = LocalContext.current
+    val bottomNavigator = LocalBottomSheetNavigator.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -442,11 +444,11 @@ fun OptionsContent(
         val bottomNavigator = LocalBottomSheetNavigator.current
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp)
-                .clickable {
+                .fillMaxWidth().clickable {
                     bottomNavigator.show(CommentSheet("Комментарий водителю", Comments.DRIVER))
-                },
+                }
+                .padding(15.dp)
+                ,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -470,7 +472,6 @@ fun OptionsContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp)
                 .clickable {
                     bottomNavigator.show(
                         CommentSheet(
@@ -478,7 +479,9 @@ fun OptionsContent(
                             Comments.TO_ANOTHER_HUMAN
                         )
                     )
-                },
+                }
+                .padding(15.dp)
+               ,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -498,14 +501,14 @@ fun OptionsContent(
         Divider()
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp)
-                .clickable {
+                .fillMaxWidth().clickable {
                     Toast.makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT).show()
 
                     /*stateOfDopInfoForDriver.value = "PLAN_TRIP"
                     dopPhone()*/
-                },
+                }
+                .padding(15.dp)
+                ,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -525,11 +528,12 @@ fun OptionsContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp)
                 .clickable {
                     Toast.makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT).show()
                     /*bottomNavigator.show(AddAllowancesSheet(){})*/
-                },
+                }
+                .padding(15.dp)
+               ,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
