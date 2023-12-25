@@ -2,12 +2,10 @@ package com.gram.client.presentation.screens.main
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +37,6 @@ import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.presentation.screens.map.currentRoute
 import com.gram.client.presentation.screens.map.mLocationOverlay
 import com.gram.client.presentation.screens.map.map
-import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
@@ -240,7 +237,9 @@ class SearchAddressScreen : Screen {
                                 )
                                 FromAddressField(fromAddress) {
                                     bottomNavigator.show(
-                                        SearchAddresses{
+                                        SearchAddresses({
+                                            navigator.push(MainScreen())
+                                        }){
                                             navigator.push(MapPointScreen())
                                         }
                                     )
