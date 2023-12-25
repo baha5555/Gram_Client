@@ -257,6 +257,7 @@ class OrderExecutionViewModel @Inject constructor(
                             "ActiveOrdersResponse",
                             "ActiveOrdersResponseSuccess->\n ${_stateActiveOrders.value}"
                         )
+                        showRoad()
                         onSuccess()
                     } catch (e: Exception) {
                         Log.d("ActiveOrdersResponse", "${e.message} Exception")

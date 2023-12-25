@@ -12,8 +12,11 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gram.client.utils.Constants
-import com.gram.client.utils.Resource
+import com.google.android.gms.location.LocationServices
+import com.google.gson.Gson
+import com.gram.client.domain.countries.CountriesKeyResponse
+import com.gram.client.domain.countries.GetCountriesKeyResponseState
+import com.gram.client.domain.countries.GetCountriesKeyUseCase
 import com.gram.client.domain.mainScreen.*
 import com.gram.client.domain.mainScreen.fast_address.FastAddressesResponse
 import com.gram.client.domain.mainScreen.fast_address.FastAddressesUseCase
@@ -21,11 +24,8 @@ import com.gram.client.domain.mainScreen.order.*
 import com.gram.client.presentation.screens.main.states.*
 import com.gram.client.presentation.screens.map.MapController
 import com.gram.client.presentation.screens.map.map
-import com.google.android.gms.location.LocationServices
-import com.google.gson.Gson
-import com.gram.client.domain.countries.CountriesKeyResponse
-import com.gram.client.domain.countries.GetCountriesKeyResponseState
-import com.gram.client.domain.countries.GetCountriesKeyUseCase
+import com.gram.client.utils.Constants
+import com.gram.client.utils.Resource
 import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -176,13 +176,19 @@ class MainViewModel @Inject constructor(
     fun includeAllowance(toDesiredAllowance: ToDesiredAllowance, price: Int? = null) {
         selectedAllowances.value?.forEachIndexed { inx, it ->
             if (it.allowance_id == toDesiredAllowance.id) {
+                Log.i("asdad", ""+_selectedAllowances)
                 _selectedAllowances.removeAt(inx)
+                if (toDesiredAllowance.isSelected.value) {
+                    _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest(price))
+                }
+                selectedAllowances.value = _selectedAllowances
+                return
             }
         }
         if (toDesiredAllowance.isSelected.value) {
             _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest(price))
             selectedAllowances.value = _selectedAllowances
-        } else {
+        } else if(price!=null) {
             _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest(price))
             selectedAllowances.value = _selectedAllowances
         }

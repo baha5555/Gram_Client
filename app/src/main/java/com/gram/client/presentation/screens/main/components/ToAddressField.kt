@@ -50,7 +50,11 @@ fun ToAddressField(
             .clip(RoundedCornerShape(20.dp))
             .clickable {
                 Values.WhichAddress.value = Constants.TO_ADDRESS
-                bottomNavigator.show(SearchAddresses() {
+                bottomNavigator.show(SearchAddresses(
+                    {
+                        navigator.push(MainScreen())
+                    }
+                ) {
                     navigator.push(MapPointScreen())
                 })
             }
