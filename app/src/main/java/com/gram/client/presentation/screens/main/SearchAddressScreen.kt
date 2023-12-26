@@ -15,6 +15,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -49,10 +50,10 @@ class SearchAddressScreen : Screen {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val mainViewModel: MainViewModel = hiltViewModel()
         val isSearchState = remember { mutableStateOf(false) }
-        val sheetPeekHeight = remember { mutableStateOf(350) }
+        val sheetPeekHeight = remember { mutableStateOf(310) }
 
 
-        val bottomSheetState = rememberBottomSheetScaffoldState(
+        var bottomSheetState = rememberBottomSheetScaffoldState(
             bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
         )
         val coroutineScope = rememberCoroutineScope()
@@ -156,7 +157,7 @@ class SearchAddressScreen : Screen {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .focusRequester(focusRequester)
-                                        .fillMaxHeight(fraction = 0.98f)
+                                        .fillMaxHeight(fraction = 0.80f)
                                         .background(Color(0xffEEEEEE)),
                                 ) {
                                     Column(
@@ -225,7 +226,7 @@ class SearchAddressScreen : Screen {
 //            Services()
                                 }
                             },
-                            sheetPeekHeight = sheetPeekHeight.value.dp-40.dp,
+                            sheetPeekHeight = sheetPeekHeight.value.dp,
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
