@@ -11,12 +11,14 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import com.gram.client.domain.mainScreen.*
 import com.gram.client.domain.mainScreen.order.*
 import com.gram.client.domain.mainScreen.order.connectClientWithDriver.connectClientWithDriverResponse
@@ -25,6 +27,8 @@ import com.gram.client.domain.orderExecutionScreen.active.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.domain.orderExecutionScreen.reason.*
 import com.gram.client.presentation.screens.main.states.AddressByPointResponseState
+import com.gram.client.presentation.screens.main.states.AllowancesResponseState
+import com.gram.client.presentation.screens.main.states.CalculateResponseState
 import com.gram.client.presentation.screens.main.states.CancelOrderResponseState
 import com.gram.client.presentation.screens.main.states.SearchAddressResponseState
 import com.gram.client.presentation.screens.map.MapController
@@ -54,9 +58,14 @@ class OrderExecutionViewModel @Inject constructor(
     private val searchAddressUseCase: SearchAddressUseCase,
     private val getAddressByPointUseCase: GetAddressByPointUseCase,
     private val getReasonsUseCase: GetReasonsUseCase,
-    private val getRatingReasonsUseCase: GetRatingReasonsUseCase
+    private val getRatingReasonsUseCase: GetRatingReasonsUseCase,
+    private val getAllowancesUseCase: GetAllowancesUseCase,
+    private val getPriceUseCase: GetPriceUseCase
     ) : AndroidViewModel(application) {
 
+    private var _selectedAllowances: MutableList<AllowanceRequest> =
+        mutableListOf<AllowanceRequest>()
+    val selectedAllowances = MutableLiveData<MutableList<AllowanceRequest>>(_selectedAllowances)
     val context get() = getApplication<Application>()
     private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private val mapController = MapController(context)
@@ -132,7 +141,9 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun updateToAddressInx(address: Address, inx: Int) {
         _toAddresses[inx] = address
-        editOrder()
+        editOrder {
+
+        }
     }
 
     fun updateToAddress(address: Address? = null, clear: Boolean = false) {
@@ -153,7 +164,9 @@ class OrderExecutionViewModel @Inject constructor(
     fun addToAddress(address: Address) {
         _toAddresses.add(address)
         _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
-        editOrder()
+        editOrder {
+
+        }
         showRoad()
     }
 
@@ -359,7 +372,9 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun removeAddStop(address: Address?) {
         _toAddresses.remove(address)
-        editOrder()
+        editOrder {
+
+        }
     }
 
     fun getAddressFromMap(
@@ -423,28 +438,18 @@ class OrderExecutionViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun editOrder() {
-        Log.e(
-            "EditOrderResponseFrom",
-            ""+_fromAddress.value.id
-        )
-        Log.e(
-            "EditOrderResponseTo",
-            ""+_toAddresses[0].id
-        )
-        Log.e(
-            "EditOrderResponseSelected",
-            ""+ (_selectedOrder.value.from_address?.id ?: 0)
-        )
+    fun editOrder(onSuccess: () -> Unit) {
         editOrderUseCase.invoke(
             order_id = selectedOrder.value.id,
             dop_phone = null,
-            search_address_id = if (_fromAddress.value.id!=-1) _fromAddress.value.id else null,
+            search_address_id = selectedOrder.value.search_address_id,
             meeting_info = null,
             to_addresses = _toAddresses,
             comment = null,
             tariff_id = selectedOrder.value.tariff_id ?: 0,
-            allowances = null,
+            allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
+                selectedAllowances.value
+            ) else null,
             from_address = if (_fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.lng}\",\"lat\":\"${fromAddress.value.lat}\"}" else null
         ).onEach { result: Resource<UpdateOrderResponse> ->
             when (result) {
@@ -458,6 +463,7 @@ class OrderExecutionViewModel @Inject constructor(
                             "EditOrderResponse",
                             "EditOrderResponseSuccess->\n ${_stateEditOrder.value}"
                         )
+                        onSuccess()
                     } catch (e: Exception) {
                         Log.d("EditOrderResponse", "${e.message} Exception")
                     }
@@ -470,6 +476,54 @@ class OrderExecutionViewModel @Inject constructor(
                 }
                 is Resource.Loading -> {
                     _stateEditOrder.value = EditOrderResponseState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+
+    private val _stateCalculate = mutableStateOf(CalculateResponseState())
+    val stateCalculate: State<CalculateResponseState> = _stateCalculate
+    fun getPrice() {
+        val tariffIdsList = arrayListOf<String>()
+        tariffIdsList.add("{\"tariff_id\":${selectedOrder.value.tariff_id}}")
+        toAddresses.clear()
+        selectedOrder.value.to_addresses?.forEach {
+            _toAddresses.add(it)
+        }
+        getPriceUseCase.invoke(
+            tariff_ids = tariffIdsList.toString(),
+            allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
+                selectedAllowances.value
+            ) else null,
+            search_address_id = selectedOrder.value.search_address_id,
+            to_addresses = if (selectedOrder.value.to_addresses?.isNotEmpty() == true) toAddresses else null,
+            from_address = if ((selectedOrder.value.from_address != null)) "{\"lng\":\"${selectedOrder.value.from_address!!.lng}\",\"lat\":\"${selectedOrder.value.from_address!!.lat}\"}" else null
+        ).onEach { result: Resource<CalculateResponse> ->
+            when (result) {
+                is Resource.Success -> {
+                    try {
+                        val response: CalculateResponse? = result.data
+                        _stateCalculate.value =
+                            CalculateResponseState(response = response)
+                        Log.e(
+                            "CalculateResponse",
+                            "CalculateResponseSuccess->\n ${_stateCalculate.value}"
+                        )
+                    } catch (e: Exception) {
+                        Log.d("CalculateResponse", "${e.message} Exception")
+                    }
+                }
+
+                is Resource.Error -> {
+                    Log.e("CalculateResponse", "CalculateResponseError->\n ${result.message}")
+                    _stateCalculate.value = CalculateResponseState(
+                        error = "${result.message}"
+                    )
+                }
+
+                is Resource.Loading -> {
+                    _stateCalculate.value = CalculateResponseState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)
@@ -556,4 +610,68 @@ class OrderExecutionViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+    private val _stateAllowances = mutableStateOf(AllowancesResponseState())
+    val stateAllowances: State<AllowancesResponseState> = _stateAllowances
+    fun getAllowancesByTariffId(tariff_id: Int, onSuccess: () -> Unit) {
+        getAllowancesUseCase.invoke(tariff_id = tariff_id)
+            .onEach { result: Resource<AllowancesResponse> ->
+                when (result) {
+                    is Resource.Success -> {
+                        try {
+                            val allowancesResponse: AllowancesResponse? = result.data
+                            _stateAllowances.value =
+                                AllowancesResponseState(response = allowancesResponse?.result?.map { it.toDesiredAllowance() })
+                            Log.e(
+                                "AllowancesResponse",
+                                "AllowancesResponseSuccess->\n ${_stateAllowances.value}"
+                            )
+                            onSuccess()
+                        } catch (e: Exception) {
+                            Log.d("Exception", "${e.message} Exception")
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        Log.e("AllowancesResponse", "AllowancesResponseError->\n ${result.message}")
+                        _stateAllowances.value = AllowancesResponseState(
+                            error = "${result.message}"
+                        )
+                    }
+
+                    is Resource.Loading -> {
+                        _stateAllowances.value = AllowancesResponseState(isLoading = true)
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
+    fun includeAllowance(toDesiredAllowance: ToDesiredAllowance, price: Int? = null) {
+        Log.i("include", ""+toDesiredAllowance)
+        selectedAllowances.value?.forEachIndexed { inx, it ->
+            if (it.allowance_id == toDesiredAllowance.id) {
+                _selectedAllowances.removeAt(inx)
+                if (toDesiredAllowance.isSelected.value) {
+                    _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest(price))
+                    Log.i("asdad", ""+_selectedAllowances)
+                }
+                selectedAllowances.value = _selectedAllowances
+                return
+            }
+        }
+        if (toDesiredAllowance.isSelected.value) {
+            _selectedAllowances.add(toDesiredAllowance.toAllowanceRequest(price))
+            selectedAllowances.value = _selectedAllowances
+            Log.i("asdad", ""+_selectedAllowances)
+
+        } else if(price!=null) {
+            _selectedAllowances.remove(toDesiredAllowance.toAllowanceRequest(price))
+            selectedAllowances.value = _selectedAllowances
+        }
+    }
+    fun clearSelectedAllowance() {
+        _selectedAllowances.clear()
+    }
+    fun clearCalculate() {
+        _stateCalculate.value = CalculateResponseState(response = null)
+    }
+
 }

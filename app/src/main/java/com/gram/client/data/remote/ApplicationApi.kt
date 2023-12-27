@@ -1,8 +1,8 @@
 package com.gram.client.data.remote
 
 import com.gram.client.domain.athorization.AuthResponse
-import com.gram.client.domain.athorization.IdentificationResponse
 import com.gram.client.domain.athorization.IdentificationRequest
+import com.gram.client.domain.athorization.IdentificationResponse
 import com.gram.client.domain.countries.CountriesKeyResponse
 import com.gram.client.domain.mainScreen.AddressByPointResponse
 import com.gram.client.domain.mainScreen.AllowancesResponse
@@ -20,7 +20,6 @@ import com.gram.client.domain.orderExecutionScreen.active.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.reason.GetRatingReasonsResponse
 import com.gram.client.domain.orderExecutionScreen.reason.Reasons
 import com.gram.client.domain.orderHistory.OrderHistoryPagingResult
-
 import com.gram.client.domain.profile.GetProfileInfoResponse
 import com.gram.client.domain.profile.ProfileResponse
 import com.gram.client.domain.promocod.PromoCode
@@ -129,7 +128,6 @@ interface ApplicationApi {
     suspend fun getPrice(
         @Query("tariff_ids") tariff_ids : String,
         @Field("allowances") allowances: String?,
-        @Field("value_allowances") value_allowances: String?,
         @Field("search_address_id") search_address_id: Int?,
         @Field("to_addresses") to_addresses: String?,
         @Field("from_address") from_address: String?,

@@ -113,7 +113,9 @@ class AddStopScreenOrderExcecution : Screen {
                 Button(
                     onClick = {
                         //bottomNavigator.show(SearchAddressOrderExecutionNavigator(Constants.ADD_TO_ADDRESS))
-                        vm.editOrder()
+                        vm.editOrder {
+
+                        }
                         bottomNavigator.hide()
                     },
                     modifier = Modifier

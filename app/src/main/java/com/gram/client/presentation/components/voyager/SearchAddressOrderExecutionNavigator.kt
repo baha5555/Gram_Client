@@ -191,7 +191,9 @@ class SearchAddressOrderExecutionNavigator(val inx: Int = -1,  val function: () 
                                             }
                                             Constants.FROM_ADDRESS->{
                                                 orderExecutionViewModel.updateFromAddress(it)
-                                                orderExecutionViewModel.editOrder()
+                                                orderExecutionViewModel.editOrder {
+
+                                                }
                                             }
                                         }
                                         orderExecutionViewModel.getActiveOrders {  }

@@ -1,7 +1,6 @@
 package com.gram.client.presentation.components.voyager
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,8 +11,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -83,7 +80,9 @@ class OrderExecutionMapPointScreen () : Screen {
                                 }
                             }
                         }
-                        orderExecutionViewModel.editOrder()
+                        orderExecutionViewModel.editOrder {
+
+                        }
                     }
                     navigator.pop()
                 }

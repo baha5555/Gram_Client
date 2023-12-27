@@ -460,7 +460,6 @@ class MainViewModel @Inject constructor(
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
             ) else null,
-            value_allowances = null,
             search_address_id = if (fromAddress.value.id != 0 && fromAddress.value.id != -1) fromAddress.value.id else null,
             to_addresses = if (toAddresses.size != 0) toAddresses else null,
             from_address = if (fromAddress.value.id == -1) "{\"lng\":\"${fromAddress.value.lng}\",\"lat\":\"${fromAddress.value.lat}\"}" else null

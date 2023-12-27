@@ -32,7 +32,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
-import com.gram.client.utils.Constants
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.domain.mainScreen.TariffsResult
@@ -43,6 +42,7 @@ import com.gram.client.presentation.screens.main.states.AllowancesResponseState
 import com.gram.client.presentation.screens.main.states.CalculateResponseState
 import com.gram.client.presentation.screens.main.states.TariffsResponseState
 import com.gram.client.utils.Comments
+import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
 import com.gram.client.utils.getAddressText
 import currentFraction
@@ -247,7 +247,13 @@ fun AddressesContent(
                         bottomNavigator.show(AddStopScreen {
                             navigator.push(MapPointScreen())
                         })
-                        Toast.makeText(context,"Можно изменить порядок остановки",Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(
+                                context,
+                                "Можно изменить порядок остановки",
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
                     }
                 }
                 .fillMaxWidth()
@@ -335,7 +341,7 @@ val countriesKey = mainViewModel.stateCountriesKey.value
                 Color(0xffFFFFFF),
                 shape = RoundedCornerShape(0.dp + (currentFraction * 20).dp)
             )
-            .padding(horizontal = 20.dp, vertical =20.dp)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
         Row(
             Modifier
@@ -444,7 +450,8 @@ fun OptionsContent(
         val bottomNavigator = LocalBottomSheetNavigator.current
         Row(
             modifier = Modifier
-                .fillMaxWidth().clickable {
+                .fillMaxWidth()
+                .clickable {
                     bottomNavigator.show(CommentSheet("Комментарий водителю", Comments.DRIVER))
                 }
                 .padding(15.dp)
@@ -501,8 +508,11 @@ fun OptionsContent(
         Divider()
         Row(
             modifier = Modifier
-                .fillMaxWidth().clickable {
-                    Toast.makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT).show()
+                .fillMaxWidth()
+                .clickable {
+                    Toast
+                        .makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT)
+                        .show()
 
                     /*stateOfDopInfoForDriver.value = "PLAN_TRIP"
                     dopPhone()*/
@@ -524,30 +534,32 @@ fun OptionsContent(
                 contentDescription = "icon"
             )
         }
-        Divider()
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    Toast.makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT).show()
-                    /*bottomNavigator.show(AddAllowancesSheet(){})*/
-                }
-                .padding(15.dp)
-               ,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(text = "Добавить надбавки", fontSize = 16.sp)
+    }
+    Spacer(modifier = Modifier.height(10.dp))
+    Row(
+        modifier = Modifier
+            .background(Color.White, shape = RoundedCornerShape(20.dp))
+            .padding(horizontal = 15.dp)
+            .fillMaxWidth()
+            .clickable {
+//                Toast
+//                    .makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT)
+//                    .show()
+                bottomNavigator.show(AddAllowancesSheet(){})
             }
-            Icon(
-                modifier = Modifier
-                    .size(18.dp),
-                imageVector = Icons.Default.Add,
-                contentDescription = "icon"
-            )
+            .padding(15.dp)
+        ,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text(text = "Добавить надбавки", fontSize = 16.sp)
         }
+        Icon(
+            modifier = Modifier
+                .size(18.dp),
+            imageVector = Icons.Default.Add,
+            contentDescription = "icon"
+        )
     }
 }
-
-
