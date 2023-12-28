@@ -161,7 +161,7 @@ class AddAllowancesSheet(val onClick:()->Unit) : Screen {
                                             contentAlignment = Alignment.Center,
                                         ) {
                                             Text(
-                                                text = "" +  allowance.price_property[it] + "c",
+                                                text = "" +  allowance.price_property[it] + if(allowance.type=="custom_type_multiply") "" else "c",
                                                 modifier = Modifier.padding(horizontal = 11.5.dp),
                                                 color = if (selectedPropertyInx.value != it) Color.Black else Color.White
                                             )
