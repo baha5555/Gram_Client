@@ -206,7 +206,9 @@ fun AddressesContent(
                     )
                 } else {
                     Text(
-                        if (meeting == "") getAddressText(address_from) else getAddressText(address_from) + ", Место встречи " + meeting,
+                        if (meeting == "") getAddressText(address_from) else getAddressText(
+                            address_from
+                        ) + ", Место встречи " + meeting,
                         maxLines = 2, overflow = TextOverflow.Ellipsis,
                     )
                 }
@@ -281,12 +283,14 @@ fun AddressesContent(
                             maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
                     }
+
                     1 -> {
                         Text(
                             getAddressText(toAddresses[0]),
                             maxLines = 1, overflow = TextOverflow.Ellipsis
                         )
                     }
+
                     else -> {
                         Text(
                             "" + toAddresses.size + " - остановки",
@@ -333,7 +337,7 @@ fun TariffsContent(
     mainViewModel: MainViewModel,
 ) {
     val stateCalculate = mainViewModel.stateCalculate.value
-val countriesKey = mainViewModel.stateCountriesKey.value
+    val countriesKey = mainViewModel.stateCountriesKey.value
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -445,7 +449,7 @@ fun OptionsContent(
                 Color(0xffFFFFFF),
                 shape = RoundedCornerShape(20.dp)
             )
-            .padding(horizontal = 20.dp, vertical = 0.dp)
+            .clip(RoundedCornerShape(20.dp))
     ) {
         val bottomNavigator = LocalBottomSheetNavigator.current
         Row(
@@ -455,7 +459,7 @@ fun OptionsContent(
                     bottomNavigator.show(CommentSheet("Комментарий водителю", Comments.DRIVER))
                 }
                 .padding(15.dp)
-                ,
+                .padding(horizontal = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -471,7 +475,7 @@ fun OptionsContent(
             }
             Image(
                 modifier = Modifier.size(18.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                imageVector = if (Values.CommentDriver.value == "") ImageVector.vectorResource(R.drawable.arrow_right) else Icons.Default.Done,
                 contentDescription = "icon"
             )
         }
@@ -480,30 +484,44 @@ fun OptionsContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    bottomNavigator.show(
-                        CommentSheet(
-                            "Кто поедет на такси?",
-                            Comments.TO_ANOTHER_HUMAN
+                    if (Values.CommentToAnotherHuman.value == "992") {
+                        bottomNavigator.show(
+                            CommentSheet(
+                                "Кто поедет на такси?",
+                                Comments.TO_ANOTHER_HUMAN
+                            )
                         )
-                    )
+                    } else {
+                        Values.CommentToAnotherHuman.value = "992"
+                    }
+
                 }
                 .padding(15.dp)
-               ,
+                .padding(horizontal = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(text = "Заказ другому человеку", fontSize = 16.sp)
                 if (Values.CommentToAnotherHuman.value != "992")
-                    Text(text = Values.CommentToAnotherHuman.value, fontSize = 12.sp, color = Color.Gray)
+                    Text(
+                        text = Values.CommentToAnotherHuman.value,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
             }
-            if (mainViewModel.dopPhone.value != "")
+            if (Values.CommentToAnotherHuman.value != "992")
                 Icon(
                     modifier = Modifier
                         .size(18.dp),
                     imageVector = Icons.Default.Done,
                     contentDescription = "icon"
                 )
+            else Image(
+                modifier = Modifier.size(18.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.arrow_right),
+                contentDescription = "icon"
+            )
         }
         Divider()
         Row(
@@ -518,7 +536,7 @@ fun OptionsContent(
                     dopPhone()*/
                 }
                 .padding(15.dp)
-                ,
+                .padding(horizontal = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -539,16 +557,16 @@ fun OptionsContent(
     Row(
         modifier = Modifier
             .background(Color.White, shape = RoundedCornerShape(20.dp))
-            .padding(horizontal = 15.dp)
             .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
             .clickable {
 //                Toast
 //                    .makeText(context, "В стадии разработки!", Toast.LENGTH_SHORT)
 //                    .show()
-                bottomNavigator.show(AddAllowancesSheet(){})
+                bottomNavigator.show(AddAllowancesSheet() {})
             }
             .padding(15.dp)
-        ,
+            .padding(horizontal = 5.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

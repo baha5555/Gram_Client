@@ -3,13 +3,28 @@ package com.gram.client.presentation.components.voyager
 import android.view.ViewTreeObserver
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -79,9 +94,7 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
             view.viewTreeObserver.addOnGlobalLayoutListener(listener)
             onDispose {
                 view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
-                if (keyboard != null) {
-                    keyboard.hide()
-                }
+                keyboard?.hide()
             }
         }
         Column(
@@ -131,9 +144,7 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
             }
             Button(
                 onClick = {
-                    if (keyboard != null) {
-                        keyboard.hide()
-                    }
+                    keyboard?.hide()
                     when (withComment) {
                         Comments.CANCEL -> Values.CommentCancelReasons.value = text.value.text
                         Comments.RATING -> Values.CommentRatingReasons.value = text.value.text
@@ -150,12 +161,12 @@ class CommentSheet(val label: String, val withComment: String) : Screen {
                     }
                     bottomNavigator.pop()
                 },
-                enabled = if(withComment!=Comments.TO_ANOTHER_HUMAN) text.value.text != "" else text.value.text.length==12,
+                enabled = if(withComment!=Comments.TO_ANOTHER_HUMAN) true else text.value.text.length==12,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(57.dp)
                     .padding(horizontal = 15.dp)
-                    .offset(0.dp, -15.dp),
+                    .offset(0.dp, (-15).dp),
                 shape = RoundedCornerShape(15.dp),
                 elevation = ButtonDefaults.elevation(0.dp)
             ) {
