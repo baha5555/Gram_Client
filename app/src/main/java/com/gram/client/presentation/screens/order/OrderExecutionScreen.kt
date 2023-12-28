@@ -72,6 +72,7 @@ class OrderExecutionScreen : Screen {
         }
 
         DisposableEffect(key1 = true ){
+            orderExecutionViewModel.clearToAddress()
             orderExecutionViewModel.getRatingReasons()
             orderExecutionViewModel.selectedOrder.value.let { order ->
             order.from_address.let {

@@ -147,13 +147,13 @@ class OrderExecutionViewModel @Inject constructor(
     }
 
     fun updateToAddress(address: Address? = null, clear: Boolean = false) {
-        if (clear) _toAddresses.clear()
+        if (clear) clearToAddress()
         if (address != null) {
             _toAddresses.add(address)
             _toAddresses[_toAddresses.lastIndex].idIncrement = _toAddresses.lastIndex
         }
         showRoad()
-        //Log.i("fromaDA", "" + _toAddresses.size)
+        Log.i("fromaDA", "" + _toAddresses.size)
     }
 
     fun clearAddresses() {
@@ -449,7 +449,7 @@ class OrderExecutionViewModel @Inject constructor(
             tariff_id = selectedOrder.value.tariff_id ?: 0,
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
-            ) else null,
+            ) else "[]",
             from_address = if (_fromAddress.value.id==-1) "{\"lng\":\"${fromAddress.value.lng}\",\"lat\":\"${fromAddress.value.lat}\"}" else null
         ).onEach { result: Resource<UpdateOrderResponse> ->
             when (result) {
@@ -487,15 +487,11 @@ class OrderExecutionViewModel @Inject constructor(
     fun getPrice() {
         val tariffIdsList = arrayListOf<String>()
         tariffIdsList.add("{\"tariff_id\":${selectedOrder.value.tariff_id}}")
-        toAddresses.clear()
-        selectedOrder.value.to_addresses?.forEach {
-            _toAddresses.add(it)
-        }
         getPriceUseCase.invoke(
             tariff_ids = tariffIdsList.toString(),
             allowances = if (selectedAllowances.value?.isNotEmpty() == true) Gson().toJson(
                 selectedAllowances.value
-            ) else null,
+            ) else "[]",
             search_address_id = selectedOrder.value.search_address_id,
             to_addresses = if (selectedOrder.value.to_addresses?.isNotEmpty() == true) toAddresses else null,
             from_address = if ((selectedOrder.value.from_address != null)) "{\"lng\":\"${selectedOrder.value.from_address!!.lng}\",\"lat\":\"${selectedOrder.value.from_address!!.lat}\"}" else null
