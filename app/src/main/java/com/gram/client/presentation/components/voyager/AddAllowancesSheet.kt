@@ -126,7 +126,7 @@ class AddAllowancesSheet(val onClick:()->Unit) : Screen {
                                     }
                                     CustomSwitch(switchON = allowance.isSelected) {
                                         if(allowance.price_property!=null){
-                                            mainViewModel.includeAllowance(allowance, price = selectedPropertyPrice.value)
+                                            mainViewModel.includeAllowance(allowance, price = if(selectedPropertyPrice.value==0) allowance.price_property[0] else selectedPropertyPrice.value)
                                         } else {
                                             mainViewModel.includeAllowance(allowance)
                                         }
@@ -155,7 +155,7 @@ class AddAllowancesSheet(val onClick:()->Unit) : Screen {
                                                     if(allowance.isSelected.value){
                                                         selectedPropertyInx.value = it
                                                         selectedPropertyPrice.value =  allowance.price_property[it]
-                                                        mainViewModel.includeAllowance(allowance, price = selectedPropertyPrice.value)
+                                                        mainViewModel.includeAllowance(allowance, price = if(selectedPropertyPrice.value==0) allowance.price_property[0] else selectedPropertyPrice.value)
                                                     }
                                                 },
                                             contentAlignment = Alignment.Center,
