@@ -358,8 +358,10 @@ fun TariffsContent(
         ) {
             Text(
                 text = selected_tariff?.value!!.name,
-                fontSize = 32.sp,
-                color = MaterialTheme.colors.onBackground, fontWeight = FontWeight.Bold
+                fontSize = 30.sp,
+                color = MaterialTheme.colors.onBackground, fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                maxLines = 1
             )
             stateCalculate.response?.let { it ->
                 it.result.forEach {
