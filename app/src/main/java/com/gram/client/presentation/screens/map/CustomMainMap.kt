@@ -49,17 +49,15 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.MainActivity
-import com.gram.client.presentation.components.voyager.MapPointScreen
-import com.gram.client.presentation.components.voyager.OrderExecutionMapPointScreen
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.order.OrderExecutionScreen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
-import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.ui.theme.BackgroundColor
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.PreferencesName
+import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -90,6 +88,7 @@ val myLocationPoint = mutableStateOf(GeoPoint(0.0, 0.0))
 
 @SuppressLint("StaticFieldLeak")
 lateinit var btnZoomIn: ImageButton
+
 @SuppressLint("StaticFieldLeak")
 lateinit var btnZoomOut: ImageButton
 private var zoomAnimation: ValueAnimator? = null
@@ -98,10 +97,10 @@ private var targetZoom = 0.0
 
 @Composable
 fun CustomMainMap(
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
 ) {
     val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
-    val WHICH_ADDRESS=Values.WhichAddress
+    val WHICH_ADDRESS = Values.WhichAddress
     val isGet = remember {
         mutableStateOf(false)
     }
@@ -125,7 +124,7 @@ fun CustomMainMap(
             orderExecutionViewModel.updateToAddress(Address())
             orderExecutionViewModel.updateFromAddress(Address())
             isGet.value = true
-        }else if (currentRoute == MainScreen().key){
+        } else if (currentRoute == MainScreen().key) {
             mainViewModel.showRoad()
         }
         val observer = LifecycleEventObserver { _, event ->
@@ -134,22 +133,28 @@ fun CustomMainMap(
                 Lifecycle.Event.ON_CREATE -> {
                     Log.d("mapLive", "ON_CREATE")
                 }
+
                 Lifecycle.Event.ON_START -> {
                     Log.d("mapLive", "ON_START")
                 }
+
                 Lifecycle.Event.ON_RESUME -> {
                     Log.d("mapLive", "ON_RESUME")
                     stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 }
+
                 Lifecycle.Event.ON_PAUSE -> {
                     Log.d("mapLive", "ON_PAUSE")
                 }
+
                 Lifecycle.Event.ON_STOP -> {
                     Log.d("mapLive", "ON_STOP")
                 }
+
                 Lifecycle.Event.ON_DESTROY -> {
                     Log.d("mapLive", "ON_DESTROY")
                 }
+
                 else -> return@LifecycleEventObserver
             }
         }
@@ -215,47 +220,19 @@ fun CustomMainMap(
                     val myLocationProvider = GpsMyLocationProvider(it)
                     mLocationOverlay = MyLocationNewOverlay(myLocationProvider, map)
                     myLocationShow(it, mLocationOverlay)
-                    when (currentRoute) {
-                        MainScreen().key -> {
-                            getAddressMarker.visibility = View.GONE
-                            map.overlays.clear()
-                            addOverlays()
-                        }
-                        SearchDriverScreen().key -> {
-                            getAddressMarker.visibility = View.GONE
-                            map.overlays.clear()
-                            addOverlays()
-                        }
-                        SearchAddressScreen().key -> {
-                            map.overlays.clear()
-                            addOverlays()
-                        }
-                        MapPointScreen().key -> {
-                            map.overlays.clear()
-                            addOverlays()
-                        }
-                        OrderExecutionScreen().key -> {
-                            getAddressMarker.visibility = View.GONE
-                            map.overlays.clear()
-                            addOverlays()
-                        }
 
-                    }
                     setChangeLocationListener()
                 }
             },
             update = {
+                if (Values.currentRoute.value == Routes.SEARCH_ADDRESS_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET) {
+                    getAddressMarker.visibility = View.VISIBLE
+                } else {
+                    getAddressMarker.visibility = View.GONE
+                }
                 when (currentRoute) {
-                    MainScreen().key -> {
-
-                    }
-                    OrderExecutionScreen().key -> {
-
-                        if (Values.DriverLocation.value != GeoPoint(0.0, 0.0)) {
-                            //markers.addDriverMarker(Values.DriverLocation.value, "")
-                        }
-                    }
                     SearchAddressScreen().key -> {
+                        if(Values.currentRoute.value == Routes.CREATE_ORDER_SHEET) return@AndroidView
                         map.overlays.clear()
                         userTouchSurface.setCallback(
                             TwoFingerDrag(
@@ -272,6 +249,7 @@ fun CustomMainMap(
                                                         "${map.mapCenter.latitude}-${map.mapCenter.longitude}"
                                                     )
                                                 }
+
                                                 MotionEvent.ACTION_DOWN -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
@@ -279,12 +257,13 @@ fun CustomMainMap(
                                                     )
 
                                                 }
+
                                                 MotionEvent.ACTION_UP -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
                                                         "Action was UP"
                                                     )
-                                                    if (WHICH_ADDRESS != null) {
+                                                    if ((Values.currentRoute.value == Routes.SEARCH_ADDRESS_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET) && WHICH_ADDRESS != null) {
                                                         mainViewModel.getAddressFromMap(
                                                             map.mapCenter.longitude,
                                                             map.mapCenter.latitude
@@ -293,6 +272,7 @@ fun CustomMainMap(
                                                     Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
                                                 }
+
                                                 MotionEvent.ACTION_CANCEL -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
@@ -300,6 +280,7 @@ fun CustomMainMap(
                                                     )
 
                                                 }
+
                                                 MotionEvent.ACTION_OUTSIDE -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
@@ -307,6 +288,7 @@ fun CustomMainMap(
                                                     )
 
                                                 }
+
                                                 else -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
@@ -325,31 +307,36 @@ fun CustomMainMap(
                                                 MotionEvent.ACTION_MOVE -> {
                                                     //                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
                                                 }
+
                                                 MotionEvent.ACTION_POINTER_2_DOWN -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
                                                         "Action was ACTION_POINTER_2_DOWN"
                                                     )
                                                 }
+
                                                 MotionEvent.TOOL_TYPE_FINGER -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
                                                         "Action was TOOL_TYPE_FINGER"
                                                     )
                                                 }
+
                                                 MotionEvent.ACTION_POINTER_2_UP -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
                                                         "Action was UP"
                                                     )
-                                                    if (WHICH_ADDRESS != null) {
+                                                    if ((Values.currentRoute.value == Routes.SEARCH_ADDRESS_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET) && WHICH_ADDRESS != null) {
                                                         mainViewModel.getAddressFromMap(
                                                             map.mapCenter.longitude,
-                                                            map.mapCenter.latitude)
+                                                            map.mapCenter.latitude
+                                                        )
                                                     }
                                                     Log.e("singleTapConfirmedHelper", "")
                                                     map.postInvalidate()
                                                 }
+
                                                 else -> {
                                                     Log.e(
                                                         "singleTapConfirmedHelper",
@@ -368,194 +355,9 @@ fun CustomMainMap(
                                     if (WHICH_ADDRESS != null) {
                                         mainViewModel.getAddressFromMap(
                                             map.mapCenter.longitude,
-                                            map.mapCenter.latitude)
+                                            map.mapCenter.latitude
+                                        )
                                     }
-                                    return true
-                                }
-
-                                override fun longPressHelper(p: GeoPoint): Boolean {
-                                    return false
-                                }
-                            })
-                        )
-                        addOverlays()
-                    }
-                    MapPointScreen().key -> {
-                        map.overlays.clear()
-                        userTouchSurface.setCallback(
-                            TwoFingerDrag(
-                                context,
-                                object : TwoFingerDrag.Listener {
-                                    @SuppressLint("LongLogTag")
-                                    override fun onOneFinger(event: MotionEvent?) {
-                                        map.dispatchTouchEvent(event)
-                                        if (event != null) {
-                                            when (event.action) {
-                                                MotionEvent.ACTION_UP -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "Action was UP"
-                                                    )
-                                                    mainViewModel.getAddressFromMap(
-                                                        map.mapCenter.longitude,
-                                                        map.mapCenter.latitude
-                                                    )
-                                                    Log.e("singleTapConfirmedHelper", "")
-                                                    map.postInvalidate()
-                                                }
-                                                else -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "ACTION_CANCEL"
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    @SuppressLint("LongLogTag")
-                                    override fun onTwoFingers(event: MotionEvent?) {
-                                        map.dispatchTouchEvent(event)
-                                        if (event != null) {
-                                            when (event.action) {
-                                                MotionEvent.ACTION_MOVE -> {
-                                                    //                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
-                                                }
-                                                MotionEvent.ACTION_POINTER_2_DOWN -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "Action was ACTION_POINTER_2_DOWN"
-                                                    )
-                                                }
-                                                MotionEvent.TOOL_TYPE_FINGER -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "Action was TOOL_TYPE_FINGER"
-                                                    )
-                                                }
-                                                MotionEvent.ACTION_POINTER_2_UP -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "Action was UP"
-                                                    )
-                                                    if (WHICH_ADDRESS != null) {
-                                                        mainViewModel.getAddressFromMap(
-                                                            map.mapCenter.longitude,
-                                                            map.mapCenter.latitude)
-                                                    }
-                                                    Log.e("singleTapConfirmedHelper", "")
-                                                    map.postInvalidate()
-                                                }
-                                                else -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "ACTION_CANCEL"
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                })
-                        )
-                        map.overlays.add(
-                            MapEventsOverlay(object : MapEventsReceiver {
-                                override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-                                    map.postInvalidate()
-                                    if (WHICH_ADDRESS != null) {
-                                        mainViewModel.getAddressFromMap(
-                                            map.mapCenter.longitude,
-                                            map.mapCenter.latitude)
-                                    }
-                                    return true
-                                }
-
-                                override fun longPressHelper(p: GeoPoint): Boolean {
-                                    return false
-                                }
-                            })
-                        )
-                        addOverlays()
-                    }
-                    OrderExecutionMapPointScreen().key -> {
-                        map.overlays.clear()
-                        userTouchSurface.setCallback(
-                            TwoFingerDrag(
-                                context,
-                                object : TwoFingerDrag.Listener {
-                                    @SuppressLint("LongLogTag")
-                                    override fun onOneFinger(event: MotionEvent?) {
-                                        map.dispatchTouchEvent(event)
-                                        if (event != null) {
-                                            when (event.action) {
-                                                MotionEvent.ACTION_UP -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "Action was UP"
-                                                    )
-                                                    orderExecutionViewModel.getAddressFromMap(
-                                                        map.mapCenter.longitude,
-                                                        map.mapCenter.latitude
-                                                    )
-                                                    Log.e("singleTapConfirmedHelper", "")
-                                                    map.postInvalidate()
-                                                }
-                                                else -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "ACTION_CANCEL"
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    @SuppressLint("LongLogTag")
-                                    override fun onTwoFingers(event: MotionEvent?) {
-                                        map.dispatchTouchEvent(event)
-                                        if (event != null) {
-                                            when (event.action) {
-                                                MotionEvent.ACTION_MOVE -> {
-                                                    //                                    Log.e("singleTapConfirmedHelper", "${map.mapCenter.latitude}-${map.mapCenter.longitude}")
-                                                }
-                                                MotionEvent.ACTION_POINTER_2_DOWN -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "Action was ACTION_POINTER_2_DOWN"
-                                                    )
-                                                }
-                                                MotionEvent.TOOL_TYPE_FINGER -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "Action was TOOL_TYPE_FINGER"
-                                                    )
-                                                }
-                                                MotionEvent.ACTION_POINTER_2_UP -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "Action was UP"
-                                                    )
-                                                    orderExecutionViewModel.getAddressFromMap(
-                                                        map.mapCenter.longitude,
-                                                        map.mapCenter.latitude)
-                                                    Log.e("singleTapConfirmedHelper", "")
-                                                    map.postInvalidate()
-                                                }
-                                                else -> {
-                                                    Log.e(
-                                                        "singleTapConfirmedHelper",
-                                                        "ACTION_CANCEL"
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                })
-                        )
-                        map.overlays.add(
-                            MapEventsOverlay(object : MapEventsReceiver {
-                                override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-                                    map.postInvalidate()
-                                    mainViewModel.getAddressFromMap(map.mapCenter.longitude, map.mapCenter.latitude)
                                     return true
                                 }
 
@@ -656,7 +458,6 @@ fun addOverlays() {
 }
 
 
-
 private fun myLocationShow(context: Context?, mLocationOverlay: MyLocationNewOverlay) {
     val person: Bitmap = context?.let { getBitmap(it, R.drawable.ic_person) }!!
     val arrow: Bitmap = getBitmap(context, R.drawable.ic_navigation)!!
@@ -743,7 +544,6 @@ private fun printoutDebugInfo(
         }
     }
 }
-
 
 
 inline fun <reified T : ViewGroup.LayoutParams> View.layoutParams(block: T.() -> Unit) {

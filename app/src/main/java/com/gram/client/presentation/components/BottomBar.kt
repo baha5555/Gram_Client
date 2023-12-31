@@ -24,16 +24,13 @@ import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.screens.authorization.AuthScreen
 import com.gram.client.presentation.screens.main.MainViewModel
-import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.utils.Constants.IDENTIFY_TO_SCREEN
-import com.gram.client.utils.Constants.stateOfDopInfoForDriver
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomBar(
     mainBottomSheetState: BottomSheetScaffoldState,
-    modalBottomSheetValue: ModalBottomSheetState,
     createOrder: () -> Unit
 ) {
     val navigator = LocalNavigator.currentOrThrow
@@ -56,14 +53,14 @@ fun BottomBar(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             IconButton(onClick = {
-                stateOfDopInfoForDriver.value = "PAYMENT_METHOD"
-                coroutineScope.launch {
-                    if (modalBottomSheetValue.isVisible) {
-                        modalBottomSheetValue.animateTo(ModalBottomSheetValue.Hidden)
-                    } else {
-                        modalBottomSheetValue.animateTo(ModalBottomSheetValue.Expanded)
-                    }
-                }
+//                stateOfDopInfoForDriver.value = "PAYMENT_METHOD"
+//                coroutineScope.launch {
+//                    if (modalBottomSheetValue.isVisible) {
+//                        modalBottomSheetValue.animateTo(ModalBottomSheetValue.Hidden)
+//                    } else {
+//                        modalBottomSheetValue.animateTo(ModalBottomSheetValue.Expanded)
+//                    }
+//                }
             }) {
                 Image(
                     modifier = Modifier.size(30.dp),

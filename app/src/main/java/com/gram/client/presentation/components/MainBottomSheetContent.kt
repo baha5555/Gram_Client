@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
@@ -54,15 +53,25 @@ fun MainBottomSheetContent(
     heightFraction: Float = 0.92f,
     scaffoldState: BottomSheetScaffoldState,
     mainViewModel: MainViewModel,
-    stateCalculate: CalculateResponseState,
-    stateTariffs: TariffsResponseState,
-    stateAllowances: AllowancesResponseState,
     dopPhone: () -> Unit
 ) {
-    val fromAddress by mainViewModel.fromAddress
+    val stateCalculate: CalculateResponseState = mainViewModel.stateCalculate.value
+    val stateTariffs: TariffsResponseState = mainViewModel.stateTariffs.value
+    val stateAllowances: AllowancesResponseState = mainViewModel.stateAllowances.value
     val toAddress = mainViewModel.toAddresses
     val selected_tariff = mainViewModel.selectedTariff?.observeAsState()
     val searchText = remember { mutableStateOf("") }
+
+    LaunchedEffect(key1 = true ){
+        mainViewModel.showRoad()
+        mainViewModel.getTariffs()
+        mainViewModel.getAllowancesByTariffId(1)
+        mainViewModel.getPrice()
+        if(mainViewModel.stateCountriesKey.value.response==null){
+            mainViewModel.getCountriesKey("tj")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,7 +84,7 @@ fun MainBottomSheetContent(
             addressContent = {
                 AddressesContent(
                     currentFraction = scaffoldState.currentFraction,
-                    address_from = fromAddress
+                    mainViewModel = mainViewModel
                 )
             },
             tariffsContent = {
@@ -146,9 +155,9 @@ fun SheetContent(
 @Composable
 fun AddressesContent(
     currentFraction: Float,
-    address_from: Address
+    mainViewModel: MainViewModel
 ) {
-    val mainViewModel: MainViewModel = hiltViewModel()
+    val address_from = mainViewModel.fromAddress.value
     val toAddresses = mainViewModel.toAddresses
     val navigator: Navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current

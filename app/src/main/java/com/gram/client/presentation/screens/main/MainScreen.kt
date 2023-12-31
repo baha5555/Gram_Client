@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +42,6 @@ import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.components.*
 import com.gram.client.presentation.screens.main.components.CustomDopInfoForDriver
-import com.gram.client.presentation.screens.main.components.FloatingButton
 import com.gram.client.presentation.screens.main.components.FloatingButton2
 import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.presentation.screens.map.currentRoute
@@ -357,7 +355,7 @@ class MainScreen : Screen{
                     contentAlignment = Alignment.CenterStart
                 ) {
                     Scaffold(scaffoldState = scaffoldState, bottomBar = {
-                        BottomBar(mainBottomSheetState, modalSheetState,
+                        BottomBar(mainBottomSheetState,
                             createOrder = {
                                 mainViewModel.createOrder(){
                                     navigator.push(SearchDriverScreen())
@@ -431,10 +429,7 @@ class MainScreen : Screen{
                             sheetContent = {
                                 MainBottomSheetContent(
                                     scaffoldState = mainBottomSheetState,
-                                    mainViewModel = mainViewModel,
-                                    stateCalculate = stateCalculate,
-                                    stateTariffs = stateTariffs,
-                                    stateAllowances = stateAllowances
+                                    mainViewModel = mainViewModel
                                 ) {
                                     if (stateOfDopInfoForDriver.value != "PLAN_TRIP" && stateOfDopInfoForDriver.value != "") {
                                         val inputMethodManager =

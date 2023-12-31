@@ -43,7 +43,7 @@ class MapPointScreen() : Screen {
         BottomSheetScaffold(
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
-                SheetContent(Values.WhichAddress.value){
+                MapPointSheetContent(mainViewModel){
                     statePoint.response.let {
                         when(Values.WhichAddress.value) {
                             Constants.FROM_ADDRESS-> {
@@ -64,14 +64,6 @@ class MapPointScreen() : Screen {
                             }
                             Constants.TO_ADDRESS-> {
                                 if (it == null) {
-//                                    mainViewModel.updateToAddress(
-//                                        Address(
-//                                            "Метка на карте",
-//                                            -1,
-//                                            map.mapCenter.latitude.toString(),
-//                                            map.mapCenter.longitude.toString()
-//                                        )
-//                                    )
                                     mainViewModel.clearToAddress()
                                 } else {
                                     mainViewModel.updateToAddress(
@@ -117,8 +109,7 @@ class MapPointScreen() : Screen {
     }
 }
 @Composable
-fun SheetContent(whichScreen: String?,stateViews:Boolean = false,onClick: () -> Unit) {
-    val mainViewModel: MainViewModel = hiltViewModel()
+fun MapPointSheetContent(mainViewModel: MainViewModel, stateViews:Boolean = false, onClick: () -> Unit) {
     val orderExecutionViewModel:OrderExecutionViewModel = hiltViewModel()
     val statePoint = if(!stateViews) mainViewModel.stateAddressPoint.value else orderExecutionViewModel.stateAddressPoint.value
     Column(
@@ -129,7 +120,7 @@ fun SheetContent(whichScreen: String?,stateViews:Boolean = false,onClick: () -> 
     ) {
         Column() {
             Text(
-                text = if(whichScreen == Constants.FROM_ADDRESS)"Точка назначения" else "Точка отправления",
+                text = if(Values.WhichAddress.value == Constants.FROM_ADDRESS)"Точка назначения" else "Точка отправления",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -139,7 +130,7 @@ fun SheetContent(whichScreen: String?,stateViews:Boolean = false,onClick: () -> 
             Image(
                 modifier = Modifier
                     .size(20.dp),
-                imageVector = ImageVector.vectorResource(if(whichScreen == Constants.FROM_ADDRESS) R.drawable.from_marker else R.drawable.ic_to_address_marker),
+                imageVector = ImageVector.vectorResource(if(Values.WhichAddress.value == Constants.FROM_ADDRESS) R.drawable.from_marker else R.drawable.ic_to_address_marker),
                 contentDescription = "Logo"
             )
             if(statePoint.isLoading){

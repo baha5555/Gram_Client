@@ -1,6 +1,7 @@
 package com.gram.client.presentation.screens.map
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -9,9 +10,8 @@ import android.graphics.Paint
 import androidx.core.content.res.ResourcesCompat
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
-import com.gram.client.presentation.components.voyager.MapPointScreen
-import com.gram.client.presentation.components.voyager.OrderExecutionMapPointScreen
-import com.gram.client.presentation.screens.main.SearchAddressScreen
+import com.gram.client.utils.Routes
+import com.gram.client.utils.Values
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,6 +24,7 @@ class MapController(val context: Context) {
     private var zoomAnimation: ValueAnimator? = null
     private var targetZoom = 0.0
 
+    @SuppressLint("SuspiciousIndentation")
     @OptIn(DelicateCoroutinesApi::class)
     fun showRoadAB(
         fromAddress: Address,
@@ -33,8 +34,8 @@ class MapController(val context: Context) {
 
         GlobalScope.launch {
             try {
-                if(currentRoute==SearchAddressScreen().key || currentRoute==MapPointScreen().key || currentRoute==OrderExecutionMapPointScreen().key) return@launch
-
+                //if( currentRoute== MapPointScreen().key || currentRoute== OrderExecutionMapPointScreen().key) return@launch
+                if(Values.currentRoute.value == Routes.SEARCH_ADDRESS_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET) return@launch
                 val waypoints = ArrayList<GeoPoint>()
                 val fromAddressPoint = GeoPoint(0, 0)
                 fromAddressPoint.latitude = fromAddress.lat.toDouble()

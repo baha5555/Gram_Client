@@ -44,7 +44,7 @@ class OrderExecutionMapPointScreen () : Screen {
         BottomSheetScaffold(
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
-                SheetContent(Values.WhichAddress.value, stateViews = true) {
+                MapPointSheetContent(mainViewModel, stateViews = true) {
                     statePoint.value.response.let {
                         when (Values.WhichAddress.value) {
                             Constants.FROM_ADDRESS -> {

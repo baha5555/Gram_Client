@@ -1,7 +1,13 @@
 package com.gram.client.presentation.screens.main.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -11,22 +17,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import cafe.adriel.voyager.navigator.LocalNavigator
+import androidx.navigation.NavHostController
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import com.gram.client.presentation.components.voyager.MapPointScreen
+import com.gram.client.R
 import com.gram.client.presentation.components.voyager.SearchAddresses
 import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressViewModel
-import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
-import com.valentinilk.shimmer.shimmer
-import com.gram.client.R
 import com.gram.client.utils.getAddressText
+import com.valentinilk.shimmer.shimmer
 
 @Composable
-fun FastAddresses(mainViewModel: MainViewModel) {
+fun FastAddresses(mainViewModel: MainViewModel, navController: NavHostController) {
     val myAddressViewModel: MyAddressViewModel = hiltViewModel()
     val stateMyAddresses = myAddressViewModel.stateGetAllMyAddresses.value
     LaunchedEffect(key1 = true) {
@@ -34,7 +38,6 @@ fun FastAddresses(mainViewModel: MainViewModel) {
             mainViewModel.getFastAddresses()
         }
     }
-    val navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
     val stateFastAddresses = mainViewModel.stateFastAddress.value
     if (stateFastAddresses.isLoading) {
@@ -60,14 +63,14 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it[0].address)
                         if (mainViewModel.fromAddress.value.name != "") {
-                            navigator.push(MainScreen())
+                            navController.navigate(Routes.CREATE_ORDER_SHEET)
                         } else {
                             Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
                             bottomNavigator.show(
                                 SearchAddresses({
-                                    navigator.push(MainScreen())
+                                    navController.navigate(Routes.CREATE_ORDER_SHEET)
                                 }) {
-                                    navigator.push(MapPointScreen())
+                                    navController.navigate(Routes.MAP_POINT_SHEET)
                                 }
                             )
                         }
@@ -83,14 +86,14 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it[0].address)
                         if (mainViewModel.fromAddress.value.name != "") {
-                            navigator.push(MainScreen())
+                            navController.navigate(Routes.CREATE_ORDER_SHEET)
                         } else {
                             Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
                             bottomNavigator.show(
                                 SearchAddresses({
-                                    navigator.push(MainScreen())
+                                    navController.navigate(Routes.CREATE_ORDER_SHEET)
                                 }) {
-                                    navigator.push(MapPointScreen())
+                                    navController.navigate(Routes.MAP_POINT_SHEET)
                                 }
                             )
                         }
@@ -108,14 +111,14 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                             mainViewModel.clearToAddress()
                             mainViewModel.addToAddress(it.address)
                             if (mainViewModel.fromAddress.value.name != "") {
-                                navigator.push(MainScreen())
+                                navController.navigate(Routes.CREATE_ORDER_SHEET)
                             } else {
                                 Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
                                 bottomNavigator.show(
                                     SearchAddresses({
-                                        navigator.push(MainScreen())
+                                        navController.navigate(Routes.CREATE_ORDER_SHEET)
                                     }) {
-                                        navigator.push(MapPointScreen())
+                                        navController.navigate(Routes.MAP_POINT_SHEET)
                                     }
                                 )
                             }
@@ -131,14 +134,14 @@ fun FastAddresses(mainViewModel: MainViewModel) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it)
                         if (mainViewModel.fromAddress.value.name != "") {
-                            navigator.push(MainScreen())
+                            navController.navigate(Routes.CREATE_ORDER_SHEET)
                         } else {
                             Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
                             bottomNavigator.show(
                                 SearchAddresses({
-                                    navigator.push(MainScreen())
+                                    navController.navigate(Routes.CREATE_ORDER_SHEET)
                                 }) {
-                                    navigator.push(MapPointScreen())
+                                    navController.navigate(Routes.MAP_POINT_SHEET)
                                 }
                             )
                         }
