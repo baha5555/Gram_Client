@@ -1,4 +1,4 @@
-package com.gram.client.presentation.components
+package com.gram.client.presentation.sheets
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -26,14 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
+import androidx.navigation.NavHostController
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.domain.mainScreen.TariffsResult
+import com.gram.client.presentation.components.CustomPulseLoader
+import com.gram.client.presentation.components.CustomRectangleShimmer
+import com.gram.client.presentation.components.TariffItem
 import com.gram.client.presentation.components.voyager.*
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.components.*
@@ -42,6 +43,7 @@ import com.gram.client.presentation.screens.main.states.CalculateResponseState
 import com.gram.client.presentation.screens.main.states.TariffsResponseState
 import com.gram.client.utils.Comments
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
 import com.gram.client.utils.getAddressText
 import currentFraction
@@ -53,6 +55,7 @@ fun MainBottomSheetContent(
     heightFraction: Float = 0.92f,
     scaffoldState: BottomSheetScaffoldState,
     mainViewModel: MainViewModel,
+    navController: NavHostController,
     dopPhone: () -> Unit
 ) {
     val stateCalculate: CalculateResponseState = mainViewModel.stateCalculate.value
@@ -84,7 +87,8 @@ fun MainBottomSheetContent(
             addressContent = {
                 AddressesContent(
                     currentFraction = scaffoldState.currentFraction,
-                    mainViewModel = mainViewModel
+                    mainViewModel = mainViewModel,
+                    navController = navController
                 )
             },
             tariffsContent = {
@@ -155,11 +159,11 @@ fun SheetContent(
 @Composable
 fun AddressesContent(
     currentFraction: Float,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    navController: NavHostController
 ) {
     val address_from = mainViewModel.fromAddress.value
     val toAddresses = mainViewModel.toAddresses
-    val navigator: Navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
     val meeting = mainViewModel.stateMeetingInfo.value
     val context = LocalContext.current
@@ -190,7 +194,7 @@ fun AddressesContent(
             modifier = Modifier
                 .clickable {
                     bottomNavigator.show(SearchAddresses {
-                        navigator.push(MapPointScreen())
+                        navController.navigate(Routes.MAP_POINT_SHEET)
                     })
                     Values.WhichAddress.value = Constants.FROM_ADDRESS
                 }
@@ -251,12 +255,12 @@ fun AddressesContent(
                     if (toAddresses.size <= 1) {
                         Values.WhichAddress.value = Constants.TO_ADDRESS
                         bottomNavigator.show(SearchAddresses {
-                            navigator.push(MapPointScreen())
+                            navController.navigate(Routes.MAP_POINT_SHEET)
                         })
                     } else {
                         Values.WhichAddress.value = Constants.ADD_TO_ADDRESS
                         bottomNavigator.show(AddStopScreen {
-                            navigator.push(MapPointScreen())
+                            navController.navigate(Routes.MAP_POINT_SHEET)
                         })
                         Toast
                             .makeText(
@@ -315,8 +319,8 @@ fun AddressesContent(
                         bottomNavigator.show(SearchAddressNavigator(
                             Constants.ADD_TO_ADDRESS,
                             function = {
-                                navigator.push(MapPointScreen())
                                 Values.WhichAddress.value = Constants.ADD_TO_ADDRESS
+                                navController.navigate(Routes.MAP_POINT_SHEET)
                             }
                         )
                         )

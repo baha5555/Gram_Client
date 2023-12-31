@@ -26,7 +26,6 @@ import com.gram.client.domain.orderExecutionScreen.*
 import com.gram.client.domain.orderExecutionScreen.active.ActiveOrdersResponse
 import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.domain.orderExecutionScreen.reason.*
-import com.gram.client.domain.orderHistory.addOverlays
 import com.gram.client.presentation.screens.main.states.AddressByPointResponseState
 import com.gram.client.presentation.screens.main.states.AllowancesResponseState
 import com.gram.client.presentation.screens.main.states.CalculateResponseState
@@ -363,10 +362,7 @@ class OrderExecutionViewModel @Inject constructor(
 
         selectedOrder.value.from_address?.let {
             if(it.lat != "" && (selectedOrder.value.to_addresses?.size ?: 0) > 0){
-                if(Values.currentRoute.value == Routes.SEARCH_ADDRESS_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET || Values.currentRoute.value == Routes.SEARCH_DRIVER_SHEET) {
-                    addOverlays()
-                    return
-                }
+                if(Values.currentRoute.value == Routes.SEARCH_ADDRESS_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET || Values.currentRoute.value == Routes.SEARCH_DRIVER_SHEET) { return }
                 map.controller.animateTo(GeoPoint(it.lat.toDouble(), it.lng.toDouble()), 16.0, 1000)
             }
             mapController.showRoadAB(

@@ -1,6 +1,5 @@
 package com.gram.client.presentation.components.voyager
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -122,17 +121,8 @@ class SearchAddressNavigator(
                         .align(Alignment.CenterEnd)
                         .padding(end = 20.dp)
                         .clickable {
-                            Log.e("WHICHSCREEN" ,"$whichScreen")
-                            when(whichScreen) {
-                                Constants.FROM_ADDRESS -> {
-                                    bottomNavigator.hide()
-                                    function.invoke()
-                                }
-                                else -> {
-                                    bottomNavigator.hide()
-                                    //navigator.push(MapPointScreen(whichScreen))
-                                }
-                            }
+                            function()
+                            bottomNavigator.hide()
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -192,12 +182,15 @@ class SearchAddressNavigator(
                                             Constants.TO_ADDRESS -> {
                                                 mainViewModel.updateToAddressInx(it, inx)
                                             }
+
                                             Constants.ADD_TO_ADDRESS -> {
                                                 mainViewModel.addToAddress(it)
                                             }
+
                                             Constants.FROM_ADDRESS -> {
                                                 mainViewModel.updateFromAddress(it)
                                             }
+
                                             Constants.MY_ADDRESS -> {
                                                 stateAddress?.value = it
                                             }

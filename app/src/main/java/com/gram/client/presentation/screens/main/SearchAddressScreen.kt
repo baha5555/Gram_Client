@@ -19,14 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,7 +32,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -47,17 +44,19 @@ import com.gram.client.R
 import com.gram.client.app.preference.CustomPreference
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.components.*
-import com.gram.client.presentation.components.voyager.MapPointSheetContent
 import com.gram.client.presentation.components.voyager.SearchAddresses
 import com.gram.client.presentation.screens.drawer.myaddresses_screen.MyAddressViewModel
 import com.gram.client.presentation.screens.main.components.*
 import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.presentation.screens.map.mLocationOverlay
 import com.gram.client.presentation.screens.map.map
-import com.gram.client.presentation.screens.order.OrderExecutionSheetContent
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
-import com.gram.client.presentation.screens.order.SearchDriverSheetContent
 import com.gram.client.presentation.screens.profile.ProfileViewModel
+import com.gram.client.presentation.sheets.DetailActiveOrderSheetContent
+import com.gram.client.presentation.sheets.MainBottomSheetContent
+import com.gram.client.presentation.sheets.MapPointSheetContent
+import com.gram.client.presentation.sheets.SearchAddressSheetContent
+import com.gram.client.presentation.sheets.SearchDriverSheetContent
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Routes
@@ -69,9 +68,15 @@ class SearchAddressScreen : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
         val mainViewModel: MainViewModel = hiltViewModel()
+        val myAddressViewModel: MyAddressViewModel = hiltViewModel()
+        val profileViewModel: ProfileViewModel = hiltViewModel()
+        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
+
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+
         val statePoint = mainViewModel.stateAddressPoint.value
+        val statePointActive = mainViewModel.stateAddressPoint.value
         val isSearchState = remember { mutableStateOf(false) }
         val sheetPeekHeight = remember { mutableStateOf(310) }
         when (Values.currentRoute.value) {
@@ -98,10 +103,7 @@ class SearchAddressScreen : Screen {
 
         CustomBackHandle(drawerState.isClosed)
 
-        val myAddressViewModel: MyAddressViewModel = hiltViewModel()
-        val profileViewModel: ProfileViewModel = hiltViewModel()
-        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
-        val prefs = CustomPreference(LocalContext.current)
+                val prefs = CustomPreference(LocalContext.current)
 
         LaunchedEffect(true) {
             Values.WhichAddress.value = Constants.FROM_ADDRESS
@@ -296,7 +298,8 @@ class SearchAddressScreen : Screen {
                                         composable(Routes.CREATE_ORDER_SHEET) {
                                             MainBottomSheetContent(
                                                 scaffoldState = bottomSheetState,
-                                                mainViewModel = mainViewModel
+                                                mainViewModel = mainViewModel,
+                                                navController = navController
                                             ) {
                                                 if (Constants.stateOfDopInfoForDriver.value != "PLAN_TRIP" && Constants.stateOfDopInfoForDriver.value != "") {
                                                     val inputMethodManager =
@@ -341,8 +344,62 @@ class SearchAddressScreen : Screen {
                                                                 )
                                                             }
                                                         }
+                                                        Constants.ADD_TO_ADDRESS ->{
+                                                            if (it != null) {
+                                                                mainViewModel.addToAddress(it)
+                                                            } else {
+                                                                mainViewModel.clearToAddress()
+                                                            }
+                                                        }
                                                     }
                                                     navController.popBackStack()
+                                                }
+                                                statePointActive.response.let { item->
+                                                    when (Values.WhichAddress.value) {
+//                                                        Constants.FROM_ADDRESS -> {
+//                                                            if (item == null) {
+//                                                                orderExecutionViewModel.updateFromAddress(
+//                                                                    Address(
+//                                                                        "Метка на карте",
+//                                                                        -1,
+//                                                                        map.mapCenter.latitude.toString(),
+//                                                                        map.mapCenter.longitude.toString()
+//                                                                    )
+//                                                                )
+//                                                            } else {
+//                                                                orderExecutionViewModel.updateFromAddress(
+//                                                                    item
+//                                                                )
+//                                                            }
+//                                                        }
+                                                        Constants.TO_ADDRESS_ACTIVE -> {
+                                                            if (item == null) {
+                                                                orderExecutionViewModel.updateToAddress(
+                                                                    Address(
+                                                                        "Метка на карте",
+                                                                        -1,
+                                                                        map.mapCenter.latitude.toString(),
+                                                                        map.mapCenter.longitude.toString()
+                                                                    )
+                                                                )
+                                                            } else {
+                                                                orderExecutionViewModel.updateToAddress(
+                                                                    item, true
+                                                                )
+                                                                orderExecutionViewModel.editOrder {  }
+                                                            }
+                                                        }
+                                                        Constants.ADD_TO_ADDRESS_ACTIVE -> {
+                                                            if (item == null) {
+                                                                orderExecutionViewModel.clearToAddress()
+                                                            } else {
+                                                                orderExecutionViewModel.addToAddress(
+                                                                    item
+                                                                )
+                                                                orderExecutionViewModel.editOrder {  }
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -350,7 +407,7 @@ class SearchAddressScreen : Screen {
                                             SearchDriverSheetContent(orderExecutionViewModel, navController)
                                         }
                                         composable(Routes.DETAIL_ACTIVE_ORDER_SHEET){
-                                            OrderExecutionSheetContent(orderExecutionViewModel, navController)
+                                            DetailActiveOrderSheetContent(orderExecutionViewModel, navController)
                                         }
                                     }
                                 },
@@ -382,86 +439,5 @@ class SearchAddressScreen : Screen {
         }
     }
 
-    @Composable
-    private fun SearchAddressSheetContent(
-        focusRequester: FocusRequester,
-        isSearchState: MutableState<Boolean>,
-        navController: NavHostController,
-        mainViewModel: MainViewModel
-    ) {
-        val toAddress = mainViewModel.toAddresses
-        val searchText = remember { mutableStateOf("") }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester)
-                .fillMaxHeight(fraction = 0.80f)
-                .background(Color(0xffEEEEEE)),
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(197.dp)
-                    .padding(2.dp)
-                    .background(
-                        color = Color(0xFFFFFFFF),
-                        shape = RoundedCornerShape(size = 30.dp)
-                    ), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                        .padding(9.dp)
-                        .background(
-                            color = Color(0xFFFFFFFF),
-                            shape = RoundedCornerShape(size = 30.dp)
-                        )
-                ) {
-                    if (!isSearchState.value) {
-                        if (searchText.value != "") searchText.value = ""
-                        ToAddressField(
-                            toAddress = toAddress,
-                            navController = navController,
-                            mainViewModel = mainViewModel
-                        )
-                        Spacer(modifier = Modifier.height(15.dp))
-                        FastAddresses(mainViewModel, navController)
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = Color(0xFFFFFFFF),
-                        shape = RoundedCornerShape(size = 30.dp)
-                    )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                        .background(
-                            color = Color(0xFFFFFFFF),
-                            shape = RoundedCornerShape(size = 30.dp)
-                        )
-                ) {
-                    Text(
-                        text = "Добро пожаловать в Gram",
-                        style = TextStyle(
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight(600),
-                            color = Color(0xFF343434),
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    StoriesList()
-                }
-
-
-            }
-        }
-    }
 }

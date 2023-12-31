@@ -37,6 +37,9 @@ fun FastAddresses(mainViewModel: MainViewModel, navController: NavHostController
         if (mainViewModel.stateFastAddress.value.response == null) {
             mainViewModel.getFastAddresses()
         }
+        if (myAddressViewModel.stateGetAllMyAddresses.value.response == null) {
+            myAddressViewModel.getAllMyAddresses()
+        }
     }
     val bottomNavigator = LocalBottomSheetNavigator.current
     val stateFastAddresses = mainViewModel.stateFastAddress.value
@@ -59,7 +62,7 @@ fun FastAddresses(mainViewModel: MainViewModel, navController: NavHostController
             stateMyAddresses.response?.result?.home.let {
                 item {
                     if(it==null) return@item
-                    FastAddressCard("Дом", it[0].address.city, icon = R.drawable.ic_home) {
+                    FastAddressCard("Дом", it[0].address, icon = R.drawable.ic_home) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it[0].address)
                         if (mainViewModel.fromAddress.value.name != "") {
@@ -82,7 +85,7 @@ fun FastAddresses(mainViewModel: MainViewModel, navController: NavHostController
             stateMyAddresses.response?.result?.work.let {
                 item {
                     if(it==null) return@item
-                    FastAddressCard("Работа", it[0].address.city, icon = R.drawable.ic_work) {
+                    FastAddressCard("Работа", it[0].address, icon = R.drawable.ic_work) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it[0].address)
                         if (mainViewModel.fromAddress.value.name != "") {
@@ -107,7 +110,7 @@ fun FastAddresses(mainViewModel: MainViewModel, navController: NavHostController
                 it.forEach {
                     item {
                         if(it==null) return@item
-                        FastAddressCard(getAddressText(it.address), it.address.city, icon = R.drawable.ic_favorites) {
+                        FastAddressCard(getAddressText(it.address), it.address, icon = R.drawable.ic_favorites) {
                             mainViewModel.clearToAddress()
                             mainViewModel.addToAddress(it.address)
                             if (mainViewModel.fromAddress.value.name != "") {
@@ -130,7 +133,7 @@ fun FastAddresses(mainViewModel: MainViewModel, navController: NavHostController
             }
             stateFastAddresses.response?.forEach {
                 item {
-                    FastAddressCard(getAddressText(it), it.city) {
+                    FastAddressCard(getAddressText(it), it) {
                         mainViewModel.clearToAddress()
                         mainViewModel.addToAddress(it)
                         if (mainViewModel.fromAddress.value.name != "") {

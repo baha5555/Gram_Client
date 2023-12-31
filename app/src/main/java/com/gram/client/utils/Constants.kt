@@ -15,7 +15,9 @@ object Constants {
     const val FROM_ADDRESS = "FROM_ADDRESS"
     val TARIFF_ID = mutableStateOf(0)
     const val TO_ADDRESS = "TO_ADDRESS"
+    const val TO_ADDRESS_ACTIVE = "TO_ADDRESS_ACTIVE"
     const val ADD_TO_ADDRESS = "ADD_TO_ADDRESS"
+    const val ADD_TO_ADDRESS_ACTIVE = "ADD_TO_ADDRESS_ACTIVE"
     const val MY_ADDRESS = "MY_ADDRESS"
     const val ADD_FROM_ADDRESS_FOR_NAVIGATE = "ADD_FROM_ADDRESS_FOR_NAVIGATE"
 

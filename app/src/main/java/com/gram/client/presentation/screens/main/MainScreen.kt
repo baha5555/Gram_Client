@@ -427,22 +427,7 @@ class MainScreen : Screen{
                             },
                             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                             sheetContent = {
-                                MainBottomSheetContent(
-                                    scaffoldState = mainBottomSheetState,
-                                    mainViewModel = mainViewModel
-                                ) {
-                                    if (stateOfDopInfoForDriver.value != "PLAN_TRIP" && stateOfDopInfoForDriver.value != "") {
-                                        val inputMethodManager =
-                                            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                        inputMethodManager.toggleSoftInput(
-                                            InputMethodManager.SHOW_FORCED,
-                                            0
-                                        )
-                                    }
-                                    coroutineScope.launch {
-                                        modalSheetState.animateTo(ModalBottomSheetValue.Expanded)
-                                    }
-                                }
+
                             },
                             sheetPeekHeight = 345.dp,
                         ) {

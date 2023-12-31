@@ -1,4 +1,4 @@
-package com.gram.client.presentation.screens.order
+package com.gram.client.presentation.sheets
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -26,6 +26,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.presentation.components.voyager.reason.Reason2Screen
+import com.gram.client.presentation.screens.order.OrderExecutionViewModel
+import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.presentation.screens.order.components.CustomInfoOfActiveOrder
 import com.gram.client.presentation.screens.order.components.actionSection
 import com.gram.client.presentation.screens.order.components.optionSection
@@ -36,7 +38,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun OrderExecutionSheetContent(
+fun DetailActiveOrderSheetContent(
     orderExecutionViewModel: OrderExecutionViewModel,
     navController: NavHostController,
 ) {
@@ -123,7 +125,7 @@ fun OrderExecutionSheetContent(
                 performerSection(performer = order, orderExecutionViewModel)
                 stateCancelOrderText.value = "Водитель уже найден! Вы уверены, что все равно хотите отменить поездку?"
             }
-            orderSection(order, scope)
+            orderSection(order, scope, navController, orderExecutionViewModel)
             Spacer(modifier = Modifier.height(10.dp))
             optionSection(onClick = {
                 navigator.push(CustomInfoOfActiveOrder())
@@ -136,9 +138,13 @@ fun OrderExecutionSheetContent(
                     return@actionSection
                 }
                 if (order.performer != null) {
-                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(SearchDriverScreen())})
+                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(
+                        SearchDriverScreen()
+                    )})
                 }else{
-                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(SearchDriverScreen())})
+                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(
+                        SearchDriverScreen()
+                    )})
                 }
             })
         }

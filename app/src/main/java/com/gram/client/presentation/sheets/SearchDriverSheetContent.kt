@@ -1,4 +1,4 @@
-package com.gram.client.presentation.screens.order
+package com.gram.client.presentation.sheets
 
 import android.annotation.SuppressLint
 import android.os.Handler
@@ -51,12 +51,15 @@ import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.presentation.components.CustomCircleButton
 import com.gram.client.presentation.components.CustomDialog
 import com.gram.client.presentation.components.voyager.reason.Reason2Screen
+import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+
+val isSelected = mutableStateOf(0)
 
 @Composable
 fun SearchDriverSheetContent(
@@ -65,9 +68,7 @@ fun SearchDriverSheetContent(
 ) {
     val bottomNavigator = LocalBottomSheetNavigator.current
     val scope = rememberCoroutineScope()
-    val isSelected = remember {
-        mutableStateOf(0)
-    }
+
     val isCreated = remember {
         mutableStateOf(false)
     }

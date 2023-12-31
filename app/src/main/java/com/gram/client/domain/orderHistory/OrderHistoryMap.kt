@@ -47,13 +47,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.MainActivity
-import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.map.Markers
 import com.gram.client.presentation.screens.map.UserTouchSurface
 import com.gram.client.presentation.screens.map.map
-import com.gram.client.presentation.screens.order.OrderExecutionScreen
-import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.ui.theme.BackgroundColor
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.PreferencesName
@@ -110,14 +107,6 @@ fun CustomMainMapHistory(
     var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
     DisposableEffect(lifecycleOwner) {
-        if (currentRoute == OrderExecutionScreen().key) {
-            Log.i("showRoad", "run")
-            //mainViewModel.updateToAddress(Address())
-//            mainViewModel.updateFromAddress(Address())
-            isGet.value = true
-        }else if (currentRoute == MainScreen().key){
-//            mainViewModel.showRoad()
-        }
         val observer = LifecycleEventObserver { _, event ->
             stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
             when (event) {
@@ -190,28 +179,6 @@ fun CustomMainMapHistory(
                         }
                     }
                     getAddressMarker.visibility = View.GONE
-                    when (currentRoute) {
-                        MainScreen().key -> {
-                            getAddressMarker.visibility = View.GONE
-                            map.overlays.clear()
-                            addOverlays()
-                        }
-                        SearchDriverScreen().key -> {
-                            getAddressMarker.visibility = View.GONE
-                            map.overlays.clear()
-                            addOverlays()
-                        }
-                        SearchAddressScreen().key -> {
-                            map.overlays.clear()
-                            addOverlays()
-                        }
-                        OrderExecutionScreen().key -> {
-                            getAddressMarker.visibility = View.GONE
-                            map.overlays.clear()
-                            addOverlays()
-                        }
-
-                    }
                     setChangeLocationListener()
                 }
             },

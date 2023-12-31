@@ -21,7 +21,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
-import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.components.FloatingButton
 import com.gram.client.presentation.screens.map.CustomMainMap
@@ -29,8 +28,6 @@ import com.gram.client.presentation.screens.map.mLocationOverlay
 import com.gram.client.presentation.screens.map.map
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.ui.theme.PrimaryColor
-import com.gram.client.utils.Constants
-import com.gram.client.utils.Values
 
 class OrderExecutionMapPointScreen () : Screen {
     @SuppressLint("UnrememberedMutableState")
@@ -44,48 +41,48 @@ class OrderExecutionMapPointScreen () : Screen {
         BottomSheetScaffold(
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             sheetContent = {
-                MapPointSheetContent(mainViewModel, stateViews = true) {
-                    statePoint.value.response.let {
-                        when (Values.WhichAddress.value) {
-                            Constants.FROM_ADDRESS -> {
-                                if (it == null) {
-                                    orderExecutionViewModel.updateFromAddress(
-                                        Address(
-                                            "Метка на карте",
-                                            -1,
-                                            map.mapCenter.latitude.toString(),
-                                            map.mapCenter.longitude.toString()
-                                        )
-                                    )
-                                } else {
-                                    orderExecutionViewModel.updateFromAddress(
-                                        it
-                                    )
-                                }
-                            }
-                            Constants.TO_ADDRESS -> {
-                                if (it == null) {
-                                    orderExecutionViewModel.updateToAddress(
-                                        Address(
-                                            "Метка на карте",
-                                            -1,
-                                            map.mapCenter.latitude.toString(),
-                                            map.mapCenter.longitude.toString()
-                                        )
-                                    )
-                                } else {
-                                    orderExecutionViewModel.updateToAddress(
-                                        it
-                                    )
-                                }
-                            }
-                        }
-                        orderExecutionViewModel.editOrder {
-
-                        }
-                    }
-                    navigator.pop()
-                }
+//                MapPointSheetContent(mainViewModel, stateViews = true) {
+//                    statePoint.value.response.let {
+//                        when (Values.WhichAddress.value) {
+//                            Constants.FROM_ADDRESS -> {
+//                                if (it == null) {
+//                                    orderExecutionViewModel.updateFromAddress(
+//                                        Address(
+//                                            "Метка на карте",
+//                                            -1,
+//                                            map.mapCenter.latitude.toString(),
+//                                            map.mapCenter.longitude.toString()
+//                                        )
+//                                    )
+//                                } else {
+//                                    orderExecutionViewModel.updateFromAddress(
+//                                        it
+//                                    )
+//                                }
+//                            }
+//                            Constants.TO_ADDRESS -> {
+//                                if (it == null) {
+//                                    orderExecutionViewModel.updateToAddress(
+//                                        Address(
+//                                            "Метка на карте",
+//                                            -1,
+//                                            map.mapCenter.latitude.toString(),
+//                                            map.mapCenter.longitude.toString()
+//                                        )
+//                                    )
+//                                } else {
+//                                    orderExecutionViewModel.updateToAddress(
+//                                        it
+//                                    )
+//                                }
+//                            }
+//                        }
+//                        orderExecutionViewModel.editOrder {
+//
+//                        }
+//                    }
+//                    navigator.pop()
+//                }
             },
             sheetPeekHeight = 200.dp,
             floatingActionButton = {

@@ -49,9 +49,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.MainActivity
-import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
-import com.gram.client.presentation.screens.order.OrderExecutionScreen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.ui.theme.BackgroundColor
 import com.gram.client.ui.theme.PrimaryColor
@@ -118,13 +116,11 @@ fun CustomMainMap(
     val mapControllers = MapController(context)
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        if (currentRoute == OrderExecutionScreen().key) {
+        if (Values.currentRoute.value == Routes.DETAIL_ACTIVE_ORDER_SHEET) {
             Log.i("showRoad", "run")
             orderExecutionViewModel.updateToAddress(Address())
             orderExecutionViewModel.updateFromAddress(Address())
             isGet.value = true
-        } else if (currentRoute == MainScreen().key) {
-            mainViewModel.showRoad()
         }
         val observer = LifecycleEventObserver { _, event ->
             stateStatusGPS.value = manager.isProviderEnabled(LocationManager.GPS_PROVIDER)

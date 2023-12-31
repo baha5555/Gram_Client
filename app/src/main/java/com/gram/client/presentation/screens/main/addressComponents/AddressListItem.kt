@@ -13,17 +13,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gram.client.domain.mainScreen.Address
+import com.gram.client.utils.getAddressText
+import com.gram.client.utils.getAddressTextRegion
 
 @Composable
 fun AddressListItem(it: Address, onItemClick: (String) -> Unit) {
     Column( modifier = Modifier.fillMaxWidth().clickable { onItemClick(if(it.type == "address") "${it.street}, ${it.name}" else it.name) }.padding(vertical = 10.dp)) {
         Text(
-            text = if(it.type == "address") "${it.street}, ${it.name}" else it.name,
+            text = getAddressText(it),
             fontSize = 18.sp,
             maxLines = 1
         )
         Text(
-            text = if(it.type == "address") "${it.city}, ${it.region}" else "${it.street}",
+            text = getAddressTextRegion(it),
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight(400),
