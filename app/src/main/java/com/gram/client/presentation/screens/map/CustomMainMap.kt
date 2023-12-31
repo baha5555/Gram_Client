@@ -195,22 +195,21 @@ fun CustomMainMap(
                     btnZoomIn.setOnClickListener {
                         btnZoomOut.visibility = View.VISIBLE
                         mapControllers.changeZoom(+1.0)
-
-                        if (map.zoomLevelDouble == 21.0) {
-                            btnZoomIn.visibility = View.INVISIBLE
-                        }
+//                        if (map.zoomLevelDouble == 21.0) {
+//                            btnZoomIn.visibility = View.INVISIBLE
+//                        }
                     }
                     btnZoomOut.setOnClickListener {
                         btnZoomIn.visibility = View.VISIBLE
                         mapControllers.changeZoom(-1.0)
-                        if (map.zoomLevelDouble == 15.0) {
-                            btnZoomOut.visibility = View.INVISIBLE
-                        }
+//                        if (map.zoomLevelDouble == 15.0) {
+//                            btnZoomOut.visibility = View.INVISIBLE
+//                        }
                     }
 
 
 
-                    map.minZoomLevel = 16.0
+                    map.minZoomLevel = 14.0
                     map.maxZoomLevel = 20.0
 
                     val myLocationProvider = GpsMyLocationProvider(it)

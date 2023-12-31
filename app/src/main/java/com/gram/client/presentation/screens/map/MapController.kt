@@ -52,7 +52,7 @@ class MapController(val context: Context) {
                     toAddressesPoints.add(toAddressPoint)
                 }
                 if (fromAddressPoint.latitude != 0.0 && toAddressesPoints[0].latitude != 0.0 && fromAddressPoint != toAddressesPoints[0])
-                    map.controller.setCenter(fromAddressPoint)
+                    //map.controller.animateTo(fromAddressPoint, 14.0, 1000)
                 toAddressesPoints.forEach {
                     waypoints.add(it)
                 }
