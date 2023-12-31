@@ -76,7 +76,11 @@ fun SearchDriverSheetContent(
         isCreated.value = true
     } else if(orderExecutionViewModel.stateActiveOrdersList.size==0 && isCreated.value){
         isCreated.value = false
-        navController.navigate(Routes.SEARCH_ADDRESS_SHEET)
+        navController.navigate(Routes.SEARCH_ADDRESS_SHEET){
+            popUpTo(Routes.SEARCH_DRIVER_SHEET){
+                inclusive = true
+            }
+        }
     }
     Column(
         Modifier

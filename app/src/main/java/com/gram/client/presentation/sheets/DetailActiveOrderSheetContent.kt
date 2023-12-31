@@ -27,12 +27,12 @@ import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.presentation.components.voyager.reason.Reason2Screen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
-import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.presentation.screens.order.components.CustomInfoOfActiveOrder
 import com.gram.client.presentation.screens.order.components.actionSection
 import com.gram.client.presentation.screens.order.components.optionSection
 import com.gram.client.presentation.screens.order.components.orderSection
 import com.gram.client.presentation.screens.order.components.performerSection
+import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
 
@@ -138,13 +138,22 @@ fun DetailActiveOrderSheetContent(
                     return@actionSection
                 }
                 if (order.performer != null) {
-                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(
-                        SearchDriverScreen()
-                    )})
+                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){
+                        //navigator.push(SearchDriverScreen())
+                        navController.navigate(Routes.SEARCH_ADDRESS_SHEET){
+                            popUpTo(Routes.DETAIL_ACTIVE_ORDER_SHEET){
+                                inclusive = true
+                            }
+                            popUpTo(Routes.SEARCH_DRIVER_SHEET){
+                                inclusive = true
+                            }
+                        }
+                    })
                 }else{
-                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){navigator.push(
-                        SearchDriverScreen()
-                    )})
+                    bottomNavigator.show(Reason2Screen(orderExecutionViewModel, order){
+                        //navigator.push(SearchDriverScreen())
+                        navController.popBackStack()
+                    })
                 }
             })
         }

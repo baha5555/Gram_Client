@@ -147,7 +147,14 @@ class SearchAddressScreen : Screen {
                                 Routes.CREATE_ORDER_SHEET->{ BottomBar(mainBottomSheetState = bottomSheetState) {
                                     mainViewModel.createOrder {
                                         //navigator.push(SearchDriverScreen())
-                                        navController.navigate(Routes.SEARCH_DRIVER_SHEET)
+                                        navController.navigate(Routes.SEARCH_DRIVER_SHEET){
+                                            popUpTo(Routes.CREATE_ORDER_SHEET){
+                                                inclusive = true
+                                            }
+                                            popUpTo(Routes.SEARCH_ADDRESS_SHEET){
+                                                inclusive = true
+                                            }
+                                        }
                                         orderExecutionViewModel.getActiveOrders { }
                                     }
                                 }}
