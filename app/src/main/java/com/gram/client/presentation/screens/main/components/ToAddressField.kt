@@ -19,18 +19,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.mainScreen.Address
-import com.gram.client.presentation.components.voyager.MapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddresses
-import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
 import com.gram.client.utils.getAddressText
 
@@ -38,10 +37,11 @@ import com.gram.client.utils.getAddressText
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ToAddressField(
-    toAddress: List<Address>
+    toAddress: List<Address>,
+    navController: NavHostController,
+    mainViewModel: MainViewModel
 ) {
     val navigator = LocalNavigator.currentOrThrow
-    val mainViewModel: MainViewModel = hiltViewModel()
     val bottomNavigator = LocalBottomSheetNavigator.current
     Row(
         modifier = Modifier
@@ -52,10 +52,11 @@ fun ToAddressField(
                 Values.WhichAddress.value = Constants.TO_ADDRESS
                 bottomNavigator.show(SearchAddresses(
                     {
-                        navigator.push(MainScreen())
+                        navController.navigate(Routes.CREATE_ORDER_SHEET)
+                        //navigator.push(MainScreen())
                     }
                 ) {
-                    navigator.push(MapPointScreen())
+                    navController.navigate(Routes.MAP_POINT_SHEET)
                 })
             }
             .background(PrimaryColor)
@@ -94,15 +95,15 @@ fun ToAddressField(
                     .size(24.dp)
                     .clickable {
                         if (mainViewModel.fromAddress.value.name != "") {
-                            navigator.push(MainScreen())
+                            navController.navigate(Routes.CREATE_ORDER_SHEET)
                         } else {
                             Values.WhichAddress.value = Constants.ADD_FROM_ADDRESS_FOR_NAVIGATE
                             bottomNavigator.show(SearchAddresses(
                                 {
-                                    navigator.push(MainScreen())
+                                    navController.navigate(Routes.CREATE_ORDER_SHEET)
                                 }
                             ) {
-                                navigator.push(MapPointScreen())
+                                navController.navigate(Routes.MAP_POINT_SHEET)
                             })
                         }
                     },

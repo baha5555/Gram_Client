@@ -26,11 +26,13 @@ import com.gram.client.presentation.screens.map.MapController
 import com.gram.client.presentation.screens.map.map
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Resource
+import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.burnoutcrew.reorderable.ItemPosition
+import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 @HiltViewModel
@@ -150,6 +152,12 @@ class MainViewModel @Inject constructor(
 
     fun showRoad() {
         map.overlays.clear()
+        if(fromAddress.value.lat!="" && toAddresses.size>0){
+            if(Values.currentRoute.value == Routes.SEARCH_ADDRESS_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET) return
+            map.controller.animateTo(GeoPoint(fromAddress.value.lat.toDouble(), fromAddress.value.lng.toDouble()), 16.0, 1000)
+        }
+
+
         mapController.showRoadAB(
             _fromAddress.value,
             _toAddresses

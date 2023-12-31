@@ -1,7 +1,6 @@
 package com.gram.client.presentation.screens.drawer.orderHistoryScreen
 
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,8 +25,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
+import com.gram.client.domain.mainScreen.Address
 import com.gram.client.domain.orderHistory.Data
-import com.gram.client.domain.orderHistory.ToAddresse
+import com.gram.client.utils.getAddressText
 import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
@@ -102,7 +101,7 @@ class OrdersHistoryScreen : Screen {
                         val outputFormat =
                             DateTimeFormatter.ofPattern("dd MMMM, EEEE", Locale("ru"))
 
-                        res.from_address?.name?.let { fromAddress ->
+                        res.from_address?.let { fromAddress ->
                             res.to_addresses?.let { toAddress ->
                                 currentDate = date.format(outputFormat)
                                 if (currentDate != lastDate) {
@@ -188,8 +187,8 @@ fun ListHistoryItem(
     price: String,
     status: String,
     createdAt: String,
-    fromAddress: String,
-    toAddresse: List<ToAddresse>,
+    fromAddress: Address,
+    toAddresse: List<Address>,
     tariff_id: Int,
     onClick:()->Unit
     ) {
@@ -228,7 +227,7 @@ fun ListHistoryItem(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = " $fromAddress,",
+                        text = getAddressText(fromAddress),
                         fontSize = 20.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -236,7 +235,7 @@ fun ListHistoryItem(
                     )
                     toAddresse.forEach {
                         Text(
-                            text = " ${it.name}",
+                            text = getAddressText(it),
                             fontSize = 20.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

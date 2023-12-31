@@ -1,5 +1,6 @@
 package com.gram.client.presentation.screens.drawer.myaddresses_screen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +65,7 @@ class MyAddressViewModel @Inject constructor(
     private val _stateGetAllMyAddresses = mutableStateOf(GetAllMyAddressesResponseState())
     val stateGetAllMyAddresses: State<GetAllMyAddressesResponseState> = _stateGetAllMyAddresses
 
+    @SuppressLint("LongLogTag")
     fun getAllMyAddresses() {
         myAddressesUseCase.getAllMyAddresses()
             .onEach { result: Resource<GetAllMyAddressesResponse> ->

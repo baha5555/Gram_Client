@@ -1,0 +1,9 @@
+package com.gram.client.utils
+
+object Routes {
+    const val SEARCH_ADDRESS_SHEET = "SEARCH_ADDRESS_SHEET"
+    const val CREATE_ORDER_SHEET = "CREATE_ORDER_SHEET"
+    const val MAP_POINT_SHEET = "MAP_POINT_SHEET"
+    const val SEARCH_DRIVER_SHEET = "SEARCH_DRIVER_SHEET"
+    const val DETAIL_ACTIVE_ORDER_SHEET = "DETAIL_ACTIVE_ORDER_SHEET"
+}

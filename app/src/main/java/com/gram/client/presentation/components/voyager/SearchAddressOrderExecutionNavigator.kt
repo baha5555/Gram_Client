@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.presentation.screens.main.addressComponents.AddressListItem
@@ -31,7 +30,7 @@ import com.gram.client.utils.Constants
 import com.gram.client.utils.Values
 import kotlinx.coroutines.launch
 
-class SearchAddressOrderExecutionNavigator(val inx: Int = -1,  val function: () -> Unit) : Screen {
+class SearchAddressOrderExecutionNavigator(val orderExecutionViewModel: OrderExecutionViewModel,val inx: Int = -1,  val function: () -> Unit) : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
@@ -42,7 +41,6 @@ class SearchAddressOrderExecutionNavigator(val inx: Int = -1,  val function: () 
             mutableStateOf("")
         }
         val scope = rememberCoroutineScope()
-        val orderExecutionViewModel: OrderExecutionViewModel = hiltViewModel()
         val focusRequester = remember { FocusRequester() }
         val bottomNavigator = LocalBottomSheetNavigator.current
 
@@ -183,10 +181,10 @@ class SearchAddressOrderExecutionNavigator(val inx: Int = -1,  val function: () 
                                             keyboardController.hide()
                                         }
                                         when (Values.WhichAddress.value) {
-                                            Constants.TO_ADDRESS -> {
+                                            Constants.TO_ADDRESS_ACTIVE -> {
                                                 if(inx>=0) orderExecutionViewModel.updateToAddressInx(it, inx)
                                             }
-                                            Constants.ADD_TO_ADDRESS -> {
+                                            Constants.ADD_TO_ADDRESS_ACTIVE -> {
                                                 orderExecutionViewModel.addToAddress(it)
                                             }
                                             Constants.FROM_ADDRESS->{

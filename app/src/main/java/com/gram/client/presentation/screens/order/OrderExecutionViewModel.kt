@@ -37,6 +37,7 @@ import com.gram.client.presentation.screens.order.states.GetRatingReasonsRespons
 import com.gram.client.presentation.screens.order.states.GetReasonsResponseState
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Resource
+import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -358,7 +359,12 @@ class OrderExecutionViewModel @Inject constructor(
 
     fun showRoad() {
         map.overlays.clear()
+
         selectedOrder.value.from_address?.let {
+            if(it.lat != "" && (selectedOrder.value.to_addresses?.size ?: 0) > 0){
+                if(Values.currentRoute.value == Routes.SEARCH_ADDRESS_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET || Values.currentRoute.value == Routes.SEARCH_DRIVER_SHEET) { return }
+                map.controller.animateTo(GeoPoint(it.lat.toDouble(), it.lng.toDouble()), 16.0, 1000)
+            }
             mapController.showRoadAB(
                 it,
                 selectedOrder.value.to_addresses

@@ -28,15 +28,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.domain.orderExecutionScreen.active.AllActiveOrdersResult
 import com.gram.client.presentation.components.voyager.AddStopScreenOrderExcecution
-import com.gram.client.presentation.components.voyager.OrderExecutionMapPointScreen
 import com.gram.client.presentation.components.voyager.SearchAddressOrderExecutionNavigator
+import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.utils.Constants
+import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
 import com.gram.client.utils.getAddressText
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +48,8 @@ import kotlinx.coroutines.launch
 fun orderSection(
     order: AllActiveOrdersResult,
     scope: CoroutineScope,
+    navController: NavHostController,
+    orderExecutionViewModel: OrderExecutionViewModel,
 ) {
     val navigator = LocalNavigator.currentOrThrow
     val bottomNavigator = LocalBottomSheetNavigator.current
@@ -100,10 +104,11 @@ fun orderSection(
             Row(
                 modifier = Modifier
                     .clickable {
-                        Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
+                        Values.WhichAddress.value=Constants.ADD_TO_ADDRESS_ACTIVE
                         scope.launch {
-                            bottomNavigator.show(SearchAddressOrderExecutionNavigator(){
-                                navigator.push(OrderExecutionMapPointScreen())
+                            bottomNavigator.show(SearchAddressOrderExecutionNavigator(orderExecutionViewModel){
+                               // navigator.push(OrderExecutionMapPointScreen())
+                                navController.navigate(Routes.MAP_POINT_SHEET)
                             })
                         }
                     }
@@ -142,15 +147,15 @@ fun orderSection(
                     .clickable {
                         scope.launch {
                             if (order.to_addresses.size > 1) {
-                                Values.WhichAddress.value=Constants.ADD_TO_ADDRESS
+                                Values.WhichAddress.value=Constants.ADD_TO_ADDRESS_ACTIVE
                                 bottomNavigator.show(AddStopScreenOrderExcecution())
                                 Toast.makeText(context,"Можно изменить порядок остановки", Toast.LENGTH_SHORT).show()
 
                             } else {
-                                Values.WhichAddress.value=Constants.TO_ADDRESS
+                                Values.WhichAddress.value=Constants.TO_ADDRESS_ACTIVE
                                 bottomNavigator.show(
-                                    SearchAddressOrderExecutionNavigator(inx = 0){
-                                        navigator.push(OrderExecutionMapPointScreen())
+                                    SearchAddressOrderExecutionNavigator(orderExecutionViewModel = orderExecutionViewModel,inx = 0){
+                                        navController.navigate(Routes.MAP_POINT_SHEET)
                                     }
                                 )
                             }
