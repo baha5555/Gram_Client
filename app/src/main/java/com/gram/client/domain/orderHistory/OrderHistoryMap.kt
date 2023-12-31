@@ -45,6 +45,7 @@ import androidx.lifecycle.LifecycleOwner
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
+import com.gram.client.domain.mainScreen.Address
 import com.gram.client.presentation.MainActivity
 import com.gram.client.presentation.screens.main.MainScreen
 import com.gram.client.presentation.screens.main.SearchAddressScreen
@@ -306,8 +307,8 @@ fun addOverlays() {
 
 fun showRoadAB(
     context: Context,
-    fromAddress: FromAddress,
-    toAddress: List<ToAddresse>?,
+    fromAddress: Address,
+    toAddress: List<Address>?,
 ) {
     if(currentRoute== SearchAddressScreen().key) return
     val roadManager: RoadManager = OSRMRoadManager(context, "GramDriver/1.0")

@@ -48,6 +48,7 @@ fun RootScreen() {
             Column {
                 Text(text = ""+ Values.currentRoute.value)
                 Text(text = ""+ Values.WhichAddress.value)
+                Text(text = ""+orderExecutionViewModel.stateActiveOrdersList.size)
             }
         }
     }

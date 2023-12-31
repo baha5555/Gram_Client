@@ -4,25 +4,32 @@ import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,9 +54,11 @@ import com.gram.client.presentation.screens.main.components.*
 import com.gram.client.presentation.screens.map.CustomMainMap
 import com.gram.client.presentation.screens.map.mLocationOverlay
 import com.gram.client.presentation.screens.map.map
+import com.gram.client.presentation.screens.order.OrderExecutionSheetContent
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
-import com.gram.client.presentation.screens.order.SearchDriverScreen
+import com.gram.client.presentation.screens.order.SearchDriverSheetContent
 import com.gram.client.presentation.screens.profile.ProfileViewModel
+import com.gram.client.ui.theme.PrimaryColor
 import com.gram.client.utils.Constants
 import com.gram.client.utils.Routes
 import com.gram.client.utils.Values
@@ -69,6 +78,7 @@ class SearchAddressScreen : Screen {
             Routes.CREATE_ORDER_SHEET -> sheetPeekHeight.value = 345
             Routes.SEARCH_ADDRESS_SHEET -> sheetPeekHeight.value = 310
             Routes.MAP_POINT_SHEET -> sheetPeekHeight.value = 200
+            Routes.SEARCH_DRIVER_SHEET -> sheetPeekHeight.value = 200
         }
 
         val navController = rememberNavController()
@@ -131,13 +141,79 @@ class SearchAddressScreen : Screen {
                 content = {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                         Scaffold(bottomBar = {
+                            when(Values.currentRoute.value){
+                                Routes.CREATE_ORDER_SHEET->{ BottomBar(mainBottomSheetState = bottomSheetState) {
+                                    mainViewModel.createOrder {
+                                        //navigator.push(SearchDriverScreen())
+                                        navController.navigate(Routes.SEARCH_DRIVER_SHEET)
+                                        orderExecutionViewModel.getActiveOrders { }
+                                    }
+                                }}
+                                Routes.SEARCH_DRIVER_SHEET ->{
+                                    Box(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(80.dp), contentAlignment = Alignment.Center){
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth(0.9f)
+                                                .height(50.dp)
+                                                .clip(RoundedCornerShape(20.dp))
+                                                .clickable {
+                                                    Values.WhichAddress.value =
+                                                        Constants.TO_ADDRESS
+                                                    bottomNavigator.show(SearchAddresses({
+                                                        //navigator.push(MainScreen())
+                                                        navController.navigate(Routes.CREATE_ORDER_SHEET)
+                                                    }) {
+                                                        //navigator.push(MapPointScreen())
+                                                        navController.navigate(Routes.MAP_POINT_SHEET)
+                                                    })
+                                                }
+                                                .background(PrimaryColor)
+                                                .padding(horizontal = 5.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.car_kuda_edem),
+                                                contentDescription = "car_eco",
+                                                modifier = Modifier.offset(x = -25.dp)
+                                            )
+                                            Text(
+                                                text = "Заказать ещё одну машину",
+                                                textAlign = TextAlign.Start,
+                                                color = Color.White,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .padding(end = 12.dp)
+                                            )
+                                            Row(
+                                                modifier = Modifier
+                                                    .padding(end = 10.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Divider(
+                                                    color = Color.White,
+                                                    modifier = Modifier
+                                                        .width(1.dp)
+                                                        .fillMaxHeight(0.5f)
+                                                        .offset((-10).dp, 0.dp)
+                                                )
+                                                Icon(
+                                                    modifier = Modifier
+                                                        .size(24.dp)
+                                                        .clickable {
+                                                            //navigator.push(MainScreen())
+                                                        },
+                                                    imageVector = Icons.Default.ArrowForward,
+                                                    contentDescription = "car_eco",
+                                                    tint = Color.White
+                                                )
+                                            }
 
-                            AnimatedVisibility(Values.currentRoute.value == Routes.CREATE_ORDER_SHEET) {
-                                Box(modifier = Modifier.fillMaxWidth()) {
-                                    BottomBar(mainBottomSheetState = bottomSheetState) {
-                                        mainViewModel.createOrder {
-                                            navigator.push(SearchDriverScreen())
-                                            orderExecutionViewModel.getActiveOrders { }
                                         }
                                     }
                                 }
@@ -146,7 +222,7 @@ class SearchAddressScreen : Screen {
                             BottomSheetScaffold(
                                 modifier = Modifier.fillMaxSize(),
                                 floatingActionButton = {
-                                    AnimatedVisibility(Values.currentRoute.value == Routes.CREATE_ORDER_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET) {
+                                    AnimatedVisibility(Values.currentRoute.value == Routes.CREATE_ORDER_SHEET || Values.currentRoute.value == Routes.MAP_POINT_SHEET || Values.currentRoute.value == Routes.DETAIL_ACTIVE_ORDER_SHEET) {
                                         Column(
                                             modifier = Modifier
                                                 .offset(y = (-100).dp, x = 25.dp),
@@ -206,7 +282,7 @@ class SearchAddressScreen : Screen {
                                 sheetContent = {
                                     NavHost(
                                         navController = navController,
-                                        startDestination = Routes.SEARCH_ADDRESS_SHEET
+                                        startDestination = Values.firstRoute.value
                                     ) {
                                         composable(Routes.SEARCH_ADDRESS_SHEET) {
                                             if(Values.WhichAddress.value == Constants.TO_ADDRESS && Routes.SEARCH_ADDRESS_SHEET == Values.currentRoute.value) Values.WhichAddress.value = Constants.FROM_ADDRESS
@@ -269,6 +345,12 @@ class SearchAddressScreen : Screen {
                                                     navController.popBackStack()
                                                 }
                                             }
+                                        }
+                                        composable(Routes.SEARCH_DRIVER_SHEET){
+                                            SearchDriverSheetContent(orderExecutionViewModel, navController)
+                                        }
+                                        composable(Routes.DETAIL_ACTIVE_ORDER_SHEET){
+                                            OrderExecutionSheetContent(orderExecutionViewModel, navController)
                                         }
                                     }
                                 },

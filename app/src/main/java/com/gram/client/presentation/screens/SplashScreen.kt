@@ -1,7 +1,13 @@
 package com.gram.client.presentation.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -17,9 +23,9 @@ import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.main.SearchAddressScreen
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
-import com.gram.client.presentation.screens.order.SearchDriverScreen
 import com.gram.client.presentation.screens.profile.ProfileViewModel
-import kotlinx.coroutines.delay
+import com.gram.client.utils.Routes
+import com.gram.client.utils.Values
 
 class SplashScreen : Screen {
     @Composable
@@ -32,7 +38,7 @@ class SplashScreen : Screen {
         val currentKey = navigator.lastItem.key
         val activeOrders = orderExecutionViewModel.stateActiveOrders.value
 
-        val isAnimationEnd = remember{
+        val isAnimationEnd = remember {
             mutableStateOf(false)
         }
 
@@ -41,11 +47,10 @@ class SplashScreen : Screen {
             if (prefs.getAccessToken() == "") {
                 navigator.replace(SearchAddressScreen())
                 //mainViewModel.getFastAddresses()
-            }
-            else {
+            } else {
                 orderExecutionViewModel.getActiveOrders()
                 profileViewModel.getProfileInfo()
-                if(mainViewModel.stateCountriesKey.value.response==null){
+                if (mainViewModel.stateCountriesKey.value.response == null) {
                     mainViewModel.getCountriesKey("tj")
                 }
                 //mainViewModel.getFastAddresses()
@@ -54,18 +59,22 @@ class SplashScreen : Screen {
 
         }
         if (activeOrders.success) {
-        if (currentKey == SplashScreen().key) {
-            if (activeOrders.response!!.isEmpty()) { navigator.replace(SearchAddressScreen()) }
-            else { navigator.replace(SearchDriverScreen()) }
-        }
+            if (currentKey == SplashScreen().key) {
+                if (activeOrders.response!!.isEmpty()) {
+                    navigator.replace(SearchAddressScreen())
+                } else {
+                    Values.firstRoute.value = Routes.SEARCH_DRIVER_SHEET
+                    navigator.replace(SearchAddressScreen())
+                }
+            }
         }
         Splash(isAnimationEnd)
     }
 
     @Composable
     fun Splash(isAnimationEnd: MutableState<Boolean>) {
-        Box(){
-            if(!isAnimationEnd.value){
+        Box() {
+            if (!isAnimationEnd.value) {
                 val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash))
                 //val progress by animateLottieCompositionAsState(composition)
                 LottieAnimation(
@@ -74,7 +83,7 @@ class SplashScreen : Screen {
                     contentScale = ContentScale.Crop
                     //progress = { progress },
                 )
-            }else{
+            } else {
                 val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_end))
                 //val progress by animateLottieCompositionAsState(composition)
                 LottieAnimation(
