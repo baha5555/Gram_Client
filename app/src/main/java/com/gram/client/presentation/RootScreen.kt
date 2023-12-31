@@ -5,10 +5,8 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
@@ -24,7 +22,6 @@ import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.presentation.screens.profile.ProfileViewModel
 import com.gram.client.utils.Constants
-import com.gram.client.utils.Values
 import org.burnoutcrew.reorderable.*
 
 @SuppressLint("StaticFieldLeak")
@@ -45,11 +42,11 @@ fun RootScreen() {
     BottomSheetNavigator(sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)) {
         Box {
             Navigator(screen = SplashScreen())
-            Column {
-                Text(text = ""+ Values.currentRoute.value)
-                Text(text = ""+ Values.WhichAddress.value)
-                Text(text = ""+orderExecutionViewModel.stateActiveOrdersList.size)
-            }
+//            Column {
+//                Text(text = ""+ Values.currentRoute.value)
+//                Text(text = ""+ Values.WhichAddress.value)
+//                Text(text = ""+orderExecutionViewModel.stateActiveOrdersList.size)
+//            }
         }
     }
     ReturnRequest()
