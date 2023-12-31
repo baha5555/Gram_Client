@@ -440,7 +440,7 @@ class MainViewModel @Inject constructor(
                         _stateMeetingInfo.value = ""
                         _toAddresses.clear()
                         Values.CommentDriver.value = ""
-                        Values.CommentToAnotherHuman.value = ""
+                        Values.CommentToAnotherHuman.value = "992"
                     } catch (e: Exception) {
                         Log.d("OrderResponse", "${e.message} Exception")
                     }
