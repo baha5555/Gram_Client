@@ -103,6 +103,7 @@ class MyAddressViewModel @Inject constructor(
     private val _stateUpdateMyAddress = mutableStateOf(UpdateMyAddressesResponseState())
     val stateUpdateMyAddress: State<UpdateMyAddressesResponseState> = _stateUpdateMyAddress
 
+    @SuppressLint("LongLogTag")
     fun updateMyAddress(
         updateMyAddressRequest: UpdateMyAddressRequest,
         success: () -> Boolean

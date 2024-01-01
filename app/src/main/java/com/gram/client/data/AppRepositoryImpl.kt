@@ -176,7 +176,7 @@ class AppRepositoryImpl(
     override suspend fun updateMyAddresses(
         updateMyAddressRequest: UpdateMyAddressRequest
     ): UpdateMyAddressResponse =
-        api.updateMyAddresses(prefs.getAccessToken(), updateMyAddressRequest)
+        api.updateMyAddresses(prefs.getAccessToken(), updateMyAddressRequest.id, updateMyAddressRequest.name, updateMyAddressRequest.search_address_id, updateMyAddressRequest.meet_info, updateMyAddressRequest.comment_to_driver, updateMyAddressRequest.type)
 
     override suspend fun deleteMyAddresses(
         id: Int,

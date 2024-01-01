@@ -3,8 +3,18 @@ package com.gram.client.presentation.screens.drawer.myaddresses_screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -21,6 +31,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.gram.client.R
 import com.gram.client.presentation.components.CustomTopAppBar
+import com.gram.client.utils.getAddressText
 
 class MyAddressScreen : Screen {
     @Composable
@@ -55,7 +66,7 @@ fun MyAddressesScreenContent() {
                 if((stateMyAddresses.response?.result?.home ?: "") != ""){
                     stateMyAddresses.response?.result?.home?.get(0)?.let {
                         ListAddressesShow(R.drawable.ic_home, "Дом",
-                            it.address.name
+                            getAddressText(it.address)
                         ){
                             navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                         }
@@ -70,7 +81,7 @@ fun MyAddressesScreenContent() {
                     stateMyAddresses.response?.result?.work?.get(0)?.let {
                         ListAddressesShow(
                             R.drawable.ic_work, "Работа",
-                            it.address.name
+                            getAddressText(it.address)
                         ) {
                             navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                         }
@@ -82,7 +93,8 @@ fun MyAddressesScreenContent() {
                     }
                 }
                 stateMyAddresses.response?.result?.other?.forEach {
-                    ListAddressesShow(R.drawable.ic_favorites, it.name, it.address.name) {
+                    ListAddressesShow(R.drawable.ic_favorites, it.name,getAddressText(it.address)
+                    ) {
                         navigator.push(EditAddressScreen(it.name, it.address, it.meet_info, it.comment_to_driver, it.type, it.id))
                     }
                 }

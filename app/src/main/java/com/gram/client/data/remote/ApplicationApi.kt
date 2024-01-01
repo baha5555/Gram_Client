@@ -193,9 +193,15 @@ interface ApplicationApi {
 
     @FormUrlEncoded
     @PATCH("/api/mob-app/my-address/{id}/update")
+
     suspend fun updateMyAddresses(
         @Header("Authorization") token: String,
-        @Body updateMyAddressRequest: UpdateMyAddressRequest
+        @Path("id") id: Int,
+        @Field("name") name : String,
+        @Field("search_address_id") search_address_id : Int,
+        @Field("meet_info") meet_info : String?,
+        @Field("comment_to_driver") comment_to_driver : String?,
+        @Field("type") type : String,
     ): UpdateMyAddressResponse
 
     @DELETE("/api/mob-app/my-address/{id}/delete")

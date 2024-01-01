@@ -1,6 +1,10 @@
 package com.gram.client.presentation.components.voyager.reason
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -45,7 +49,9 @@ class Reason1Screen(
             Spacer(modifier = Modifier.height(35.dp))
             Button(
                 onClick = {
-                    bottomNavigator.replace(Reason2Screen(orderExecutionViewModel, order) {navigator.replaceAll(SearchDriverScreen())})
+                    bottomNavigator.replace(Reason2Screen(orderExecutionViewModel, order) {
+                        navigator.replaceAll(SearchDriverScreen())}
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
