@@ -25,6 +25,8 @@ import com.gram.client.domain.myAddresses.AddMyAddressRequest
 import com.gram.client.presentation.components.CustomTopAppBar
 import com.gram.client.presentation.components.voyager.SearchAddressNavigator
 import com.gram.client.utils.Constants
+import com.gram.client.utils.getAddressText
+import com.gram.client.utils.getAddressTextRegion
 
 
 class AddAddressScreen(var type: String) : Screen {
@@ -107,11 +109,11 @@ fun AddAddressContent(type: String) {
                             .fillMaxWidth(), verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = if (stateAddress.value.name == "") "Выбрать адрес" else (stateAddress.value.name),
+                            text = if (stateAddress.value.name == "") "Выбрать адрес" else getAddressText(stateAddress.value),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )
-                        //Text(text = "Добавить адрес", fontSize = 12.sp)
+                        Text(text = if (stateAddress.value.name == "") "" else getAddressTextRegion(stateAddress.value), fontSize = 12.sp)
                     }
                     Divider()
 

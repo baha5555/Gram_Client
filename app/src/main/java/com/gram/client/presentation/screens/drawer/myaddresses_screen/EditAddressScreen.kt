@@ -30,6 +30,8 @@ import com.gram.client.domain.myAddresses.UpdateMyAddressRequest
 import com.gram.client.presentation.components.CustomTopAppBar
 import com.gram.client.presentation.components.voyager.SearchAddressNavigator
 import com.gram.client.utils.Constants
+import com.gram.client.utils.getAddressText
+import com.gram.client.utils.getAddressTextRegion
 
 
 class EditAddressScreen(
@@ -134,12 +136,12 @@ class EditAddressScreen(
                                 .fillMaxWidth(), verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = if (stateAddress.value.name == "") address.name else stateAddress.value.name,
+                                text = if (stateAddress.value.name == "") getAddressText(address) else getAddressText(stateAddress.value),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = if (stateAddress.value.name == "") address.city else stateAddress.value.city,
+                                text = if (stateAddress.value.name == "") getAddressTextRegion(address = address) else getAddressTextRegion(stateAddress.value),
                                 fontSize = 12.sp
                             )
                         }
