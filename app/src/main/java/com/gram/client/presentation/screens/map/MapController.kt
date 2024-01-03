@@ -118,30 +118,4 @@ class MapController(val context: Context) {
             null
         }
     }
-    fun changeZoom(requestedDiff: Double) {
-        zoomAnimation = ValueAnimator.ofFloat(0f, 1f)
-        zoomAnimation?.duration = 250.toLong()
-        val startZoom = map.zoomLevelDouble
-        if (zoomAnimation!!.isRunning) { // user clicked zoom button once again before the previous animation was finished
-            targetZoom += requestedDiff
-            zoomAnimation!!.cancel()
-        } else { // usual case
-            if (startZoom == Math.round(startZoom).toDouble()) { // user is already on even level
-                targetZoom =
-                    Math.round(startZoom + requestedDiff)
-                        .toDouble() // zoom to an another even level
-            } else {
-                targetZoom = if (requestedDiff > 0) // zoom to the closest even level
-                    Math.ceil(startZoom) else Math.floor(startZoom)
-            }
-        }
-        zoomAnimation!!.removeAllUpdateListeners()
-        zoomAnimation!!.addUpdateListener(ValueAnimator.AnimatorUpdateListener { updatedAnimation: ValueAnimator ->
-            val fraction = updatedAnimation.animatedFraction
-            map.controller.setZoom(startZoom + (targetZoom - startZoom) * fraction)
-        })
-        zoomAnimation!!.duration = 1000
-        zoomAnimation!!.start()
-
-    }
 }
