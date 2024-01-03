@@ -31,5 +31,7 @@ object Values {
     val ActiveOrdersInx: MutableState<Int> = mutableStateOf(-1)
     val currentRoute: MutableState<String> = mutableStateOf("")
     val firstRoute: MutableState<String> = mutableStateOf(Routes.SEARCH_ADDRESS_SHEET)
+    val ZoomLevel = mutableStateOf(0)
+
 
 }
