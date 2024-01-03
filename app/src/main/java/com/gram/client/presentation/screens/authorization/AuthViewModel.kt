@@ -8,14 +8,16 @@ import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gram.client.app.preference.CustomPreference
-import com.gram.client.domain.athorization.*
-import com.gram.client.utils.Resource
+import com.gram.client.domain.athorization.AuthResponse
+import com.gram.client.domain.athorization.AuthUseCase
+import com.gram.client.domain.athorization.IdentificationRequest
+import com.gram.client.domain.athorization.IdentificationResponse
+import com.gram.client.domain.athorization.IdentificationUseCase
 import com.gram.client.presentation.screens.authorization.states.AuthResponseState
 import com.gram.client.presentation.screens.authorization.states.IdentificationResponseState
-import com.gram.client.utils.Constants
+import com.gram.client.utils.Resource
 import com.gram.client.utils.Values.CLIENT_REGISTER_ID
 import com.gram.client.utils.Values.PHONE_NUMBER
 import com.gram.client.utils.Values.SMS_CODE
@@ -43,7 +45,7 @@ class AuthViewModel @Inject constructor(
     val stateAuth: State<AuthResponseState> = _stateAuth
 
     private val _stateLogin = mutableStateOf(IdentificationResponseState())
-    val stateLogin: State<IdentificationResponseState> = _stateLogin
+    var stateLogin: State<IdentificationResponseState> = _stateLogin
 
 
 
@@ -54,6 +56,9 @@ class AuthViewModel @Inject constructor(
         _isAutoInsert.value = value
     }
 
+    fun clearStateLogin(){
+        stateLogin = mutableStateOf(IdentificationResponseState())
+    }
     fun setCodeAutomaticly(code:String, scope:CoroutineScope,fcm_token:String){
         scope.launch {
             SMS_CODE.value = code
@@ -116,6 +121,7 @@ class AuthViewModel @Inject constructor(
                     _stateLogin.value = IdentificationResponseState(
                         error = "Введён неправильный код"
                     )
+                    updateCode("")
                 }
                 is Resource.Loading -> {
                     _stateLogin.value = IdentificationResponseState(isLoading = true)
