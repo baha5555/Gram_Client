@@ -1,5 +1,6 @@
 package com.gram.client.presentation.screens.main
 
+import Connect
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.compose.BackHandler
@@ -106,6 +107,9 @@ class SearchAddressScreen : Screen {
                 val prefs = CustomPreference(LocalContext.current)
 
         LaunchedEffect(true) {
+            if (CustomPreference(context = context).getAccessToken()!=""){
+                Connect(orderExecutionViewModel, context)
+            }
             Values.WhichAddress.value = Constants.FROM_ADDRESS
             mainViewModel.getActualLocation(context)
             if (myAddressViewModel.stateGetAllMyAddresses.value.response == null) {
