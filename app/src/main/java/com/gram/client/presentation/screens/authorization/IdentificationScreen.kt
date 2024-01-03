@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -70,6 +71,10 @@ class IdentificationScreen() : Screen {
         var initialApiCalled by rememberSaveable { mutableStateOf(false) }
         val isAutoInsert by viewModel.isAutoInsert
 
+        val focusRequester = remember { FocusRequester() }
+        LaunchedEffect(key1 = !stateLogin.isLoading ){
+            focusRequester.requestFocus()
+        }
         LaunchedEffect(key1 = true) {
             while (time > 0) {
                 delay(1000L)
@@ -166,7 +171,7 @@ class IdentificationScreen() : Screen {
                             if (it.length == 4) {
                                 initialApiCalled = false
                             }
-                        })
+                        }, focusRequester = focusRequester)
                     }
                     ErrorMessage(
                         modifier = Modifier
