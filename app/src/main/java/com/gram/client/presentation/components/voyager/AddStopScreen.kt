@@ -25,6 +25,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.gram.client.presentation.screens.main.MainViewModel
 import com.gram.client.utils.Constants
+import com.gram.client.utils.getAddressText
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
@@ -86,7 +87,7 @@ class AddStopScreen(val function: () -> Unit) : Screen {
                                     Text(text = "" + (inx + 1), fontSize = 18.sp)
                                 }
                                 Text(
-                                    text = item.name,
+                                    text = getAddressText(item),
                                     modifier = Modifier.padding(start = 10.dp),
                                     maxLines = 2
                                 )
