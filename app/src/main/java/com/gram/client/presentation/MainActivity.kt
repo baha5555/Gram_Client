@@ -1,6 +1,5 @@
 package com.gram.client.presentation
 
-import SocketHandler
 import android.app.AlertDialog
 import android.content.*
 import android.content.res.Configuration
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gram.client.*
-import com.gram.client.app.preference.CustomPreference
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.ui.theme.GramClientTheme
 import com.gram.client.utils.MyFirebaseMessagingService
@@ -40,21 +38,12 @@ class MainActivity : ComponentActivity() {
                 RootScreen()
                 MyFirebaseMessagingService().onCreate()
             }
-            if (CustomPreference(this).getAccessToken()!=""){
-                Connect(orderExecutionViewModel)
-            }
+//            if (CustomPreference(this).getAccessToken()!=""){
+//                Connect(orderExecutionViewModel)
+//            }
         }
         adjustFontScale(getResources().getConfiguration())
 
-    }
-
-    fun Connect(orderExecutionViewModel: OrderExecutionViewModel) {
-        val customPreference = CustomPreference(this).getSocketAccessToken()
-        Log.i("tokenSocket", customPreference)
-        SocketHandler.setSocket(
-            customPreference,
-            orderExecutionViewModel
-        )
     }
 
     fun adjustFontScale(configuration: Configuration) {

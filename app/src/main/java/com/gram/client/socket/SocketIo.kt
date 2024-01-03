@@ -1,7 +1,9 @@
 @file:Suppress("CAST_NEVER_SUCCEEDS")
 
+import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
+import com.gram.client.app.preference.CustomPreference
 import com.gram.client.domain.socket.EditOrderSocketResponse
 import com.gram.client.presentation.screens.order.OrderExecutionViewModel
 import com.gram.client.utils.Constants.URL
@@ -92,3 +94,11 @@ object SocketHandler {
 /*
 val socket = IO.socket("https://driverapi.gram.tj/traffic_gram", options)
 */
+fun Connect(orderExecutionViewModel: OrderExecutionViewModel, context: Context) {
+    val customPreference = CustomPreference(context).getSocketAccessToken()
+    Log.i("tokenSocket", customPreference)
+    SocketHandler.setSocket(
+        customPreference,
+        orderExecutionViewModel
+    )
+}
